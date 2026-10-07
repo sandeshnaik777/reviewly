@@ -6,6 +6,12 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
     headers.set('Content-Type', 'application/json');
   }
 
+  // Dual auth: Attach token from localStorage as fallback when cookies are blocked over HTTP/proxies
+  const storedToken = typeof localStorage !== 'undefined' ? localStorage.getItem('reviewly_token') : null;
+  if (storedToken && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${storedToken}`);
+  }
+
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers,
@@ -23,6 +29,11 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
     throw err;
   }
 
+  // Persist token if provided in response
+  if (json.data?.token && typeof localStorage !== 'undefined') {
+    localStorage.setItem('reviewly_token', json.data.token);
+  }
+
   return json.data;
 }
 
@@ -32,7 +43,12 @@ export const api = {
     apiRequest('/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
   register: (data: any) => apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data: any) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
-  logout: () => apiRequest('/auth/logout', { method: 'POST' }),
+  logout: () => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('reviewly_token');
+    }
+    return apiRequest('/auth/logout', { method: 'POST' });
+  },
   getMe: () => apiRequest('/auth/me'),
   sendVerificationOtp: (email?: string) =>
     apiRequest('/auth/send-verification-otp', { method: 'POST', body: JSON.stringify({ email }) }),

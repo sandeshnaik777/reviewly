@@ -73,17 +73,19 @@ const loginSchema = z.object({
 /**
  * Generate JWT and set HTTP-only secure cookie
  */
-function sendAuthToken(user: User, res: Response) {
+function sendAuthToken(user: User, res: Response, req?: Request) {
   const token = jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
     config.jwt.secret,
     { expiresIn: '7d' }
   );
 
+  const isHttps = Boolean(req && (req.secure || req.headers['x-forwarded-proto'] === 'https'));
+
   res.cookie(config.jwt.cookieName, token, {
     httpOnly: true,
-    secure: config.isProduction,
-    sameSite: config.isProduction ? 'strict' : 'lax',
+    secure: isHttps,
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   });
@@ -138,7 +140,7 @@ authRouter.post('/signup', validateBody(signupSchema), async (req: Request, res:
 
     await emailService.sendVerificationOtp(newUser.email, otp, newUser.name);
 
-    const token = sendAuthToken(newUser, res);
+    const token = sendAuthToken(newUser, res, req);
 
     res.status(201).json({
       success: true,
@@ -340,7 +342,7 @@ authRouter.post('/register', validateBody(registerSchema), async (req: Request, 
       createdAt: now.toISOString(),
     });
 
-    const token = sendAuthToken(userToUse, res);
+    const token = sendAuthToken(userToUse, res, req);
 
     res.status(201).json({
       success: true,
@@ -407,7 +409,7 @@ authRouter.post('/login', loginRateLimiter, validateBody(loginSchema), async (re
       await db.updateUser(user.id, { failedLoginAttempts: 0, lockoutUntil: undefined });
     }
 
-    const token = sendAuthToken(user, res);
+    const token = sendAuthToken(user, res, req);
     const businesses = await db.findBusinessesByOwnerId(user.id);
 
     res.json({
@@ -637,15 +639,19 @@ authRouter.post(
       const updatedUser = await db.updateUser(targetUser.id, { emailVerified: true });
       await db.deleteVerificationRecordsByEmail(targetEmail);
 
+      const verifiedUser = updatedUser || targetUser;
+      const token = sendAuthToken(verifiedUser, res, req);
+
       res.json({
         success: true,
         message: 'Email successfully verified!',
         data: {
+          token,
           user: {
-            id: updatedUser?.id || targetUser.id,
-            email: updatedUser?.email || targetUser.email,
-            name: updatedUser?.name || targetUser.name,
-            role: updatedUser?.role || targetUser.role,
+            id: verifiedUser.id,
+            email: verifiedUser.email,
+            name: verifiedUser.name,
+            role: verifiedUser.role,
             emailVerified: true,
           },
         },
