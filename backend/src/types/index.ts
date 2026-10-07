@@ -188,6 +188,7 @@ export interface GeneratedReview {
   sessionId: string;
   ratingsSnapshot: Record<string, number>;
   customerComment?: string;
+  dishesTried?: string[];
   generatedText: string;
   editedText?: string;
   sentiment: 'positive' | 'neutral' | 'constructive_critical';

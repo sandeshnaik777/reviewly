@@ -7,7 +7,9 @@ import { requireTenant } from '../../middleware/tenant.js';
 import { validateBody } from '../../middleware/validate.js';
 import { CATEGORIES_CATALOG, getDefaultQuestionsForCategory } from './categories.js';
 import { subscriptionService } from '../subscription/service.js';
+import { mapsRankingService } from './mapsService.js';
 import { Business, Subscription } from '../../types/index.js';
+import { AppError } from '../../middleware/errorHandler.js';
 
 export const businessRouter = Router();
 
@@ -206,8 +208,38 @@ businessRouter.get('/:businessId/reviews', authenticate, requireTenant, async (r
 // Tenant Protected: Full Funnel Analytics (Section 22)
 businessRouter.get('/:businessId/analytics', authenticate, requireTenant, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const business = await db.findBusinessById(req.tenantId!);
+    if (!business) throw new AppError('Business not found', 404);
+
     const analytics = await db.getBusinessAnalytics(req.tenantId!);
+    const reviews = await db.listBusinessReviews(business.id);
+    const avgRating = analytics.avgRating || 0;
+
+    // Dynamically evaluate Google Maps rankings for business's actual city and category
+    const mapsData = await mapsRankingService.getRankings(business, reviews.length, avgRating);
+    analytics.keywordRankings = mapsData.keywordRankings;
+    analytics.competitorRadar = mapsData.competitorRadar;
+    analytics.localSeoMetrics = mapsData.localSeoMetrics;
+    analytics.isAiGrounding = mapsData.isAiGrounding;
+
     res.json({ success: true, data: analytics });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Tenant Protected: Force Refresh Live Google Maps Ranking & Competitor Radar
+businessRouter.post('/:businessId/maps-rankings/refresh', authenticate, requireTenant, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const business = await db.findBusinessById(req.tenantId!);
+    if (!business) throw new AppError('Business not found', 404);
+
+    const reviews = await db.listBusinessReviews(business.id);
+    const analytics = await db.getBusinessAnalytics(req.tenantId!);
+    const avgRating = analytics.avgRating || 0;
+
+    const mapsData = await mapsRankingService.getRankings(business, reviews.length, avgRating, true);
+    res.json({ success: true, data: mapsData });
   } catch (err) {
     next(err);
   }

@@ -93,6 +93,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const [sentimentFilter, setSentimentFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Google Maps AI Telemetry Refresh
+  const [isRefreshingMaps, setIsRefreshingMaps] = useState(false);
+
   // Toast / Status Message
   const [toast, setToast] = useState<string | null>(null);
 
@@ -291,19 +294,41 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     }
   };
 
-  // 6. Handle Aura AI Lever Executions
+  // 6. Handle Live Google Maps Telemetry AI Refresh
+  const handleRefreshMapsRankings = async () => {
+    if (!businessId) return;
+    try {
+      setIsRefreshingMaps(true);
+      const freshMaps = await api.refreshMapsRankings(businessId);
+      setAnalytics((prev: any) => ({
+        ...prev,
+        keywordRankings: freshMaps.keywordRankings,
+        competitorRadar: freshMaps.competitorRadar,
+        localSeoMetrics: freshMaps.localSeoMetrics,
+        isAiGrounding: freshMaps.isAiGrounding,
+      }));
+      showNotification('✅ Live Google Maps rankings evaluated in real-time via AI engine!');
+    } catch (err: any) {
+      showNotification(`Failed to refresh Google Maps rankings: ${err.message || 'Error'}`);
+    } finally {
+      setIsRefreshingMaps(false);
+    }
+  };
+
+  // 7. Handle Aura AI Lever Executions
   const handleExecuteAuraLever = async (leverId: string) => {
     if (leverId === 'dish_boost') {
       if (settings) {
         const existing = settings.thingsToHighlight || [];
-        const updated = Array.from(new Set([...existing, 'Truffle Mushroom Risotto', 'Craft Cocktails', 'Arborio Creaminess']));
+        const dynamicAdditions = business?.subcategory ? [`Best ${business.subcategory}`, 'Signature Dishes', 'Top Hospitality'] : ['Signature Dishes', 'Top Hospitality'];
+        const updated = Array.from(new Set([...existing, ...dynamicAdditions]));
         const newSettings = { ...settings, thingsToHighlight: updated, reviewTone: 'enthusiastic' };
         setSettings(newSettings);
         await api.saveSettings(businessId, newSettings);
-        showNotification('⚡ Aura Applied: Truffle Risotto & Craft Cocktails injected into Tonight’s AI Prompt!');
+        showNotification('⚡ Aura Applied: Signature dishes & hospitality injected into Tonight’s AI Prompt!');
       }
     } else if (leverId === 'waiter_bonus') {
-      showNotification('🏆 Server Recognition Logged: Rahul K. flagged as Server of the Week in Manager Log!');
+      showNotification('🏆 Server Recognition Logged: Team member flagged as Server of the Week in Manager Log!');
     } else if (leverId === 'google_pack_gap') {
       setRushMode(true);
       showNotification('🚀 Local Pack Sprint Mode Activated: Accelerated 1-click Google conversion prompts engaged!');
@@ -326,136 +351,44 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const maxDayReviews = Math.max(10, ...dailyTrends.map((d: any) => d.totalReviews || 0));
 
   const roi = analytics?.roiEstimate || {
-    estimatedMonthlyRevenueBoostInr: 34200,
-    projectedAnnualGainsInr: 410400,
-    negativeReviewsShielded: 14,
-    reputationProtectionScore: '99.4%',
-    googleLocalPackRank: 'Rank #1 (Area Dominance)',
-    averageRatingLiftVsLocal: '+0.5 ★',
+    estimatedMonthlyRevenueBoostInr: 0,
+    projectedAnnualGainsInr: 0,
+    reviewsVelocityPerWeek: 0,
+    negativeReviewsShielded: 0,
+    reputationProtectionScore: '100%',
+    googleLocalPackRank: 'Awaiting Initial Reviews',
+    averageRatingLiftVsLocal: '0.0 ★',
   };
 
   const financial = analytics?.financialTelemetry || {
-    walkInRevenueInr: 84500,
-    aggregatorCommissionsSavedInr: 32600,
-    shieldRecoveredRevenueInr: 46800,
-    totalMonthlyImpactInr: 163900,
-    customerLifetimeValueMultiplier: '4.8x',
-    acquisitionCostVsAds: '₹0 / review (vs ₹450 Google Ads CPC)',
+    walkInRevenueInr: 0,
+    aggregatorCommissionsSavedInr: 0,
+    shieldRecoveredRevenueInr: 0,
+    totalMonthlyImpactInr: 0,
+    customerLifetimeValueMultiplier: '1.0x',
+    acquisitionCostVsAds: '₹0 / review',
   };
 
-  const competitors = analytics?.competitorRadar || [
-    { name: `${business.name} (You)`, rank: 1, rating: 4.9, reviewsCount: 412, shareOfSearch: '38%', badge: 'Area Leader 🔥' },
-    { name: 'Truffles Indiranagar', rank: 2, rating: 4.5, reviewsCount: 1240, shareOfSearch: '27%', badge: 'Trailing' },
-    { name: 'Smoke House Deli', rank: 3, rating: 4.4, reviewsCount: 890, shareOfSearch: '19%', badge: 'Trailing' },
-    { name: 'The Reservoire', rank: 4, rating: 4.3, reviewsCount: 1450, shareOfSearch: '16%', badge: 'Trailing' },
-  ];
+  const competitors = analytics?.competitorRadar || [];
   const aura = analytics?.auraBriefing || {
     statusText: 'All systems operating at peak efficiency. Aura Reputation Shield active.',
-    defenseShieldHealth: '100% Negative Leaks Prevented',
-    recommendations: [
-      {
-        id: 'dish_boost',
-        title: 'Promote Truffle Risotto & Craft Cocktails for Tonight',
-        desc: 'Truffle praise is up +24% this week. Inject these keywords into the AI review generator for tonight’s dinner rush.',
-        type: 'OPTIMIZE',
-        actionText: 'Apply Tonight’s Prompt Preset',
-      },
-      {
-        id: 'waiter_bonus',
-        title: 'Acknowledge Rahul K. (Server of the Week)',
-        desc: 'Rahul drove 22 five-star reviews this week with a 52% conversion rate on Table QR stands.',
-        type: 'STAFF',
-        actionText: 'Mark Reward Recorded',
-      },
-      {
-        id: 'google_pack_gap',
-        title: 'Only 14 More Reviews to Lock Permanent #1 Suburb Ranking',
-        desc: 'Your rating is 4.9★ vs Truffles 4.5★. Accelerate table prompts by +2 per shift to overtake local search permanently.',
-        type: 'GROWTH',
-        actionText: 'Boost QR Prompt Intensity',
-      },
-    ],
+    defenseShieldHealth: '100% Shield Armed & Ready',
+    recommendations: [],
   };
 
-  const keywordRankings = analytics?.keywordRankings || [
-    {
-      id: 'kw-1',
-      keyword: `Best ${business.subcategory || 'Restaurant'} in ${business.city || 'Bangalore'}`,
-      rank: 1,
-      previousRank: 4,
-      change: 3,
-      direction: 'UP',
-      monthlySearches: 2840,
-      impressionsLift: '+142%',
-      status: 'Google 3-Pack Leader 🏆',
-      competitorRank: '#2 (Truffles)',
-      tag: 'Highest Intent',
-    },
-    {
-      id: 'kw-2',
-      keyword: `Top Rated ${business.subcategory || 'Restaurant'} Near Me`,
-      rank: 2,
-      previousRank: 5,
-      change: 3,
-      direction: 'UP',
-      monthlySearches: 3410,
-      impressionsLift: '+168%',
-      status: 'Top 3 Local Pack ⭐',
-      competitorRank: '#1 (Smoke House)',
-      tag: 'High Volume',
-    },
-    {
-      id: 'kw-3',
-      keyword: `Best Dinner Places in ${business.city || 'Bangalore'}`,
-      rank: 1,
-      previousRank: 3,
-      change: 2,
-      direction: 'UP',
-      monthlySearches: 1920,
-      impressionsLift: '+95%',
-      status: 'Google 3-Pack Leader 🏆',
-      competitorRank: '#3 (The Reservoire)',
-      tag: 'Evening Prime',
-    },
-    {
-      id: 'kw-4',
-      keyword: `Romantic Date Night ${business.subcategory || 'Restaurant'}`,
-      rank: 3,
-      previousRank: 8,
-      change: 5,
-      direction: 'UP',
-      monthlySearches: 2150,
-      impressionsLift: '+210%',
-      status: 'Rapidly Climbing 🚀',
-      competitorRank: '#2 (Olive Beach)',
-      tag: 'High Ticket',
-    },
-    {
-      id: 'kw-5',
-      keyword: `${business.name} Reviews & Photos`,
-      rank: 1,
-      previousRank: 2,
-      change: 1,
-      direction: 'UP',
-      monthlySearches: 1100,
-      impressionsLift: '+84%',
-      status: 'Verified Authority 🔒',
-      competitorRank: '-',
-      tag: 'Brand Search',
-    },
-  ];
+  const keywordRankings = analytics?.keywordRankings || [];
 
   const localSeo = analytics?.localSeoMetrics || {
-    averageRankLift: '+3.4 Positions Gained',
-    totalSearchImpressions: 14820,
-    impressionsGrowth: '+148%',
-    mapsDirectionsClicks: 840,
-    directionsGrowth: '+92%',
-    phoneCallClicks: 310,
-    phoneCallsGrowth: '+74%',
-    topThreeShare: '94%',
-    headline: 'Google Maps Search Rankings Surging',
-    rankingMessage: `🎉 Excellent news! Your business is holding #1 and #2 spots across key searches in ${business.city || 'Bangalore'}. Your steady stream of genuine 5-star customer reviews has pushed your average Google Maps rank up by +3.4 positions this month!`,
+    averageRankLift: 'Baseline Setup',
+    totalSearchImpressions: 0,
+    impressionsGrowth: '0%',
+    mapsDirectionsClicks: 0,
+    directionsGrowth: '0%',
+    phoneCallClicks: 0,
+    phoneCallsGrowth: '0%',
+    topThreeShare: '0%',
+    headline: 'Google Maps Search Telemetry Active',
+    rankingMessage: `Real-time Google Maps telemetry active for ${business?.city || 'your area'}. As customers scan your QR code and post 5-star reviews, your live search rank and local 3-pack visibility will dynamically climb.`,
   };
 
   return (
@@ -509,9 +442,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             </span>
           </div>
           <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            📍 {business.city || 'Bengaluru'} · {business.subcategory} ·{' '}
-            <strong style={{ color: 'var(--primary)' }}>Google Pack #1 Leader</strong> ·{' '}
-            <span style={{ color: 'var(--success)', fontWeight: 600 }}>99.4% Shield Defense Active</span>
+            📍 {business.city || 'Local Area'} · {business.subcategory} ·{' '}
+            <strong style={{ color: 'var(--primary)' }}>{roi.googleLocalPackRank}</strong> ·{' '}
+            <span style={{ color: 'var(--success)', fontWeight: 600 }}>{roi.reputationProtectionScore} Shield Defense Active</span>
           </div>
         </div>
 
@@ -741,7 +674,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   Total Net Monthly Value
                 </div>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
-                  +₹{financial.totalMonthlyImpactInr.toLocaleString()}
+                  +₹{(financial.totalMonthlyImpactInr ?? 0).toLocaleString()}
                 </div>
                 <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
                   Walk-ins + Aggregator commission saved
@@ -753,7 +686,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   Reputation Defense Shield
                 </div>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                  {roi.negativeReviewsShielded || 14} Intercepted
+                  {roi.negativeReviewsShielded ?? 0} Intercepted
                 </div>
                 <div style={{ fontSize: '11px', color: '#4ade80' }}>
                   100% Negative Leaks Contained
@@ -765,10 +698,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   Google Local Pack Rank
                 </div>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#fde047', marginTop: '2px' }}>
-                  #1 Suburb Leader
+                  {roi.googleLocalPackRank || 'Awaiting Initial Reviews'}
                 </div>
                 <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
-                  412 Reviews · 4.9 ★ Rating
+                  {reviews.length} Reviews · {analytics?.avgRating ? `${analytics.avgRating} ★` : '0.0 ★'} Rating
                 </div>
               </div>
 
@@ -777,10 +710,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   Weekly Review Velocity
                 </div>
                 <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                  24 reviews/wk
+                  {roi.reviewsVelocityPerWeek ?? 0} reviews/wk
                 </div>
                 <div style={{ fontSize: '11px', color: '#4ade80' }}>
-                  ▲ +34% Review Acceleration
+                  {reviews.length > 0 ? '▲ Active Review Acceleration' : 'Initial Baseline Setup'}
                 </div>
               </div>
             </div>
@@ -1002,11 +935,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               <div className="card" style={{ padding: '22px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Customer Satisfaction Index</div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <div style={{ fontSize: '36px', fontWeight: 800 }}>{analytics?.avgRating || 4.9}</div>
+                  <div style={{ fontSize: '36px', fontWeight: 800 }}>{analytics?.avgRating ? `${analytics.avgRating}` : '0.0'}</div>
                   <div style={{ color: 'var(--star-active)', fontSize: '18px' }}>★★★★★</div>
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
-                  ● Ranked in top 1% of city bistros
+                  {reviews.length > 0 ? '● Verified rating active' : '● Awaiting initial customer ratings'}
                 </div>
               </div>
 
@@ -1016,27 +949,27 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <span>Google Maps Reviews Driven</span>
                 </div>
                 <div style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--success)' }}>
-                  {analytics?.googleClicks || 18}
+                  {analytics?.googleClicks ?? 0}
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  {analytics?.funnel?.copiedToGoogle || 72}% conversion from customer scans
+                  {analytics?.funnel?.copiedToGoogle ?? 0}% conversion from customer scans
                 </div>
               </div>
 
               <div className="card" style={{ padding: '22px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>AI Reviews Generated</div>
                 <div style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--primary)' }}>
-                  {analytics?.generated || 20}
+                  {analytics?.generated ?? 0}
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  From {analytics?.ratings || 22} dining rating sessions
+                  From {analytics?.ratings ?? 0} dining rating sessions
                 </div>
               </div>
 
               <div className="card" style={{ padding: '22px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total Table QR Scans</div>
                 <div style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px' }}>
-                  {analytics?.scans || 28}
+                  {analytics?.scans ?? 0}
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
                   Across {qrs.length} active QR stations
@@ -1054,7 +987,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     </h3>
                     <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <TrendingUpIcon size={14} color="#15803d" />
-                      +34% Weekly Velocity
+                      {reviews.length > 0 ? `+${reviews.length} Reviews Logged` : '0 Reviews Logged'}
                     </span>
                   </div>
                   <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -1388,7 +1321,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div style={{ padding: '12px 14px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Shield Recovered Revenue</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>14 dissatisfied diners intercepted and recovered</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied diners intercepted and recovered</div>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: '15px', color: '#16a34a' }}>
                       +₹{financial.shieldRecoveredRevenueInr.toLocaleString()}
@@ -1408,48 +1341,56 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <h4 style={{ fontSize: '17px', fontWeight: 600 }}>
                     Local Search Dominance & Competitor Radar
                   </h4>
-                  <span className="stat-pill stat-pill-primary">Rank #1 Leader</span>
+                  <span className="stat-pill stat-pill-primary">{roi.googleLocalPackRank || 'Radar Active'}</span>
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
                   Your Google Maps local 3-pack search share vs top 3 local rivals.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {competitors.map((comp: any, idx: number) => (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: '10px 14px',
-                        background: comp.rank === 1 ? '#fef3ee' : 'var(--surface-container)',
-                        border: comp.rank === 1 ? '1px solid #fed7aa' : 'none',
-                        borderRadius: 'var(--radius-sm)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <strong style={{ fontSize: '13px', width: '20px', color: comp.rank === 1 ? 'var(--primary)' : 'var(--text-muted)' }}>
-                          #{comp.rank}
-                        </strong>
-                        <div>
-                          <div style={{ fontWeight: 600, fontSize: '13.5px', color: comp.rank === 1 ? 'var(--primary)' : 'var(--text)' }}>
-                            {comp.name}
-                          </div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                            {comp.reviewsCount} reviews · {comp.shareOfSearch} search share
+                  {competitors.length === 0 ? (
+                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🎯</div>
+                      <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Competitor Radar Initializing</div>
+                      <div style={{ fontSize: '12px', marginTop: '4px' }}>Live competitor benchmarks will populate as reviews and Google Maps data are collected.</div>
+                    </div>
+                  ) : (
+                    competitors.map((comp: any, idx: number) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '10px 14px',
+                          background: comp.rank === 1 ? '#fef3ee' : 'var(--surface-container)',
+                          border: comp.rank === 1 ? '1px solid #fed7aa' : 'none',
+                          borderRadius: 'var(--radius-sm)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <strong style={{ fontSize: '13px', width: '20px', color: comp.rank === 1 ? 'var(--primary)' : 'var(--text-muted)' }}>
+                            #{comp.rank}
+                          </strong>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: '13.5px', color: comp.rank === 1 ? 'var(--primary)' : 'var(--text)' }}>
+                              {comp.name}
+                            </div>
+                            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                              {comp.reviewsCount} reviews · {comp.shareOfSearch} search share
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{comp.rating} ★</div>
-                        <span className={`stat-pill ${comp.rank === 1 ? 'stat-pill-success' : 'stat-pill-neutral'}`} style={{ fontSize: '10.5px' }}>
-                          {comp.badge}
-                        </span>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{comp.rating} ★</div>
+                          <span className={`stat-pill ${comp.rank === 1 ? 'stat-pill-success' : 'stat-pill-neutral'}`} style={{ fontSize: '10.5px' }}>
+                            {comp.badge}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -1487,9 +1428,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={handleRefreshMapsRankings}
+                    disabled={isRefreshingMaps}
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    title="Run live AI Google Maps local 3-pack search analysis"
+                  >
+                    <span>{isRefreshingMaps ? '⏳ Analyzing Maps...' : '🔄 Refresh Live Maps Rank'}</span>
+                  </button>
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700, padding: '6px 12px' }}>
-                    {localSeo.averageRankLift}
+                    {localSeo.averageRankLift || 'Baseline Setup'}
                   </span>
                   {business.googleReviewUrl && (
                     <a
@@ -1537,11 +1487,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
                     Average Rank Movement
                   </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#16a34a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>▲ +3.4</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px' }}>
-                      Positions Up
-                    </span>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#16a34a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>{localSeo.averageRankLift || 'Baseline'}</span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
                     Gained across all target keywords
@@ -1553,9 +1500,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Search Impressions
                   </div>
                   <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{localSeo.totalSearchImpressions?.toLocaleString() || '14,820'}</span>
+                    <span>{(localSeo.totalSearchImpressions ?? 0).toLocaleString()}</span>
                     <span style={{ fontSize: '12px', fontWeight: 600, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px' }}>
-                      {localSeo.impressionsGrowth || '+148%'}
+                      {localSeo.impressionsGrowth || '0%'}
                     </span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
@@ -1568,9 +1515,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Direction &amp; Route Requests
                   </div>
                   <div style={{ fontSize: '22px', fontWeight: 800, color: '#2563eb', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{localSeo.mapsDirectionsClicks?.toLocaleString() || '840'}</span>
+                    <span>{(localSeo.mapsDirectionsClicks ?? 0).toLocaleString()}</span>
                     <span style={{ fontSize: '12px', fontWeight: 600, color: '#1d4ed8', background: '#dbeafe', padding: '2px 8px', borderRadius: '12px' }}>
-                      {localSeo.directionsGrowth || '+92%'}
+                      {localSeo.directionsGrowth || '0%'}
                     </span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
@@ -1583,9 +1530,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Call &amp; Direct Clicks
                   </div>
                   <div style={{ fontSize: '22px', fontWeight: 800, color: '#9333ea', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{localSeo.phoneCallClicks?.toLocaleString() || '310'}</span>
+                    <span>{(localSeo.phoneCallClicks ?? 0).toLocaleString()}</span>
                     <span style={{ fontSize: '12px', fontWeight: 600, color: '#7e22ce', background: '#f3e8ff', padding: '2px 8px', borderRadius: '12px' }}>
-                      {localSeo.phoneCallsGrowth || '+74%'}
+                      {localSeo.phoneCallsGrowth || '0%'}
                     </span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
@@ -1609,87 +1556,97 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     </tr>
                   </thead>
                   <tbody>
-                    {keywordRankings.map((kw: any, idx: number) => (
-                      <tr
-                        key={kw.id || idx}
-                        style={{
-                          borderBottom: '1px solid var(--border-light)',
-                          background: idx % 2 === 0 ? '#ffffff' : '#fcfbf9',
-                          transition: 'background 0.15s ease',
-                        }}
-                      >
-                        <td style={{ padding: '14px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>
-                              "{kw.keyword}"
-                            </strong>
-                            <span className="badge badge-neutral" style={{ fontSize: '10.5px' }}>
-                              {kw.tag}
-                            </span>
-                          </div>
-                        </td>
-
-                        <td style={{ padding: '14px', textAlign: 'center' }}>
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '38px',
-                              height: '38px',
-                              borderRadius: '10px',
-                              fontWeight: 800,
-                              fontSize: '15px',
-                              background: kw.rank === 1 ? '#fef3c7' : kw.rank === 2 ? '#e0f2fe' : '#f3e8ff',
-                              color: kw.rank === 1 ? '#92400e' : kw.rank === 2 ? '#0369a1' : '#6b21a8',
-                              border: `1.5px solid ${kw.rank === 1 ? '#f59e0b' : kw.rank === 2 ? '#38bdf8' : '#c084fc'}`,
-                            }}
-                          >
-                            #{kw.rank}
-                          </span>
-                        </td>
-
-                        <td style={{ padding: '14px', textAlign: 'center' }}>
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              color: '#15803d',
-                              background: '#dcfce7',
-                              fontWeight: 700,
-                              fontSize: '12px',
-                              padding: '4px 10px',
-                              borderRadius: '20px',
-                            }}
-                          >
-                            ▲ +{kw.change} Positions
-                          </span>
-                        </td>
-
-                        <td style={{ padding: '14px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>
-                          {kw.monthlySearches?.toLocaleString() || '2,400'}/mo
-                        </td>
-
-                        <td style={{ padding: '14px', textAlign: 'center', fontWeight: 700, color: '#16a34a' }}>
-                          {kw.impressionsLift || '+140%'}
-                        </td>
-
-                        <td style={{ padding: '14px' }}>
-                          <span className={`stat-pill ${kw.rank === 1 ? 'stat-pill-success' : 'stat-pill-primary'}`} style={{ fontSize: '11px', fontWeight: 600 }}>
-                            {kw.status}
-                          </span>
-                        </td>
-
-                        <td style={{ padding: '14px', color: 'var(--text-muted)', fontSize: '12px' }}>
-                          {kw.competitorRank !== '-' ? (
-                            <span>Ahead of {kw.competitorRank}</span>
-                          ) : (
-                            <span style={{ color: '#16a34a', fontWeight: 600 }}>✓ Verified Sole Owner</span>
-                          )}
+                    {keywordRankings.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                          <div style={{ fontSize: '24px', marginBottom: '8px' }}>📍</div>
+                          <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Awaiting Live Google Maps Telemetry</div>
+                          <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Click "🔄 Refresh Live Maps Rank" above or generate your first customer reviews to track real-time 3-pack positions.</div>
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      keywordRankings.map((kw: any, idx: number) => (
+                        <tr
+                          key={kw.id || idx}
+                          style={{
+                            borderBottom: '1px solid var(--border-light)',
+                            background: idx % 2 === 0 ? '#ffffff' : '#fcfbf9',
+                            transition: 'background 0.15s ease',
+                          }}
+                        >
+                          <td style={{ padding: '14px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>
+                                "{kw.keyword}"
+                              </strong>
+                              <span className="badge badge-neutral" style={{ fontSize: '10.5px' }}>
+                                {kw.tag}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td style={{ padding: '14px', textAlign: 'center' }}>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '38px',
+                                height: '38px',
+                                borderRadius: '10px',
+                                fontWeight: 800,
+                                fontSize: '15px',
+                                background: kw.rank === 1 ? '#fef3c7' : kw.rank === 2 ? '#e0f2fe' : '#f3e8ff',
+                                color: kw.rank === 1 ? '#92400e' : kw.rank === 2 ? '#0369a1' : '#6b21a8',
+                                border: `1.5px solid ${kw.rank === 1 ? '#f59e0b' : kw.rank === 2 ? '#38bdf8' : '#c084fc'}`,
+                              }}
+                            >
+                              #{kw.rank}
+                            </span>
+                          </td>
+
+                          <td style={{ padding: '14px', textAlign: 'center' }}>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                color: kw.change > 0 ? '#15803d' : '#64748b',
+                                background: kw.change > 0 ? '#dcfce7' : '#f1f5f9',
+                                fontWeight: 700,
+                                fontSize: '12px',
+                                padding: '4px 10px',
+                                borderRadius: '20px',
+                              }}
+                            >
+                              {kw.change > 0 ? `▲ +${kw.change}` : kw.change < 0 ? `▼ ${kw.change}` : '● 0'} Positions
+                            </span>
+                          </td>
+
+                          <td style={{ padding: '14px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>
+                            {(kw.monthlySearches ?? 0).toLocaleString()}/mo
+                          </td>
+
+                          <td style={{ padding: '14px', textAlign: 'center', fontWeight: 700, color: '#16a34a' }}>
+                            {kw.impressionsLift || '0%'}
+                          </td>
+
+                          <td style={{ padding: '14px' }}>
+                            <span className={`stat-pill ${kw.rank === 1 ? 'stat-pill-success' : 'stat-pill-primary'}`} style={{ fontSize: '11px', fontWeight: 600 }}>
+                              {kw.status}
+                            </span>
+                          </td>
+
+                          <td style={{ padding: '14px', color: 'var(--text-muted)', fontSize: '12px' }}>
+                            {kw.competitorRank !== '-' ? (
+                              <span>Ahead of {kw.competitorRank}</span>
+                            ) : (
+                              <span style={{ color: '#16a34a', fontWeight: 600 }}>✓ Verified Sole Owner</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1711,39 +1668,42 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <h4 style={{ fontSize: '17px', fontWeight: 600 }}>
                     Dining Rush & Shift Telemetry
                   </h4>
-                  <span className="stat-pill stat-pill-neutral">Peak: Dinner 7-11 PM</span>
+                  <span className="stat-pill stat-pill-neutral">{reviews.length > 0 ? 'Shift Telemetry Active' : 'Awaiting Scans'}</span>
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px' }}>
                   Customer activity, review submission velocity, and table turn rates.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {(analytics?.hourlyDistribution || [
-                    { shift: 'Lunch Rush (12 PM - 3:30 PM)', reviews: 11, percentage: 34, avgRating: 4.8, turnRate: '3.2 turns/table' },
-                    { shift: 'Afternoon Downtime (3:30 PM - 6:30 PM)', reviews: 4, percentage: 12, avgRating: 4.9, turnRate: '1.4 turns/table' },
-                    { shift: 'Dinner Rush & Drinks (7 PM - 11 PM)', reviews: 19, percentage: 48, isPeak: true, avgRating: 5.0, turnRate: '4.6 turns/table' },
-                    { shift: 'Late Night Cocktails (11 PM+)', reviews: 3, percentage: 6, avgRating: 4.7, turnRate: '1.8 turns/table' },
-                  ]).map((shift: any, idx: number) => (
-                    <div key={idx} style={{ padding: '10px 14px', background: shift.isPeak ? '#fef3ee' : 'var(--surface-container)', borderRadius: 'var(--radius-sm)', border: shift.isPeak ? '1px solid #fed7aa' : 'none' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <div style={{ fontWeight: 600, fontSize: '13.5px', color: shift.isPeak ? 'var(--primary)' : 'var(--text)' }}>
-                          {shift.shift} {shift.isPeak && '🔥'}
-                        </div>
-                        <div style={{ fontSize: '13px', fontWeight: 700 }}>
-                          {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>{shift.turnRate}</span>
-                        </div>
-                      </div>
-                      <div style={{ height: '6px', background: 'rgba(0,0,0,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
-                        <div
-                          style={{
-                            height: '100%',
-                            width: `${shift.percentage}%`,
-                            background: shift.isPeak ? 'var(--primary)' : '#22c55e',
-                          }}
-                        />
-                      </div>
+                  {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
+                    <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '18px', marginBottom: '4px' }}>⏰</div>
+                      <div style={{ fontWeight: 600, fontSize: '13px' }}>Shift Telemetry Standby</div>
+                      <div style={{ fontSize: '11.5px' }}>Hourly distribution begins tracking with your first customer scan.</div>
                     </div>
-                  ))}
+                  ) : (
+                    analytics.hourlyDistribution.map((shift: any, idx: number) => (
+                      <div key={idx} style={{ padding: '10px 14px', background: shift.isPeak ? '#fef3ee' : 'var(--surface-container)', borderRadius: 'var(--radius-sm)', border: shift.isPeak ? '1px solid #fed7aa' : 'none' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <div style={{ fontWeight: 600, fontSize: '13.5px', color: shift.isPeak ? 'var(--primary)' : 'var(--text)' }}>
+                            {shift.shift} {shift.isPeak && '🔥'}
+                          </div>
+                          <div style={{ fontSize: '13px', fontWeight: 700 }}>
+                            {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>{shift.turnRate}</span>
+                          </div>
+                        </div>
+                        <div style={{ height: '6px', background: 'rgba(0,0,0,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div
+                            style={{
+                              height: '100%',
+                              width: `${shift.percentage}%`,
+                              background: shift.isPeak ? 'var(--primary)' : '#22c55e',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -1757,26 +1717,27 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {(analytics?.sentimentTopics || [
-                    { topic: 'Food Taste & Signature Dishes', count: 42, score: 98, trend: '+14%' },
-                    { topic: 'Staff Hospitality & Promptness', count: 36, score: 96, trend: '+9%' },
-                    { topic: 'Ambiance, Music & Acoustics', count: 28, score: 95, trend: '+18%' },
-                    { topic: 'Craft Cocktails & Wine Selection', count: 24, score: 94, trend: '+22%' },
-                    { topic: 'Valet Parking & Ease of Access', count: 18, score: 92, trend: '+5%' },
-                    { topic: 'Weekend Waiting Time', count: 4, score: 72, trend: '-8%' },
-                  ]).map((t: any, i: number) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)' }}>
-                      <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                        {t.score >= 85 ? '🟢' : '🟡'} {t.topic}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{t.count} mentions</span>
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: t.score >= 85 ? 'var(--success)' : 'var(--warning)' }}>
-                          {t.score}%
-                        </span>
-                      </div>
+                  {(!analytics?.sentimentTopics || analytics.sentimentTopics.length === 0) ? (
+                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>💬</div>
+                      <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Topic Intelligence Initializing</div>
+                      <div style={{ fontSize: '12px' }}>Customer praise themes and dish mentions will appear here once diners submit reviews.</div>
                     </div>
-                  ))}
+                  ) : (
+                    analytics.sentimentTopics.map((t: any, i: number) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                          {t.score >= 85 ? '🟢' : '🟡'} {t.topic}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{t.count} mentions</span>
+                          <span style={{ fontSize: '12px', fontWeight: 700, color: t.score >= 85 ? 'var(--success)' : 'var(--warning)' }}>
+                            {t.score}%
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>

@@ -716,6 +716,7 @@ class DatabaseService {
   }
 
   async getBusinessAnalytics(businessId: string): Promise<any> {
+    const business = this.data.businesses.find((b) => b.id === businessId);
     const events = this.data.analyticsEvents.filter((e) => e.businessId === businessId);
     const scans = events.filter((e) => e.eventType === 'QR_SCAN').length;
     const ratings = events.filter((e) => e.eventType === 'RATING_SUBMISSION').length;
@@ -727,6 +728,10 @@ class DatabaseService {
     const positive = reviews.filter((r) => r.sentiment === 'positive').length;
     const neutral = reviews.filter((r) => r.sentiment === 'neutral').length;
     const constructive = reviews.filter((r) => r.sentiment === 'constructive_critical').length;
+
+    const todayStr = new Date().toDateString();
+    const todayReviews = reviews.filter((r) => new Date(r.createdAt).toDateString() === todayStr).length;
+    const todayScans = events.filter((e) => e.eventType === 'QR_SCAN' && new Date(e.createdAt).toDateString() === todayStr).length;
 
     // Calculate average score across all ratings in snapshots
     let totalScore = 0;
@@ -741,9 +746,9 @@ class DatabaseService {
         }
       }
     }
-    const avgRating = scoreCount > 0 ? Number((totalScore / scoreCount).toFixed(1)) : 4.9;
+    const avgRating = scoreCount > 0 ? Number((totalScore / scoreCount).toFixed(1)) : 0.0;
 
-    // Generate daily time-series trends (Last 7 Days) for visual chart
+    // Generate daily time-series trends (Last 7 Days) strictly starting from zero
     const now = new Date();
     const dailyTrends = [];
     for (let i = 6; i >= 0; i--) {
@@ -751,29 +756,22 @@ class DatabaseService {
       const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
       const dayReviews = reviews.filter((r) => new Date(r.createdAt).toDateString() === d.toDateString());
+      const dayScans = events.filter((e) => e.eventType === 'QR_SCAN' && new Date(e.createdAt).toDateString() === d.toDateString()).length;
 
       const posCount = dayReviews.filter((r) => r.sentiment === 'positive').length;
       const neuCount = dayReviews.filter((r) => r.sentiment === 'neutral').length;
       const critCount = dayReviews.filter((r) => r.sentiment === 'constructive_critical').length;
       const gCount = dayReviews.filter((r) => r.isGoogleClicked).length;
 
-      // Realistic progress curve if data is newly initialized
-      const fallbackPos = i === 0 ? 5 : i === 1 ? 6 : i === 2 ? 4 : i === 3 ? 8 : i === 4 ? 7 : i === 5 ? 9 : 6;
-      const finalPos = posCount || fallbackPos;
-      const finalNeu = neuCount || (i % 3 === 0 ? 1 : 0);
-      const finalCrit = critCount || (i === 2 ? 1 : 0);
-      const finalGoogle = gCount || Math.max(1, Math.round(finalPos * 0.78));
-      const finalScans = (finalPos + finalNeu + finalCrit) * 2 + 2;
-
       dailyTrends.push({
         date: dateStr,
         day: dayName,
-        positive: finalPos,
-        neutral: finalNeu,
-        critical: finalCrit,
-        googleClicks: finalGoogle,
-        scans: finalScans,
-        totalReviews: finalPos + finalNeu + finalCrit,
+        positive: posCount,
+        neutral: neuCount,
+        critical: critCount,
+        googleClicks: gCount,
+        scans: dayScans,
+        totalReviews: dayReviews.length,
       });
     }
 
@@ -791,17 +789,35 @@ class DatabaseService {
       return {
         key: q.questionKey,
         label: q.label,
-        avgScore: count > 0 ? Number((sum / count).toFixed(1)) : 4.8,
-        count: count || reviews.length || 6,
+        avgScore: count > 0 ? Number((sum / count).toFixed(1)) : 0.0,
+        count,
       };
     });
 
-    // Table / QR Stand Leaderboard
+    // Table / QR Stand Leaderboard - mapped strictly from actual QR stands
     const qrs = this.data.qrCodes.filter((q) => q.businessId === businessId);
-    const tableLeaderboard = qrs.map((qr, idx) => {
-      const qrEvents = this.data.analyticsEvents.filter((e) => e.qrCodeId === qr.id);
-      const scanCount = qr.scanCount || qrEvents.filter((e) => e.eventType === 'QR_SCAN').length || (idx === 0 ? 24 : 12);
-      const qrReviews = Math.round(scanCount * 0.52);
+    const tableLeaderboard = qrs.map((qr) => {
+      const qrEvents = events.filter((e) => e.qrCodeId === qr.id);
+      const scanCount = qrEvents.filter((e) => e.eventType === 'QR_SCAN').length || qr.scanCount || 0;
+      const qrReviews = reviews.filter((r) => {
+        const session = this.data.reviewSessions.find((s) => s.id === r.sessionId);
+        return session?.qrCodeId === qr.id;
+      }).length;
+
+      let qrScoreSum = 0;
+      let qrScoreCnt = 0;
+      for (const r of reviews) {
+        const session = this.data.reviewSessions.find((s) => s.id === r.sessionId);
+        if (session?.qrCodeId === qr.id && r.ratingsSnapshot) {
+          for (const val of Object.values(r.ratingsSnapshot)) {
+            if (typeof val === 'number') {
+              qrScoreSum += val;
+              qrScoreCnt++;
+            }
+          }
+        }
+      }
+
       return {
         id: qr.id,
         name: qr.name,
@@ -809,237 +825,248 @@ class DatabaseService {
         slug: qr.slug,
         scanCount,
         reviewsGenerated: qrReviews,
-        conversionRate: Math.round((qrReviews / (scanCount || 1)) * 100),
-        avgRating: idx === 0 ? 4.9 : 4.8,
+        conversionRate: scanCount > 0 ? Math.round((qrReviews / scanCount) * 100) : 0,
+        avgRating: qrScoreCnt > 0 ? Number((qrScoreSum / qrScoreCnt).toFixed(1)) : 0.0,
       };
     });
 
-    // Shift / Hourly Distribution
+    // Shift / Hourly Distribution - calculated dynamically from real reviews/scans
+    const shiftBuckets = {
+      lunch: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+      afternoon: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+      dinner: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+      lateNight: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+    };
+
+    for (const r of reviews) {
+      const hr = new Date(r.createdAt).getHours();
+      let bucket = 'dinner';
+      if (hr >= 12 && hr < 15) bucket = 'lunch';
+      else if (hr >= 15 && hr < 19) bucket = 'afternoon';
+      else if (hr >= 19 && hr < 23) bucket = 'dinner';
+      else bucket = 'lateNight';
+
+      (shiftBuckets as any)[bucket].reviews++;
+      if (r.ratingsSnapshot) {
+        for (const val of Object.values(r.ratingsSnapshot)) {
+          if (typeof val === 'number') {
+            (shiftBuckets as any)[bucket].ratingSum += val;
+            (shiftBuckets as any)[bucket].ratingCount++;
+          }
+        }
+      }
+    }
+
+    for (const e of events) {
+      if (e.eventType === 'QR_SCAN') {
+        const hr = new Date(e.createdAt).getHours();
+        let bucket = 'dinner';
+        if (hr >= 12 && hr < 15) bucket = 'lunch';
+        else if (hr >= 15 && hr < 19) bucket = 'afternoon';
+        else if (hr >= 19 && hr < 23) bucket = 'dinner';
+        else bucket = 'lateNight';
+        (shiftBuckets as any)[bucket].scans++;
+      }
+    }
+
+    const totalShiftReviews = reviews.length;
     const hourlyDistribution = [
-      { shift: 'Lunch Rush (12 PM - 3:30 PM)', reviews: 11, scans: 20, percentage: 34, avgRating: 4.8, turnRate: '3.2 turns/table' },
-      { shift: 'Afternoon Downtime (3:30 PM - 6:30 PM)', reviews: 4, scans: 8, percentage: 12, avgRating: 4.9, turnRate: '1.4 turns/table' },
-      { shift: 'Dinner Rush & Drinks (7 PM - 11 PM)', reviews: 19, scans: 31, percentage: 48, isPeak: true, avgRating: 5.0, turnRate: '4.6 turns/table' },
-      { shift: 'Late Night Cocktails (11 PM+)', reviews: 3, scans: 5, percentage: 6, avgRating: 4.7, turnRate: '1.8 turns/table' },
+      {
+        shift: 'Lunch Rush (12 PM - 3:30 PM)',
+        reviews: shiftBuckets.lunch.reviews,
+        scans: shiftBuckets.lunch.scans,
+        percentage: totalShiftReviews > 0 ? Math.round((shiftBuckets.lunch.reviews / totalShiftReviews) * 100) : 0,
+        avgRating: shiftBuckets.lunch.ratingCount > 0 ? Number((shiftBuckets.lunch.ratingSum / shiftBuckets.lunch.ratingCount).toFixed(1)) : 0.0,
+        turnRate: `${Math.round(shiftBuckets.lunch.scans / Math.max(1, qrs.length))} turns/stand`,
+      },
+      {
+        shift: 'Afternoon Downtime (3:30 PM - 6:30 PM)',
+        reviews: shiftBuckets.afternoon.reviews,
+        scans: shiftBuckets.afternoon.scans,
+        percentage: totalShiftReviews > 0 ? Math.round((shiftBuckets.afternoon.reviews / totalShiftReviews) * 100) : 0,
+        avgRating: shiftBuckets.afternoon.ratingCount > 0 ? Number((shiftBuckets.afternoon.ratingSum / shiftBuckets.afternoon.ratingCount).toFixed(1)) : 0.0,
+        turnRate: `${Math.round(shiftBuckets.afternoon.scans / Math.max(1, qrs.length))} turns/stand`,
+      },
+      {
+        shift: 'Dinner Rush & Evening (7 PM - 11 PM)',
+        reviews: shiftBuckets.dinner.reviews,
+        scans: shiftBuckets.dinner.scans,
+        percentage: totalShiftReviews > 0 ? Math.round((shiftBuckets.dinner.reviews / totalShiftReviews) * 100) : 0,
+        isPeak: true,
+        avgRating: shiftBuckets.dinner.ratingCount > 0 ? Number((shiftBuckets.dinner.ratingSum / shiftBuckets.dinner.ratingCount).toFixed(1)) : 0.0,
+        turnRate: `${Math.round(shiftBuckets.dinner.scans / Math.max(1, qrs.length))} turns/stand`,
+      },
+      {
+        shift: 'Late Night (11 PM+)',
+        reviews: shiftBuckets.lateNight.reviews,
+        scans: shiftBuckets.lateNight.scans,
+        percentage: totalShiftReviews > 0 ? Math.round((shiftBuckets.lateNight.reviews / totalShiftReviews) * 100) : 0,
+        avgRating: shiftBuckets.lateNight.ratingCount > 0 ? Number((shiftBuckets.lateNight.ratingSum / shiftBuckets.lateNight.ratingCount).toFixed(1)) : 0.0,
+        turnRate: `${Math.round(shiftBuckets.lateNight.scans / Math.max(1, qrs.length))} turns/stand`,
+      },
     ];
 
-    // Customer Sentiment & Topic Intelligence
-    const sentimentTopics = [
-      { topic: 'Food Taste & Signature Dishes', count: 42, sentiment: 'positive', score: 98, trend: '+14%' },
-      { topic: 'Staff Hospitality & Promptness', count: 36, sentiment: 'positive', score: 96, trend: '+9%' },
-      { topic: 'Ambiance, Music & Acoustics', count: 28, sentiment: 'positive', score: 95, trend: '+18%' },
-      { topic: 'Craft Cocktails & Wine Selection', count: 24, sentiment: 'positive', score: 94, trend: '+22%' },
-      { topic: 'Valet Parking & Ease of Access', count: 18, sentiment: 'positive', score: 92, trend: '+5%' },
-      { topic: 'Weekend Waiting Time', count: 4, sentiment: 'neutral', score: 72, trend: '-8%' },
-    ];
+    // Customer Sentiment & Topic Intelligence - derived from real reviews
+    const sentimentTopics: any[] = [];
+    const dishCounts = new Map<string, { count: number; praise: number; critique: number }>();
+    for (const r of reviews) {
+      if (r.dishesTried && Array.isArray(r.dishesTried)) {
+        for (const dish of r.dishesTried) {
+          const item = dishCounts.get(dish) || { count: 0, praise: 0, critique: 0 };
+          item.count++;
+          if (r.sentiment === 'positive') item.praise++;
+          else if (r.sentiment === 'constructive_critical') item.critique++;
+          dishCounts.set(dish, item);
+        }
+      }
+    }
 
-    // Estimated Business Revenue & Reputation ROI
-    const gClicks = googleClicks || Math.round((reviews.length || 18) * 0.72);
+    const kitchenDishDiagnostics: any[] = [];
+    dishCounts.forEach((stats, dish) => {
+      kitchenDishDiagnostics.push({
+        dish,
+        category: 'Signature Item',
+        mentions: stats.count,
+        praise: stats.count > 0 ? Math.round((stats.praise / stats.count) * 100) : 100,
+        critique: stats.count > 0 ? Math.round((stats.critique / stats.count) * 100) : 0,
+        speedScore: 'Standard Turnaround',
+      });
+    });
+
+    // Dining Floor Heatmap mapped to real stands
+    const floorHeatmap = qrs.map((qr) => {
+      const qrEvents = events.filter((e) => e.qrCodeId === qr.id);
+      const qrScans = qrEvents.filter((e) => e.eventType === 'QR_SCAN').length || qr.scanCount || 0;
+      const qrReviews = reviews.filter((r) => {
+        const session = this.data.reviewSessions.find((s) => s.id === r.sessionId);
+        return session?.qrCodeId === qr.id;
+      }).length;
+
+      return {
+        id: qr.id.slice(0, 4).toUpperCase(),
+        name: qr.name,
+        section: qr.locationTag || 'Dining Area',
+        scans: qrScans,
+        reviews: qrReviews,
+        avgRating: qrReviews > 0 ? avgRating : 0.0,
+        status: qrScans === 0 ? 'STANDBY' : (qrReviews > 0 ? 'DELIGHTED' : 'ACTIVE'),
+        lastScan: qrScans === 0 ? 'No scans yet' : 'Scanned recently',
+      };
+    });
+
+    const serverLeaderboard: any[] = [];
+
+    // Real-time Revenue & ROI Metrics starting fresh from zero
     const roiEstimate = {
-      estimatedMonthlyRevenueBoostInr: gClicks * 3200,
-      projectedAnnualGainsInr: gClicks * 3200 * 12,
-      reviewsVelocityPerWeek: (positive || 16) + (neutral || 2),
-      negativeReviewsShielded: 14,
-      reputationProtectionScore: '99.4%',
-      googleLocalPackRank: 'Rank #2 (Top Suburb Bistro)',
-      averageRatingLiftVsLocal: '+0.5 ★',
+      estimatedMonthlyRevenueBoostInr: googleClicks * 2500,
+      projectedAnnualGainsInr: googleClicks * 2500 * 12,
+      reviewsVelocityPerWeek: reviews.length,
+      negativeReviewsShielded: constructive,
+      reputationProtectionScore: reviews.length > 0 ? `${Math.round(((positive + neutral) / reviews.length) * 100)}%` : '100%',
+      googleLocalPackRank: reviews.length > 0 ? (reviews.length >= 25 ? 'Rank #1 (Area Dominance)' : `Climbing (Rank #${Math.max(1, 10 - Math.floor(reviews.length / 3))})`) : 'Baseline Setup',
+      averageRatingLiftVsLocal: reviews.length > 0 ? `+${(avgRating - 4.0).toFixed(1)} ★` : '0.0 ★',
     };
 
-    // --- IRON MAN EXTENDED TELEMETRY ---
-    // 1. Competitor Local Radar
-    const competitorRadar = [
-      { name: 'Saffron Bistro (You)', rank: 1, rating: 4.9, reviewsCount: 412, shareOfSearch: '38%', badge: 'Area Leader 🔥' },
-      { name: 'Truffles Indiranagar', rank: 2, rating: 4.5, reviewsCount: 1240, shareOfSearch: '27%', badge: 'Trailing' },
-      { name: 'Smoke House Deli', rank: 3, rating: 4.4, reviewsCount: 890, shareOfSearch: '19%', badge: 'Trailing' },
-      { name: 'The Reservoire', rank: 4, rating: 4.3, reviewsCount: 1450, shareOfSearch: '16%', badge: 'Trailing' },
-    ];
-
-    // 2. Dining Floor & Table Heatmap
-    const floorHeatmap = [
-      { id: 'T1', name: 'Booth 1', section: 'Main Dining', scans: 14, reviews: 8, avgRating: 5.0, status: 'DELIGHTED', server: 'Rahul K.', lastScan: '6m ago' },
-      { id: 'T2', name: 'Booth 2', section: 'Main Dining', scans: 11, reviews: 6, avgRating: 4.9, status: 'DELIGHTED', server: 'Rahul K.', lastScan: '12m ago' },
-      { id: 'T3', name: 'Window 1', section: 'Window View', scans: 16, reviews: 9, avgRating: 4.9, status: 'DELIGHTED', server: 'Priya M.', lastScan: '4m ago' },
-      { id: 'T4', name: 'Patio 1', section: 'Al Fresco Deck', scans: 22, reviews: 14, avgRating: 5.0, status: 'DELIGHTED', server: 'Rahul K.', lastScan: 'Just now' },
-      { id: 'T5', name: 'Patio 2', section: 'Al Fresco Deck', scans: 18, reviews: 10, avgRating: 4.8, status: 'DELIGHTED', server: 'Priya M.', lastScan: '18m ago' },
-      { id: 'T6', name: 'VIP Booth', section: 'Private Lounge', scans: 8, reviews: 3, avgRating: 4.2, status: 'SHIELDED', server: 'Amit S.', lastScan: '35m ago', note: 'Slow dessert intercepted & addressed' },
-      { id: 'T7', name: 'Bar 1-4', section: 'Craft Cocktail Bar', scans: 26, reviews: 17, avgRating: 4.95, status: 'DELIGHTED', server: 'Vikram B.', lastScan: '2m ago' },
-      { id: 'T8', name: 'Rooftop 1', section: 'Terrace Garden', scans: 15, reviews: 8, avgRating: 4.9, status: 'DELIGHTED', server: 'Sneha R.', lastScan: '9m ago' },
-    ];
-
-    // 3. Kitchen & Dish Diagnostic Matrix
-    const kitchenDishDiagnostics = [
-      { dish: 'Truffle Mushroom Risotto', category: 'Mains', mentions: 48, praise: 99, critique: 1, speedScore: 'Fast (14m)' },
-      { dish: 'Woodfired Neapolitan Pizza', category: 'Pizza', mentions: 42, praise: 98, critique: 2, speedScore: 'Fast (12m)' },
-      { dish: 'Smoked BBQ Glazed Ribs', category: 'Grill', mentions: 36, praise: 97, critique: 1, speedScore: 'Medium (18m)' },
-      { dish: 'Signature Espresso Martini', category: 'Bar', mentions: 31, praise: 96, critique: 0, speedScore: 'Instant (5m)' },
-      { dish: 'Belgian Molten Fondant', category: 'Dessert', mentions: 29, praise: 98, critique: 1, speedScore: 'Medium (16m)' },
-      { dish: 'Weekend Cold Brew / Latte', category: 'Beverage', mentions: 16, praise: 86, critique: 3, speedScore: 'Fast (6m)' },
-    ];
-
-    // 4. Staff & Waiter Leaderboard
-    const serverLeaderboard = [
-      { name: 'Rahul K.', section: 'Patio & Deck', tablesHandled: 42, reviewsDrove: 22, convRate: 52, avgRating: 4.95, topPraise: 'Attentive, swift, warm recommendations' },
-      { name: 'Priya M.', section: 'Window Booths', tablesHandled: 35, reviewsDrove: 18, convRate: 51, avgRating: 4.90, topPraise: 'Great wine & dessert pairings' },
-      { name: 'Vikram B.', section: 'Cocktail Bar', tablesHandled: 28, reviewsDrove: 16, convRate: 57, avgRating: 4.92, topPraise: 'Expert mixology flair' },
-      { name: 'Amit S.', section: 'Main Dining', tablesHandled: 31, reviewsDrove: 14, convRate: 45, avgRating: 4.82, topPraise: 'Polite and attentive' },
-    ];
-
-    // 5. Financial & Revenue Telemetry
     const financialTelemetry = {
-      walkInRevenueInr: 84500,
-      aggregatorCommissionsSavedInr: 32600, // saved 28% delivery commission by filling dine-in tables
-      shieldRecoveredRevenueInr: 46800, // prevented churn from 14 negative diners who returned
-      totalMonthlyImpactInr: 163900,
-      customerLifetimeValueMultiplier: '4.8x',
-      acquisitionCostVsAds: '₹0 / review (vs ₹450 Google Ads CPC)',
+      walkInRevenueInr: googleClicks * 1800,
+      aggregatorCommissionsSavedInr: Math.round(googleClicks * 450),
+      shieldRecoveredRevenueInr: constructive * 2000,
+      totalMonthlyImpactInr: googleClicks * 1800 + Math.round(googleClicks * 450) + constructive * 2000,
+      customerLifetimeValueMultiplier: reviews.length > 0 ? '4.8x' : '1.0x',
+      acquisitionCostVsAds: reviews.length > 0 ? '₹0 / review' : '₹0',
     };
 
-    // 6. Aura AI Executive Copilot Briefing & Actionable Levers
     const auraBriefing = {
-      statusText: 'All systems optimal. Aura Reputation Shield active.',
-      defenseShieldHealth: '100% Negative Leaks Prevented',
-      recommendations: [
-        {
-          id: 'dish_boost',
-          title: 'Promote Truffle Risotto & Craft Cocktails for Tonight',
-          desc: 'Truffle praise is up +24% this week. Inject these keywords into the AI review generator for tonight’s dinner rush.',
-          type: 'OPTIMIZE',
-          actionText: 'Apply Tonight’s Prompt Preset',
-        },
-        {
-          id: 'waiter_bonus',
-          title: 'Acknowledge Rahul K. (Server of the Week)',
-          desc: 'Rahul drove 22 five-star reviews this week with a 52% conversion rate on Table QR stands.',
-          type: 'STAFF',
-          actionText: 'Mark Reward Recorded',
-        },
-        {
-          id: 'google_pack_gap',
-          title: 'Only 14 More Reviews to Lock Permanent #1 Suburb Ranking',
-          desc: 'Your rating is 4.9★ vs Truffles 4.5★. Accelerate table prompts by +2 per shift to overtake local search permanently.',
-          type: 'GROWTH',
-          actionText: 'Boost QR Prompt Intensity',
-        },
-      ],
-    };
-
-    // 7. Google Maps Local SEO Keyword Rankings Tracker
-    const bObj = this.data.businesses.find((b) => b.id === businessId);
-    const catName = bObj?.subcategory || 'Restaurant';
-    const locCity = bObj?.city || 'Bangalore';
-    const bizName = bObj?.name || 'Saffron Bistro';
-
-    const keywordRankings = [
-      {
-        id: 'kw-1',
-        keyword: `Best ${catName} in ${locCity}`,
-        rank: 1,
-        previousRank: 4,
-        change: 3,
-        direction: 'UP',
-        monthlySearches: 2840,
-        impressionsLift: '+142%',
-        status: 'Google 3-Pack Leader 🏆',
-        competitorRank: '#2 (Truffles)',
-        tag: 'Highest Intent',
-      },
-      {
-        id: 'kw-2',
-        keyword: `Top Rated ${catName} Near Me`,
-        rank: 2,
-        previousRank: 5,
-        change: 3,
-        direction: 'UP',
-        monthlySearches: 3410,
-        impressionsLift: '+168%',
-        status: 'Top 3 Local Pack ⭐',
-        competitorRank: '#1 (Smoke House)',
-        tag: 'High Volume',
-      },
-      {
-        id: 'kw-3',
-        keyword: `Best Dinner Places in ${locCity}`,
-        rank: 1,
-        previousRank: 3,
-        change: 2,
-        direction: 'UP',
-        monthlySearches: 1920,
-        impressionsLift: '+95%',
-        status: 'Google 3-Pack Leader 🏆',
-        competitorRank: '#3 (The Reservoire)',
-        tag: 'Evening Prime',
-      },
-      {
-        id: 'kw-4',
-        keyword: `Romantic Date Night ${catName}`,
-        rank: 3,
-        previousRank: 8,
-        change: 5,
-        direction: 'UP',
-        monthlySearches: 2150,
-        impressionsLift: '+210%',
-        status: 'Rapidly Climbing 🚀',
-        competitorRank: '#2 (Olive Beach)',
-        tag: 'High Ticket',
-      },
-      {
-        id: 'kw-5',
-        keyword: `${bizName} Reviews & Photos`,
-        rank: 1,
-        previousRank: 2,
-        change: 1,
-        direction: 'UP',
-        monthlySearches: 1100,
-        impressionsLift: '+84%',
-        status: 'Verified Authority 🔒',
-        competitorRank: '-',
-        tag: 'Brand Search',
-      },
-    ];
-
-    const localSeoMetrics = {
-      averageRankLift: '+3.4 Positions Gained',
-      totalSearchImpressions: 14820,
-      impressionsGrowth: '+148%',
-      mapsDirectionsClicks: 840,
-      directionsGrowth: '+92%',
-      phoneCallClicks: 310,
-      phoneCallsGrowth: '+74%',
-      topThreeShare: '94%',
-      headline: 'Google Maps Search Rankings Surging',
-      rankingMessage: `🎉 Excellent news! ${bizName} is holding #1 and #2 spots across key searches in ${locCity}. Your steady stream of genuine 5-star customer reviews has pushed your average Google Maps rank up by +3.4 positions this month!`,
+      statusText: reviews.length === 0
+        ? 'Aura Reputation Shield active. Place table QR stands to start capturing verified 5-star reviews.'
+        : `Aura Reputation Shield active. Monitoring diner satisfaction across ${qrs.length} stands.`,
+      defenseShieldHealth: '100% Shield Armed & Ready',
+      recommendations: reviews.length === 0
+        ? [
+            {
+              id: 'qr_print',
+              title: 'Print & Position Table QR Stands',
+              desc: 'Place your generated QR stands on dining tables or bill folders to start capturing diner reviews.',
+              type: 'GROWTH',
+              actionText: 'View QR Stands',
+            },
+            {
+              id: 'test_scan',
+              title: 'Test Review Flow from Smartphone',
+              desc: 'Scan your Table 1 QR stand with your mobile phone to experience the 30-second AI review generation.',
+              type: 'OPTIMIZE',
+              actionText: 'Test Scan QR',
+            },
+            {
+              id: 'dish_settings',
+              title: 'Configure Signature Highlight Dishes',
+              desc: 'Add your signature menu items in Prompt Settings so AI weaves them naturally into diner review drafts.',
+              type: 'SETTINGS',
+              actionText: 'Manage Dishes',
+            },
+          ]
+        : [
+            {
+              id: 'dish_boost',
+              title: 'Highlight Top Performer Menu Items',
+              desc: 'Diners are praising your signature offerings. Inject key dishes into tonight’s prompt preset.',
+              type: 'OPTIMIZE',
+              actionText: 'Apply Prompt Preset',
+            },
+            {
+              id: 'google_pack_gap',
+              title: 'Accelerate Table Review Velocity',
+              desc: `You currently have ${reviews.length} verified reviews. Each new review strengthens your local rank.`,
+              type: 'GROWTH',
+              actionText: 'Boost QR Intensity',
+            },
+          ],
     };
 
     return {
-      scans: scans || reviews.length * 2 || 28,
-      ratings: ratings || reviews.length || 20,
-      generated: generated || reviews.length || 18,
-      copied: copied || Math.round((reviews.length || 18) * 0.8),
-      googleClicks: gClicks,
+      scans,
+      ratings,
+      generated,
+      copied,
+      googleClicks,
       avgRating,
+      todayReviews,
+      todayScans,
       dailyTrends,
       aspectRatings,
       tableLeaderboard,
       hourlyDistribution,
       sentimentTopics,
       roiEstimate,
-      competitorRadar,
+      competitorRadar: [],
       floorHeatmap,
       kitchenDishDiagnostics,
       serverLeaderboard,
       financialTelemetry,
       auraBriefing,
-      keywordRankings,
-      localSeoMetrics,
+      keywordRankings: [],
+      localSeoMetrics: {
+        averageRankLift: '0 Positions',
+        totalSearchImpressions: 0,
+        impressionsGrowth: '0%',
+        mapsDirectionsClicks: 0,
+        directionsGrowth: '0%',
+        phoneCallClicks: 0,
+        phoneCallsGrowth: '0%',
+        topThreeShare: '0%',
+        headline: 'Google Maps Telemetry Active',
+        rankingMessage: `Listing initialized for ${business?.city || 'Local Area'}.`,
+      },
       sentimentBreakdown: {
-        positive: positive || (reviews.length === 0 ? 15 : 0),
-        neutral: neutral || (reviews.length === 0 ? 2 : 0),
-        constructive: constructive || (reviews.length === 0 ? 1 : 0),
+        positive,
+        neutral,
+        constructive,
       },
       funnel: {
-        scanToRating: scans > 0 ? Math.round((ratings / scans) * 100) : 75,
-        ratingToGenerated: ratings > 0 ? Math.round((generated / ratings) * 100) : 88,
-        generatedToCopied: generated > 0 ? Math.round((copied / generated) * 100) : 80,
-        copiedToGoogle: copied > 0 ? Math.round((gClicks / copied) * 100) : 68,
+        scanToRating: scans > 0 ? Math.round((ratings / scans) * 100) : 0,
+        ratingToGenerated: ratings > 0 ? Math.round((generated / ratings) * 100) : 0,
+        generatedToCopied: generated > 0 ? Math.round((copied / generated) * 100) : 0,
+        copiedToGoogle: copied > 0 ? Math.round((googleClicks / copied) * 100) : 0,
       },
     };
   }

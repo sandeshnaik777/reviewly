@@ -73,6 +73,7 @@ export const api = {
     return apiRequest(`/business/${id}/reviews${query ? `?${query}` : ''}`);
   },
   getAnalytics: (id: string) => apiRequest(`/business/${id}/analytics`),
+  refreshMapsRankings: (id: string) => apiRequest(`/business/${id}/maps-rankings/refresh`, { method: 'POST' }),
   getBusinessNotifications: (businessId: string) => apiRequest(`/business/${businessId}/notifications`),
   submitSoftwareInquiry: (businessId: string, data: { serviceType: string; requirements?: string; contactPhone: string }) =>
     apiRequest(`/business/${businessId}/custom-software-inquiry`, { method: 'POST', body: JSON.stringify(data) }),
