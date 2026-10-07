@@ -1,0 +1,19 @@
+# ====================================================================
+# Robots.txt — Reviewly Multi-Tenant Business Review Platform
+# https://reviewly.in/
+# ====================================================================
+
+User-agent: *
+Allow: /
+Allow: /r/*
+
+# Disallow internal backend APIs, auth endpoints, and platform admin
+Disallow: /api/
+Disallow: /admin
+Disallow: /onboarding/checkout
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# XML Sitemaps
+Sitemap: https://reviewly.in/sitemap.xml

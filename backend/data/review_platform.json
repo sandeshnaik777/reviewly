@@ -1,0 +1,208 @@
+{
+  "users": [
+    {
+      "id": "965853fc-fa6c-4cef-a041-f99f5c1bdc13",
+      "email": "admin@reviewplatform.local",
+      "passwordHash": "$2b$10$O0SY15VbYSNl6y4K7vKdNO/t/ySJnODhgJkVgMpvXui2L2nyvgbmG",
+      "name": "Platform Administrator",
+      "role": "PLATFORM_ADMIN",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T21:05:23.020Z",
+      "updatedAt": "2026-10-07T21:05:23.020Z"
+    }
+  ],
+  "emailVerifications": [],
+  "businesses": [],
+  "businessMembers": [],
+  "businessQuestions": [],
+  "businessSettings": [],
+  "qrCodes": [],
+  "subscriptionPlans": [
+    {
+      "id": "c0000000-0000-0000-0000-000000000001",
+      "slug": "trial",
+      "name": "7-Day Free Trial Pass",
+      "priceInr": 2,
+      "originalPriceInr": 149,
+      "offerBadge": "₹2 Trial Activation Pass",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 50,
+      "qrCodeLimit": 1,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": false,
+      "teamMembersLimit": 1,
+      "features": [
+        "7-day full access",
+        "₹2 trial verification fee",
+        "50 AI review generations",
+        "1 Smart QR Stand",
+        "Standard analytics"
+      ],
+      "isActive": true
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000002",
+      "slug": "starter",
+      "name": "Testing Pack",
+      "priceInr": 79,
+      "originalPriceInr": 149,
+      "offerBadge": "₹79 First Month Offer (Reg. ₹149)",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 100,
+      "qrCodeLimit": 2,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": false,
+      "teamMembersLimit": 1,
+      "features": [
+        "100 AI review generations/mo",
+        "First month offer: ₹79 (Reg. ₹149)",
+        "2 Smart QR Stands",
+        "Category question builder",
+        "Scan & copy analytics",
+        "Email support"
+      ],
+      "isActive": true
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000003",
+      "slug": "growth",
+      "name": "Growth Pack",
+      "priceInr": 149,
+      "originalPriceInr": 249,
+      "offerBadge": "₹149 First Month Offer (Reg. ₹249)",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 500,
+      "qrCodeLimit": 5,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": true,
+      "teamMembersLimit": 3,
+      "features": [
+        "500 AI review generations/mo",
+        "First month offer: ₹149 (Reg. ₹249)",
+        "5 Smart QR Stands",
+        "Custom question builder",
+        "Full funnel analytics",
+        "Tone & length customization",
+        "Priority support"
+      ],
+      "isActive": true
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000004",
+      "slug": "pro",
+      "name": "Scale / Pro Pack",
+      "priceInr": 249,
+      "originalPriceInr": 399,
+      "offerBadge": "₹249 First Month Offer (Reg. ₹399)",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 1000,
+      "qrCodeLimit": 15,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": true,
+      "teamMembersLimit": 10,
+      "features": [
+        "1,000 AI review generations/mo",
+        "First month offer: ₹249 (Reg. ₹399)",
+        "15 Smart QR Stands",
+        "Advanced anti-abuse guards",
+        "Multi-staff RBAC",
+        "Aura reputation shield",
+        "Dedicated SLA"
+      ],
+      "isActive": true
+    }
+  ],
+  "subscriptions": [],
+  "usageRecords": [],
+  "payments": [],
+  "reviewSessions": [],
+  "reviewRatings": [],
+  "generatedReviews": [],
+  "analyticsEvents": [],
+  "auditLogs": [],
+  "systemNotifications": [
+    {
+      "id": "notif-1",
+      "title": "🚀 Platform Upgrade: Custom Software Module Live",
+      "message": "We now build custom software systems — from Fleet Delivery & Dispatch Tracking to Enterprise ERP and Omnichannel POS. Request a direct consultation anytime!",
+      "type": "INFO",
+      "createdAt": "2026-10-07T21:05:22.948Z"
+    },
+    {
+      "id": "notif-2",
+      "title": "⭐ Reviewly Reputation Engine Operational",
+      "message": "All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.",
+      "type": "SUCCESS",
+      "createdAt": "2026-10-07T21:05:22.948Z"
+    }
+  ],
+  "customSoftwareInquiries": [],
+  "blogPosts": [
+    {
+      "id": "blog-1",
+      "title": "How to Collect 100+ Real 5-Star Google Reviews in 30 Days",
+      "slug": "how-to-get-100-google-reviews-in-30-days",
+      "excerpt": "Step-by-step masterclass on leveraging table stands, customer peak happiness moments, and conversational AI review prompts.",
+      "content": "# The Blueprint to 100+ Authentic 5-Star Google Reviews\n\nLocal search traffic is the single highest-ROI customer acquisition channel for physical businesses. Over 84% of consumers trust online reviews as much as personal recommendations.\n\n## 1. The Friction Problem\nMost happy customers NEVER leave reviews. Why? Because opening Google Maps, searching your business, and thinking about what to write takes 3+ minutes.\n\n## 2. The 15-Second Solution\nBy placing smart QR table stands directly at the table or billing desk, customers scan when their satisfaction is at its peak. Our AI engine prompts them with friendly questions (\"What dish did you love?\", \"How was the speed?\") and formats a human, authentic review draft in seconds.\n\n## 3. The Power of Private Interception\nIf an experience fell short, our Reputation Shield routes the feedback directly to manager SMS/email for private resolution, protecting your Google public rating.",
+      "category": "GROWTH & REPUTATION",
+      "author": "Platform Editorial Team",
+      "readTime": "4 min read",
+      "tags": [
+        "Google Reviews",
+        "SEO",
+        "Customer Experience",
+        "Local Pack"
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-10-07T21:05:22.941Z",
+      "createdAt": "2026-10-07T21:05:22.942Z",
+      "updatedAt": "2026-10-07T21:05:22.942Z"
+    },
+    {
+      "id": "blog-2",
+      "title": "Why Table QR Stands Outperform Post-Visit SMS by 4.8x",
+      "slug": "why-qr-stands-outperform-sms-review-requests",
+      "excerpt": "Data analysis across 50,000 customer sessions: why on-site table tent conversion blows away delayed WhatsApp or SMS requests.",
+      "content": "# The Psychology of Immediate Review Generation\n\nDelayed SMS and WhatsApp review requests suffer from catastrophic drop-off rates (less than 3% click-through). Here is why on-premise table engagement delivers 28% to 52% conversion rates.\n\n## 1. Cognitive Presence vs Distraction\nWhen a customer is finishing their meal or paying their bill, your service is top-of-mind. 24 hours later, they are at work or running errands and dismiss marketing texts.\n\n## 2. Zero Spam Perception\nCustomers appreciate clean, self-service QR stands. They hate unsolicited automated texts that feel intrusive.\n\n## 3. Tactile Acrylic Stands\nPremium acrylic stands with a clear call-to-action (\"Share your experience in 10 seconds\") command attention on tables and reception desks.",
+      "category": "CUSTOMER EXPERIENCE",
+      "author": "Growth Engineering",
+      "readTime": "5 min read",
+      "tags": [
+        "QR Codes",
+        "Conversion Optimization",
+        "Retail",
+        "Hospitality"
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-10-07T21:05:22.942Z",
+      "createdAt": "2026-10-07T21:05:22.942Z",
+      "updatedAt": "2026-10-07T21:05:22.942Z"
+    },
+    {
+      "id": "blog-3",
+      "title": "Custom Software vs Generic POS: When to Build Bespoke Solutions",
+      "slug": "custom-software-vs-generic-pos",
+      "excerpt": "Why high-volume businesses and delivery fleets switch from rigid off-the-shelf software to bespoke dispatch and ERP architectures.",
+      "content": "# Custom Software vs Rigid Generic Software\n\nOff-the-shelf tools charge high monthly subscriptions while locking your operational data into closed ecosystems.\n\n## 1. Delivery Fleet & Dispatch Optimization\nIf you manage in-house delivery riders, generic aggregators charge 25-30% commissions. Custom dispatch software with real-time GPS tracking and route optimization saves hundreds of thousands of rupees monthly.\n\n## 2. Multi-Branch Warehousing & Billing\nCustom ERPs built to your exact workflow eliminate manual spreadsheet reconciliation and automate supplier ledgers in real-time.\n\n## 3. You Tell Us What You Need, We Build It\nOur engineering team builds custom web portals, mobile rider apps, and integrated billing systems tailored specifically to your business model.",
+      "category": "CUSTOM SOFTWARE",
+      "author": "Chief Systems Architect",
+      "readTime": "6 min read",
+      "tags": [
+        "Custom Software",
+        "Fleet Dispatch",
+        "ERP",
+        "Billing"
+      ],
+      "isPublished": true,
+      "publishedAt": "2026-10-07T21:05:22.942Z",
+      "createdAt": "2026-10-07T21:05:22.942Z",
+      "updatedAt": "2026-10-07T21:05:22.942Z"
+    }
+  ]
+}

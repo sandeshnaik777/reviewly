@@ -1,0 +1,1043 @@
+{
+  "users": [
+    {
+      "id": "fede29cc-9cbc-4db9-9091-020db6422ca2",
+      "email": "admin@reviewplatform.local",
+      "passwordHash": "$2b$10$elSSV0tExSbQ5GvG7H8dJ.gqBSRccST.JnhvNkL2QI8LjJopdcQOe",
+      "name": "Platform Administrator",
+      "role": "PLATFORM_ADMIN",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:27:28.555Z",
+      "updatedAt": "2026-10-07T10:27:28.556Z"
+    },
+    {
+      "id": "f06f1493-6ab4-48db-8edb-b5daaf49eb54",
+      "email": "lockout-1791368848779@test.com",
+      "passwordHash": "hash",
+      "name": "Lockout User",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 5,
+      "lockoutUntil": "2026-10-07T10:42:28.779Z",
+      "createdAt": "2026-10-07T10:27:28.779Z",
+      "updatedAt": "2026-10-07T10:27:28.779Z"
+    },
+    {
+      "id": "3c4bfe42-3206-465c-88aa-b9285be1247b",
+      "email": "owner-a-1791368848800@test.com",
+      "passwordHash": "hash",
+      "name": "Owner A",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:27:28.800Z",
+      "updatedAt": "2026-10-07T10:27:28.800Z"
+    },
+    {
+      "id": "4449717a-9618-4c53-a6c0-f650acdecc45",
+      "email": "owner-b-1791368848800@test.com",
+      "passwordHash": "hash",
+      "name": "Owner B",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:27:28.800Z",
+      "updatedAt": "2026-10-07T10:27:28.800Z"
+    },
+    {
+      "id": "b9d0f527-6265-4fc6-9611-20805ad7ab48",
+      "email": "lockout-1791368890517@test.com",
+      "passwordHash": "hash",
+      "name": "Lockout User",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 5,
+      "lockoutUntil": "2026-10-07T10:43:10.517Z",
+      "createdAt": "2026-10-07T10:28:10.518Z",
+      "updatedAt": "2026-10-07T10:28:10.518Z"
+    },
+    {
+      "id": "e70551f1-b5c9-4591-82ec-0d89c00b644b",
+      "email": "owner-a-1791368890529@test.com",
+      "passwordHash": "hash",
+      "name": "Owner A",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:28:10.529Z",
+      "updatedAt": "2026-10-07T10:28:10.529Z"
+    },
+    {
+      "id": "efc3befb-9bba-461d-9090-e54ac8e64415",
+      "email": "owner-b-1791368890529@test.com",
+      "passwordHash": "hash",
+      "name": "Owner B",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:28:10.529Z",
+      "updatedAt": "2026-10-07T10:28:10.529Z"
+    },
+    {
+      "id": "08061778-7060-4520-8476-69fffefa5327",
+      "email": "lockout-1791368905135@test.com",
+      "passwordHash": "hash",
+      "name": "Lockout User",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 5,
+      "lockoutUntil": "2026-10-07T10:43:25.135Z",
+      "createdAt": "2026-10-07T10:28:25.136Z",
+      "updatedAt": "2026-10-07T10:28:25.136Z"
+    },
+    {
+      "id": "f146b346-9e05-47f9-84eb-7c3eb9d05c12",
+      "email": "owner-a-1791368905143@test.com",
+      "passwordHash": "hash",
+      "name": "Owner A",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:28:25.143Z",
+      "updatedAt": "2026-10-07T10:28:25.143Z"
+    },
+    {
+      "id": "fd234f92-f169-4585-9253-d05aec776cd8",
+      "email": "owner-b-1791368905143@test.com",
+      "passwordHash": "hash",
+      "name": "Owner B",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:28:25.143Z",
+      "updatedAt": "2026-10-07T10:28:25.143Z"
+    },
+    {
+      "id": "6305d7aa-f345-41fb-a4db-7b5065871a1c",
+      "email": "saffron.bistro@test.com",
+      "passwordHash": "$2b$12$i6xh1YgnFnLv0JyT5QNUwuHPnjNammftbaUrqIaz/OOcsMHnb6nZu",
+      "name": "Vikram Mehra",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T10:34:10.794Z",
+      "updatedAt": "2026-10-07T10:34:10.794Z"
+    },
+    {
+      "id": "3a0f4dbe-3067-4290-a590-e32947b89f5b",
+      "email": "lockout-1791370877511@test.com",
+      "passwordHash": "hash",
+      "name": "Lockout User",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 5,
+      "lockoutUntil": "2026-10-07T11:16:17.511Z",
+      "createdAt": "2026-10-07T11:01:17.512Z",
+      "updatedAt": "2026-10-07T11:01:17.512Z"
+    },
+    {
+      "id": "3b4168b6-b638-48cc-b623-609bed88ae69",
+      "email": "owner-a-1791370877521@test.com",
+      "passwordHash": "hash",
+      "name": "Owner A",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T11:01:17.521Z",
+      "updatedAt": "2026-10-07T11:01:17.521Z"
+    },
+    {
+      "id": "f6eefaae-290f-42b5-a523-5aab299785ba",
+      "email": "owner-b-1791370877521@test.com",
+      "passwordHash": "hash",
+      "name": "Owner B",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-07T11:01:17.521Z",
+      "updatedAt": "2026-10-07T11:01:17.521Z"
+    }
+  ],
+  "businesses": [
+    {
+      "id": "f502d660-458a-412f-a93e-9b572a107650",
+      "ownerId": "3c4bfe42-3206-465c-88aa-b9285be1247b",
+      "name": "Business Alpha",
+      "slug": "alpha-1791368848805",
+      "mainCategory": "RESTAURANT",
+      "subcategory": "Café",
+      "phone": "9876543210",
+      "email": "owner-a-1791368848800@test.com",
+      "address": "123 Alpha St",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "country": "India",
+      "pincode": "560001",
+      "googleReviewUrl": "https://maps.google.com/?cid=123",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:27:28.805Z",
+      "updatedAt": "2026-10-07T10:27:28.805Z"
+    },
+    {
+      "id": "01d51c7e-e1cb-4b01-9ef6-5eb16d316571",
+      "ownerId": "4449717a-9618-4c53-a6c0-f650acdecc45",
+      "name": "Business Beta",
+      "slug": "beta-1791368848805",
+      "mainCategory": "SERVICES",
+      "subcategory": "Salon",
+      "phone": "9876543211",
+      "email": "owner-b-1791368848800@test.com",
+      "address": "456 Beta St",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "country": "India",
+      "pincode": "400001",
+      "googleReviewUrl": "https://maps.google.com/?cid=456",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:27:28.805Z",
+      "updatedAt": "2026-10-07T10:27:28.805Z"
+    },
+    {
+      "id": "acd85efc-fbcc-4f8d-a56f-643535c3db07",
+      "ownerId": "e70551f1-b5c9-4591-82ec-0d89c00b644b",
+      "name": "Business Alpha",
+      "slug": "alpha-1791368890534",
+      "mainCategory": "RESTAURANT",
+      "subcategory": "Café",
+      "phone": "9876543210",
+      "email": "owner-a-1791368890529@test.com",
+      "address": "123 Alpha St",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "country": "India",
+      "pincode": "560001",
+      "googleReviewUrl": "https://maps.google.com/?cid=123",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:28:10.534Z",
+      "updatedAt": "2026-10-07T10:28:10.534Z"
+    },
+    {
+      "id": "8bb93bc7-e79a-44aa-9057-314eec9b2aa5",
+      "ownerId": "efc3befb-9bba-461d-9090-e54ac8e64415",
+      "name": "Business Beta",
+      "slug": "beta-1791368890534",
+      "mainCategory": "SERVICES",
+      "subcategory": "Salon",
+      "phone": "9876543211",
+      "email": "owner-b-1791368890529@test.com",
+      "address": "456 Beta St",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "country": "India",
+      "pincode": "400001",
+      "googleReviewUrl": "https://maps.google.com/?cid=456",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:28:10.534Z",
+      "updatedAt": "2026-10-07T10:28:10.534Z"
+    },
+    {
+      "id": "296e80f3-e053-4217-9b59-0a0055491755",
+      "ownerId": "f146b346-9e05-47f9-84eb-7c3eb9d05c12",
+      "name": "Business Alpha",
+      "slug": "alpha-1791368905146",
+      "mainCategory": "RESTAURANT",
+      "subcategory": "Café",
+      "phone": "9876543210",
+      "email": "owner-a-1791368905143@test.com",
+      "address": "123 Alpha St",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "country": "India",
+      "pincode": "560001",
+      "googleReviewUrl": "https://maps.google.com/?cid=123",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:28:25.146Z",
+      "updatedAt": "2026-10-07T10:28:25.146Z"
+    },
+    {
+      "id": "df668696-9f29-4cea-8bfb-ce5e67024e78",
+      "ownerId": "fd234f92-f169-4585-9253-d05aec776cd8",
+      "name": "Business Beta",
+      "slug": "beta-1791368905146",
+      "mainCategory": "SERVICES",
+      "subcategory": "Salon",
+      "phone": "9876543211",
+      "email": "owner-b-1791368905143@test.com",
+      "address": "456 Beta St",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "country": "India",
+      "pincode": "400001",
+      "googleReviewUrl": "https://maps.google.com/?cid=456",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:28:25.146Z",
+      "updatedAt": "2026-10-07T10:28:25.146Z"
+    },
+    {
+      "id": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "ownerId": "6305d7aa-f345-41fb-a4db-7b5065871a1c",
+      "slug": "saffron-fine-dining-34f84a",
+      "name": "Saffron Fine Dining",
+      "mainCategory": "FOOD & HOSPITALITY",
+      "subcategory": "Restaurant",
+      "phone": "+91 9876543210",
+      "email": "saffron.bistro@test.com",
+      "address": "88 Indiranagar Main Rd",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "country": "India",
+      "pincode": "560038",
+      "googleReviewUrl": "https://maps.google.com/?cid=12345678",
+      "isActive": true,
+      "createdAt": "2026-10-07T10:34:10.809Z",
+      "updatedAt": "2026-10-07T10:34:10.809Z"
+    },
+    {
+      "id": "54a2d043-404b-4874-af59-c2a72868a475",
+      "ownerId": "3b4168b6-b638-48cc-b623-609bed88ae69",
+      "name": "Business Alpha",
+      "slug": "alpha-1791370877528",
+      "mainCategory": "RESTAURANT",
+      "subcategory": "Café",
+      "phone": "9876543210",
+      "email": "owner-a-1791370877521@test.com",
+      "address": "123 Alpha St",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "country": "India",
+      "pincode": "560001",
+      "googleReviewUrl": "https://maps.google.com/?cid=123",
+      "isActive": true,
+      "createdAt": "2026-10-07T11:01:17.528Z",
+      "updatedAt": "2026-10-07T11:01:17.528Z"
+    },
+    {
+      "id": "d36dc8e2-849d-436a-ac00-18d0274e33ad",
+      "ownerId": "f6eefaae-290f-42b5-a523-5aab299785ba",
+      "name": "Business Beta",
+      "slug": "beta-1791370877528",
+      "mainCategory": "SERVICES",
+      "subcategory": "Salon",
+      "phone": "9876543211",
+      "email": "owner-b-1791370877521@test.com",
+      "address": "456 Beta St",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "country": "India",
+      "pincode": "400001",
+      "googleReviewUrl": "https://maps.google.com/?cid=456",
+      "isActive": true,
+      "createdAt": "2026-10-07T11:01:17.528Z",
+      "updatedAt": "2026-10-07T11:01:17.528Z"
+    }
+  ],
+  "businessMembers": [],
+  "businessQuestions": [
+    {
+      "id": "90267e82-a3d8-4079-8778-7be473c68e8b",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "food_quality",
+      "label": "Food Quality",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "displayOrder": 0,
+      "isRequired": true,
+      "isActive": true
+    },
+    {
+      "id": "71027aab-164f-423c-9d57-52740acd1bda",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "taste",
+      "label": "Taste & Flavors",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "displayOrder": 1,
+      "isRequired": true,
+      "isActive": true
+    },
+    {
+      "id": "611f6a9f-f90a-44a1-9fba-d73482c2ada6",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "service",
+      "label": "Service & Hospitality",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "displayOrder": 2,
+      "isRequired": true,
+      "isActive": true
+    },
+    {
+      "id": "1912a045-0ec4-43e1-9be2-86f8619027ab",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "cleanliness",
+      "label": "Cleanliness & Hygiene",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "displayOrder": 3,
+      "isRequired": true,
+      "isActive": true
+    },
+    {
+      "id": "ea7c1e5e-3d65-4052-be9b-eb6db4b6255b",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "ambience",
+      "label": "Ambience & Atmosphere",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "displayOrder": 4,
+      "isRequired": true,
+      "isActive": true
+    },
+    {
+      "id": "7816b206-d0be-4d24-b478-ed2848fe610a",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "value_for_money",
+      "label": "Value for Money",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "displayOrder": 5,
+      "isRequired": true,
+      "isActive": true
+    }
+  ],
+  "businessSettings": [
+    {
+      "id": "0861d1a1-f97c-4cbd-a7fd-ee429a76d760",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "reviewTone": "enthusiastic",
+      "reviewLength": "medium",
+      "wordsToAvoid": [],
+      "thingsToHighlight": [],
+      "autoRedirectGoogle": false
+    }
+  ],
+  "qrCodes": [
+    {
+      "id": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "slug": "aC3mL0fx",
+      "name": "Main Counter",
+      "locationTag": "Reception / Counter",
+      "isActive": true,
+      "scanCount": 4,
+      "createdAt": "2026-10-07T10:34:10.813Z",
+      "updatedAt": "2026-10-07T10:34:10.813Z"
+    },
+    {
+      "id": "1ad31d6d-d025-4eee-a24a-237b84f1ab67",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "slug": "cBSBlCWV",
+      "name": "Toilet",
+      "locationTag": "Table 1",
+      "isActive": true,
+      "scanCount": 0,
+      "createdAt": "2026-10-07T11:20:02.641Z",
+      "updatedAt": "2026-10-07T11:20:02.641Z"
+    }
+  ],
+  "subscriptionPlans": [
+    {
+      "id": "c0000000-0000-0000-0000-000000000001",
+      "slug": "trial",
+      "name": "7-Day Free Trial Pass",
+      "priceInr": 2,
+      "originalPriceInr": 149,
+      "offerBadge": "₹2 Trial Activation Pass",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 50,
+      "qrCodeLimit": 1,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": false,
+      "teamMembersLimit": 1,
+      "features": [
+        "7-day full access",
+        "₹2 trial verification fee",
+        "50 AI review generations",
+        "1 Smart QR Stand",
+        "Standard analytics"
+      ],
+      "isActive": true
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000002",
+      "slug": "starter",
+      "name": "Testing Pack",
+      "priceInr": 79,
+      "originalPriceInr": 149,
+      "offerBadge": "₹79 First Month Offer (Reg. ₹149)",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 100,
+      "qrCodeLimit": 2,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": false,
+      "teamMembersLimit": 1,
+      "features": [
+        "100 AI review generations/mo",
+        "First month offer: ₹79 (Reg. ₹149)",
+        "2 Smart QR Stands",
+        "Category question builder",
+        "Scan & copy analytics",
+        "Email support"
+      ],
+      "isActive": true
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000003",
+      "slug": "growth",
+      "name": "Growth Pack",
+      "priceInr": 149,
+      "originalPriceInr": 249,
+      "offerBadge": "₹149 First Month Offer (Reg. ₹249)",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 500,
+      "qrCodeLimit": 5,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": true,
+      "teamMembersLimit": 3,
+      "features": [
+        "500 AI review generations/mo",
+        "First month offer: ₹149 (Reg. ₹249)",
+        "5 Smart QR Stands",
+        "Custom question builder",
+        "Full funnel analytics",
+        "Tone & length customization",
+        "Priority support"
+      ],
+      "isActive": true
+    },
+    {
+      "id": "c0000000-0000-0000-0000-000000000004",
+      "slug": "pro",
+      "name": "Scale / Pro Pack",
+      "priceInr": 249,
+      "originalPriceInr": 399,
+      "offerBadge": "₹249 First Month Offer (Reg. ₹399)",
+      "billingPeriod": "month",
+      "reviewGenerationLimit": 1000,
+      "qrCodeLimit": 15,
+      "analyticsEnabled": true,
+      "customQuestionsEnabled": true,
+      "customBrandingEnabled": true,
+      "teamMembersLimit": 10,
+      "features": [
+        "1,000 AI review generations/mo",
+        "First month offer: ₹249 (Reg. ₹399)",
+        "15 Smart QR Stands",
+        "Advanced anti-abuse guards",
+        "Multi-staff RBAC",
+        "Iron Man reputation shield",
+        "Dedicated SLA"
+      ],
+      "isActive": true
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "49031765-56e1-4473-b49b-4786540ddb53",
+      "businessId": "bb944e56-5ebc-4fdc-bca0-ec02750201c4",
+      "planId": "f294ee95-3ca3-4e67-9968-c14620ef433d",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-07T10:27:28.809Z",
+      "currentPeriodEnd": "2026-11-06T10:27:28.809Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-10-07T10:27:28.809Z",
+      "updatedAt": "2026-10-07T10:27:28.809Z"
+    },
+    {
+      "id": "425dbea1-0652-458a-9108-99ae744a6fd1",
+      "businessId": "baae8347-44fb-4879-84a1-aa47d0182d59",
+      "planId": "59dd24e0-c698-493c-93ca-3f832c6da4b6",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-07T10:28:10.542Z",
+      "currentPeriodEnd": "2026-11-06T10:28:10.542Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-10-07T10:28:10.542Z",
+      "updatedAt": "2026-10-07T10:28:10.542Z"
+    },
+    {
+      "id": "c46943ec-cd05-4a77-9052-d8025bd4a3ae",
+      "businessId": "4c548771-b822-44e6-b805-a8074120f1fa",
+      "planId": "9edced55-9974-4bcc-8cae-9fa149c0f87b",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-07T10:28:25.153Z",
+      "currentPeriodEnd": "2026-11-06T10:28:25.153Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-10-07T10:28:25.153Z",
+      "updatedAt": "2026-10-07T10:28:25.153Z"
+    },
+    {
+      "id": "096afbcd-8679-4d2c-ac23-80615587eb3d",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "planId": "c0000000-0000-0000-0000-000000000002",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-07T10:34:10.813Z",
+      "currentPeriodEnd": "2026-10-14T10:34:10.813Z",
+      "trialStart": "2026-10-07T10:34:10.813Z",
+      "trialEnd": "2026-10-14T10:34:10.813Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-10-07T10:34:10.813Z",
+      "updatedAt": "2026-10-07T10:34:10.813Z"
+    },
+    {
+      "id": "a3dbf883-704a-4f53-88cf-078de6476751",
+      "businessId": "f0c0c27d-6af4-4d80-952d-3c77c883b7fe",
+      "planId": "86136243-a8fe-420a-a8da-fe77746d826a",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-07T11:01:17.542Z",
+      "currentPeriodEnd": "2026-11-06T11:01:17.542Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-10-07T11:01:17.542Z",
+      "updatedAt": "2026-10-07T11:01:17.542Z"
+    },
+    {
+      "id": "5c2d1bf0-e5a2-4afa-a452-b957ec1ec7ff",
+      "businessId": "test_biz_123",
+      "planId": "c0000000-0000-0000-0000-000000000002",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-07T13:43:27.584Z",
+      "currentPeriodEnd": "2026-11-06T13:43:27.584Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-10-07T13:43:27.584Z",
+      "updatedAt": "2026-10-07T13:43:27.584Z"
+    }
+  ],
+  "usageRecords": [
+    {
+      "id": "630dcf76-8c37-4281-9024-001792fbc490",
+      "businessId": "bb944e56-5ebc-4fdc-bca0-ec02750201c4",
+      "periodMonth": "2026-10",
+      "reviewsGeneratedCount": 4,
+      "qrScansCount": 0,
+      "updatedAt": "2026-10-07T10:27:28.824Z"
+    },
+    {
+      "id": "55a3bdf1-d638-4447-b9ec-0b75c4efcd2c",
+      "businessId": "baae8347-44fb-4879-84a1-aa47d0182d59",
+      "periodMonth": "2026-10",
+      "reviewsGeneratedCount": 3,
+      "qrScansCount": 0,
+      "updatedAt": "2026-10-07T10:28:10.547Z"
+    },
+    {
+      "id": "95edf6fb-84fc-4549-a5bb-be50dd44a0fe",
+      "businessId": "4c548771-b822-44e6-b805-a8074120f1fa",
+      "periodMonth": "2026-10",
+      "reviewsGeneratedCount": 3,
+      "qrScansCount": 0,
+      "updatedAt": "2026-10-07T10:28:25.159Z"
+    },
+    {
+      "id": "3c440d3d-4ab9-4095-badb-60e601adbe09",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "periodMonth": "2026-10",
+      "reviewsGeneratedCount": 2,
+      "qrScansCount": 0,
+      "updatedAt": "2026-10-07T11:22:30.059Z"
+    },
+    {
+      "id": "a75786ab-938e-45fe-9c6a-24581ac50238",
+      "businessId": "f0c0c27d-6af4-4d80-952d-3c77c883b7fe",
+      "periodMonth": "2026-10",
+      "reviewsGeneratedCount": 3,
+      "qrScansCount": 0,
+      "updatedAt": "2026-10-07T11:01:17.552Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "33647700-a347-4ae9-90a5-e0e370c86762",
+      "businessId": "test_biz_123",
+      "orderId": "order_feb3d47bb96bc8c2f7ab9d19",
+      "amountInr": 49,
+      "currency": "INR",
+      "status": "created",
+      "provider": "RAZORPAY",
+      "createdAt": "2026-10-07T13:42:16.945Z",
+      "updatedAt": "2026-10-07T13:42:16.946Z"
+    },
+    {
+      "id": "f20e0107-a8cd-4e1e-a44c-976f490b60da",
+      "businessId": "test_biz_123",
+      "planId": "c0000000-0000-0000-0000-000000000002",
+      "orderId": "order_Tl2T3j83FxRuZq",
+      "amountInr": 49,
+      "currency": "INR",
+      "status": "captured",
+      "provider": "RAZORPAY",
+      "createdAt": "2026-10-07T13:43:09.139Z",
+      "updatedAt": "2026-10-07T13:43:27.581Z",
+      "paymentId": "pay_test123456",
+      "providerReference": "pay_test123456"
+    },
+    {
+      "id": "158a79c7-6e5b-45a4-8e58-53f740955368",
+      "businessId": "test_biz_trial_reg",
+      "planId": "c0000000-0000-0000-0000-000000000001",
+      "orderId": "order_Tl2pLdGd9yZoRh",
+      "amountInr": 2,
+      "currency": "INR",
+      "status": "created",
+      "provider": "RAZORPAY",
+      "createdAt": "2026-10-07T14:04:15.140Z",
+      "updatedAt": "2026-10-07T14:04:15.145Z"
+    }
+  ],
+  "reviewSessions": [
+    {
+      "id": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "sessionToken": "2c443a5dd4cdaf2e14b2aed2acbf9f34",
+      "ipHash": "3e48ef9d22e096da6838540fb846999890462c8a32730a4f7a5eaee6945315f7",
+      "createdAt": "2026-10-07T10:34:10.836Z"
+    },
+    {
+      "id": "b14720ff-5f38-44f0-ae75-4b1b1a3927ec",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "sessionToken": "b4054e12d04a97e51cffb78028383c74",
+      "ipHash": "eff8e7ca506627fe15dda5e0e512fcaad70b6d520f37cc76597fdb4f2d83a1a3",
+      "createdAt": "2026-10-07T10:55:43.847Z"
+    },
+    {
+      "id": "e882f737-0606-483b-babc-e61ac9c4d9aa",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "sessionToken": "f848efe235e7d027ae0946751600e96c",
+      "ipHash": "3e48ef9d22e096da6838540fb846999890462c8a32730a4f7a5eaee6945315f7",
+      "createdAt": "2026-10-07T11:22:24.865Z"
+    },
+    {
+      "id": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "sessionToken": "ba93f4b9d61dff4a8a643012309ea216",
+      "ipHash": "3e48ef9d22e096da6838540fb846999890462c8a32730a4f7a5eaee6945315f7",
+      "createdAt": "2026-10-07T11:22:24.890Z"
+    }
+  ],
+  "reviewRatings": [
+    {
+      "id": "2bb6788f-d93b-4ccb-86c2-74c4358d692e",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "food_quality",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T10:34:10.843Z"
+    },
+    {
+      "id": "cdc2c2e8-0348-44f8-90ed-7b1bcb9fe128",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "taste",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T10:34:10.843Z"
+    },
+    {
+      "id": "f2f6081f-3653-4ec9-8acb-0b19a45369d2",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "service",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T10:34:10.843Z"
+    },
+    {
+      "id": "5c2f7180-d651-4c48-8968-2784442a4bec",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "cleanliness",
+      "ratingValue": 4,
+      "createdAt": "2026-10-07T10:34:10.843Z"
+    },
+    {
+      "id": "a9bfc0f2-322e-4866-970d-7cb80b48ac3f",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "ambience",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T10:34:10.843Z"
+    },
+    {
+      "id": "b0a9e081-b9e8-4810-90b0-8f1f67ecd9b4",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "value_for_money",
+      "ratingValue": 4,
+      "createdAt": "2026-10-07T10:34:10.843Z"
+    },
+    {
+      "id": "06a27047-31ed-4172-96f9-0924a181e73d",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "food_quality",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T11:22:30.061Z"
+    },
+    {
+      "id": "8eee2349-199a-4b8f-b808-262591abf21a",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "taste",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T11:22:30.061Z"
+    },
+    {
+      "id": "a6c1f5d4-9466-4ccd-9205-004c5c05b526",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "service",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T11:22:30.061Z"
+    },
+    {
+      "id": "b49b6484-558d-4c2e-9f25-17868ad7b9e1",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "cleanliness",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T11:22:30.061Z"
+    },
+    {
+      "id": "ab9c9b83-25c2-4ec0-aadc-df4db8bbab1b",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "ambience",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T11:22:30.062Z"
+    },
+    {
+      "id": "30ab2954-f7ac-4a16-af1f-0f231de2c97a",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "questionKey": "value_for_money",
+      "ratingValue": 5,
+      "createdAt": "2026-10-07T11:22:30.062Z"
+    }
+  ],
+  "generatedReviews": [
+    {
+      "id": "550908aa-c7af-42f4-ad11-987e32055184",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "sessionId": "f8248294-b239-46c2-8318-ffdd0e718660",
+      "ratingsSnapshot": {
+        "food_quality": 5,
+        "taste": 5,
+        "service": 5,
+        "cleanliness": 4,
+        "ambience": 5,
+        "value_for_money": 4
+      },
+      "customerComment": "The signature saffron biryani was unbelievable!",
+      "generatedText": "Had a truly wonderful experience at Saffron Fine Dining! The food quality and taste & flavors were exceptional, and everything exceeded my expectations. The signature saffron biryani was unbelievable!! Highly recommended to anyone looking for top-notch restaurant!",
+      "sentiment": "positive",
+      "isCopied": true,
+      "isGoogleClicked": true,
+      "createdAt": "2026-10-07T10:34:10.847Z"
+    },
+    {
+      "id": "c61741da-e7d1-4d92-8366-9c2f338a299a",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "sessionId": "1741df47-b32f-4ccc-9d98-73194a2d092f",
+      "ratingsSnapshot": {
+        "food_quality": 5,
+        "taste": 5,
+        "service": 5,
+        "cleanliness": 5,
+        "ambience": 5,
+        "value_for_money": 5
+      },
+      "customerComment": "hello",
+      "generatedText": "Had a truly wonderful experience at Saffron Fine Dining! The food quality and taste & flavors were exceptional, and everything exceeded my expectations. hello! Highly recommended to anyone looking for top-notch restaurant!",
+      "sentiment": "positive",
+      "isCopied": true,
+      "isGoogleClicked": true,
+      "createdAt": "2026-10-07T11:22:30.067Z"
+    }
+  ],
+  "analyticsEvents": [
+    {
+      "id": "d76614c0-d134-40fc-a65d-fd65f057b370",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "QR_SCAN",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Python-urllib/3.14"
+      },
+      "createdAt": "2026-10-07T10:34:10.834Z"
+    },
+    {
+      "id": "6aad0411-0573-4e0b-aba1-6e66bb9edfb0",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "RATING_SUBMISSION",
+      "metadata": {
+        "ratingsCount": 6
+      },
+      "createdAt": "2026-10-07T10:34:10.844Z"
+    },
+    {
+      "id": "936abd23-db89-49ad-bccc-0d13a8f1ce29",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "REVIEW_GENERATED",
+      "metadata": {
+        "reviewId": "550908aa-c7af-42f4-ad11-987e32055184",
+        "sentiment": "positive"
+      },
+      "createdAt": "2026-10-07T10:34:10.848Z"
+    },
+    {
+      "id": "b39394b9-53b2-49b1-962d-87f2f9ed75ee",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "eventType": "REVIEW_COPIED",
+      "metadata": {
+        "reviewId": "550908aa-c7af-42f4-ad11-987e32055184"
+      },
+      "createdAt": "2026-10-07T10:34:10.854Z"
+    },
+    {
+      "id": "2d799eed-9dd0-4b34-b24d-870c4f4a0583",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "eventType": "GOOGLE_MAPS_CLICK",
+      "metadata": {
+        "reviewId": "550908aa-c7af-42f4-ad11-987e32055184"
+      },
+      "createdAt": "2026-10-07T10:34:10.860Z"
+    },
+    {
+      "id": "ff45aa9f-ff37-40f0-9038-bb42f3f38e24",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "QR_SCAN",
+      "metadata": {
+        "ip": "::1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+      },
+      "createdAt": "2026-10-07T10:55:43.831Z"
+    },
+    {
+      "id": "0f10a9e5-84f0-4a11-ac94-96f8eefcf06e",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "QR_SCAN",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+      },
+      "createdAt": "2026-10-07T11:22:24.862Z"
+    },
+    {
+      "id": "835d2a2a-a16b-4100-ae92-7b3e5d572cbb",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "QR_SCAN",
+      "metadata": {
+        "ip": "::ffff:127.0.0.1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+      },
+      "createdAt": "2026-10-07T11:22:24.888Z"
+    },
+    {
+      "id": "a0f88eac-dc3c-46a9-9ce3-bded75d58c05",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "RATING_SUBMISSION",
+      "metadata": {
+        "ratingsCount": 6
+      },
+      "createdAt": "2026-10-07T11:22:30.063Z"
+    },
+    {
+      "id": "34237a2d-1b90-4733-ba4d-ba1659adaffc",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "qrCodeId": "849ca434-e863-4914-8949-d2cfdcb933d5",
+      "eventType": "REVIEW_GENERATED",
+      "metadata": {
+        "reviewId": "c61741da-e7d1-4d92-8366-9c2f338a299a",
+        "sentiment": "positive"
+      },
+      "createdAt": "2026-10-07T11:22:30.069Z"
+    },
+    {
+      "id": "509d347b-2592-41d8-bf6a-fb997c5e7285",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "eventType": "REVIEW_COPIED",
+      "metadata": {
+        "reviewId": "c61741da-e7d1-4d92-8366-9c2f338a299a"
+      },
+      "createdAt": "2026-10-07T11:22:34.048Z"
+    },
+    {
+      "id": "7a6c15ee-2155-4dc3-9f37-37d1ba622a5d",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "eventType": "REVIEW_COPIED",
+      "metadata": {
+        "reviewId": "c61741da-e7d1-4d92-8366-9c2f338a299a"
+      },
+      "createdAt": "2026-10-07T11:22:39.465Z"
+    },
+    {
+      "id": "c763e583-2655-4d2b-8e5d-7b9a0171f710",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "eventType": "GOOGLE_MAPS_CLICK",
+      "metadata": {
+        "reviewId": "c61741da-e7d1-4d92-8366-9c2f338a299a"
+      },
+      "createdAt": "2026-10-07T11:22:41.144Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "ee71bb04-00df-454a-bb9b-066d51903d3b",
+      "businessId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "userId": "6305d7aa-f345-41fb-a4db-7b5065871a1c",
+      "action": "BUSINESS_REGISTERED",
+      "resourceType": "BUSINESS",
+      "resourceId": "ebddd856-5fe4-4f70-8872-014fab69d133",
+      "details": {
+        "businessName": "Saffron Fine Dining",
+        "plan": "starter"
+      },
+      "ipAddress": "::ffff:127.0.0.1",
+      "createdAt": "2026-10-07T10:34:10.813Z"
+    },
+    {
+      "id": "9c1d0625-8422-45a2-a188-9ae7dfc64e8f",
+      "businessId": "test_biz_123",
+      "action": "PAYMENT_CAPTURED",
+      "resourceType": "PAYMENT",
+      "resourceId": "f20e0107-a8cd-4e1e-a44c-976f490b60da",
+      "details": {
+        "orderId": "order_Tl2T3j83FxRuZq",
+        "paymentId": "pay_test123456",
+        "amountInr": 49
+      },
+      "createdAt": "2026-10-07T13:43:27.584Z"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "short_name": "Reviewly",
+  "name": "Reviewly — Multi-Tenant Business Review Platform",
+  "description": "Turn happy diners and customers into 5-star Google Maps reviews automatically using smart QR stands and server-side AI assistance.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#faf8f5",
+  "theme_color": "#9a4018",
+  "display": "standalone",
+  "orientation": "portrait"
+}
