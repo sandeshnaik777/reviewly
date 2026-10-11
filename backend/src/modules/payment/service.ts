@@ -17,6 +17,7 @@ export interface CreateOrderParams {
 export interface OrderResult {
   orderId: string;
   amount: number;
+  amountInr?: number;
   currency: string;
   keyId: string;
 }
@@ -27,6 +28,8 @@ export interface PaymentService {
   verifyPaymentSignature(orderId: string, paymentId: string, signature: string): boolean;
   processPaymentSuccess(orderId: string, paymentId: string, providerRef?: string): Promise<PaymentRecord>;
   processWebhookEvent(rawBody: string, signature: string): Promise<{ handled: boolean; event: string }>;
+  getSubscription(businessId: string): Promise<Subscription | undefined>;
+  getPaymentHistory(businessId: string): Promise<PaymentRecord[]>;
   toggleAutoRenew(businessId: string, enabled: boolean): Promise<Subscription | undefined>;
   processRecurringBilling(): Promise<Array<{ subscriptionId: string; businessId: string; transactionId: string; amountInr: number }>>;
 }
