@@ -60,9 +60,9 @@ export class EmailService {
 </head>
 <body>
   <div class="card">
-    <div class="brand">✦ Reviewly</div>
+    <div class="brand">✦ KindlyReview</div>
     <div class="title">Verify Your Email Address</div>
-    <p class="text">${greeting}<br>Welcome to Reviewly! Enter the 6-digit verification code below to confirm your email and activate your account:</p>
+    <p class="text">${greeting}<br>Welcome to KindlyReview! Enter the 6-digit verification code below to confirm your email and activate your account:</p>
     
     <div class="otp-box">
       <div class="otp-code">${otp}</div>
@@ -74,7 +74,7 @@ export class EmailService {
     </p>
 
     <div class="footer">
-      Reviewly Reputation Engine · Multi-Tenant 5-Star Reviews Platform<br>
+      KindlyReview Reputation Engine · Multi-Tenant 5-Star Reviews Platform<br>
       Automated verification system. Please do not reply directly to this email.
     </div>
   </div>
@@ -82,7 +82,7 @@ export class EmailService {
 </html>
     `;
 
-    const textContent = `${greeting}\n\nYour Reviewly email verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this, please ignore this email.`;
+    const textContent = `${greeting}\n\nYour KindlyReview email verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this, please ignore this email.`;
 
     // 1. Try sending via configured SMTP
     if (this.transporter) {
@@ -90,7 +90,7 @@ export class EmailService {
         const info = await this.transporter.sendMail({
           from: config.email.from,
           to: email,
-          subject: `${otp} is your Reviewly Verification Code`,
+          subject: `${otp} is your KindlyReview Verification Code`,
           text: textContent,
           html: htmlContent,
         });
@@ -104,7 +104,7 @@ export class EmailService {
 
     // 2. Development / Local Fallback Console Display
     console.log('\n' + '='.repeat(64));
-    console.log('📧  [REVIEWLY EMAIL SERVICE — VERIFICATION CODE]');
+    console.log('📧  [KINDLYREVIEW EMAIL SERVICE — VERIFICATION CODE]');
     console.log(`    Recipient: ${email}`);
     if (recipientName) console.log(`    Name:      ${recipientName}`);
     console.log(`    CODE:      [ ${otp.split('').join(' ')} ]`);

@@ -1,10 +1,12 @@
 import { Router, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { db } from '../../db/index.js';
 import { authenticate, AuthenticatedRequest } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/rbac.js';
 import { validateBody } from '../../middleware/validate.js';
 import { AppError } from '../../middleware/errorHandler.js';
+import { smsService } from '../sms/service.js';
 
 export const adminRouter = Router();
 
@@ -38,6 +40,7 @@ adminRouter.post(
     z.object({
       ownerName: z.string().min(2, 'Owner name is required'),
       email: z.string().email('Invalid email address'),
+      password: z.string().min(6, 'Password must be at least 6 characters').optional(),
       phone: z.string().min(8, 'Phone number is required'),
       businessName: z.string().min(2, 'Business name is required'),
       mainCategory: z.enum([
@@ -55,7 +58,10 @@ adminRouter.post(
       customReviewLimit: z.number().min(10).optional(),
       planSlug: z.string().default('starter'),
       paymentStatus: z.enum(['ACTIVE', 'PAST_DUE', 'TRIAL']).default('ACTIVE'),
-      googleReviewUrl: z.string().url().optional(),
+      googleReviewUrl: z.union([z.string().url(), z.literal('')]).optional(),
+      instagramUrl: z.string().optional(),
+      facebookUrl: z.string().optional(),
+      whatsappUrl: z.string().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -65,20 +71,24 @@ adminRouter.post(
         throw new AppError('An account with this email already exists.', 409, 'EMAIL_EXISTS');
       }
 
-      const business = await db.adminCreateBusiness(req.body);
+      const result = await db.adminCreateBusiness(req.body);
 
       await db.logAudit({
         id: crypto.randomUUID(),
-        businessId: business.id,
+        businessId: result.business.id,
         userId: req.user!.id,
         action: 'BUSINESS_MANUALLY_CREATED',
         resourceType: 'BUSINESS',
-        resourceId: business.id,
-        details: { byAdmin: req.user!.email, businessName: business.name },
+        resourceId: result.business.id,
+        details: { byAdmin: req.user!.email, businessName: result.business.name },
         createdAt: new Date().toISOString(),
       });
 
-      res.status(201).json({ success: true, data: business });
+      res.status(201).json({
+        success: true,
+        data: result.business,
+        credentials: result.credentials,
+      });
     } catch (err) {
       next(err);
     }
@@ -209,7 +219,13 @@ adminRouter.put(
   '/plans/:id',
   validateBody(
     z.object({
+      name: z.string().optional(),
       priceInr: z.number().min(0).optional(),
+      priceInr3Months: z.number().min(0).optional(),
+      priceInr6Months: z.number().min(0).optional(),
+      priceInr1Year: z.number().min(0).optional(),
+      originalPriceInr: z.number().min(0).optional(),
+      offerBadge: z.string().optional(),
       reviewGenerationLimit: z.number().min(1).optional(),
       qrCodeLimit: z.number().min(1).optional(),
       isActive: z.boolean().optional(),
@@ -416,3 +432,299 @@ adminRouter.delete('/blogs/:id', async (req: AuthenticatedRequest, res: Response
     next(err);
   }
 });
+
+// ==========================================
+// SUPER ADMIN API KEYS MANAGEMENT (Section 34)
+// ==========================================
+
+function maskApiKey(key: string): string {
+  if (!key) return '';
+  if (key.length <= 8) return '****' + key.slice(-4);
+  return key.slice(0, 6) + '...' + key.slice(-4);
+}
+
+// 1. List all system API keys
+adminRouter.get('/api-keys', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const service = req.query.service as string | undefined;
+    const rawKeys = await db.listApiKeys(service);
+    const sanitized = rawKeys.map((k) => ({
+      ...k,
+      maskedKey: maskApiKey(k.keyValue),
+    }));
+    res.json({ success: true, data: sanitized });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 2. Add new API key
+adminRouter.post(
+  '/api-keys',
+  validateBody(
+    z.object({
+      service: z.enum(['GEMINI', 'GOOGLE_MAPS', 'RAZORPAY', 'EMAIL', 'AWS_SMS', 'OTHER']),
+      name: z.string().min(2, 'Key name / description is required'),
+      keyValue: z.string().min(4, 'API Key value is required'),
+      secondaryValue: z.string().optional(),
+      isActive: z.boolean().default(true),
+    })
+  ),
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const created = await db.createApiKey(req.body);
+      await db.logAudit({
+        id: crypto.randomUUID(),
+        userId: req.user!.id,
+        action: 'API_KEY_CREATED',
+        resourceType: 'SYSTEM_API_KEY',
+        resourceId: created.id,
+        details: { service: created.service, name: created.name },
+        createdAt: new Date().toISOString(),
+      });
+      res.status(201).json({
+        success: true,
+        data: {
+          ...created,
+          maskedKey: maskApiKey(created.keyValue),
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// 3. Update an existing API key
+adminRouter.put(
+  '/api-keys/:id',
+  validateBody(
+    z.object({
+      name: z.string().min(2).optional(),
+      keyValue: z.string().min(4).optional(),
+      secondaryValue: z.string().optional(),
+      isActive: z.boolean().optional(),
+    })
+  ),
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id as string;
+      const updated = await db.updateApiKey(id, req.body);
+      if (!updated) {
+        throw new AppError('API key not found', 404, 'NOT_FOUND');
+      }
+      await db.logAudit({
+        id: crypto.randomUUID(),
+        userId: req.user!.id,
+        action: 'API_KEY_UPDATED',
+        resourceType: 'SYSTEM_API_KEY',
+        resourceId: id,
+        details: { name: updated.name, isActive: updated.isActive },
+        createdAt: new Date().toISOString(),
+      });
+      res.json({
+        success: true,
+        data: {
+          ...updated,
+          maskedKey: maskApiKey(updated.keyValue),
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// 4. Delete an API key
+adminRouter.delete('/api-keys/:id', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params.id as string;
+    const existing = await db.getApiKeyById(id);
+    const deleted = await db.deleteApiKey(id);
+    if (!deleted) {
+      throw new AppError('API key not found', 404, 'NOT_FOUND');
+    }
+    await db.logAudit({
+      id: crypto.randomUUID(),
+      userId: req.user!.id,
+      action: 'API_KEY_DELETED',
+      resourceType: 'SYSTEM_API_KEY',
+      resourceId: id,
+      details: { service: existing?.service, name: existing?.name },
+      createdAt: new Date().toISOString(),
+    });
+    res.json({ success: true, data: { deleted } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 5. Live test an existing API key
+adminRouter.post('/api-keys/:id/test', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params.id as string;
+    const key = await db.getApiKeyById(id);
+    if (!key) {
+      throw new AppError('API key not found', 404, 'NOT_FOUND');
+    }
+
+    if (key.service === 'GEMINI') {
+      const model = key.secondaryValue || 'gemini-flash-latest';
+      const startTime = Date.now();
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key.keyValue}`;
+
+      const testRes = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'Respond with the word ACTIVE.' }] }],
+          generationConfig: { maxOutputTokens: 10 },
+        }),
+      });
+
+      const latencyMs = Date.now() - startTime;
+      if (testRes.ok) {
+        const body = (await testRes.json()) as any;
+        const candidate = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'OK';
+        await db.recordApiKeyUsage(key.id, true);
+        res.json({
+          success: true,
+          data: {
+            status: 'HEALTHY',
+            latencyMs,
+            model,
+            sampleResponse: candidate,
+            message: `Key verified! Gemini responded in ${latencyMs}ms.`,
+          },
+        });
+      } else {
+        const errText = await testRes.text();
+        await db.recordApiKeyUsage(key.id, false, `Test failed: HTTP ${testRes.status}`);
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'KEY_TEST_FAILED',
+            message: `Gemini returned HTTP ${testRes.status}: ${errText.slice(0, 200)}`,
+          },
+        });
+      }
+    } else if (key.service === 'AWS_SMS') {
+      const parts = key.keyValue.includes(':') ? key.keyValue.split(':') : [key.keyValue, ''];
+      const region = key.secondaryValue?.split('|')[0]?.trim() || 'ap-south-1';
+      const testRes = await smsService.testCredentials(parts[0], parts[1], region);
+      await db.recordApiKeyUsage(key.id, testRes.valid, testRes.valid ? undefined : testRes.message);
+      if (testRes.valid) {
+        res.json({
+          success: true,
+          data: {
+            status: 'HEALTHY',
+            latencyMs: testRes.latencyMs,
+            message: testRes.message,
+          },
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: {
+            code: 'KEY_TEST_FAILED',
+            message: testRes.message,
+          },
+        });
+      }
+    } else {
+      res.json({
+        success: true,
+        data: {
+          status: 'CONFIGURED',
+          message: `${key.service} key format validated successfully.`,
+        },
+      });
+    }
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+// 6. Test a raw unsaved key (pre-validation)
+adminRouter.post(
+  '/api-keys/test-raw',
+  validateBody(
+    z.object({
+      service: z.enum(['GEMINI', 'GOOGLE_MAPS', 'RAZORPAY', 'EMAIL', 'AWS_SMS', 'OTHER']),
+      keyValue: z.string().min(4),
+      secondaryValue: z.string().optional(),
+    })
+  ),
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const { service, keyValue, secondaryValue } = req.body;
+      if (service === 'AWS_SMS') {
+        const parts = keyValue.includes(':') ? keyValue.split(':') : [keyValue, ''];
+        const region = secondaryValue?.split('|')[0]?.trim() || 'ap-south-1';
+        const testRes = await smsService.testCredentials(parts[0], parts[1], region);
+        if (testRes.valid) {
+          res.json({
+            success: true,
+            data: {
+              status: 'HEALTHY',
+              latencyMs: testRes.latencyMs,
+              message: testRes.message,
+            },
+          });
+        } else {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'KEY_INVALID',
+              message: testRes.message,
+            },
+          });
+        }
+      } else if (service === 'GEMINI') {
+        const model = secondaryValue || 'gemini-flash-latest';
+        const startTime = Date.now();
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyValue}`;
+
+        const testRes = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: 'Respond with OK.' }] }],
+            generationConfig: { maxOutputTokens: 10 },
+          }),
+        });
+
+        const latencyMs = Date.now() - startTime;
+        if (testRes.ok) {
+          res.json({
+            success: true,
+            data: {
+              status: 'HEALTHY',
+              latencyMs,
+              message: `Gemini API Key is valid and active (${latencyMs}ms)!`,
+            },
+          });
+        } else {
+          const errText = await testRes.text();
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'KEY_INVALID',
+              message: `Gemini test failed (HTTP ${testRes.status}): ${errText.slice(0, 200)}`,
+            },
+          });
+        }
+      } else {
+        res.json({
+          success: true,
+          data: {
+            status: 'HEALTHY',
+            message: `${service} key format validated.`,
+          },
+        });
+      }
+    } catch (err: any) {
+      next(err);
+    }
+  }
+);

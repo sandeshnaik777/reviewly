@@ -5,7 +5,7 @@ const app = createApp();
 
 const server = app.listen(config.port, () => {
   console.log(`====================================================`);
-  console.log(`  Reviewly: Business Review Platform (Multi-Tenant) `);
+  console.log(`  KindlyReview: Business Review Platform (Multi-Tenant) `);
   console.log(`  API Server running on port ${config.port}`);
   console.log(`  Environment: ${config.nodeEnv}`);
   console.log(`  API Base URL: ${config.apiBaseUrl}`);

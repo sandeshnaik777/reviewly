@@ -16,8 +16,8 @@ export async function authenticate(req: AuthenticatedRequest, res: Response, nex
     let token: string | undefined;
 
     // Check HTTP-only cookie first (preferred)
-    if (req.cookies && req.cookies[config.jwt.cookieName]) {
-      token = req.cookies[config.jwt.cookieName];
+    if (req.cookies && (req.cookies[config.jwt.cookieName] || req.cookies['reviewly_auth_token'])) {
+      token = req.cookies[config.jwt.cookieName] || req.cookies['reviewly_auth_token'];
     } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
     }

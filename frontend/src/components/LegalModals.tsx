@@ -117,7 +117,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
             <span style={{ fontSize: '22px' }}>⚖️</span>
             <div>
               <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0 }}>
-                Reviewly Trust, Legal &amp; Support Portal
+                KindlyReview Trust, Legal &amp; Support Portal
               </h3>
               <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
                 Official Policies compliant with IT Act 2000, DPDP Act 2023 &amp; Razorpay Standards
@@ -189,18 +189,18 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   Terms of Service &amp; SaaS Agreement
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
-                  Governing usage of Reviewly multi-tenant SaaS, table stands, and server-side review assistance.
+                  Governing usage of KindlyReview multi-tenant SaaS, table stands, and server-side review assistance.
                 </p>
               </div>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. Acceptance of Terms</h4>
               <p>
-                By creating an account, paying verification fees, or deploying Reviewly QR stands in your establishment, you agree to be bound by these Terms of Service. If you are registering on behalf of a restaurant or commercial enterprise, you warrant that you hold legal authority to bind that entity.
+                By creating an account, paying verification fees, or deploying KindlyReview QR stands in your establishment, you agree to be bound by these Terms of Service. If you are registering on behalf of a restaurant or commercial enterprise, you warrant that you hold legal authority to bind that entity.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Fair Use &amp; Review Authenticity</h4>
               <p>
-                Reviewly provides assistive AI drafting and reputation telemetry designed to help real, in-person dining customers express their feedback smoothly. Merchants agree <strong>NOT</strong> to:
+                KindlyReview provides assistive AI drafting and reputation telemetry designed to help real, in-person dining customers express their feedback smoothly. Merchants agree <strong>NOT</strong> to:
               </p>
               <ul style={{ paddingLeft: '20px', marginBottom: '12px' }}>
                 <li>Manufacture fake reviews or incentivize non-customers to post fraudulent claims.</li>
@@ -240,7 +240,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               <ul style={{ paddingLeft: '20px', marginBottom: '12px' }}>
                 <li><strong>Merchant Data:</strong> Business name, email, phone number, Google Review URL, dining sections, and staff attribution records.</li>
                 <li><strong>Customer Session Data:</strong> Ratings submitted (1-5 stars per category), dining dish mentions, and anonymous QR scan timestamps. Diners are <em>never</em> required to sign up or disclose passwords.</li>
-                <li><strong>Payment Data:</strong> Handled entirely through Razorpay. Reviewly never stores credit card or debit card numbers on internal servers.</li>
+                <li><strong>Payment Data:</strong> Handled entirely through Razorpay. KindlyReview never stores credit card or debit card numbers on internal servers.</li>
               </ul>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Data Encryption &amp; Security</h4>
@@ -255,7 +255,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>4. Grievance Officer</h4>
               <p>
-                In compliance with the Digital Personal Data Protection Act, you may contact our designated Grievance Officer at: <strong>grievance@reviewly.in</strong>, Reviewly Operations, Indiranagar, Bengaluru.
+                In compliance with the Digital Personal Data Protection Act, you may contact our designated Grievance Officer at: <strong>grievance@kindlyreview.in</strong>, KindlyReview Operations, Indiranagar, Bengaluru.
               </p>
             </div>
           )}
@@ -285,7 +285,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>3. Refund Eligibility &amp; Dispute Windows</h4>
               <p>
-                If an accidental duplicate charge or technical billing anomaly occurs, notify our finance desk within 7 days at <strong>billing@reviewly.in</strong>. Once verified, refunds are initiated immediately and reflected in your original payment method (UPI / Bank / Card) within <strong>5 to 7 business days</strong> as per banking network guidelines.
+                If an accidental duplicate charge or technical billing anomaly occurs, notify our finance desk within 7 days at <strong>billing@kindlyreview.in</strong>. Once verified, refunds are initiated immediately and reflected in your original payment method (UPI / Bank / Card) within <strong>5 to 7 business days</strong> as per banking network guidelines.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>4. Hardware / Acrylic Stands</h4>
@@ -317,8 +317,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   <div style={{ fontSize: '20px', marginBottom: '4px' }}>✉️</div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>Email Support</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Avg response &lt; 2 hrs</div>
-                  <a href="mailto:support@reviewly.in" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
-                    support@reviewly.in
+                  <a href="mailto:support@kindlyreview.in" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
+                    support@kindlyreview.in
                   </a>
                 </div>
 
@@ -491,7 +491,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               ) : (
                 <div>
                   <div style={{ marginBottom: '20px' }}>
-                    <span className="badge badge-primary">Reviewly Knowledge & Growth</span>
+                    <span className="badge badge-primary">KindlyReview Knowledge & Growth</span>
                     <h2 className="serif" style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0 4px', color: '#0f172a' }}>
                       Articles, Field Studies &amp; Playbooks
                     </h2>

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import { LegalModals } from '../components/LegalModals.js';
+import { KindlyReviewLogo } from '../components/Logos.js';
+import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
+import { PhoneInput } from '../components/PhoneInput.js';
+import { validatePhoneNumber } from '../utils/phoneValidator.js';
 
 interface Props {
   onComplete: (business: any) => void;
@@ -15,6 +19,13 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [legalModal, setLegalModal] = useState<'terms' | 'privacy' | null>(null);
+
+  // Maps Share Link conversion state
+  const [convertingMapsUrl, setConvertingMapsUrl] = useState(false);
+  const [mapsConvertSuccess, setMapsConvertSuccess] = useState<string | null>(null);
+
+  // Plan duration selections (1, 3, 6, 12 months)
+  const [onboardingPlanDurations, setOnboardingPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({});
 
   // Auth & Account state
   const [isAccountCreated, setIsAccountCreated] = useState(false);
@@ -70,7 +81,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
     reviewTone: 'enthusiastic',
     reviewLength: 'medium',
 
-    // Step 5: Google Review URL
+    // Step 5: Google Review URL & Share Link
+    googleMapsShareUrl: '',
     googleReviewUrl: '',
 
     // Step 6: Plan
@@ -150,7 +162,12 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
     setEmailExistsNotice(false);
 
     if (!formData.ownerName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-      setError('Please provide your name, email, and phone number.');
+      setError('Please provide your name, email, and mobile phone number.');
+      return;
+    }
+    const phoneVal = validatePhoneNumber(formData.phone);
+    if (!phoneVal.isValid) {
+      setError(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
       return;
     }
     if (!formData.password || formData.password.length < 8) {
@@ -320,7 +337,36 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
     }
   };
 
-  const handleNext = () => {
+  const handleConvertOnboardingMapsLink = async () => {
+    const raw = (formData.googleMapsShareUrl || '').trim();
+    if (!raw) {
+      setError('Please enter a Google Maps share link or URL to convert.');
+      return;
+    }
+
+    try {
+      setConvertingMapsUrl(true);
+      setError(null);
+      setMapsConvertSuccess(null);
+
+      const res = await convertGoogleMapsUrl(raw);
+      if (res && res.directReviewUrl) {
+        setFormData((prev: any) => ({
+          ...prev,
+          googleReviewUrl: res.directReviewUrl,
+        }));
+        setMapsConvertSuccess(`✓ Converted to direct 5-star review link! (${res.detectedType})`);
+      } else {
+        throw new Error('Could not convert this link. Please enter your direct review URL manually.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to convert Google Maps link.');
+    } finally {
+      setConvertingMapsUrl(false);
+    }
+  };
+
+  const handleNext = async () => {
     setError(null);
 
     // Step 1 validation
@@ -337,12 +383,36 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         setError('Please enter your restaurant or business name.');
         return;
       }
+      if (formData.phone) {
+        const phoneVal = validatePhoneNumber(formData.phone);
+        if (!phoneVal.isValid) {
+          setError(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+          return;
+        }
+      }
     }
 
     // Step 5 validation (Google URL)
     if (step === 5) {
-      if (!formData.googleReviewUrl || !formData.googleReviewUrl.startsWith('http')) {
-        setError('Please enter a valid Google Review or Google Maps URL (e.g. https://maps.google.com/...).');
+      let targetReviewUrl = formData.googleReviewUrl;
+      if (!targetReviewUrl && formData.googleMapsShareUrl) {
+        try {
+          setConvertingMapsUrl(true);
+          const res = await convertGoogleMapsUrl(formData.googleMapsShareUrl);
+          if (res && res.directReviewUrl) {
+            targetReviewUrl = res.directReviewUrl;
+            setFormData((prev: any) => ({ ...prev, googleReviewUrl: res.directReviewUrl }));
+            setMapsConvertSuccess(`✓ Converted to direct 5-star review link! (${res.detectedType})`);
+          }
+        } catch {
+          // fallback validation below
+        } finally {
+          setConvertingMapsUrl(false);
+        }
+      }
+
+      if (!targetReviewUrl || !targetReviewUrl.startsWith('http')) {
+        setError('Please enter or convert a valid Google Review URL (e.g. https://search.google.com/local/writereview?...).');
         return;
       }
     }
@@ -375,6 +445,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             country: formData.country || 'India',
             pincode: formData.pincode || '000000',
             googleReviewUrl: formData.googleReviewUrl,
+            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
             description: formData.description,
             openingHours: formData.openingHours,
             questions: formData.questions,
@@ -426,6 +497,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             country: formData.country || 'India',
             pincode: formData.pincode || '000000',
             googleReviewUrl: formData.googleReviewUrl,
+            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
             description: formData.description,
             openingHours: formData.openingHours,
             questions: formData.questions,
@@ -456,6 +528,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             country: formData.country || 'India',
             pincode: formData.pincode || '000000',
             googleReviewUrl: formData.googleReviewUrl,
+            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
             description: formData.description,
             openingHours: formData.openingHours,
             questions: formData.questions,
@@ -483,7 +556,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           key: order.keyId,
           amount: order.amount, // 200 paisa (₹2)
           currency: order.currency || 'INR',
-          name: 'Reviewly Platform',
+          name: 'KindlyReview Platform',
           description: '7-Day Free Trial Pass (₹2 Activation)',
           order_id: order.orderId,
           prefill: {
@@ -539,7 +612,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   return (
     <div className="desktop-container" style={{ maxWidth: '800px', margin: '30px auto' }}>
       {/* Top Navigation Strip */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
         <button
           type="button"
           onClick={onNavigateHome || onNavigateLogin}
@@ -548,6 +621,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         >
           ← Back to Home
         </button>
+        <KindlyReviewLogo height={34} />
         <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
           Step <strong>{step}</strong> of 9
         </span>
@@ -886,14 +960,13 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     </div>
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Mobile Phone Number *</label>
-                    <input
-                      className="form-input"
-                      placeholder="+91 9876543210"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  <div>
+                    <PhoneInput
+                      label="Mobile Phone Number"
                       required
+                      value={formData.phone}
+                      onChange={(val) => setFormData({ ...formData, phone: val })}
+                      defaultCountryCode="IN"
                     />
                   </div>
                 </div>
@@ -928,7 +1001,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </button>
 
                   <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                    By creating an account, you agree to Reviewly's{' '}
+                    By creating an account, you agree to KindlyReview's{' '}
                     <button
                       type="button"
                       onClick={() => setLegalModal('terms')}
@@ -1018,8 +1091,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
         {/* STEP 3: Restaurant / Business Info */}
         {step === 3 && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <label className="form-label">Restaurant / Business Name *</label>
               <input
                 className="form-input"
@@ -1030,7 +1103,17 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               />
             </div>
 
-            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <PhoneInput
+                label="Business Phone Number"
+                required
+                value={formData.phone}
+                onChange={(val) => setFormData({ ...formData, phone: val })}
+                defaultCountryCode="IN"
+              />
+            </div>
+
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <label className="form-label">Physical Address</label>
               <input
                 className="form-input"
@@ -1207,18 +1290,97 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           </div>
         )}
 
-        {/* STEP 5: Google Review URL */}
+        {/* STEP 5: Google Review URL & Google Maps Share Link */}
         {step === 5 && (
           <div>
-            <div className="form-group">
-              <label className="form-label">Google Maps Review Link *</label>
+            {/* 1. Google Maps Share Link Converter */}
+            <div className="card" style={{ padding: '20px', marginBottom: '20px', border: '1.5px dashed var(--primary)', background: '#fffcfb' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <span style={{ fontSize: '18px' }}>🔗</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '15px' }}>Paste Any Google Maps Share Link</div>
+                  <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                    Copy from Google Maps app (e.g. <code>https://maps.app.goo.gl/...</code>) or browser URL
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <input
+                  className="form-input"
+                  style={{ flex: 1, minWidth: '240px' }}
+                  placeholder="https://maps.app.goo.gl/... or https://goo.gl/maps/..."
+                  value={formData.googleMapsShareUrl || ''}
+                  onChange={(e) => setFormData({ ...formData, googleMapsShareUrl: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={convertingMapsUrl || !formData.googleMapsShareUrl?.trim()}
+                  onClick={handleConvertOnboardingMapsLink}
+                  style={{ whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px', padding: '0 18px' }}
+                >
+                  {convertingMapsUrl ? (
+                    <>
+                      <span className="spinner" style={{ width: '14px', height: '14px' }}></span>
+                      <span>Resolving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span>
+                      <span>Convert to Review Link</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {mapsConvertSuccess && (
+                <div
+                  style={{
+                    background: '#dcfce7',
+                    border: '1px solid #86efac',
+                    color: '#166534',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12.5px',
+                    marginTop: '12px',
+                    fontWeight: 600,
+                  }}
+                >
+                  {mapsConvertSuccess}
+                </div>
+              )}
+            </div>
+
+            {/* 2. Direct Review Link (Editable & Testable) */}
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>
+                  Direct Google 5-Star Review Submission URL *
+                </label>
+                {formData.googleReviewUrl && (
+                  <a
+                    href={formData.googleReviewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-outline"
+                    style={{ fontSize: '12px', padding: '3px 10px', height: 'auto', textDecoration: 'none' }}
+                  >
+                    Test Link ↗
+                  </a>
+                )}
+              </div>
               <input
                 className="form-input"
-                placeholder="https://g.page/r/your-business/review or https://maps.google.com/?cid=..."
+                placeholder="https://search.google.com/local/writereview?placeid=... or ?cid=..."
                 value={formData.googleReviewUrl}
                 onChange={(e) => setFormData({ ...formData, googleReviewUrl: e.target.value })}
               />
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                You can freely edit or test this URL. When guests scan your table stand, this link immediately opens Google's 5-star review modal.
+              </div>
             </div>
+
             <div
               style={{
                 background: 'var(--surface-container)',
@@ -1228,11 +1390,11 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 color: 'var(--text-muted)',
               }}
             >
-              💡 <strong>How to find your Google review link:</strong>
+              💡 <strong>Tips for your Google review link:</strong>
               <ol style={{ paddingLeft: '18px', marginTop: '6px' }}>
-                <li>Search your business name on Google Maps.</li>
-                <li>Click <strong>Ask for reviews</strong> or <strong>Share review form</strong>.</li>
-                <li>Copy and paste that URL here so customers are sent straight to your Google Maps review dialog!</li>
+                <li>Paste your standard Google Maps share link above and click <strong>Convert to Review Link</strong>.</li>
+                <li>Or go to Google Maps on desktop, search your business, and click <strong>Ask for reviews</strong>.</li>
+                <li>You can freely update this link anytime later in your Business Settings!</li>
               </ol>
             </div>
           </div>
@@ -1253,11 +1415,40 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
               {plans
                 .filter((p) => p.slug !== 'trial')
                 .map((p) => {
                   const isSelected = formData.planSlug === p.slug;
+                  const dur = onboardingPlanDurations[p.id] || 1;
+
+                  let activePrice = p.priceInr;
+                  let origPrice = p.originalPriceInr || Math.round(p.priceInr * 1.5);
+                  let subLabel = '/ month';
+                  let reviewsDisplay = `${p.reviewGenerationLimit.toLocaleString()} Monthly Reviews`;
+                  let tag = p.offerBadge || 'First Month Offer';
+
+                  if (dur === 3) {
+                    activePrice = p.priceInr3Months || p.priceInr * 3;
+                    origPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 3;
+                    subLabel = `for 3 mos (₹${Math.round(activePrice / 3)}/mo)`;
+                    reviewsDisplay = `${(p.reviewGenerationLimit * 3).toLocaleString()} Total Reviews (Quarterly)`;
+                    tag = 'Quarterly Pack';
+                  } else if (dur === 6) {
+                    activePrice = p.priceInr6Months || p.priceInr * 6;
+                    origPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 6;
+                    subLabel = `for 6 mos (₹${Math.round(activePrice / 6)}/mo)`;
+                    reviewsDisplay = `${(p.reviewGenerationLimit * 6).toLocaleString()} Total Reviews (Semi-Annual)`;
+                    tag = 'Semi-Annual Pack';
+                  } else if (dur === 12) {
+                    // 1 Year Pack: 2 Months Free discount!
+                    activePrice = p.priceInr1Year || (p.priceInr * 10);
+                    origPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 12;
+                    subLabel = `for 1 yr (₹${Math.round(activePrice / 12)}/mo)`;
+                    reviewsDisplay = `${(p.reviewGenerationLimit * 12).toLocaleString()} Total Reviews (1-Year Pass)`;
+                    tag = '🎁 2 Months Free Applied!';
+                  }
+
                   return (
                     <div
                       key={p.slug}
@@ -1280,7 +1471,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                           style={{
                             position: 'absolute',
                             top: '-10px',
-                            right: '14px',
+                            left: '16px',
                             background: 'var(--primary)',
                             color: 'white',
                             fontSize: '11px',
@@ -1293,25 +1484,74 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                         </div>
                       )}
 
-                      <div style={{ fontWeight: 700, fontSize: '17px', color: 'var(--text)' }}>{p.name}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
-                        {p.offerBadge || 'First Month Offer'}
+                      {/* Header with Title and Month Duration Selector in Right Upper Container */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '17px', color: 'var(--text)' }}>{p.name}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
+                            {tag}
+                          </div>
+                        </div>
+
+                        {/* In right upper of container: Select Months */}
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}
+                        >
+                          <span style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.4px' }}>
+                            Select Months
+                          </span>
+                          <div style={{ display: 'inline-flex', background: 'var(--surface-container)', padding: '2px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                            {[
+                              { m: 1 as const, lbl: '1M' },
+                              { m: 3 as const, lbl: '3M' },
+                              { m: 6 as const, lbl: '6M' },
+                              { m: 12 as const, lbl: '1Y 🎁' },
+                            ].map((tab) => (
+                              <button
+                                key={tab.m}
+                                type="button"
+                                onClick={() => setOnboardingPlanDurations((prev) => ({ ...prev, [p.id]: tab.m }))}
+                                style={{
+                                  background: dur === tab.m ? 'var(--primary)' : 'transparent',
+                                  color: dur === tab.m ? '#ffffff' : 'var(--text)',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '10.5px',
+                                  fontWeight: dur === tab.m ? 700 : 500,
+                                  padding: '2px 6px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                title={tab.m === 12 ? '1 Year Plan: 2 Months Free Discount!' : `${tab.m} Months`}
+                              >
+                                {tab.lbl}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
-                      <div style={{ margin: '12px 0 16px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                      <div style={{ margin: '8px 0 12px', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
                         <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)' }}>
-                          ₹{p.priceInr}
+                          ₹{activePrice}
                         </span>
-                        {p.originalPriceInr && (
+                        {origPrice && origPrice > activePrice && (
                           <span style={{ fontSize: '15px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                            ₹{p.originalPriceInr}
+                            ₹{origPrice}
                           </span>
                         )}
-                        <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>/ month</span>
+                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{subLabel}</span>
                       </div>
 
+                      {dur === 12 && (
+                        <div style={{ fontSize: '11px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '5px 8px', borderRadius: '6px', marginBottom: '10px', fontWeight: 600 }}>
+                          🎉 1-Year Pack: 2 Months Free Discount Applied!
+                        </div>
+                      )}
+
                       <ul style={{ listStyle: 'none', fontSize: '12.5px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                        <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {p.reviewGenerationLimit.toLocaleString()} Monthly Reviews</li>
+                        <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviewsDisplay}</li>
                         <li>✓ {p.qrCodeLimit} Smart QR Stands</li>
                         <li>✓ Full Funnel Conversion Tracking</li>
                         <li>✓ Aura Telemetry & Reputation Shield</li>
@@ -1454,7 +1694,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               </div>
 
               <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                All charges in INR. By proceeding, you agree to Reviewly's{' '}
+                All charges in INR. By proceeding, you agree to KindlyReview's{' '}
                 <button
                   type="button"
                   onClick={() => setLegalModal('terms')}

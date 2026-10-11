@@ -1,0 +1,37 @@
+name: KindlyReview CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            echo "🚀 [GitHub Actions] Connected to EC2. Triggering KindlyReview deployment..."
+            cd /var/www/kindlyreview
+            git config --global --add safe.directory /var/www/kindlyreview
+            
+            # Fetch latest commits from main
+            git fetch origin main
+            git reset --hard origin/main
+            
+            # Execute automated deployment script
+            chmod +x /var/www/kindlyreview/deploy.sh
+            bash /var/www/kindlyreview/deploy.sh

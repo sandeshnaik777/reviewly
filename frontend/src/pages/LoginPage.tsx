@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../services/api.js';
 import { LegalModals } from '../components/LegalModals.js';
+import { KindlyReviewBrand } from '../components/Logos.js';
 
 interface Props {
   onLoginSuccess: (user: any, businesses: any[]) => void;
@@ -29,16 +30,6 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
     }
   };
 
-  const fillDemoMerchant = () => {
-    setEmail('saffron.bistro@test.com');
-    setPassword('SecurePassword123!');
-  };
-
-  const fillDemoAdmin = () => {
-    setEmail('admin@reviewplatform.local');
-    setPassword('AdminSecurePassword123!');
-  };
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#faf8f5' }}>
       {/* Top Header with Back to Home Navigation */}
@@ -54,13 +45,10 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
       >
         <div
           onClick={onNavigateHome}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
-          title="Return to Reviewly Home"
+          style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+          title="Return to KindlyReview Home"
         >
-          <span style={{ fontSize: '22px' }}>⭐</span>
-          <span className="serif" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.02em' }}>
-            Reviewly
-          </span>
+          <KindlyReviewBrand iconSize={38} fontSize={24} />
         </div>
 
         <button
@@ -101,7 +89,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
 
           <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <h1 className="serif" style={{ fontSize: '28px', fontWeight: 700 }}>
-              Sign in to Reviewly
+              Sign in to KindlyReview
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '4px' }}>
               Access your restaurant analytics and reputation command center.
@@ -109,54 +97,6 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
           </div>
 
           {error && <div className="alert alert-error">{error}</div>}
-
-          {/* Quick Demo Credentials Autofill Helper */}
-          <div
-            style={{
-              background: 'var(--surface-container)',
-              borderRadius: '8px',
-              padding: '12px 14px',
-              marginBottom: '20px',
-              fontSize: '12px',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '6px' }}>
-              ⚡ 1-Click Demo Logins:
-            </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={fillDemoMerchant}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid var(--border)',
-                  padding: '4px 10px',
-                  borderRadius: '4px',
-                  fontSize: '11.5px',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                }}
-              >
-                🍴 Saffron Bistro Owner
-              </button>
-              <button
-                type="button"
-                onClick={fillDemoAdmin}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid var(--border)',
-                  padding: '4px 10px',
-                  borderRadius: '4px',
-                  fontSize: '11.5px',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                }}
-              >
-                🛡️ Super Admin
-              </button>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -190,7 +130,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
 
           {/* Terms & Privacy Policy Legal Agreement Notice */}
           <div style={{ marginTop: '14px', textAlign: 'center', fontSize: '11.5px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            By signing in, you agree to Reviewly's{' '}
+            By signing in, you agree to KindlyReview's{' '}
             <button
               type="button"
               onClick={() => setLegalModal('terms')}

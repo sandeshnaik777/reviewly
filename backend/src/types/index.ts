@@ -23,6 +23,8 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   emailVerified: boolean;
+  phone?: string;
+  phoneVerified?: boolean;
   failedLoginAttempts: number;
   lockoutUntil?: string;
   createdAt: string;
@@ -45,10 +47,14 @@ export interface Business {
   country: string;
   pincode: string;
   googleReviewUrl: string;
+  googleMapsShareUrl?: string;
   logoUrl?: string;
   coverImageUrl?: string;
   description?: string;
   openingHours?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  whatsappUrl?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -83,10 +89,20 @@ export interface BusinessSettings {
   businessId: string;
   reviewTone: 'casual' | 'enthusiastic' | 'professional' | 'concise' | 'detailed' | 'warm';
   reviewLength: 'short' | 'medium' | 'detailed';
+  reviewFormat?: 'narrative' | 'bullet_highlights' | 'casual_conversational' | 'professional_critique';
   customInstructions?: string;
   wordsToAvoid: string[];
   thingsToHighlight: string[];
   autoRedirectGoogle: boolean;
+  // Scratch Card & Rewards Engine (Optional)
+  scratchCardEnabled?: boolean;
+  scratchCardType?: 'golden_ticket' | 'neon_glow' | 'festive_confetti' | 'minimal_classic';
+  scratchCardWinProbability?: number;
+  scratchCardRewardTitle?: string;
+  scratchCardRewardDescription?: string;
+  scratchCardCouponCode?: string;
+  scratchCardCustomLogoUrl?: string;
+  scratchCardLoseMessage?: string;
 }
 
 export interface QRCodeItem {
@@ -110,7 +126,10 @@ export interface SubscriptionPlan {
   id: string;
   slug: 'starter' | 'growth' | 'pro' | 'trial';
   name: string;
-  priceInr: number;
+  priceInr: number; // 1 Month
+  priceInr3Months?: number; // 3 Months
+  priceInr6Months?: number; // 6 Months
+  priceInr1Year?: number; // 1 Year / 12 Months (2 Months Free discount)
   originalPriceInr?: number;
   offerBadge?: string;
   billingPeriod: 'month' | 'year';
@@ -165,6 +184,7 @@ export interface PaymentRecord {
   paymentId?: string;
   amountInr: number;
   currency: string;
+  durationMonths?: number;
   status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
   provider: 'RAZORPAY' | 'STRIPE' | 'MOCK';
   providerReference?: string;
@@ -202,7 +222,8 @@ export type AnalyticsEventType =
   | 'RATING_SUBMISSION'
   | 'REVIEW_GENERATED'
   | 'REVIEW_COPIED'
-  | 'GOOGLE_MAPS_CLICK';
+  | 'GOOGLE_MAPS_CLICK'
+  | 'SOCIAL_CLICK';
 
 export interface AnalyticsEvent {
   id: string;
@@ -245,6 +266,16 @@ export interface EmailVerificationRecord {
   createdAt: string;
 }
 
+export interface PhoneVerificationRecord {
+  id: string;
+  userId?: string;
+  phone: string;
+  codeHash: string;
+  expiresAt: string;
+  attempts: number;
+  createdAt: string;
+}
+
 export interface SystemNotification {
   id: string;
   title: string;
@@ -279,6 +310,23 @@ export interface BlogPost {
   tags: string[];
   isPublished: boolean;
   publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ApiKeyServiceType = 'GEMINI' | 'GOOGLE_MAPS' | 'RAZORPAY' | 'EMAIL' | 'AWS_SMS' | 'OTHER';
+
+export interface SystemApiKey {
+  id: string;
+  service: ApiKeyServiceType;
+  name: string;
+  keyValue: string;
+  secondaryValue?: string;
+  isActive: boolean;
+  callCount: number;
+  errorCount: number;
+  lastUsedAt?: string;
+  lastError?: string;
   createdAt: string;
   updatedAt: string;
 }

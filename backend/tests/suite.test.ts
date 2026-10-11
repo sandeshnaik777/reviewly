@@ -8,7 +8,9 @@ import { aiReviewService } from '../src/modules/ai/service.js';
 import { subscriptionService } from '../src/modules/subscription/service.js';
 import { config } from '../src/config/index.js';
 import { createApp } from '../src/app.js';
-import { User, Business, Subscription, SubscriptionPlan } from '../src/types/index.js';
+import { convertMapsUrlToDirectReviewUrl } from '../src/modules/business/mapsService.js';
+import { validatePhoneNumber, parsePhoneInput, formatIndianPhone, SUPPORTED_COUNTRIES } from '../src/utils/phoneValidator.js';
+import { smsService } from '../src/modules/sms/service.js';
 
 test('1. Authentication & Password Security', async (t) => {
   await t.test('Securely hashes passwords with bcrypt and does not store plaintext', async () => {
@@ -581,5 +583,427 @@ test('9. Super Admin Blog & Articles System', async (t) => {
     assert.equal(post, null);
   });
 });
+
+test('10. Category-Aware AI, Review Formats, Scratch Card & GeoGrid Engine', async (t) => {
+  await t.test('Generates PC/Hardware specific vocabulary for computer sellers, avoiding dining terms', async () => {
+    const pcBusiness: Business = {
+      id: crypto.randomUUID(),
+      ownerId: crypto.randomUUID(),
+      name: 'Apex Gaming Rig & PC Hub',
+      slug: `apex-pc-${Date.now()}`,
+      category: 'RETAIL',
+      mainCategory: 'RETAIL',
+      subcategory: 'Custom PC Builds & Computer Hardware',
+      city: 'Bangalore',
+      googlePlaceId: 'place_pc_123',
+      googleReviewUrl: 'https://g.page/apex-pc',
+      ratingPromptThreshold: 4,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const result = await aiReviewService.generateReview({
+      business: pcBusiness,
+      settings: {
+        id: crypto.randomUUID(),
+        businessId: pcBusiness.id,
+        reviewTone: 'enthusiastic',
+        reviewLength: 'detailed',
+        thingsToHighlight: ['Custom PC Builds', 'Genuine Components', 'Clean Cable Management'],
+        wordsToAvoid: ['food', 'flavor', 'waiter', 'delicious'],
+        autoRedirectGoogle: false,
+      },
+      ratings: { components: 5, assembly: 5, diagnostics: 5 },
+      questionsMap: {
+        components: 'Component Quality & Authenticity',
+        assembly: 'Cable Management & Assembly',
+        diagnostics: 'Technical Consultation',
+      },
+      reviewLength: 'detailed',
+      reviewFormat: 'bullet_highlights',
+    });
+
+    const review = result.reviewText;
+    assert.ok(review.length > 20);
+    // Bullet highlights format should have bullet points or checkmarks
+    assert.ok(review.includes('•') || review.includes('✔') || review.includes('-'));
+    // Should NOT contain dining clichés
+    assert.equal(review.toLowerCase().includes('dining'), false);
+    assert.equal(review.toLowerCase().includes('delicious'), false);
+    assert.equal(review.toLowerCase().includes('food'), false);
+  });
+
+  await t.test('Generates formatted reviews according to requested format style', async () => {
+    const cafeBusiness: Business = {
+      id: crypto.randomUUID(),
+      ownerId: crypto.randomUUID(),
+      name: 'Artisan Brew Roastery',
+      slug: `artisan-brew-${Date.now()}`,
+      category: 'FOOD_AND_BEVERAGE',
+      mainCategory: 'FOOD_AND_BEVERAGE',
+      subcategory: 'Specialty Coffee Shop',
+      city: 'Mumbai',
+      googlePlaceId: 'place_cafe_123',
+      googleReviewUrl: 'https://g.page/artisan-brew',
+      ratingPromptThreshold: 4,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const result = await aiReviewService.generateReview({
+      business: cafeBusiness,
+      settings: {
+        id: crypto.randomUUID(),
+        businessId: cafeBusiness.id,
+        reviewTone: 'casual',
+        reviewLength: 'medium',
+        wordsToAvoid: [],
+        thingsToHighlight: [],
+        autoRedirectGoogle: false,
+      },
+      ratings: { coffee: 5, vibe: 5 },
+      questionsMap: { coffee: 'Brew Quality', vibe: 'Ambience' },
+      reviewFormat: 'casual_conversational',
+      reviewLength: 'medium',
+    });
+
+    assert.ok(result.reviewText.length > 15);
+  });
+
+  await t.test('Stores and updates optional scratch card reward engine settings', async () => {
+    const businessId = crypto.randomUUID();
+    const settings = {
+      id: crypto.randomUUID(),
+      businessId,
+      reviewTone: 'enthusiastic' as const,
+      reviewLength: 'medium' as const,
+      wordsToAvoid: [],
+      thingsToHighlight: [],
+      autoRedirectGoogle: true,
+      scratchCardEnabled: true,
+      scratchCardType: 'festive_confetti' as const,
+      scratchCardRewardTitle: 'Free Espresso on Next Visit',
+      scratchCardRewardDescription: 'Present this coupon to your barista',
+      scratchCardCouponCode: 'FREECOFFEE2026',
+      scratchCardWinProbability: 80,
+      scratchCardLoseMessage: 'Thank you for visiting! Try again next time.',
+      scratchCardCustomLogoUrl: 'https://cdn.example.com/logo.png',
+      reviewFormat: 'bullet_highlights' as const,
+    };
+
+    const saved = await db.saveBusinessSettings(settings);
+    assert.equal(saved.scratchCardEnabled, true);
+    assert.equal(saved.scratchCardType, 'festive_confetti');
+    assert.equal(saved.scratchCardWinProbability, 80);
+    assert.equal(saved.scratchCardCouponCode, 'FREECOFFEE2026');
+    assert.equal(saved.reviewFormat, 'bullet_highlights');
+
+    const fetched = await db.getBusinessSettings(businessId);
+    assert.equal(fetched?.scratchCardEnabled, true);
+    assert.equal(fetched?.scratchCardCouponCode, 'FREECOFFEE2026');
+  });
+});
+
+test('11. Google Maps Share Link Converter, Multi-Month Plans & Super Admin Quota Control', async (t) => {
+  await t.test('Converts Place ID into direct writereview link', async () => {
+    const res = await convertMapsUrlToDirectReviewUrl('ChIJN1t_tDeuEmsRUsoyG83frY4');
+    assert.equal(res.detectedType, 'PLACE_ID');
+    assert.equal(res.directReviewUrl, 'https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4');
+  });
+
+  await t.test('Converts Hex CID from Google Maps data parameter into decimal CID review link', async () => {
+    const rawUrl = 'https://www.google.com/maps/place/Artisan+Cafe/data=!4m7!3m6!1s0x3be7c6306644edc1:0x5101fa2d7e57c6b7!8m2!3d19.076!4d72.877!16s';
+    const res = await convertMapsUrlToDirectReviewUrl(rawUrl);
+    assert.equal(res.detectedType, 'HEX_CID_DECODED');
+    assert.equal(res.cid, '5837221665349027511');
+    assert.equal(res.directReviewUrl, 'https://search.google.com/local/writereview?cid=5837221665349027511');
+  });
+
+  await t.test('Converts g.page business profile into /review URL', async () => {
+    const res = await convertMapsUrlToDirectReviewUrl('https://g.page/delight-bistro');
+    assert.equal(res.detectedType, 'G_PAGE_REVIEW_URL');
+    assert.equal(res.directReviewUrl, 'https://g.page/delight-bistro/review');
+  });
+
+  await t.test('Calculates 1-year pack with 2 months free discount (10 months price) during order creation', async () => {
+    const starterPlan = (await db.listSubscriptionPlans()).find((p) => p.slug === 'starter');
+    assert.ok(starterPlan, 'Starter plan must exist');
+
+    // 1-month order
+    const order1M = await paymentService.createOrder({
+      businessId: 'test-biz-order',
+      planId: starterPlan.id,
+      durationMonths: 1,
+    });
+    assert.equal(order1M.amount, starterPlan.priceInr * 100);
+
+    // 12-month order: 2 Months Free discount applied
+    const expected1YearPrice = starterPlan.priceInr1Year || starterPlan.priceInr * 10;
+    const order1Y = await paymentService.createOrder({
+      businessId: 'test-biz-order',
+      planId: starterPlan.id,
+      durationMonths: 12,
+    });
+    assert.equal(order1Y.amount, expected1YearPrice * 100);
+    // Verified 1-year total is strictly less than 12 * 1-month
+    assert.ok(order1Y.amount < starterPlan.priceInr * 12 * 100);
+  });
+
+  await t.test('Super Admin updates plan prices (1M, 3M, 6M, 1Y) and review generation limit quota', async () => {
+    const proPlan = (await db.listSubscriptionPlans()).find((p) => p.slug === 'pro');
+    assert.ok(proPlan, 'Pro plan must exist');
+
+    const updated = await db.updatePlan(proPlan.id, {
+      name: 'Scale / Enterprise Pro',
+      priceInr: 299,
+      priceInr3Months: 799,
+      priceInr6Months: 1499,
+      priceInr1Year: 2990, // 10x with 2 months free
+      reviewGenerationLimit: 2500, // custom reviews count
+      qrCodeLimit: 25,
+      offerBadge: 'Super Admin Special Edition',
+    });
+
+    assert.equal(updated?.name, 'Scale / Enterprise Pro');
+    assert.equal(updated?.priceInr, 299);
+    assert.equal(updated?.priceInr3Months, 799);
+    assert.equal(updated?.priceInr6Months, 1499);
+    assert.equal(updated?.priceInr1Year, 2990);
+    assert.equal(updated?.reviewGenerationLimit, 2500);
+    assert.equal(updated?.qrCodeLimit, 25);
+    assert.equal(updated?.offerBadge, 'Super Admin Special Edition');
+
+    // Verify persisted in database
+    const refreshed = await db.findPlanById(proPlan.id);
+    assert.equal(refreshed?.priceInr, 299);
+    assert.equal(refreshed?.reviewGenerationLimit, 2500);
+  });
+});
+
+test('12. Phone Number Country Verification & Aggressive Input/Output Validation', async (t) => {
+  await t.test('Accepts valid 10-digit Indian numbers starting with 6, 7, 8, or 9', async () => {
+    const validNumbers = [
+      '9876543210',
+      '8123456789',
+      '7012345678',
+      '6234567890',
+      '+91 9876543210',
+      '+91-98765-43210',
+      '919876543210',
+      '09876543210',
+    ];
+
+    for (const num of validNumbers) {
+      const res = validatePhoneNumber(num, 'IN');
+      assert.equal(res.isValid, true, `Number ${num} should be valid`);
+      assert.equal(res.rawDigits.length, 10);
+      assert.equal(res.e164.startsWith('+91'), true);
+      assert.equal(res.country.code, 'IN');
+    }
+  });
+
+  await t.test('Rejects invalid Indian phone numbers (length < 10, length > 10, invalid starting digit)', async () => {
+    // Under-length
+    const underLength = validatePhoneNumber('987654321', 'IN');
+    assert.equal(underLength.isValid, false);
+    assert.ok(underLength.errorMessage?.includes('10 digits'));
+
+    // Over-length (11 digits not starting with 0)
+    const overLength = validatePhoneNumber('98765432101', 'IN');
+    assert.equal(overLength.isValid, false);
+    assert.ok(overLength.errorMessage?.includes('10 digits'));
+
+    // Invalid starting digits (1, 2, 3, 4, 5)
+    const invalidPrefixes = ['5876543210', '1234567890', '2876543210', '3876543210', '4876543210'];
+    for (const prefixNum of invalidPrefixes) {
+      const res = validatePhoneNumber(prefixNum, 'IN');
+      assert.equal(res.isValid, false, `Prefix ${prefixNum.charAt(0)} should be rejected`);
+      assert.ok(res.errorMessage?.includes('must start with 6, 7, 8, or 9'));
+    }
+
+    // Empty string
+    const emptyNum = validatePhoneNumber('', 'IN');
+    assert.equal(emptyNum.isValid, false);
+  });
+
+  await t.test('Correctly parses and formats Indian phone numbers as 5-5 grouped string', async () => {
+    assert.equal(formatIndianPhone('9876543210'), '98765 43210');
+    assert.equal(formatIndianPhone('98765'), '98765');
+  });
+
+  await t.test('Validates international phone numbers across supported countries (US, UK, UAE, SG)', async () => {
+    // US (+1, 10 digits)
+    const usValid = validatePhoneNumber('5551234567', 'US');
+    assert.equal(usValid.isValid, true);
+    assert.equal(usValid.e164, '+15551234567');
+
+    const usInvalid = validatePhoneNumber('555123', 'US');
+    assert.equal(usInvalid.isValid, false);
+
+    // UK (+44, 10-11 digits)
+    const ukValid = validatePhoneNumber('7911123456', 'GB');
+    assert.equal(ukValid.isValid, true);
+    assert.equal(ukValid.e164, '+447911123456');
+
+    // UAE (+971, 9 digits)
+    const uaeValid = validatePhoneNumber('501234567', 'AE');
+    assert.equal(uaeValid.isValid, true);
+    assert.equal(uaeValid.e164, '+971501234567');
+
+    const uaeInvalid = validatePhoneNumber('5012345', 'AE');
+    assert.equal(uaeInvalid.isValid, false);
+
+    // Singapore (+65, 8 digits)
+    const sgValid = validatePhoneNumber('81234567', 'SG');
+    assert.equal(sgValid.isValid, true);
+    assert.equal(sgValid.e164, '+6581234567');
+  });
+
+  await t.test('Auto-detects country prefix when input includes international dial code', async () => {
+    const fromDialCodeUS = parsePhoneInput('+1 415 555 2671');
+    assert.equal(fromDialCodeUS.country.code, 'US');
+    assert.equal(fromDialCodeUS.digits, '4155552671');
+
+    const fromDialCodeUAE = parsePhoneInput('+971 50 123 4567');
+    assert.equal(fromDialCodeUAE.country.code, 'AE');
+    assert.equal(fromDialCodeUAE.digits, '501234567');
+
+    const fromDialCodeIN = parsePhoneInput('+91 98765 43210');
+    assert.equal(fromDialCodeIN.country.code, 'IN');
+    assert.equal(fromDialCodeIN.digits, '9876543210');
+  });
+});
+
+test('13. Super Admin API Keys Management & Multi-Key Failover Engine', async (t) => {
+  let createdKeyId = '';
+
+  await t.test('Super Admin creates and registers a new Gemini API key', async () => {
+    const newKey = await db.createApiKey({
+      service: 'GEMINI',
+      name: 'Production Pool Gemini Key #2',
+      keyValue: 'AIzaSyFakeTestKeyForValidation123456',
+      secondaryValue: 'gemini-flash-latest',
+      isActive: true,
+    });
+
+    assert.ok(newKey.id);
+    createdKeyId = newKey.id;
+    assert.equal(newKey.service, 'GEMINI');
+    assert.equal(newKey.name, 'Production Pool Gemini Key #2');
+    assert.equal(newKey.isActive, true);
+    assert.equal(newKey.callCount, 0);
+  });
+
+  await t.test('Retrieves registered API keys with active status filtering', async () => {
+    const allKeys = await db.listApiKeys();
+    assert.ok(allKeys.length >= 1);
+    assert.ok(allKeys.some((k) => k.id === createdKeyId));
+
+    const activeGeminiKeys = await db.getActiveApiKeys('GEMINI');
+    assert.ok(activeGeminiKeys.some((k) => k.id === createdKeyId));
+  });
+
+  await t.test('Updates key configuration and toggles active status', async () => {
+    const updated = await db.updateApiKey(createdKeyId, {
+      name: 'Renamed Gemini Production Key',
+      isActive: false,
+    });
+
+    assert.equal(updated?.name, 'Renamed Gemini Production Key');
+    assert.equal(updated?.isActive, false);
+
+    // Should not be in active keys when paused
+    const activeKeys = await db.getActiveApiKeys('GEMINI');
+    assert.equal(activeKeys.some((k) => k.id === createdKeyId), false);
+
+    // Re-activate
+    await db.updateApiKey(createdKeyId, { isActive: true });
+  });
+
+  await t.test('Tracks call count and errors accurately when API keys are invoked', async () => {
+    await db.recordApiKeyUsage(createdKeyId, true);
+    const key = await db.getApiKeyById(createdKeyId);
+    assert.equal(key?.callCount, 1);
+    assert.ok(key?.lastUsedAt);
+
+    await db.recordApiKeyUsage(createdKeyId, false, 'Simulated HTTP 429 Quota Exceeded');
+    const updatedKey = await db.getApiKeyById(createdKeyId);
+    assert.equal(updatedKey?.callCount, 2);
+    assert.equal(updatedKey?.errorCount, 1);
+    assert.equal(updatedKey?.lastError, 'Simulated HTTP 429 Quota Exceeded');
+  });
+
+  await t.test('Super Admin deletes an API key successfully', async () => {
+    const deleted = await db.deleteApiKey(createdKeyId);
+    assert.equal(deleted, true);
+
+    const postDelete = await db.getApiKeyById(createdKeyId);
+    assert.equal(postDelete, null);
+  });
+});
+
+test('14. AWS SNS SMS Phone Verification OTP & Security Lifecycle', async (t) => {
+  const testPhone = '9876543210';
+  const expectedE164 = '+919876543210';
+
+  await t.test('Correctly formats Indian phone numbers to E.164 international format', () => {
+    const formatted = smsService.formatE164(testPhone);
+    assert.equal(formatted, expectedE164);
+
+    const alreadyE164 = smsService.formatE164('+14155552671');
+    assert.equal(alreadyE164, '+14155552671');
+  });
+
+  await t.test('Dispatches phone verification OTP with SMS service', async () => {
+    const otp = '482910';
+    const result = await smsService.sendPhoneOtp(testPhone, otp, 'Aria Bistro');
+
+    assert.equal(result.success, true);
+    assert.equal(result.phone, expectedE164);
+    assert.ok(result.mode === 'aws_sns' || result.mode === 'console');
+  });
+
+  await t.test('Stores phone verification record with codeHash and 10-minute expiry', async () => {
+    const otp = '654321';
+    const codeHash = crypto.createHash('sha256').update(otp).digest('hex');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+    const record = await db.createPhoneVerification({
+      id: crypto.randomUUID(),
+      phone: expectedE164,
+      codeHash,
+      expiresAt,
+      attempts: 0,
+      createdAt: new Date().toISOString(),
+    });
+
+    assert.ok(record.id);
+    assert.equal(record.phone, expectedE164);
+
+    const latest = await db.findLatestPhoneVerification(expectedE164);
+    assert.ok(latest);
+    assert.equal(latest.codeHash, codeHash);
+  });
+
+  await t.test('Enforces attempt counting and cleans up after verification', async () => {
+    const latest = await db.findLatestPhoneVerification(expectedE164);
+    assert.ok(latest);
+
+    // Increment attempts on incorrect code
+    await db.updatePhoneVerificationRecord(latest.id, { attempts: latest.attempts + 1 });
+    const updated = await db.findLatestPhoneVerification(expectedE164);
+    assert.equal(updated?.attempts, 1);
+
+    // Clean up record
+    await db.deletePhoneVerificationRecords(expectedE164);
+    const postCleanup = await db.findLatestPhoneVerification(expectedE164);
+    assert.equal(postCleanup, undefined);
+  });
+});
+
+
+
 
 

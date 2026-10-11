@@ -56,8 +56,8 @@ customerRouter.get('/qr/:slug', qrScanRateLimiter, async (req: Request, res: Res
     };
     await db.createReviewSession(session);
 
-    // Fetch active customized questions
     const questions = await db.getBusinessQuestions(business.id);
+    const settings = await db.getBusinessSettings(business.id);
 
     res.json({
       success: true,
@@ -72,6 +72,9 @@ customerRouter.get('/qr/:slug', qrScanRateLimiter, async (req: Request, res: Res
           coverImageUrl: business.coverImageUrl,
           description: business.description,
           googleReviewUrl: business.googleReviewUrl,
+          instagramUrl: business.instagramUrl,
+          facebookUrl: business.facebookUrl,
+          whatsappUrl: business.whatsappUrl,
         },
         qrCode: {
           id: qr.id,
@@ -86,6 +89,19 @@ customerRouter.get('/qr/:slug', qrScanRateLimiter, async (req: Request, res: Res
           maxValue: q.maxValue,
           isRequired: q.isRequired,
         })),
+        preferredReviewFormat: settings?.reviewFormat || 'narrative',
+        scratchCard: settings?.scratchCardEnabled
+          ? {
+              enabled: true,
+              type: settings.scratchCardType || 'golden_ticket',
+              winProbability: settings.scratchCardWinProbability ?? 100,
+              rewardTitle: settings.scratchCardRewardTitle || '10% Off Your Next Visit',
+              rewardDescription: settings.scratchCardRewardDescription || 'Show this screen at checkout or on your next visit!',
+              couponCode: settings.scratchCardCouponCode || 'REVIEW10',
+              customLogoUrl: settings.scratchCardCustomLogoUrl || business.logoUrl,
+              loseMessage: settings.scratchCardLoseMessage || 'Thank you for your valuable feedback!',
+            }
+          : null,
       },
     });
   } catch (err) {
@@ -99,6 +115,7 @@ const generateReviewSchema = z.object({
   customerComment: z.string().max(500, 'Comment cannot exceed 500 characters').optional(),
   dishesTried: z.array(z.string().max(60)).max(10).optional(),
   reviewLength: z.enum(['short', 'medium', 'detailed']).optional(),
+  reviewFormat: z.enum(['narrative', 'bullet_highlights', 'casual_conversational', 'professional_critique']).optional(),
 });
 
 /**
@@ -116,7 +133,7 @@ customerRouter.post(
   validateBody(generateReviewSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { sessionToken, ratings, customerComment, dishesTried, reviewLength } = req.body;
+      const { sessionToken, ratings, customerComment, dishesTried, reviewLength, reviewFormat } = req.body;
 
       const session = await db.findReviewSessionByToken(sessionToken);
       if (!session) {
@@ -178,6 +195,7 @@ customerRouter.post(
         customerComment,
         dishesTried,
         reviewLength,
+        reviewFormat,
       });
 
       // 5. Persist Generated Review
@@ -274,3 +292,33 @@ customerRouter.post(
     }
   }
 );
+
+/**
+ * POST /api/customer/social-click
+ * Customer clicks Instagram, Facebook, or WhatsApp link
+ */
+customerRouter.post(
+  '/social-click',
+  validateBody(
+    z.object({
+      businessId: z.string(),
+      platform: z.enum(['instagram', 'facebook', 'whatsapp']),
+    })
+  ),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { businessId, platform } = req.body;
+      await db.trackAnalyticsEvent({
+        id: crypto.randomUUID(),
+        businessId,
+        eventType: 'SOCIAL_CLICK',
+        metadata: { platform },
+        createdAt: new Date().toISOString(),
+      });
+      res.json({ success: true });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+

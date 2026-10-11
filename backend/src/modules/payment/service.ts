@@ -7,6 +7,7 @@ export interface CreateOrderParams {
   businessId: string;
   planId: string;
   amountInr: number;
+  durationMonths?: number;
   currency?: string;
 }
 
@@ -37,8 +38,26 @@ export class RazorpayPaymentService implements PaymentService {
   }
 
   async createOrder(params: CreateOrderParams): Promise<OrderResult> {
-    const { businessId, planId, amountInr, currency = 'INR' } = params;
+    const { businessId, planId, amountInr, currency = 'INR', durationMonths = 1 } = params;
     let orderId = `order_${crypto.randomBytes(12).toString('hex')}`;
+
+    let finalAmount = amountInr;
+    if (finalAmount === undefined || isNaN(finalAmount)) {
+      const plan = await db.findPlanById(planId);
+      if (plan) {
+        if (durationMonths === 3) {
+          finalAmount = plan.priceInr3Months || (plan.priceInr * 3);
+        } else if (durationMonths === 6) {
+          finalAmount = plan.priceInr6Months || (plan.priceInr * 6);
+        } else if (durationMonths === 12) {
+          finalAmount = plan.priceInr1Year || (plan.priceInr * 10);
+        } else {
+          finalAmount = plan.priceInr;
+        }
+      } else {
+        finalAmount = 0;
+      }
+    }
 
     // Call live Razorpay API if valid test/live credentials are configured
     if (this.keyId && this.keySecret && this.keyId.startsWith('rzp_')) {
@@ -51,7 +70,7 @@ export class RazorpayPaymentService implements PaymentService {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: amountInr * 100, // paisa
+            amount: finalAmount * 100, // paisa
             currency,
             receipt: `rcpt_${Date.now().toString(36)}_${businessId.slice(0, 6)}`,
             notes: {
@@ -81,7 +100,8 @@ export class RazorpayPaymentService implements PaymentService {
       businessId,
       planId,
       orderId,
-      amountInr,
+      amountInr: finalAmount,
+      durationMonths,
       currency,
       status: 'created',
       provider: 'RAZORPAY',
@@ -91,7 +111,7 @@ export class RazorpayPaymentService implements PaymentService {
 
     return {
       orderId,
-      amount: amountInr * 100, // Razorpay uses paisa
+      amount: finalAmount * 100, // Razorpay uses paisa
       currency,
       keyId: this.keyId,
     };
@@ -149,7 +169,19 @@ export class RazorpayPaymentService implements PaymentService {
     const now = new Date();
     const plan = payment.planId ? await db.findPlanById(payment.planId) : undefined;
     const isTrial = plan?.slug === 'trial' || payment.amountInr === 2;
-    const periodDays = isTrial ? 7 : 30;
+    const durMonths = payment.durationMonths || 1;
+    let periodDays = 30;
+    if (isTrial) {
+      periodDays = 7;
+    } else if (durMonths >= 12) {
+      periodDays = 365;
+    } else if (durMonths >= 6) {
+      periodDays = 180;
+    } else if (durMonths >= 3) {
+      periodDays = 90;
+    } else {
+      periodDays = 30;
+    }
     const periodEnd = new Date(now.getTime() + periodDays * 24 * 60 * 60 * 1000);
 
     const newSub: Subscription = {

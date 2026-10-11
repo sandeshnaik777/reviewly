@@ -37,10 +37,33 @@ export interface LocalSeoMetrics {
   rankingMessage: string;
 }
 
+export interface GeoGridPoint {
+  id: string;
+  row: number; // 0, 1, 2
+  col: number; // 0, 1, 2
+  label: string; // 'NW', 'N', 'NE', 'W', 'Center', 'E', 'SW', 'S', 'SE'
+  name: string; // e.g. "Center (Storefront)", "North (1.5 mi)", etc.
+  distanceMiles: number; // e.g. 0.0, 1.5, 2.2
+  rank: number; // e.g. 1, 2, 4, 8
+  rankTier: 'TOP_3' | 'TOP_10' | 'OUTSIDE_10';
+  change: number; // e.g. +2
+}
+
+export interface GeoGridData {
+  radiusMiles: number;
+  centerAddress: string;
+  gridPoints: GeoGridPoint[];
+  averageRank: number;
+  topThreeCoveragePct: number;
+  selectedKeyword: string;
+  availableKeywords: string[];
+}
+
 export interface MapsRankingsResult {
   keywordRankings: KeywordRankingItem[];
   competitorRadar: CompetitorRadarItem[];
   localSeoMetrics: LocalSeoMetrics;
+  geoGrid: GeoGridData;
   lastUpdated: string;
   isAiGrounding: boolean;
 }
@@ -78,6 +101,68 @@ export class GoogleMapsRankingService {
     return result;
   }
 
+  private generateGeoGrid(business: Business, reviewCount: number, baseRank: number): GeoGridData {
+    const city = business.city || 'Your City';
+    const sub = business.subcategory || 'Business';
+
+    const availableKeywords = [
+      `Best ${sub} in ${city}`,
+      `Top Rated ${sub} Near Me`,
+      `${sub} near me`,
+      `${business.name} ${city}`,
+    ];
+
+    const selectedKeyword = availableKeywords[0];
+
+    // Grid layout: 3x3 surrounding radius
+    // Center at (1,1) is baseRank
+    // Cardinals (0,1), (2,1), (1,0), (1,2) have +1 rank penalty (further away)
+    // Diagonals (0,0), (0,2), (2,0), (2,2) have +2 rank penalty
+    const pointDefs = [
+      { id: 'grid-0-0', row: 0, col: 0, label: 'NW', name: 'North-West (2.2 mi)', distance: 2.2, penalty: 2 },
+      { id: 'grid-0-1', row: 0, col: 1, label: 'N', name: 'North (1.5 mi)', distance: 1.5, penalty: 1 },
+      { id: 'grid-0-2', row: 0, col: 2, label: 'NE', name: 'North-East (2.2 mi)', distance: 2.2, penalty: 2 },
+      { id: 'grid-1-0', row: 1, col: 0, label: 'W', name: 'West (1.5 mi)', distance: 1.5, penalty: 1 },
+      { id: 'grid-1-1', row: 1, col: 1, label: 'Center', name: 'Storefront (0.0 mi)', distance: 0.0, penalty: 0 },
+      { id: 'grid-1-2', row: 1, col: 2, label: 'E', name: 'East (1.5 mi)', distance: 1.5, penalty: 1 },
+      { id: 'grid-2-0', row: 2, col: 0, label: 'SW', name: 'South-West (2.2 mi)', distance: 2.2, penalty: 2 },
+      { id: 'grid-2-1', row: 2, col: 1, label: 'S', name: 'South (1.5 mi)', distance: 1.5, penalty: 1 },
+      { id: 'grid-2-2', row: 2, col: 2, label: 'SE', name: 'South-East (2.2 mi)', distance: 2.2, penalty: 2 },
+    ];
+
+    const gridPoints: GeoGridPoint[] = pointDefs.map((p) => {
+      const calculatedRank = Math.min(20, Math.max(1, baseRank + p.penalty));
+      const tier: 'TOP_3' | 'TOP_10' | 'OUTSIDE_10' =
+        calculatedRank <= 3 ? 'TOP_3' : calculatedRank <= 9 ? 'TOP_10' : 'OUTSIDE_10';
+      return {
+        id: p.id,
+        row: p.row,
+        col: p.col,
+        label: p.label,
+        name: p.name,
+        distanceMiles: p.distance,
+        rank: calculatedRank,
+        rankTier: tier,
+        change: reviewCount > 0 ? (p.penalty === 0 ? 3 : 1) : 0,
+      };
+    });
+
+    const sumRanks = gridPoints.reduce((sum, pt) => sum + pt.rank, 0);
+    const avgRank = Number((sumRanks / gridPoints.length).toFixed(1));
+    const topThreeCount = gridPoints.filter((pt) => pt.rankTier === 'TOP_3').length;
+    const topThreeCoveragePct = Math.round((topThreeCount / gridPoints.length) * 100);
+
+    return {
+      radiusMiles: 3.0,
+      centerAddress: `${business.address || ''}, ${city}`,
+      gridPoints,
+      averageRank: avgRank,
+      topThreeCoveragePct,
+      selectedKeyword,
+      availableKeywords,
+    };
+  }
+
   private async fetchRankingsFromAi(
     business: Business,
     reviewCount: number,
@@ -87,7 +172,7 @@ export class GoogleMapsRankingService {
     const subcategory = business.subcategory || 'Business';
     const mainCat = business.mainCategory || 'Services';
 
-    const prompt = `You are a Real-Time Google Maps Local 3-Pack SEO Engine.
+    const prompt = `You are a Google Maps Local 3-Pack SEO Analytics Engine.
 Analyze Google Maps and Local Search visibility for this business:
 - Business Name: "${business.name}"
 - Category: ${mainCat} (${subcategory})
@@ -104,12 +189,12 @@ TASK:
    - "${subcategory} in ${city}"
    - "Popular ${subcategory} in ${city}"
    - "${business.name} ${city}" (Brand search)
-2. If review count is 0 or low (< 5), the business is newly created and should rank between #8 and #15 for competitive generic keywords, and #1 or #2 for exact brand search.
-3. If review count is higher (20+), ranks should climb into the top 3-pack (#1 to #3).
+2. If review count is low (< 5), rank between #8 and #15 for generic keywords, and #1 for exact brand.
+3. If review count is higher (15+), ranks climb into top 3-pack (#1 to #3).
 4. Provide 3 real or realistic top competitors in ${city} for this category.
-5. Provide honest local SEO metrics and a helpful, non-fake summary message addressing the actual business owner.
+5. Provide honest local SEO metrics and an encouraging, executive-ready message.
 
-Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
+Respond with ONLY valid JSON (no markdown, no backticks):
 {
   "keywordRankings": [
     {
@@ -158,24 +243,31 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: 1200,
+          maxOutputTokens: 1024,
+          responseMimeType: 'application/json',
         },
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini status ${response.status}: ${await response.text()}`);
+      throw new Error(`Gemini API error: ${response.statusText}`);
     }
 
-    const json = (await response.json()) as any;
-    const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-    const cleanJson = rawText.replace(/^```json\s*|^```\s*|```$/g, '').trim();
-    const parsed = JSON.parse(cleanJson);
+    const payload = (await response.json()) as any;
+    const text = payload.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+      throw new Error('No content returned from AI');
+    }
+
+    const parsed = JSON.parse(text);
+    const centerRank = parsed.keywordRankings?.[0]?.rank || 5;
+    const geoGrid = this.generateGeoGrid(business, reviewCount, centerRank);
 
     return {
       keywordRankings: parsed.keywordRankings || [],
       competitorRadar: parsed.competitorRadar || [],
-      localSeoMetrics: parsed.localSeoMetrics || ({} as any),
+      localSeoMetrics: parsed.localSeoMetrics || {},
+      geoGrid,
       lastUpdated: new Date().toISOString(),
       isAiGrounding: true,
     };
@@ -189,7 +281,6 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
     const city = business.city || 'Your City';
     const sub = business.subcategory || 'Restaurant';
 
-    // Fresh account baseline vs established
     const isFresh = reviewCount === 0;
     const baseGenericRank = isFresh ? 10 : Math.max(1, 10 - Math.floor(reviewCount / 3));
 
@@ -203,7 +294,7 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         direction: isFresh ? 'SAME' : 'UP',
         monthlySearches: 1850,
         impressionsLift: isFresh ? '0%' : `+${reviewCount * 12}%`,
-        status: isFresh ? 'Awaiting First 5★ Reviews' : (baseGenericRank <= 3 ? 'Google 3-Pack Leader 🏆' : 'Climbing Local Pack 📈'),
+        status: isFresh ? 'Awaiting First 5★ Reviews' : (baseGenericRank <= 3 ? 'Google 3-Pack Leader' : 'Climbing Local Pack'),
         competitorRank: `#1 Top Rated ${sub} in ${city}`,
         tag: 'Highest Intent',
       },
@@ -216,7 +307,7 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         direction: isFresh ? 'SAME' : 'UP',
         monthlySearches: 2420,
         impressionsLift: isFresh ? '0%' : `+${reviewCount * 15}%`,
-        status: isFresh ? 'Unranked in Top 3' : 'Local Pack Contender ⭐',
+        status: isFresh ? 'Unranked in Top 3' : 'Local Pack Contender',
         competitorRank: `#2 Area Choice in ${city}`,
         tag: 'High Volume',
       },
@@ -229,13 +320,13 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         direction: 'SAME',
         monthlySearches: 1300,
         impressionsLift: isFresh ? '0%' : `+${reviewCount * 8}%`,
-        status: isFresh ? 'Baseline Indexing' : 'Rising Steadily 🚀',
+        status: isFresh ? 'Baseline Indexing' : 'Rising Steadily',
         competitorRank: `#1 Popular Spot in ${city}`,
         tag: 'Category Discovery',
       },
       {
         id: 'kw-4',
-        keyword: `Family Friendly ${sub} in ${city}`,
+        keyword: `Top ${sub} in ${city}`,
         rank: Math.min(12, baseGenericRank + 2),
         previousRank: Math.min(12, baseGenericRank + 2),
         change: 0,
@@ -243,8 +334,8 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         monthlySearches: 740,
         impressionsLift: isFresh ? '0%' : `+${reviewCount * 5}%`,
         status: isFresh ? 'Opportunity Keyword' : 'In Discovery Pack',
-        competitorRank: `#2 Family Favorite in ${city}`,
-        tag: 'Family Dining',
+        competitorRank: `#2 Favorite in ${city}`,
+        tag: 'Search Volume',
       },
       {
         id: 'kw-5',
@@ -255,7 +346,7 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         direction: 'SAME',
         monthlySearches: isFresh ? 120 : 450,
         impressionsLift: isFresh ? '0%' : `+${reviewCount * 20}%`,
-        status: 'Direct Brand Match 🔒',
+        status: 'Direct Brand Match',
         competitorRank: '-',
         tag: 'Brand Search',
       },
@@ -268,7 +359,7 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
         rating: avgRating > 0 ? avgRating : 0,
         reviewsCount: reviewCount,
         shareOfSearch: isFresh ? '4%' : `${Math.min(45, 10 + reviewCount * 2)}%`,
-        badge: isFresh ? 'New Listing' : 'Active Engine 🔥',
+        badge: isFresh ? 'New Listing' : 'Active Growth',
       },
       {
         name: `Top Competitor A (${city})`,
@@ -306,17 +397,20 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
       phoneCallsGrowth: isFresh ? '0%' : `+${Math.min(120, reviewCount * 6)}%`,
       topThreeShare: isFresh ? '0%' : `${Math.min(95, reviewCount * 4)}%`,
       headline: isFresh
-        ? 'Google Maps Telemetry Active — Ready for Initial Reviews'
+        ? 'Google Maps Tracking Active — Ready for Customer Reviews'
         : 'Google Maps Search Rankings Climbing',
       rankingMessage: isFresh
-        ? `📍 Your business "${business.name}" is indexed in ${city}. Place your smart QR stands on tables or counters to generate your first verified 5-star Google reviews and climb into the local top 3-pack!`
-        : `🎉 Excellent progress! With ${reviewCount} verified reviews and a ${avgRating}★ rating, "${business.name}" is advancing rapidly toward #1 search dominance in ${city}.`,
+        ? `Your business "${business.name}" is indexed in ${city}. Place your smart QR stands on tables or counters to generate verified 5-star Google reviews and climb into the local top 3-pack.`
+        : `Strong performance! With ${reviewCount} verified reviews and a ${avgRating}★ rating, "${business.name}" is expanding local search visibility across ${city}.`,
     };
+
+    const geoGrid = this.generateGeoGrid(business, reviewCount, baseGenericRank);
 
     return {
       keywordRankings,
       competitorRadar,
       localSeoMetrics,
+      geoGrid,
       lastUpdated: new Date().toISOString(),
       isAiGrounding: false,
     };
@@ -324,3 +418,143 @@ Respond with ONLY valid JSON with this exact schema (no markdown, no backticks):
 }
 
 export const mapsRankingService = new GoogleMapsRankingService();
+
+export async function convertMapsUrlToDirectReviewUrl(input: string): Promise<{
+  originalUrl: string;
+  directReviewUrl: string;
+  detectedType: string;
+  placeId?: string;
+  cid?: string;
+  businessName?: string;
+}> {
+  const raw = (input || '').trim();
+  if (!raw) {
+    throw new Error('Please provide a Google Maps URL or link.');
+  }
+
+  // 1. Direct Place ID input (e.g. ChIJN1t_tDeuEmsRUsoyG83frY4)
+  if (/^ChIJ[a-zA-Z0-9_-]{20,}$/.test(raw)) {
+    return {
+      originalUrl: raw,
+      directReviewUrl: `https://search.google.com/local/writereview?placeid=${raw}`,
+      detectedType: 'PLACE_ID',
+      placeId: raw,
+    };
+  }
+
+  let targetUrl = raw;
+
+  // Ensure protocol
+  if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+    targetUrl = 'https://' + targetUrl;
+  }
+
+  // 2. Check if already a direct review URL
+  if (targetUrl.includes('search.google.com/local/writereview') || (targetUrl.includes('g.page') && targetUrl.endsWith('/review'))) {
+    return {
+      originalUrl: raw,
+      directReviewUrl: targetUrl,
+      detectedType: 'ALREADY_DIRECT_REVIEW_URL',
+    };
+  }
+
+  // If it's a g.page link without /review, append /review
+  if (targetUrl.includes('g.page/') && !targetUrl.includes('/review')) {
+    const clean = targetUrl.replace(/\/+$/, '') + '/review';
+    return {
+      originalUrl: raw,
+      directReviewUrl: clean,
+      detectedType: 'G_PAGE_REVIEW_URL',
+    };
+  }
+
+  // 3. If shortened share link, resolve canonical redirect
+  if (targetUrl.includes('maps.app.goo.gl') || targetUrl.includes('goo.gl/maps') || targetUrl.includes('app.goo.gl')) {
+    try {
+      const res = await fetch(targetUrl, {
+        method: 'GET',
+        redirect: 'follow',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
+      });
+      if (res.url && res.url !== targetUrl) {
+        targetUrl = res.url;
+      }
+    } catch (fetchErr) {
+      console.warn('Redirect expansion error for maps short link:', fetchErr);
+    }
+  }
+
+  // 4. Try extracting Place ID from URL query parameters
+  const placeIdParamMatch = targetUrl.match(/[?&](?:placeid|query_place_id)=([^&]+)/i);
+  if (placeIdParamMatch && placeIdParamMatch[1]) {
+    const pId = decodeURIComponent(placeIdParamMatch[1]);
+    return {
+      originalUrl: raw,
+      directReviewUrl: `https://search.google.com/local/writereview?placeid=${pId}`,
+      detectedType: 'PARAM_PLACE_ID',
+      placeId: pId,
+    };
+  }
+
+  // 5. Try extracting explicit CID query parameter (e.g. ?cid=1234567890)
+  const cidParamMatch = targetUrl.match(/[?&]cid=([0-9]+)/i);
+  if (cidParamMatch && cidParamMatch[1]) {
+    const cid = cidParamMatch[1];
+    return {
+      originalUrl: raw,
+      directReviewUrl: `https://search.google.com/local/writereview?cid=${cid}`,
+      detectedType: 'PARAM_CID',
+      cid,
+    };
+  }
+
+  // 6. Try extracting Place ID from Google Maps path data (!1sChIJ...)
+  const placeIdDataMatch = targetUrl.match(/!1s(ChIJ[a-zA-Z0-9_-]+)/);
+  if (placeIdDataMatch && placeIdDataMatch[1]) {
+    const pId = placeIdDataMatch[1];
+    return {
+      originalUrl: raw,
+      directReviewUrl: `https://search.google.com/local/writereview?placeid=${pId}`,
+      detectedType: 'DATA_PLACE_ID',
+      placeId: pId,
+    };
+  }
+
+  // 7. Try extracting Hex CID from data (!1s0x...:0x[HEX])
+  const hexCidMatch = targetUrl.match(/!1s0x[a-fA-F0-9]+:0x([a-fA-F0-9]+)/);
+  if (hexCidMatch && hexCidMatch[1]) {
+    try {
+      const hex = hexCidMatch[1];
+      const decimalCid = BigInt('0x' + hex).toString();
+      return {
+        originalUrl: raw,
+        directReviewUrl: `https://search.google.com/local/writereview?cid=${decimalCid}`,
+        detectedType: 'HEX_CID_DECODED',
+        cid: decimalCid,
+      };
+    } catch {
+      // ignore BigInt parse error
+    }
+  }
+
+  // 8. Try extracting Business Name from /maps/place/Business+Name/@...
+  const placeNameMatch = targetUrl.match(/\/maps\/place\/([^/@?]+)/i);
+  if (placeNameMatch && placeNameMatch[1]) {
+    const name = decodeURIComponent(placeNameMatch[1].replace(/\+/g, ' '));
+    return {
+      originalUrl: raw,
+      directReviewUrl: `https://search.google.com/local/writereview?query=${encodeURIComponent(name)}`,
+      detectedType: 'BUSINESS_NAME_LOOKUP',
+      businessName: name,
+    };
+  }
+
+  // 9. Fallback: If nothing matched, construct standard search write review format
+  return {
+    originalUrl: raw,
+    directReviewUrl: `https://search.google.com/local/writereview?query=${encodeURIComponent(targetUrl)}`,
+    detectedType: 'FALLBACK_URL',
+  };
+}

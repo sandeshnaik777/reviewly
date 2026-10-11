@@ -1,6 +1,6 @@
 # ====================================================================
-# Robots.txt — Reviewly Multi-Tenant Business Review Platform
-# https://reviewly.in/
+# Robots.txt — KindlyReview Multi-Tenant Business Review Platform
+# https://kindlyreview.in/
 # ====================================================================
 
 User-agent: *
@@ -16,4 +16,4 @@ Disallow: /onboarding/checkout
 Crawl-delay: 1
 
 # XML Sitemaps
-Sitemap: https://reviewly.in/sitemap.xml
+Sitemap: https://kindlyreview.in/sitemap.xml

@@ -30,6 +30,7 @@ paymentRouter.post(
   validateBody(
     z.object({
       planId: z.string().min(1, 'Plan ID is required'),
+      durationMonths: z.number().int().min(1).max(12).default(1).optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -39,10 +40,22 @@ paymentRouter.post(
         throw new AppError('Invalid or inactive subscription plan', 400, 'INVALID_PLAN');
       }
 
+      const durationMonths = Number(req.body.durationMonths) || 1;
+      let amountInr = plan.priceInr;
+      if (durationMonths === 3) {
+        amountInr = plan.priceInr3Months || (plan.priceInr * 3);
+      } else if (durationMonths === 6) {
+        amountInr = plan.priceInr6Months || (plan.priceInr * 6);
+      } else if (durationMonths === 12) {
+        // 1 Year Pack gets discount of 2 months!
+        amountInr = plan.priceInr1Year || (plan.priceInr * 10);
+      }
+
       const order = await paymentService.createOrder({
         businessId: req.tenantId!,
         planId: plan.id,
-        amountInr: plan.priceInr,
+        amountInr,
+        durationMonths,
       });
 
       res.status(201).json({ success: true, data: order });

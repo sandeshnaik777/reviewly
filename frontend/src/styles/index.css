@@ -235,10 +235,12 @@ a {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-top: 1px solid var(--border-light);
-  padding: 16px 20px;
-  box-shadow: 0 -4px 16px rgba(30, 27, 25, 0.06);
+  padding: 14px 20px max(14px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 16px rgba(30, 27, 25, 0.08);
   z-index: 50;
 }
 
@@ -828,6 +830,100 @@ a {
     gap: 28px;
   }
 }
+
+/* ======================================================== */
+/* ADVANCED MOBILE PHONE OPTIMIZATION (< 640px)             */
+/* ======================================================== */
+@media (max-width: 640px) {
+  /* Prevent horizontal screen jiggle/overflow on mobile */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  /* Compact content container so small screens don't waste 30% on margins */
+  .desktop-container {
+    padding: 14px 12px !important;
+  }
+
+  /* Responsive card padding: content feels neat and not bloated */
+  .card {
+    padding: 18px 14px !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  /* Responsive typography scaling */
+  h1, .serif-h1 {
+    font-size: 26px !important;
+    line-height: 1.25 !important;
+  }
+  h2, .serif-h2 {
+    font-size: 22px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Ensure inputs have at least 16px font-size to prevent iOS Safari auto-zoom */
+  .form-input, .form-select, .form-textarea {
+    font-size: 16px !important;
+  }
+
+  /* Compact HUD on phone */
+  .ironman-hud-strip {
+    padding: 14px 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Dashboard 2x2 metric grid on phones instead of long single column */
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .dashboard-kpi-card {
+    padding: 12px 10px !important;
+  }
+  .dashboard-kpi-card .kpi-value {
+    font-size: 22px !important;
+  }
+
+  /* Responsive moving reviews cards */
+  .moving-review-card {
+    width: 300px !important;
+    min-height: 250px !important;
+    padding: 16px 14px !important;
+  }
+
+  /* Responsive tables with smooth horizontal swipe */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+  }
+
+  /* Hide verbose text labels on tiny screens while preserving icons */
+  .hide-on-phone {
+    display: none !important;
+  }
+  .show-on-phone {
+    display: block !important;
+  }
+
+  /* Sticky customer review action bar */
+  .mobile-sticky-action {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border-light);
+    padding: 10px 16px max(10px, env(safe-area-inset-bottom));
+    z-index: 50;
+  }
+}
+
 
 
 

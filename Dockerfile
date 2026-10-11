@@ -1,5 +1,5 @@
 # ====================================================================
-# Multi-Stage Production Dockerfile for Reviewly Platform
+# Multi-Stage Production Dockerfile for KindlyReview Platform
 # ====================================================================
 
 # Step 1: Build Frontend

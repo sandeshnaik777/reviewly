@@ -1,5 +1,16 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from cwd first, then fallback to relative paths
 dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'backend', '.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const config = {
   port: parseInt(process.env.PORT || '4000', 10),
@@ -11,7 +22,7 @@ export const config = {
   jwt: {
     secret: process.env.JWT_SECRET || 'dev_jwt_secret_change_in_production_key_must_be_long_and_random',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-    cookieName: 'reviewly_auth_token',
+    cookieName: 'kindlyreview_auth_token',
   },
 
   db: {
@@ -44,7 +55,16 @@ export const config = {
     smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
     smtpUser: process.env.SMTP_USER || '',
     smtpPass: process.env.SMTP_PASS || '',
-    from: process.env.EMAIL_FROM || 'Reviewly <no-reply@reviewly.local>',
+    from: process.env.EMAIL_FROM || 'KindlyReview <no-reply@kindlyreview.local>',
+  },
+
+  awsSms: {
+    region: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'ap-south-1',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+    senderId: process.env.AWS_SNS_SENDER_ID || 'KNDLYREV',
+    entityId: process.env.AWS_SNS_ENTITY_ID || '',
+    templateId: process.env.AWS_SNS_TEMPLATE_ID || '',
   },
 
   rateLimits: {

@@ -7,7 +7,7 @@ import { requireTenant } from '../../middleware/tenant.js';
 import { validateBody } from '../../middleware/validate.js';
 import { CATEGORIES_CATALOG, getDefaultQuestionsForCategory } from './categories.js';
 import { subscriptionService } from '../subscription/service.js';
-import { mapsRankingService } from './mapsService.js';
+import { mapsRankingService, convertMapsUrlToDirectReviewUrl } from './mapsService.js';
 import { Business, Subscription } from '../../types/index.js';
 import { AppError } from '../../middleware/errorHandler.js';
 
@@ -20,6 +20,24 @@ businessRouter.get('/categories', (req, res) => {
     data: CATEGORIES_CATALOG,
   });
 });
+
+// Convert Google Maps share link into direct Google Review link
+businessRouter.post(
+  '/convert-maps-link',
+  validateBody(
+    z.object({
+      mapsUrl: z.string().min(1, 'Please provide a Google Maps URL'),
+    })
+  ),
+  async (req: any, res: Response, next: NextFunction) => {
+    try {
+      const result = await convertMapsUrlToDirectReviewUrl(req.body.mapsUrl);
+      res.json({ success: true, data: result });
+    } catch (err: any) {
+      res.status(400).json({ success: false, error: err.message || 'Failed to convert Google Maps link' });
+    }
+  }
+);
 
 // Authenticated: Get all businesses of current user
 businessRouter.get('/my', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -55,10 +73,14 @@ businessRouter.put(
       state: z.string().optional(),
       pincode: z.string().optional(),
       googleReviewUrl: z.string().url().optional(),
+      googleMapsShareUrl: z.string().optional(),
       description: z.string().optional(),
       openingHours: z.string().optional(),
       logoUrl: z.string().optional(),
       coverImageUrl: z.string().optional(),
+      instagramUrl: z.string().optional(),
+      facebookUrl: z.string().optional(),
+      whatsappUrl: z.string().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -145,10 +167,20 @@ businessRouter.put(
     z.object({
       reviewTone: z.enum(['casual', 'enthusiastic', 'professional', 'concise', 'detailed', 'warm']).default('enthusiastic'),
       reviewLength: z.enum(['short', 'medium', 'detailed']).default('medium'),
+      reviewFormat: z.enum(['narrative', 'bullet_highlights', 'casual_conversational', 'professional_critique']).default('narrative').optional(),
       customInstructions: z.string().optional(),
       wordsToAvoid: z.array(z.string()).default([]),
       thingsToHighlight: z.array(z.string()).default([]),
       autoRedirectGoogle: z.boolean().default(false),
+      // Scratch Card & Reward Engine
+      scratchCardEnabled: z.boolean().default(false).optional(),
+      scratchCardType: z.enum(['golden_ticket', 'neon_glow', 'festive_confetti', 'minimal_classic']).default('golden_ticket').optional(),
+      scratchCardWinProbability: z.number().min(0).max(100).default(100).optional(),
+      scratchCardRewardTitle: z.string().optional(),
+      scratchCardRewardDescription: z.string().optional(),
+      scratchCardCouponCode: z.string().optional(),
+      scratchCardCustomLogoUrl: z.string().optional(),
+      scratchCardLoseMessage: z.string().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -221,6 +253,7 @@ businessRouter.get('/:businessId/analytics', authenticate, requireTenant, async 
     analytics.competitorRadar = mapsData.competitorRadar;
     analytics.localSeoMetrics = mapsData.localSeoMetrics;
     analytics.isAiGrounding = mapsData.isAiGrounding;
+    analytics.geoGrid = mapsData.geoGrid;
 
     res.json({ success: true, data: analytics });
   } catch (err) {
@@ -334,6 +367,7 @@ businessRouter.post(
       country: z.string().default('India'),
       pincode: z.string().optional(),
       googleReviewUrl: z.string().url('Google Review URL must be a valid link'),
+      googleMapsShareUrl: z.string().optional(),
       description: z.string().optional(),
       openingHours: z.string().optional(),
       questions: z
@@ -370,6 +404,7 @@ businessRouter.post(
           country: data.country || targetBusiness.country,
           pincode: data.pincode || targetBusiness.pincode,
           googleReviewUrl: data.googleReviewUrl,
+          googleMapsShareUrl: data.googleMapsShareUrl || targetBusiness.googleMapsShareUrl,
           description: data.description,
           openingHours: data.openingHours,
         });
@@ -394,6 +429,7 @@ businessRouter.post(
           country: data.country || 'India',
           pincode: data.pincode || '000000',
           googleReviewUrl: data.googleReviewUrl,
+          googleMapsShareUrl: data.googleMapsShareUrl || undefined,
           description: data.description,
           openingHours: data.openingHours,
           isActive: true,

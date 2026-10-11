@@ -74,6 +74,10 @@ export function createApp(): Express {
         timestamp: new Date().toISOString(),
         version: '1.0.0',
         environment: config.nodeEnv,
+        database: {
+          type: db.isPostgresConnected() ? 'postgresql' : 'json_store',
+          postgresConnected: db.isPostgresConnected(),
+        },
       },
     });
   });
@@ -136,6 +140,9 @@ export function createApp(): Express {
   // 7. Serve Static Frontend in Production
   const possibleStaticPaths = [
     path.resolve(__dirname, '../../frontend/dist'),
+    path.resolve(__dirname, '../frontend/dist'),
+    path.resolve(process.cwd(), 'frontend/dist'),
+    path.resolve(process.cwd(), '../frontend/dist'),
     path.resolve(__dirname, '../dist/public'),
     path.resolve(__dirname, '../public'),
   ];

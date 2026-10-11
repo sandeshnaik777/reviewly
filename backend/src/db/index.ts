@@ -2,7 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import pg from 'pg';
 import { config } from '../config/index.js';
+
+const { Pool } = pg;
 import {
   User,
   UserRole,
@@ -20,14 +23,19 @@ import {
   AnalyticsEvent,
   AuditLog,
   EmailVerificationRecord,
+  PhoneVerificationRecord,
   SystemNotification,
   CustomSoftwareInquiry,
   BlogPost,
+  SystemApiKey,
+  ApiKeyServiceType,
 } from '../types/index.js';
+import { getDefaultQuestionsForCategory } from '../modules/business/categories.js';
 
 interface DatabaseSchema {
   users: User[];
   emailVerifications: EmailVerificationRecord[];
+  phoneVerifications: PhoneVerificationRecord[];
   businesses: Business[];
   businessMembers: BusinessMember[];
   businessQuestions: BusinessQuestion[];
@@ -45,6 +53,7 @@ interface DatabaseSchema {
   systemNotifications: SystemNotification[];
   customSoftwareInquiries: CustomSoftwareInquiry[];
   blogPosts: BlogPost[];
+  apiKeys: SystemApiKey[];
 }
 
 const DEFAULT_PLANS: SubscriptionPlan[] = [
@@ -70,6 +79,9 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     slug: 'starter',
     name: 'Testing Pack',
     priceInr: 79,
+    priceInr3Months: 229,
+    priceInr6Months: 429,
+    priceInr1Year: 790, // 2 Months Free (10 × ₹79)
     originalPriceInr: 149,
     offerBadge: '₹79 First Month Offer (Reg. ₹149)',
     billingPeriod: 'month',
@@ -87,6 +99,9 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     slug: 'growth',
     name: 'Growth Pack',
     priceInr: 149,
+    priceInr3Months: 429,
+    priceInr6Months: 799,
+    priceInr1Year: 1490, // 2 Months Free (10 × ₹149)
     originalPriceInr: 249,
     offerBadge: '₹149 First Month Offer (Reg. ₹249)',
     billingPeriod: 'month',
@@ -104,6 +119,9 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     slug: 'pro',
     name: 'Scale / Pro Pack',
     priceInr: 249,
+    priceInr3Months: 719,
+    priceInr6Months: 1349,
+    priceInr1Year: 2490, // 2 Months Free (10 × ₹249)
     originalPriceInr: 399,
     offerBadge: '₹249 First Month Offer (Reg. ₹399)',
     billingPeriod: 'month',
@@ -203,11 +221,71 @@ class DatabaseService {
   private data: DatabaseSchema;
   private filePath: string;
   private writeLock: Promise<void> = Promise.resolve();
+  private pgPool: pg.Pool | null = null;
+  private pgConnected: boolean = false;
 
   constructor() {
-    this.filePath = path.resolve(config.db.dataFile);
+    let resolvedPath = path.resolve(config.db.dataFile);
+    if (process.cwd().replace(/\\/g, '/').endsWith('/backend') && fs.existsSync(path.resolve(process.cwd(), '../data/review_platform.json'))) {
+      resolvedPath = path.resolve(process.cwd(), '../data/review_platform.json');
+    }
+    this.filePath = resolvedPath;
     this.data = this.loadDatabase();
     this.initSeeds();
+
+    if (config.db.databaseUrl) {
+      this.initPostgres(config.db.databaseUrl);
+    }
+  }
+
+  public isPostgresConnected(): boolean {
+    return this.pgConnected;
+  }
+
+  public getPostgresPool(): pg.Pool | null {
+    return this.pgPool;
+  }
+
+  private async initPostgres(databaseUrl: string) {
+    try {
+      this.pgPool = new Pool({
+        connectionString: databaseUrl,
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      });
+
+      const client = await this.pgPool.connect();
+      try {
+        await client.query(`
+          CREATE TABLE IF NOT EXISTS kindlyreview_store (
+            id VARCHAR(64) PRIMARY KEY,
+            data JSONB NOT NULL,
+            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+          );
+        `);
+
+        const res = await client.query('SELECT data FROM kindlyreview_store WHERE id = $1', ['primary']);
+        if (res.rows.length > 0 && res.rows[0].data) {
+          this.data = { ...this.data, ...res.rows[0].data };
+          console.log('🐘 [PostgreSQL] Successfully synchronized persistent state from PostgreSQL (kindlyreview_store).');
+        } else {
+          await client.query(
+            'INSERT INTO kindlyreview_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()',
+            ['primary', JSON.stringify(this.data)]
+          );
+          console.log('🐘 [PostgreSQL] Initialized PostgreSQL kindlyreview_store with seed state.');
+        }
+
+        this.pgConnected = true;
+        console.log('🐘 [PostgreSQL] Active connection established to PostgreSQL cluster.');
+      } finally {
+        client.release();
+      }
+    } catch (err) {
+      console.warn('⚠️ [PostgreSQL] Failed to connect to PostgreSQL, operating in file store mode:', (err as Error).message);
+      this.pgConnected = false;
+    }
   }
 
   private loadDatabase(): DatabaseSchema {
@@ -222,6 +300,9 @@ class DatabaseService {
         if (!parsed.emailVerifications) {
           parsed.emailVerifications = [];
         }
+        if (!parsed.phoneVerifications) {
+          parsed.phoneVerifications = [];
+        }
         if (!parsed.systemNotifications) {
           parsed.systemNotifications = [
             {
@@ -233,7 +314,7 @@ class DatabaseService {
             },
             {
               id: 'notif-2',
-              title: '⭐ Reviewly Reputation Engine Operational',
+              title: '⭐ KindlyReview Reputation Engine Operational',
               message: 'All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.',
               type: 'SUCCESS',
               createdAt: new Date().toISOString(),
@@ -246,6 +327,23 @@ class DatabaseService {
         if (!parsed.blogPosts || parsed.blogPosts.length === 0) {
           parsed.blogPosts = DEFAULT_BLOGS;
         }
+        if (!parsed.apiKeys) {
+          parsed.apiKeys = [];
+          if (config.gemini.apiKey) {
+            parsed.apiKeys.push({
+              id: 'key-default-gemini',
+              service: 'GEMINI',
+              name: 'Primary Gemini Flash (Default)',
+              keyValue: config.gemini.apiKey,
+              secondaryValue: config.gemini.model,
+              isActive: true,
+              callCount: 0,
+              errorCount: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            });
+          }
+        }
         return parsed;
       }
     } catch (e) {
@@ -255,6 +353,7 @@ class DatabaseService {
     return {
       users: [],
       emailVerifications: [],
+      phoneVerifications: [],
       businesses: [],
       businessMembers: [],
       businessQuestions: [],
@@ -279,7 +378,7 @@ class DatabaseService {
         },
         {
           id: 'notif-2',
-          title: '⭐ Reviewly Reputation Engine Operational',
+          title: '⭐ KindlyReview Reputation Engine Operational',
           message: 'All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.',
           type: 'SUCCESS',
           createdAt: new Date().toISOString(),
@@ -287,6 +386,22 @@ class DatabaseService {
       ],
       customSoftwareInquiries: [],
       blogPosts: DEFAULT_BLOGS,
+      apiKeys: config.gemini.apiKey
+        ? [
+            {
+              id: 'key-default-gemini',
+              service: 'GEMINI',
+              name: 'Primary Gemini Flash (Default)',
+              keyValue: config.gemini.apiKey,
+              secondaryValue: config.gemini.model,
+              isActive: true,
+              callCount: 0,
+              errorCount: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+          ]
+        : [],
     };
   }
 
@@ -298,6 +413,17 @@ class DatabaseService {
           fs.mkdirSync(dir, { recursive: true });
         }
         await fs.promises.writeFile(this.filePath, JSON.stringify(this.data, null, 2), 'utf-8');
+
+        if (this.pgPool && this.pgConnected) {
+          try {
+            await this.pgPool.query(
+              'INSERT INTO kindlyreview_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()',
+              ['primary', JSON.stringify(this.data)]
+            );
+          } catch (pgErr) {
+            console.error('Failed to sync state to PostgreSQL:', pgErr);
+          }
+        }
       } catch (err) {
         console.error('Failed to write database:', err);
       }
@@ -306,8 +432,22 @@ class DatabaseService {
   }
 
   private async initSeeds() {
-    // Ensure subscription plans reflect updated pricing, limits, and trial pass
-    this.data.subscriptionPlans = DEFAULT_PLANS;
+    // Ensure subscription plans reflect updated pricing, limits, and multi-month packages
+    if (!this.data.subscriptionPlans || this.data.subscriptionPlans.length === 0) {
+      this.data.subscriptionPlans = DEFAULT_PLANS;
+    } else {
+      this.data.subscriptionPlans = DEFAULT_PLANS.map((defaultPlan) => {
+        const existing = this.data.subscriptionPlans.find((p) => p.id === defaultPlan.id || p.slug === defaultPlan.slug);
+        if (!existing) return defaultPlan;
+        return {
+          ...defaultPlan,
+          ...existing,
+          priceInr3Months: existing.priceInr3Months ?? defaultPlan.priceInr3Months,
+          priceInr6Months: existing.priceInr6Months ?? defaultPlan.priceInr6Months,
+          priceInr1Year: existing.priceInr1Year ?? defaultPlan.priceInr1Year,
+        };
+      });
+    }
     this.persist();
 
     // Seed default platform admin if absent
@@ -392,6 +532,41 @@ class DatabaseService {
     if (!this.data.emailVerifications) return;
     this.data.emailVerifications = this.data.emailVerifications.filter(
       (r) => r.email.toLowerCase() !== email.toLowerCase()
+    );
+    await this.persist();
+  }
+
+  // --- Phone Verifications (AWS SMS) ---
+  async createPhoneVerification(record: PhoneVerificationRecord): Promise<PhoneVerificationRecord> {
+    if (!this.data.phoneVerifications) this.data.phoneVerifications = [];
+    this.data.phoneVerifications.push(record);
+    await this.persist();
+    return record;
+  }
+
+  async findLatestPhoneVerification(phone: string): Promise<PhoneVerificationRecord | undefined> {
+    if (!this.data.phoneVerifications) return undefined;
+    const clean = phone.replace(/[^0-9]/g, '');
+    const records = this.data.phoneVerifications
+      .filter((r) => r.phone.replace(/[^0-9]/g, '') === clean)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return records[0];
+  }
+
+  async updatePhoneVerificationRecord(id: string, updates: Partial<PhoneVerificationRecord>): Promise<PhoneVerificationRecord | undefined> {
+    if (!this.data.phoneVerifications) return undefined;
+    const idx = this.data.phoneVerifications.findIndex((r) => r.id === id);
+    if (idx === -1) return undefined;
+    this.data.phoneVerifications[idx] = { ...this.data.phoneVerifications[idx], ...updates };
+    await this.persist();
+    return this.data.phoneVerifications[idx];
+  }
+
+  async deletePhoneVerificationRecords(phone: string): Promise<void> {
+    if (!this.data.phoneVerifications) return;
+    const clean = phone.replace(/[^0-9]/g, '');
+    this.data.phoneVerifications = this.data.phoneVerifications.filter(
+      (r) => r.phone.replace(/[^0-9]/g, '') !== clean
     );
     await this.persist();
   }
@@ -1137,6 +1312,77 @@ class DatabaseService {
       };
     });
 
+    // Funnel & Conversion Analytics
+    const qrScansFromQrs = this.data.qrCodes.reduce((acc, q) => acc + (q.scanCount || 0), 0);
+    const qrScansFromEvents = this.data.analyticsEvents.filter((e) => e.eventType === 'QR_SCAN').length;
+    const totalScans = Math.max(qrScansFromQrs, qrScansFromEvents);
+    const totalSubmissions = this.data.analyticsEvents.filter((e) => e.eventType === 'RATING_SUBMISSION').length;
+    const totalCopied = this.data.generatedReviews.filter((r) => r.isCopied).length;
+    const totalGoogleClicks = this.data.generatedReviews.filter((r) => r.isGoogleClicked).length;
+    const scanToReviewRate = totalScans > 0 ? Number(((totalGenerations / totalScans) * 100).toFixed(1)) : 0;
+    const copyToGoogleRate = totalCopied > 0 ? Number(((totalGoogleClicks / totalCopied) * 100).toFixed(1)) : 0;
+    const overallConversionRate = totalScans > 0 ? Number(((totalGoogleClicks / totalScans) * 100).toFixed(1)) : 0;
+
+    // Social Presence & Engagement Analytics
+    const socialEvents = this.data.analyticsEvents.filter((e) => e.eventType === 'SOCIAL_CLICK');
+    const instagramClicks = socialEvents.filter((e) => e.metadata?.platform === 'instagram').length;
+    const facebookClicks = socialEvents.filter((e) => e.metadata?.platform === 'facebook').length;
+    const whatsappClicks = socialEvents.filter((e) => e.metadata?.platform === 'whatsapp').length;
+    const businessesWithInstagram = this.data.businesses.filter((b) => !!b.instagramUrl).length;
+    const businessesWithFacebook = this.data.businesses.filter((b) => !!b.facebookUrl).length;
+    const businessesWithWhatsApp = this.data.businesses.filter((b) => !!b.whatsappUrl).length;
+    const businessesWithAnySocial = this.data.businesses.filter((b) => b.instagramUrl || b.facebookUrl || b.whatsappUrl).length;
+    const socialAdoptionRatePct = totalBusinesses > 0 ? Number(((businessesWithAnySocial / totalBusinesses) * 100).toFixed(1)) : 0;
+
+    // Category Distribution
+    const categoryCounts: Record<string, { count: number; scans: number; reviews: number }> = {};
+    this.data.businesses.forEach((b) => {
+      const cat = b.mainCategory || 'OTHER';
+      if (!categoryCounts[cat]) {
+        categoryCounts[cat] = { count: 0, scans: 0, reviews: 0 };
+      }
+      categoryCounts[cat].count++;
+      const bizQrs = this.data.qrCodes.filter((q) => q.businessId === b.id);
+      categoryCounts[cat].scans += bizQrs.reduce((sum, q) => sum + (q.scanCount || 0), 0);
+      categoryCounts[cat].reviews += this.data.generatedReviews.filter((r) => r.businessId === b.id).length;
+    });
+
+    const categoryDistribution = Object.entries(categoryCounts).map(([category, data]) => ({
+      category,
+      count: data.count,
+      percentage: totalBusinesses > 0 ? Number(((data.count / totalBusinesses) * 100).toFixed(1)) : 0,
+      scans: data.scans,
+      reviews: data.reviews,
+    })).sort((a, b) => b.count - a.count);
+
+    // Sentiment & Reputation Shield Diversion
+    const positiveReviews = this.data.generatedReviews.filter((r) => r.sentiment === 'positive').length;
+    const neutralReviews = this.data.generatedReviews.filter((r) => r.sentiment === 'neutral').length;
+    const criticalReviews = this.data.generatedReviews.filter((r) => r.sentiment === 'constructive_critical').length;
+    // Shield diverted: constructive/critical feedback captured privately where direct Google Maps posting was shielded
+    const shieldDivertedCount = this.data.generatedReviews.filter((r) => r.sentiment === 'constructive_critical' && !r.isGoogleClicked).length;
+    const satisfactionPct = totalGenerations > 0 ? Number(((positiveReviews / totalGenerations) * 100).toFixed(1)) : 100;
+
+    // Top Performing Businesses
+    const topPerformers = this.data.businesses.map((b) => {
+      const bizQrs = this.data.qrCodes.filter((q) => q.businessId === b.id);
+      const bScans = bizQrs.reduce((sum, q) => sum + (q.scanCount || 0), 0);
+      const bReviews = this.data.generatedReviews.filter((r) => r.businessId === b.id).length;
+      const bGoogleClicks = this.data.generatedReviews.filter((r) => r.businessId === b.id && r.isGoogleClicked).length;
+      const convRate = bScans > 0 ? Number(((bGoogleClicks / bScans) * 100).toFixed(1)) : 0;
+      return {
+        id: b.id,
+        name: b.name,
+        category: b.mainCategory,
+        city: b.city,
+        scans: bScans,
+        reviews: bReviews,
+        googleClicks: bGoogleClicks,
+        conversionRate: convRate,
+        hasSocial: !!(b.instagramUrl || b.facebookUrl || b.whatsappUrl),
+      };
+    }).sort((a, b) => b.reviews - a.reviews).slice(0, 5);
+
     return {
       // High-level Overview
       totalBusinesses,
@@ -1160,6 +1406,42 @@ class DatabaseService {
         overdue: overdueSubscriptions,
         activeTrials: trialSubscriptions,
       },
+
+      // Funnel & Performance Analytics
+      funnelAnalytics: {
+        totalScans,
+        totalSubmissions,
+        totalGenerations,
+        totalCopied,
+        totalGoogleClicks,
+        scanToReviewRate,
+        copyToGoogleRate,
+        overallConversionRate,
+      },
+
+      // Social Presence & Engagement
+      socialEngagement: {
+        totalSocialClicks: socialEvents.length,
+        instagramClicks,
+        facebookClicks,
+        whatsappClicks,
+        businessesWithInstagram,
+        businessesWithFacebook,
+        businessesWithWhatsApp,
+        businessesWithAnySocial,
+        socialAdoptionRatePct,
+      },
+
+      // Categorization & Health
+      categoryDistribution,
+      sentimentBreakdown: {
+        positive: positiveReviews,
+        neutral: neutralReviews,
+        negative: criticalReviews,
+        shieldDivertedCount,
+        satisfactionPct,
+      },
+      topPerformers,
 
       // API & System Observability
       apiObservability: {
@@ -1228,13 +1510,18 @@ class DatabaseService {
     mainCategory: any;
     subcategory: string;
     city: string;
+    password?: string;
     customReviewLimit?: number;
     planSlug?: string;
     paymentStatus?: 'ACTIVE' | 'PAST_DUE' | 'TRIAL';
     googleReviewUrl?: string;
+    instagramUrl?: string;
+    facebookUrl?: string;
+    whatsappUrl?: string;
   }) {
+    const rawPassword = params.password?.trim() || 'KindlyReview@123';
     const salt = bcrypt.genSaltSync(10);
-    const passwordHash = bcrypt.hashSync('TempPassword123!', salt);
+    const passwordHash = bcrypt.hashSync(rawPassword, salt);
     const userId = crypto.randomUUID();
 
     const newUser: User = {
@@ -1268,6 +1555,9 @@ class DatabaseService {
       country: 'India',
       pincode: '560001',
       googleReviewUrl: params.googleReviewUrl || `https://maps.google.com/?q=${encodeURIComponent(params.businessName)}`,
+      instagramUrl: params.instagramUrl?.trim() || undefined,
+      facebookUrl: params.facebookUrl?.trim() || undefined,
+      whatsappUrl: params.whatsappUrl?.trim() || undefined,
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -1295,6 +1585,33 @@ class DatabaseService {
     };
     await this.createOrUpdateSubscription(sub);
 
+    // Initial Category Questions Setup
+    const defaultQs = getDefaultQuestionsForCategory(params.mainCategory, params.subcategory);
+    const questionsToSave = defaultQs.map((q, idx) => ({
+      id: crypto.randomUUID(),
+      businessId,
+      questionKey: q.key,
+      label: q.label,
+      scaleType: '1-5_STARS' as const,
+      minValue: 1,
+      maxValue: 5,
+      displayOrder: idx,
+      isRequired: true,
+      isActive: true,
+    }));
+    await this.saveBusinessQuestions(businessId, questionsToSave);
+
+    // Default Business Review Settings
+    await this.saveBusinessSettings({
+      id: crypto.randomUUID(),
+      businessId,
+      reviewTone: 'enthusiastic',
+      reviewLength: 'medium',
+      wordsToAvoid: [],
+      thingsToHighlight: [],
+      autoRedirectGoogle: false,
+    });
+
     // Create Initial QR
     await this.createQRCode({
       id: crypto.randomUUID(),
@@ -1308,7 +1625,14 @@ class DatabaseService {
       updatedAt: now.toISOString(),
     });
 
-    return newBusiness;
+    return {
+      business: newBusiness,
+      credentials: {
+        email: newUser.email,
+        password: rawPassword,
+        ownerName: newUser.name,
+      },
+    };
   }
 
   // Admin overrides quota limit for a business
@@ -1518,6 +1842,96 @@ class DatabaseService {
       return true;
     }
     return false;
+  }
+
+  // ==========================================
+  // SYSTEM API KEYS MANAGEMENT
+  // ==========================================
+  async listApiKeys(service?: string): Promise<SystemApiKey[]> {
+    if (!this.data.apiKeys) this.data.apiKeys = [];
+    if (service) {
+      return this.data.apiKeys.filter((k) => k.service === service);
+    }
+    return [...this.data.apiKeys];
+  }
+
+  async getActiveApiKeys(service: ApiKeyServiceType): Promise<SystemApiKey[]> {
+    if (!this.data.apiKeys) this.data.apiKeys = [];
+    return this.data.apiKeys.filter(
+      (k) => k.service === service && k.isActive && k.keyValue && k.keyValue.trim() !== ''
+    );
+  }
+
+  async getApiKeyById(id: string): Promise<SystemApiKey | null> {
+    if (!this.data.apiKeys) this.data.apiKeys = [];
+    return this.data.apiKeys.find((k) => k.id === id) || null;
+  }
+
+  async createApiKey(params: {
+    service: ApiKeyServiceType;
+    name: string;
+    keyValue: string;
+    secondaryValue?: string;
+    isActive?: boolean;
+  }): Promise<SystemApiKey> {
+    if (!this.data.apiKeys) this.data.apiKeys = [];
+    const newKey: SystemApiKey = {
+      id: `key-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
+      service: params.service,
+      name: params.name.trim(),
+      keyValue: params.keyValue.trim(),
+      secondaryValue: params.secondaryValue?.trim(),
+      isActive: params.isActive !== undefined ? params.isActive : true,
+      callCount: 0,
+      errorCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.data.apiKeys.push(newKey);
+    await this.persist();
+    return newKey;
+  }
+
+  async updateApiKey(id: string, updates: Partial<SystemApiKey>): Promise<SystemApiKey | null> {
+    if (!this.data.apiKeys) return null;
+    const key = this.data.apiKeys.find((k) => k.id === id);
+    if (key) {
+      if (updates.name !== undefined) key.name = updates.name.trim();
+      if (updates.keyValue !== undefined) key.keyValue = updates.keyValue.trim();
+      if (updates.secondaryValue !== undefined) key.secondaryValue = updates.secondaryValue.trim();
+      if (updates.isActive !== undefined) key.isActive = updates.isActive;
+      key.updatedAt = new Date().toISOString();
+      await this.persist();
+      return key;
+    }
+    return null;
+  }
+
+  async deleteApiKey(id: string): Promise<boolean> {
+    if (!this.data.apiKeys) return false;
+    const initialLen = this.data.apiKeys.length;
+    this.data.apiKeys = this.data.apiKeys.filter((k) => k.id !== id);
+    if (this.data.apiKeys.length !== initialLen) {
+      await this.persist();
+      return true;
+    }
+    return false;
+  }
+
+  async recordApiKeyUsage(id: string, success: boolean, errorMessage?: string): Promise<void> {
+    if (!this.data.apiKeys) return;
+    const key = this.data.apiKeys.find((k) => k.id === id);
+    if (key) {
+      key.callCount = (key.callCount || 0) + 1;
+      key.lastUsedAt = new Date().toISOString();
+      if (!success) {
+        key.errorCount = (key.errorCount || 0) + 1;
+        key.lastError = errorMessage ? errorMessage.slice(0, 300) : 'API call failed';
+      } else {
+        key.lastError = undefined;
+      }
+      await this.persist();
+    }
   }
 }
 

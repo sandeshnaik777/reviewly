@@ -1,12 +1,12 @@
 #!/bin/bash
 # ====================================================================
-# 1-Click Automated AWS Deployment Script for Reviewly Platform
+# 1-Click Automated AWS Deployment Script for KindlyReview Platform
 # Tested on Ubuntu 22.04 / 24.04 LTS (Amazon Lightsail or EC2)
 # ====================================================================
 
 set -e
 
-echo "🚀 Starting Reviewly AWS Deployment Setup..."
+echo "🚀 Starting KindlyReview AWS Deployment Setup..."
 
 # 1. Update OS packages
 sudo apt-get update -y
@@ -39,8 +39,8 @@ npm run build --prefix backend
 # 5. Copy or link Nginx configuration
 echo "🌐 Configuring Nginx reverse proxy..."
 if [ -f "nginx.conf" ]; then
-    sudo cp nginx.conf /etc/nginx/sites-available/reviewly
-    sudo ln -sf /etc/nginx/sites-available/reviewly /etc/nginx/sites-enabled/default
+    sudo cp nginx.conf /etc/nginx/sites-available/kindlyreview
+    sudo ln -sf /etc/nginx/sites-available/kindlyreview /etc/nginx/sites-enabled/default
     sudo nginx -t
     sudo systemctl restart nginx
 fi
@@ -51,15 +51,15 @@ sudo ufw allow 22/tcp
 sudo ufw --force enable || true
 
 # 7. Start application via PM2
-echo "⚡ Starting Reviewly application with PM2..."
-pm2 delete reviewly-api || true
-pm2 start backend/dist/server.js --name "reviewly-api" --time
+echo "⚡ Starting KindlyReview application with PM2..."
+pm2 delete kindlyreview-api || pm2 delete reviewly-api || true
+pm2 start backend/dist/server.js --name "kindlyreview-api" --time
 
 # Save PM2 process list and configure to resurrect on server reboot
 pm2 save
 pm2 startup | tail -n 1 | bash || true
 
 echo "===================================================="
-echo "🎉 Reviewly is successfully deployed on AWS!"
+echo "🎉 KindlyReview is successfully deployed on AWS!"
 echo "Server is running on port 4000 (proxied via Nginx port 80)."
 echo "===================================================="

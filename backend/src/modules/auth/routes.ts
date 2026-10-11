@@ -12,6 +12,8 @@ import { validateBody } from '../../middleware/validate.js';
 import { User, Business, Subscription, BusinessSettings } from '../../types/index.js';
 import { getDefaultQuestionsForCategory } from '../business/categories.js';
 import { emailService } from '../email/service.js';
+import { smsService } from '../sms/service.js';
+import { validatePhoneNumber } from '../../utils/phoneValidator.js';
 
 export const authRouter = Router();
 
@@ -41,6 +43,7 @@ const registerSchema = z.object({
   country: z.string().default('India'),
   pincode: z.string().min(3, 'Pincode is required'),
   googleReviewUrl: z.string().url('Google Review URL must be a valid link'),
+  googleMapsShareUrl: z.string().optional(),
   // Profile (Optional)
   description: z.string().optional(),
   openingHours: z.string().optional(),
@@ -236,6 +239,7 @@ authRouter.post('/register', validateBody(registerSchema), async (req: Request, 
         country: data.country || 'India',
         pincode: data.pincode,
         googleReviewUrl: data.googleReviewUrl,
+        googleMapsShareUrl: data.googleMapsShareUrl,
         description: data.description,
         openingHours: data.openingHours,
         isActive: true,
@@ -654,6 +658,163 @@ authRouter.post(
             role: verifiedUser.role,
             emailVerified: true,
           },
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * POST /api/auth/send-phone-otp
+ * Dispatches a 6-digit verification code to the phone via AWS SNS SMS
+ */
+authRouter.post(
+  '/send-phone-otp',
+  validateBody(
+    z.object({
+      phone: z.string().min(8, 'Phone number must be at least 8 digits'),
+      countryCode: z.string().optional(),
+    })
+  ),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { phone, countryCode } = req.body;
+      const validation = validatePhoneNumber(phone, countryCode);
+      if (!validation.isValid) {
+        throw new AppError(validation.errorMessage || 'Invalid phone number format.', 400, 'INVALID_PHONE');
+      }
+
+      const normalizedPhone = validation.e164;
+
+      // Rate limit cooldown (60 seconds)
+      const latest = await db.findLatestPhoneVerification(normalizedPhone);
+      if (latest) {
+        const elapsedMs = Date.now() - new Date(latest.createdAt).getTime();
+        if (elapsedMs < 60 * 1000) {
+          const waitSec = Math.ceil((60 * 1000 - elapsedMs) / 1000);
+          throw new AppError(
+            `Please wait ${waitSec}s before requesting another SMS verification code.`,
+            429,
+            'RATE_LIMIT_COOLDOWN'
+          );
+        }
+      }
+
+      const otp = crypto.randomInt(100000, 999999).toString();
+      const codeHash = crypto.createHash('sha256').update(otp).digest('hex');
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+      await db.createPhoneVerification({
+        id: crypto.randomUUID(),
+        phone: normalizedPhone,
+        codeHash,
+        expiresAt,
+        attempts: 0,
+        createdAt: new Date().toISOString(),
+      });
+
+      const smsResult = await smsService.sendPhoneOtp(normalizedPhone, otp);
+
+      // Mask phone for client privacy (+91 98*** **210)
+      const cleanDigits = normalizedPhone.replace(/[^0-9]/g, '');
+      const maskedPhone = cleanDigits.length >= 8
+        ? normalizedPhone.slice(0, 4) + '****' + normalizedPhone.slice(-3)
+        : normalizedPhone;
+
+      res.json({
+        success: true,
+        message: '6-digit verification code dispatched via SMS.',
+        data: {
+          phone: maskedPhone,
+          deliveryMode: smsResult.mode,
+          devOtp: config.nodeEnv === 'development' ? otp : undefined,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * POST /api/auth/verify-phone-otp
+ * Validates 6-digit phone OTP code and updates verification status
+ */
+authRouter.post(
+  '/verify-phone-otp',
+  validateBody(
+    z.object({
+      phone: z.string().min(8),
+      otp: z.string().length(6, 'Verification code must be 6 digits'),
+      countryCode: z.string().optional(),
+    })
+  ),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { phone, otp, countryCode } = req.body;
+      const validation = validatePhoneNumber(phone, countryCode);
+      const normalizedPhone = validation.isValid ? validation.e164 : phone;
+
+      const latest = await db.findLatestPhoneVerification(normalizedPhone);
+      if (!latest) {
+        throw new AppError(
+          'No verification request found for this phone number. Please request a new code.',
+          400,
+          'NO_VERIFICATION_REQUEST'
+        );
+      }
+
+      if (new Date(latest.expiresAt).getTime() < Date.now()) {
+        await db.deletePhoneVerificationRecords(normalizedPhone);
+        throw new AppError('Verification code has expired. Please request a new code.', 400, 'CODE_EXPIRED');
+      }
+
+      if (latest.attempts >= 5) {
+        await db.deletePhoneVerificationRecords(normalizedPhone);
+        throw new AppError(
+          'Too many failed attempts. Code locked for security. Please request a new code.',
+          429,
+          'TOO_MANY_ATTEMPTS'
+        );
+      }
+
+      const inputHash = crypto.createHash('sha256').update(otp.trim()).digest('hex');
+      if (inputHash !== latest.codeHash) {
+        const newAttempts = latest.attempts + 1;
+        await db.updatePhoneVerificationRecord(latest.id, { attempts: newAttempts });
+        const remaining = Math.max(0, 5 - newAttempts);
+        throw new AppError(
+          `Incorrect SMS code. ${remaining > 0 ? `${remaining} attempts remaining.` : 'Code locked. Please request a new code.'}`,
+          400,
+          'INVALID_CODE'
+        );
+      }
+
+      // Successful verification
+      await db.deletePhoneVerificationRecords(normalizedPhone);
+
+      // If user is authenticated, update their user record
+      const cookieToken =
+        req.cookies?.[config.jwt.cookieName] ||
+        (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
+
+      if (cookieToken) {
+        try {
+          const decoded = jwt.verify(cookieToken, config.jwt.secret) as any;
+          if (decoded?.userId) {
+            await db.updateUser(decoded.userId, { phone: normalizedPhone, phoneVerified: true });
+          }
+        } catch {}
+      }
+
+      res.json({
+        success: true,
+        message: 'Phone number verified successfully!',
+        data: {
+          phone: normalizedPhone,
+          phoneVerified: true,
         },
       });
     } catch (error) {

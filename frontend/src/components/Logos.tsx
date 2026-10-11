@@ -1,5 +1,183 @@
 import React from 'react';
 
+// Official KindlyReview Full Logo (Icon + Wordmark)
+export const KindlyReviewLogo: React.FC<{
+  height?: number;
+  className?: string;
+  showWordmark?: boolean;
+}> = ({ height = 40, className = '', showWordmark = true }) => {
+  if (!showWordmark) {
+    return <KindlyReviewIcon size={height} className={className} />;
+  }
+  // Aspect ratio is 800:560 = 1.4285
+  const width = Math.round((height * 800) / 560);
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 800 560"
+      width={width}
+      height={height}
+      className={className}
+      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+    >
+      <defs>
+        <linearGradient id="krLeafGreen" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#39C98A" />
+          <stop offset="100%" stopColor="#009B83" />
+        </linearGradient>
+        <linearGradient id="krLeafLight" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#71E5A0" />
+          <stop offset="100%" stopColor="#00A88B" />
+        </linearGradient>
+        <linearGradient id="krGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#FFD54A" />
+          <stop offset="100%" stopColor="#FFA51F" />
+        </linearGradient>
+        <linearGradient id="krWordGreen" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#008F79" />
+          <stop offset="100%" stopColor="#16B88B" />
+        </linearGradient>
+      </defs>
+
+      {/* Icon: rounded lowercase k stem */}
+      <path
+        d="M280 65 Q280 58 288 58 H321 Q395 58 395 133 V313 Q395 388 321 388 H288 Q280 388 280 380 Z"
+        fill="#00383B"
+      />
+
+      {/* Main flowing ribbon */}
+      <path
+        d="M281 387 C306 322 354 265 408 226 C449 195 489 192 519 215 C552 240 565 290 585 330 C604 369 630 387 651 395 C604 411 555 410 514 395 C470 379 443 346 422 308 C406 278 389 258 368 258 C337 258 302 318 281 387 Z"
+        fill="url(#krLeafGreen)"
+      />
+
+      {/* Inner crossing ribbon */}
+      <path
+        d="M281 387 C310 320 359 267 409 238 C445 218 480 220 510 244 C473 229 440 240 409 265 C368 297 348 342 342 367 C332 387 310 395 281 387 Z"
+        fill="url(#krLeafLight)"
+      />
+
+      {/* Gold sparkle */}
+      <path
+        d="M525 88 C537 119 551 133 582 145 C551 157 537 171 525 202 C513 171 499 157 468 145 C499 133 513 119 525 88 Z"
+        fill="url(#krGold)"
+      />
+
+      {/* Wordmark */}
+      <text
+        x="400"
+        y="482"
+        textAnchor="middle"
+        fontFamily="system-ui, -apple-system, 'Plus Jakarta Sans', Arial, sans-serif"
+        fontSize="82"
+        fontWeight="700"
+        letterSpacing="-3"
+      >
+        <tspan fill="#00383B">kindly</tspan>
+        <tspan fill="url(#krWordGreen)">review</tspan>
+      </text>
+    </svg>
+  );
+};
+
+// Official KindlyReview Icon Mark (Stylized "k" + Gold Sparkle)
+export const KindlyReviewIcon: React.FC<{ size?: number; className?: string }> = ({
+  size = 32,
+  className = '',
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="250 20 420 420"
+    width={size}
+    height={size}
+    className={className}
+    style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+  >
+    <defs>
+      <linearGradient id="krIconLeafGreen" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#39C98A" />
+        <stop offset="100%" stopColor="#009B83" />
+      </linearGradient>
+      <linearGradient id="krIconLeafLight" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#71E5A0" />
+        <stop offset="100%" stopColor="#00A88B" />
+      </linearGradient>
+      <linearGradient id="krIconGold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#FFD54A" />
+        <stop offset="100%" stopColor="#FFA51F" />
+      </linearGradient>
+    </defs>
+
+    {/* Rounded lowercase k stem */}
+    <path
+      d="M280 65 Q280 58 288 58 H321 Q395 58 395 133 V313 Q395 388 321 388 H288 Q280 388 280 380 Z"
+      fill="#00383B"
+    />
+
+    {/* Main flowing ribbon */}
+    <path
+      d="M281 387 C306 322 354 265 408 226 C449 195 489 192 519 215 C552 240 565 290 585 330 C604 369 630 387 651 395 C604 411 555 410 514 395 C470 379 443 346 422 308 C406 278 389 258 368 258 C337 258 302 318 281 387 Z"
+      fill="url(#krIconLeafGreen)"
+    />
+
+    {/* Inner crossing ribbon */}
+    <path
+      d="M281 387 C310 320 359 267 409 238 C445 218 480 220 510 244 C473 229 440 240 409 265 C368 297 348 342 342 367 C332 387 310 395 281 387 Z"
+      fill="url(#krIconLeafLight)"
+    />
+
+    {/* Gold sparkle */}
+    <path
+      d="M525 88 C537 119 551 133 582 145 C551 157 537 171 525 202 C513 171 499 157 468 145 C499 133 513 119 525 88 Z"
+      fill="url(#krIconGold)"
+    />
+  </svg>
+);
+
+// Official KindlyReview Horizontal Brand (Icon Mark + Bold Crisp Legible Wordmark)
+export const KindlyReviewBrand: React.FC<{
+  iconSize?: number;
+  fontSize?: number;
+  className?: string;
+  darkBg?: boolean;
+}> = ({ iconSize = 38, fontSize = 24, className = '', darkBg = false }) => (
+  <div
+    className={className}
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '10px',
+      userSelect: 'none',
+      textDecoration: 'none',
+      lineHeight: 1,
+    }}
+  >
+    <KindlyReviewIcon size={iconSize} />
+    <span
+      style={{
+        fontFamily: "system-ui, -apple-system, 'Plus Jakarta Sans', Arial, sans-serif",
+        fontSize: `${fontSize}px`,
+        fontWeight: 800,
+        letterSpacing: '-0.03em',
+        display: 'inline-flex',
+        alignItems: 'center',
+        lineHeight: 1,
+      }}
+    >
+      <span style={{ color: darkBg ? '#ffffff' : '#00383B' }}>kindly</span>
+      <span
+        style={{
+          background: 'linear-gradient(135deg, #008F79 0%, #16B88B 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}
+      >
+        review
+      </span>
+    </span>
+  </div>
+);
+
 // Authentic Official 4-color Google "G" Logo
 export const GoogleLogo: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
   <svg
@@ -42,6 +220,47 @@ export const WhatsAppLogo: React.FC<{ size?: number; className?: string }> = ({ 
     style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, color: '#25D366' }}
   >
     <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.22 8.23zm4.51-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.84-.86 2.05s.88 2.38 1 2.54c.12.17 1.74 2.66 4.22 3.73.59.25 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.1-.23-.17-.47-.29z" />
+  </svg>
+);
+
+// Authentic Instagram Gradient Vector Logo
+export const InstagramLogo: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+  >
+    <defs>
+      <linearGradient id="krIgGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#f09433" />
+        <stop offset="25%" stopColor="#e6683c" />
+        <stop offset="50%" stopColor="#dc2743" />
+        <stop offset="75%" stopColor="#cc2366" />
+        <stop offset="100%" stopColor="#bc1888" />
+      </linearGradient>
+    </defs>
+    <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="url(#krIgGrad)" strokeWidth="2.2" />
+    <circle cx="12" cy="12" r="4.2" stroke="url(#krIgGrad)" strokeWidth="2.2" />
+    <circle cx="17.5" cy="6.5" r="1.2" fill="url(#krIgGrad)" />
+  </svg>
+);
+
+// Authentic Facebook Blue Vector Logo
+export const FacebookLogo: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="#1877F2"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+  >
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
   </svg>
 );
 
@@ -206,4 +425,164 @@ export const ChefIcon: React.FC<{ size?: number; color?: string }> = ({ size = 1
     <path d="M6 19v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" />
   </svg>
 );
+
+// Modern Chart Bar Icon
+export const ChartBarIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+    <line x1="2" y1="20" x2="22" y2="20" />
+  </svg>
+);
+
+// Megaphone / Broadcast Icon
+export const BroadcastIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="m3 11 18-5v12L3 14v-3z" />
+    <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+  </svg>
+);
+
+// Refresh Icon
+export const RefreshIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 16, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <polyline points="23 4 23 10 17 10" />
+    <polyline points="1 20 1 14 7 14" />
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+  </svg>
+);
+
+// Plus Icon
+export const PlusIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 16, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+// Smartphone Mobile Icon
+export const MobileIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+    <line x1="12" y1="18" x2="12.01" y2="18" />
+  </svg>
+);
+
+// Clipboard Copy Icon
+export const ClipboardCopyIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+  </svg>
+);
+
+// Trophy Award Icon
+export const TrophyIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" />
+    <path d="M10 14.66V17c0 .55-.45 1-1 1H7" />
+    <path d="M14 14.66V17c0 .55.45 1 1 1h2" />
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+  </svg>
+);
+
+// Shield Check Icon
+export const ShieldCheckIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
+
+// Balance Scale Icon
+export const ScaleIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z" />
+    <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z" />
+    <path d="M7 21h10" />
+    <path d="M12 3v18" />
+    <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+  </svg>
+);
+
+// Gift Box Icon
+export const GiftIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <polyline points="20 12 20 22 4 22 4 12" />
+    <rect x="2" y="7" width="20" height="5" />
+    <line x1="12" y1="22" x2="12" y2="7" />
+    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+  </svg>
+);
+
+// Ticket / Voucher Icon
+export const TicketIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+    <path d="M13 5v2" />
+    <path d="M13 17v2" />
+    <path d="M13 11v2" />
+  </svg>
+);
+
+// Map Pin Icon
+export const MapPinIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+// Storefront Building Icon
+export const StorefrontIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+    <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+    <path d="M2 7h20" />
+    <path d="M22 7a2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2" />
+  </svg>
+);
+
+// Settings Gear Icon
+export const SettingsIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+// Grid Icon
+export const GridIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+  </svg>
+);
+
+// Dice Random Generator Icon
+export const DiceIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 16, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" fill={color} />
+    <circle cx="15.5" cy="8.5" r="1.5" fill={color} />
+    <circle cx="15.5" cy="15.5" r="1.5" fill={color} />
+    <circle cx="8.5" cy="15.5" r="1.5" fill={color} />
+  </svg>
+);
+
+// Check Circle Icon
+export const CheckCircleIcon: React.FC<{ size?: number; color?: string; className?: string }> = ({ size = 18, color = 'currentColor', className = '' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
+
 

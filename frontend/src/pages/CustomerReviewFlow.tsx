@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
-import { GoogleLogo, SparklesIcon, DirectReviewIcon, StarIcon } from '../components/Logos.js';
+import {
+  KindlyReviewLogo,
+  GoogleLogo,
+  SparklesIcon,
+  DirectReviewIcon,
+  StarIcon,
+  InstagramLogo,
+  FacebookLogo,
+  WhatsAppLogo,
+  ClipboardCopyIcon,
+  GiftIcon,
+  CheckCircleIcon,
+  StorefrontIcon,
+} from '../components/Logos.js';
+import { ScratchCard } from '../components/ScratchCard.js';
 
 interface Props {
   slug: string;
@@ -21,6 +35,9 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
   const [customDish, setCustomDish] = useState('');
   const [showAddDish, setShowAddDish] = useState(false);
   const [reviewLength, setReviewLength] = useState<'short' | 'medium' | 'detailed'>('medium');
+  const [reviewFormat, setReviewFormat] = useState<
+    'narrative' | 'bullet_highlights' | 'casual_conversational' | 'professional_critique'
+  >('narrative');
   const [submitting, setSubmitting] = useState(false);
 
   // Review Result State
@@ -45,6 +62,10 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
         initialRatings[q.questionKey] = 5;
       });
       setRatings(initialRatings);
+
+      if (res.preferredReviewFormat) {
+        setReviewFormat(res.preferredReviewFormat);
+      }
     } catch (err: any) {
       setError(err.message || 'Unable to load review page.');
     } finally {
@@ -82,6 +103,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
         customerComment: customerComment.trim() || undefined,
         dishesTried: selectedDishes.length > 0 ? selectedDishes : undefined,
         reviewLength,
+        reviewFormat,
       });
       setGeneratedReview(res);
       setEditedText(res.reviewText);
@@ -121,6 +143,35 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
+  };
+
+  const getFormattedSocialUrl = (platform: 'instagram' | 'facebook' | 'whatsapp', rawUrl?: string) => {
+    if (!rawUrl) return '';
+    const trimmed = rawUrl.trim();
+    if (platform === 'instagram') {
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+      const handle = trimmed.replace(/^@/, '');
+      return `https://instagram.com/${handle}`;
+    }
+    if (platform === 'facebook') {
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+      return `https://facebook.com/${trimmed.replace(/^\//, '')}`;
+    }
+    if (platform === 'whatsapp') {
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+      const digits = trimmed.replace(/[^\d]/g, '');
+      return `https://wa.me/${digits}`;
+    }
+    return trimmed;
+  };
+
+  const handleSocialClick = (platform: 'instagram' | 'facebook' | 'whatsapp', rawUrl?: string) => {
+    const targetUrl = getFormattedSocialUrl(platform, rawUrl);
+    if (!targetUrl) return;
+    if (data?.business?.id) {
+      api.trackSocialClick(data.business.id, platform).catch(() => {});
+    }
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {
@@ -263,6 +314,114 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 <span>Open Google Reviews ↗</span>
               </button>
             </div>
+
+            {/* OPTIONAL SOCIAL MEDIA CONNECTIONS (Only shown if added by merchant) */}
+            {(Boolean(business?.instagramUrl?.trim()) || Boolean(business?.whatsappUrl?.trim()) || Boolean(business?.facebookUrl?.trim())) && (
+              <div
+                className="card"
+                style={{
+                  padding: '16px 18px',
+                  background: '#ffffff',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text)' }}>Connect With Us</span>
+                  <span className="badge badge-success" style={{ fontSize: '10px', padding: '2px 7px' }}>Official</span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                  Follow our official channels for offers, news &amp; direct assistance
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+                  {Boolean(business?.instagramUrl?.trim()) && (
+                    <button
+                      type="button"
+                      onClick={() => handleSocialClick('instagram', business.instagramUrl)}
+                      className="btn"
+                      style={{
+                        flex: '1 1 auto',
+                        minWidth: '120px',
+                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        padding: '10px 14px',
+                        borderRadius: '999px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 2px 8px rgba(220, 39, 67, 0.25)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <InstagramLogo size={18} />
+                      <span>Follow on Instagram</span>
+                    </button>
+                  )}
+
+                  {Boolean(business?.whatsappUrl?.trim()) && (
+                    <button
+                      type="button"
+                      onClick={() => handleSocialClick('whatsapp', business.whatsappUrl)}
+                      className="btn"
+                      style={{
+                        flex: '1 1 auto',
+                        minWidth: '120px',
+                        background: '#25D366',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        padding: '10px 14px',
+                        borderRadius: '999px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 2px 8px rgba(37, 211, 102, 0.25)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <WhatsAppLogo size={18} />
+                      <span>Chat on WhatsApp</span>
+                    </button>
+                  )}
+
+                  {Boolean(business?.facebookUrl?.trim()) && (
+                    <button
+                      type="button"
+                      onClick={() => handleSocialClick('facebook', business.facebookUrl)}
+                      className="btn"
+                      style={{
+                        flex: '1 1 auto',
+                        minWidth: '120px',
+                        background: '#1877F2',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        padding: '10px 14px',
+                        borderRadius: '999px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 2px 8px rgba(24, 119, 242, 0.25)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <FacebookLogo size={18} />
+                      <span>Visit Facebook</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -323,166 +482,261 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               })}
             </div>
 
-            {/* SECTION: Dishes / What Did You Enjoy */}
+            {/* Category-Aware Products / Services / Dishes Chips */}
+            {(() => {
+              const cat = (business?.mainCategory || '').toUpperCase();
+              const sub = (business?.subcategory || '').toLowerCase();
+              const bName = (business?.name || '').toLowerCase();
+
+              const isRetail =
+                cat === 'RETAIL' ||
+                /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+              const isServices =
+                cat === 'SERVICES' ||
+                /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+              const isHealth =
+                cat === 'HEALTH & WELLNESS' ||
+                /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+              const suggestions = isRetail
+                ? [
+                    'Custom Gaming PC Build',
+                    'Laptop Upgrade & SSD',
+                    'Mechanical Keyboard',
+                    'GPU Graphics Card',
+                    'High Refresh Monitor',
+                    'Fast RAM & Storage',
+                    'Technical Diagnostics',
+                    'Genuine Components',
+                  ]
+                : isServices
+                ? [
+                    'Periodic Maintenance',
+                    'Brake & Suspension',
+                    'Engine Diagnostics',
+                    'Oil & Filter Service',
+                    'AC Servicing',
+                    'Wheel Alignment',
+                    'Express Repair',
+                    'Transparent Billing',
+                  ]
+                : isHealth
+                ? [
+                    'Hair Styling & Cut',
+                    'Facial & Skincare',
+                    'Spa Wellness Therapy',
+                    'Dental Cleaning',
+                    'Doctor Consultation',
+                    'Pedicure & Manicure',
+                    'Attentive Staff',
+                    'Clean Clinic',
+                  ]
+                : [
+                    'Signature Dishes',
+                    'Chef Specials',
+                    'Woodfired Pizza',
+                    'Crispy Starters',
+                    'Craft Beverages',
+                    'Fresh Dessert',
+                    'Tasting Platter',
+                    'Warm Hospitality',
+                  ];
+
+              const sectionTitle = isRetail
+                ? 'Products, Hardware or Services Purchased'
+                : isServices
+                ? 'Services or Maintenance Performed'
+                : isHealth
+                ? 'Treatments or Care Received'
+                : 'Dishes or Beverages Enjoyed';
+
+              const sectionSubtitle = isRetail
+                ? 'Tap items to mention them in your review, or type any specific component:'
+                : isServices
+                ? 'Tap services to mention them in your review, or type any specific work:'
+                : isHealth
+                ? 'Tap treatments to mention them in your review, or type any care received:'
+                : 'Tap items to mention them in your review, or type your favorites:';
+
+              return (
+                <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label className="form-label" style={{ marginBottom: 0, fontWeight: 600 }}>
+                      {sectionTitle} <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(Optional)</span>
+                    </label>
+                    {selectedDishes.length > 0 && (
+                      <span style={{ fontSize: '11.5px', color: 'var(--primary)', fontWeight: 600 }}>
+                        {selectedDishes.length} selected
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                    {sectionSubtitle}
+                  </p>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                    {suggestions.map((item) => {
+                      const isSelected = selectedDishes.includes(item);
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => toggleDish(item)}
+                          style={{
+                            padding: '7px 13px',
+                            borderRadius: '20px',
+                            fontSize: '12.5px',
+                            fontWeight: isSelected ? 600 : 500,
+                            border: isSelected ? '1.5px solid var(--primary)' : '1px solid var(--border)',
+                            background: isSelected ? '#fef2ee' : 'var(--surface)',
+                            color: isSelected ? 'var(--primary)' : 'var(--text)',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          {isSelected ? '✓ ' : '+ '}
+                          {item}
+                        </button>
+                      );
+                    })}
+
+                    {selectedDishes
+                      .filter((d) => !suggestions.includes(d))
+                      .map((customItem) => (
+                        <button
+                          key={customItem}
+                          type="button"
+                          onClick={() => toggleDish(customItem)}
+                          style={{
+                            padding: '7px 13px',
+                            borderRadius: '20px',
+                            fontSize: '12.5px',
+                            fontWeight: 600,
+                            border: '1.5px solid var(--primary)',
+                            background: '#fef2ee',
+                            color: 'var(--primary)',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          ✓ {customItem} ✕
+                        </button>
+                      ))}
+
+                    {!showAddDish ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowAddDish(true)}
+                        style={{
+                          padding: '7px 13px',
+                          borderRadius: '20px',
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          border: '1px dashed var(--primary)',
+                          background: 'transparent',
+                          color: 'var(--primary)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        + Add Custom Item
+                      </button>
+                    ) : (
+                      <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="e.g. Custom item..."
+                          value={customDish}
+                          onChange={(e) => setCustomDish(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddCustomDish();
+                            }
+                          }}
+                          autoFocus
+                          style={{ padding: '6px 10px', fontSize: '12.5px', width: '130px', borderRadius: '16px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddCustomDish}
+                          className="btn btn-primary"
+                          style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '16px' }}
+                        >
+                          Add
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowAddDish(false);
+                            setCustomDish('');
+                          }}
+                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* SECTION: Review Format & Layout Style */}
             <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <label className="form-label" style={{ marginBottom: 0, fontWeight: 600 }}>
-                  🍽️ What did you enjoy or order? <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(Optional)</span>
-                </label>
-                {selectedDishes.length > 0 && (
-                  <span style={{ fontSize: '11.5px', color: 'var(--primary)', fontWeight: 600 }}>
-                    {selectedDishes.length} selected
-                  </span>
-                )}
-              </div>
-              <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                Tap dishes to mention them in your review, or type any custom dish you had:
-              </p>
-
-              {/* Dish Chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+              <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
+                Review Format & Layout
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                 {[
-                  'Signature Biryani',
-                  'Butter Chicken & Naan',
-                  'Woodfired Pizza',
-                  'Crispy Masala Dosa',
-                  'Creamy Pasta',
-                  'Craft Beverages',
-                  'Chef Tasting Platter',
-                  'Sizzling Brownie',
-                ].map((dish) => {
-                  const isSelected = selectedDishes.includes(dish);
-                  return (
-                    <button
-                      key={dish}
-                      type="button"
-                      onClick={() => toggleDish(dish)}
-                      style={{
-                        padding: '7px 13px',
-                        borderRadius: '20px',
-                        fontSize: '12.5px',
-                        fontWeight: isSelected ? 600 : 500,
-                        border: isSelected ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-                        background: isSelected ? '#fef2ee' : 'var(--surface)',
-                        color: isSelected ? 'var(--primary)' : 'var(--text)',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                      }}
-                    >
-                      {isSelected ? '✓ ' : '+ '}
-                      {dish}
-                    </button>
-                  );
-                })}
-
-                {/* Custom Added Dishes */}
-                {selectedDishes
-                  .filter(
-                    (d) =>
-                      ![
-                        'Signature Biryani',
-                        'Butter Chicken & Naan',
-                        'Woodfired Pizza',
-                        'Crispy Masala Dosa',
-                        'Creamy Pasta',
-                        'Craft Beverages',
-                        'Chef Tasting Platter',
-                        'Sizzling Brownie',
-                      ].includes(d)
-                  )
-                  .map((dish) => (
-                    <button
-                      key={dish}
-                      type="button"
-                      onClick={() => toggleDish(dish)}
-                      style={{
-                        padding: '7px 13px',
-                        borderRadius: '20px',
-                        fontSize: '12.5px',
-                        fontWeight: 600,
-                        border: '1.5px solid var(--primary)',
-                        background: '#fef2ee',
-                        color: 'var(--primary)',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                      }}
-                    >
-                      ✓ {dish} ✕
-                    </button>
-                  ))}
-
-                {!showAddDish ? (
+                  { id: 'narrative', label: 'Story Narrative', desc: 'Flowing natural experience' },
+                  { id: 'bullet_highlights', label: 'Key Highlights', desc: 'Bulleted top takeaways' },
+                  { id: 'casual_conversational', label: 'Conversational', desc: 'Short, friendly & direct' },
+                  { id: 'professional_critique', label: 'Articulate Critique', desc: 'Balanced & articulate' },
+                ].map((item) => (
                   <button
+                    key={item.id}
                     type="button"
-                    onClick={() => setShowAddDish(true)}
+                    onClick={() => setReviewFormat(item.id as any)}
                     style={{
-                      padding: '7px 13px',
-                      borderRadius: '20px',
-                      fontSize: '12.5px',
-                      fontWeight: 600,
-                      border: '1px dashed var(--primary)',
-                      background: 'transparent',
-                      color: 'var(--primary)',
+                      padding: '10px 8px',
+                      borderRadius: '8px',
+                      textAlign: 'left',
+                      border: reviewFormat === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
+                      background: reviewFormat === item.id ? '#fef2ee' : 'var(--surface)',
                       cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    + Add Other Dish
+                    <div style={{ fontWeight: 700, fontSize: '12.5px', color: reviewFormat === item.id ? 'var(--primary)' : 'var(--text)' }}>
+                      {item.label}
+                    </div>
+                    <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      {item.desc}
+                    </div>
                   </button>
-                ) : (
-                  <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. Garlic Naan"
-                      value={customDish}
-                      onChange={(e) => setCustomDish(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddCustomDish();
-                        }
-                      }}
-                      autoFocus
-                      style={{ padding: '6px 10px', fontSize: '12.5px', width: '130px', borderRadius: '16px' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddCustomDish}
-                      className="btn btn-primary"
-                      style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '16px' }}
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowAddDish(false);
-                        setCustomDish('');
-                      }}
-                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px' }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
 
             {/* SECTION: Review Length / Story Depth Selector */}
             <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
               <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
-                ✍️ Review Length & Story Depth
+                Review Length & Detail
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px' }}>
                 {[
-                  { id: 'short', label: '⚡ Quick', desc: '1–2 lines' },
-                  { id: 'medium', label: '✍️ Balanced', desc: '3–5 lines' },
-                  { id: 'detailed', label: '📖 Foodie Story', desc: '7+ lines' },
+                  { id: 'short', label: 'Crisp & Quick', desc: '1–2 sentences' },
+                  { id: 'medium', label: 'Balanced', desc: '3–4 sentences' },
+                  { id: 'detailed', label: 'Comprehensive', desc: 'Full experience story' },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -498,7 +752,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                       transition: 'all 0.15s ease',
                     }}
                   >
-                    <div style={{ fontWeight: 700, fontSize: '13px', color: reviewLength === item.id ? 'var(--primary)' : 'var(--text)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '12.5px', color: reviewLength === item.id ? 'var(--primary)' : 'var(--text)' }}>
                       {item.label}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -509,10 +763,10 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               </div>
               <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0', lineHeight: 1.4 }}>
                 {reviewLength === 'detailed'
-                  ? '🌟 In-depth Foodie Story: Crafts a multi-paragraph, 7+ line detailed narrative with taste notes, atmosphere, and dish highlights.'
+                  ? 'Comprehensive Experience: Crafts a detailed, organic narrative highlighting specific strengths and quality.'
                   : reviewLength === 'short'
-                  ? '⚡ Quick & Crisp: Direct 1-2 sentence recommendation for swift reading.'
-                  : '✍️ Balanced: Standard 3-5 sentence organic Google review covering food and hospitality.'}
+                  ? 'Crisp & Quick: Direct 1-2 sentence recommendation for swift reading.'
+                  : 'Balanced: Standard 3-4 sentence natural Google review.'}
               </p>
             </div>
 
@@ -600,9 +854,19 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               <button
                 className={`btn btn-lg ${copied ? 'btn-secondary' : 'btn-outline'}`}
                 onClick={handleCopyReview}
-                style={{ fontSize: '15px' }}
+                style={{ fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                {copied ? '✓ Copied to Clipboard!' : '📋 Copy Review Text'}
+                {copied ? (
+                  <>
+                    <CheckCircleIcon size={18} color="#15803d" />
+                    <span>Copied to Clipboard!</span>
+                  </>
+                ) : (
+                  <>
+                    <ClipboardCopyIcon size={18} />
+                    <span>Copy Review Text</span>
+                  </>
+                )}
               </button>
 
               <button
@@ -622,8 +886,165 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 ← Adjust Ratings
               </button>
             </div>
-          </div>
+
+            {/* OPTIONAL SCRATCH CARD REWARD (If enabled by merchant) */}
+            {data?.scratchCard?.enabled && (
+              <div style={{ marginTop: '22px', marginBottom: '14px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '14px' }}>
+                  <span
+                    className="badge badge-primary"
+                    style={{
+                      fontSize: '11px',
+                      padding: '4px 12px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                    }}
+                  >
+                    <GiftIcon size={13} color="var(--primary)" />
+                    <span>Customer Appreciation Reward</span>
+                  </span>
+                  <h3 className="serif" style={{ fontSize: '19px', margin: '8px 0 3px', color: 'var(--text)' }}>
+                    Scratch to Reveal Your Perk
+                  </h3>
+                  <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: 0 }}>
+                    Special thank-you voucher for reviewing {business.name}!
+                  </p>
+                </div>
+
+                <ScratchCard
+                  cardType={data.scratchCard.type || 'golden_ticket'}
+                  rewardTitle={data.scratchCard.rewardTitle || '10% Off Your Next Visit'}
+                  rewardDescription={data.scratchCard.rewardDescription}
+                  couponCode={data.scratchCard.couponCode}
+                  businessName={business.name}
+                  customLogoUrl={data.scratchCard.customLogoUrl || business.logoUrl}
+                  winProbability={data.scratchCard.winProbability ?? 100}
+                  loseMessage={data.scratchCard.loseMessage}
+                />
+              </div>
+            )}
+
+              {/* OPTIONAL SOCIAL MEDIA CONNECTIONS on Review Completion */}
+              {(Boolean(business?.instagramUrl?.trim()) || Boolean(business?.whatsappUrl?.trim()) || Boolean(business?.facebookUrl?.trim())) && (
+                <div
+                  className="card"
+                  style={{
+                    marginTop: '16px',
+                    padding: '16px 18px',
+                    background: '#ffffff',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-lg)',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text)' }}>
+                      Follow {business.name}
+                    </span>
+                    <span className="badge badge-primary" style={{ fontSize: '10px', padding: '2px 7px' }}>Community</span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                    Stay connected with us for special perks &amp; newest updates
+                  </p>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+                    {Boolean(business?.instagramUrl?.trim()) && (
+                      <button
+                        type="button"
+                        onClick={() => handleSocialClick('instagram', business.instagramUrl)}
+                        className="btn"
+                        style={{
+                          flex: '1 1 auto',
+                          minWidth: '120px',
+                          background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                          color: '#ffffff',
+                          border: 'none',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          padding: '10px 14px',
+                          borderRadius: '999px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          boxShadow: '0 2px 8px rgba(220, 39, 67, 0.25)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <InstagramLogo size={18} />
+                        <span>Follow on Instagram</span>
+                      </button>
+                    )}
+
+                    {Boolean(business?.whatsappUrl?.trim()) && (
+                      <button
+                        type="button"
+                        onClick={() => handleSocialClick('whatsapp', business.whatsappUrl)}
+                        className="btn"
+                        style={{
+                          flex: '1 1 auto',
+                          minWidth: '120px',
+                          background: '#25D366',
+                          color: '#ffffff',
+                          border: 'none',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          padding: '10px 14px',
+                          borderRadius: '999px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          boxShadow: '0 2px 8px rgba(37, 211, 102, 0.25)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <WhatsAppLogo size={18} />
+                        <span>Chat on WhatsApp</span>
+                      </button>
+                    )}
+
+                    {Boolean(business?.facebookUrl?.trim()) && (
+                      <button
+                        type="button"
+                        onClick={() => handleSocialClick('facebook', business.facebookUrl)}
+                        className="btn"
+                        style={{
+                          flex: '1 1 auto',
+                          minWidth: '120px',
+                          background: '#1877F2',
+                          color: '#ffffff',
+                          border: 'none',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          padding: '10px 14px',
+                          borderRadius: '999px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          boxShadow: '0 2px 8px rgba(24, 119, 242, 0.25)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <FacebookLogo size={18} />
+                        <span>Visit Facebook</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
         )}
+
+        {/* Brand Trust Watermark */}
+        <div style={{ textAlign: 'center', marginTop: '32px', marginBottom: '12px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.75, fontSize: '12px', color: 'var(--text-muted)' }}>
+            <span>Powered by</span>
+            <KindlyReviewLogo height={18} />
+          </div>
+        </div>
       </div>
 
       {/* Sticky Bottom Button for AI Rating Step */}

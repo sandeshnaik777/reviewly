@@ -1,11 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="250 20 420 420" width="128" height="128">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#9a4018" />
-      <stop offset="100%" stop-color="#ea580c" />
+    <linearGradient id="favLeafGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#39C98A"/>
+      <stop offset="100%" stop-color="#009B83"/>
+    </linearGradient>
+    <linearGradient id="favLeafLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#71E5A0"/>
+      <stop offset="100%" stop-color="#00A88B"/>
+    </linearGradient>
+    <linearGradient id="favGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD54A"/>
+      <stop offset="100%" stop-color="#FFA51F"/>
     </linearGradient>
   </defs>
-  <rect width="100" height="100" rx="24" fill="url(#grad)" />
-  <path d="M50 16L59.8 35.8L81.7 39L65.8 54.5L69.6 76.3L50 66L30.4 76.3L34.2 54.5L18.3 39L40.2 35.8Z" fill="#ffffff" />
-  <circle cx="50" cy="50" r="7" fill="#fef08a" />
+
+  <!-- Icon: rounded lowercase k -->
+  <path d="M280 65
+           Q280 58 288 58
+           H321
+           Q395 58 395 133
+           V313
+           Q395 388 321 388
+           H288 Q280 388 280 380 Z"
+        fill="#00383B"/>
+
+  <!-- Main flowing ribbon -->
+  <path d="M281 387
+           C306 322 354 265 408 226
+           C449 195 489 192 519 215
+           C552 240 565 290 585 330
+           C604 369 630 387 651 395
+           C604 411 555 410 514 395
+           C470 379 443 346 422 308
+           C406 278 389 258 368 258
+           C337 258 302 318 281 387 Z"
+        fill="url(#favLeafGreen)"/>
+
+  <!-- Inner crossing ribbon -->
+  <path d="M281 387
+           C310 320 359 267 409 238
+           C445 218 480 220 510 244
+           C473 229 440 240 409 265
+           C368 297 348 342 342 367
+           C332 387 310 395 281 387 Z"
+        fill="url(#favLeafLight)"/>
+
+  <!-- Gold sparkle -->
+  <path d="M525 88
+           C537 119 551 133 582 145
+           C551 157 537 171 525 202
+           C513 171 499 157 468 145
+           C499 133 513 119 525 88 Z"
+        fill="url(#favGold)"/>
 </svg>

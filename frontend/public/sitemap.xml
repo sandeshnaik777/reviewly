@@ -6,7 +6,7 @@
   
   <!-- Homepage & Core Funnel -->
   <url>
-    <loc>https://reviewly.in/</loc>
+    <loc>https://kindlyreview.in/</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Features & Telemetry -->
   <url>
-    <loc>https://reviewly.in/#features</loc>
+    <loc>https://kindlyreview.in/#features</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- Subscription Packs & Promotional Pricing -->
   <url>
-    <loc>https://reviewly.in/#pricing</loc>
+    <loc>https://kindlyreview.in/#pricing</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -30,7 +30,7 @@
 
   <!-- Verified Testimonials & ROI Case Studies -->
   <url>
-    <loc>https://reviewly.in/#testimonials</loc>
+    <loc>https://kindlyreview.in/#testimonials</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -38,7 +38,7 @@
 
   <!-- Frequently Asked Questions (FAQ) -->
   <url>
-    <loc>https://reviewly.in/#faq</loc>
+    <loc>https://kindlyreview.in/#faq</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -46,7 +46,7 @@
 
   <!-- Help Center & Merchant Support -->
   <url>
-    <loc>https://reviewly.in/help</loc>
+    <loc>https://kindlyreview.in/help</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -54,7 +54,7 @@
 
   <!-- Legal: Terms of Service -->
   <url>
-    <loc>https://reviewly.in/terms</loc>
+    <loc>https://kindlyreview.in/terms</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -62,7 +62,7 @@
 
   <!-- Legal: Privacy Policy -->
   <url>
-    <loc>https://reviewly.in/privacy</loc>
+    <loc>https://kindlyreview.in/privacy</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -70,7 +70,7 @@
 
   <!-- Legal: Cancellation & Refund Policy -->
   <url>
-    <loc>https://reviewly.in/refund</loc>
+    <loc>https://kindlyreview.in/refund</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

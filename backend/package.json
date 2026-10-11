@@ -1,5 +1,5 @@
 {
-  "name": "reviewly-backend",
+  "name": "kindlyreview-backend",
   "version": "1.0.0",
   "description": "Multi-tenant REST API backend for Business Review Platform",
   "main": "dist/server.js",
@@ -11,6 +11,7 @@
     "test": "tsx --test tests/suite.test.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.1149.0",
     "bcryptjs": "^3.0.3",
     "business-review-platform": "file:..",
     "cookie-parser": "^1.4.7",
@@ -20,6 +21,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^10.0.16",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "zod": "^3.24.2"
   },
@@ -31,6 +33,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.9",
     "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.5",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"

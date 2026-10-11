@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: reviewly-app
+    container_name: kindlyreview-app
     restart: always
     ports:
       - "4000:4000"
@@ -21,16 +21,16 @@ services:
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-xBpdUXMs0YQbRQ8Wrb0EpzcH}
       - DATABASE_FILE=/app/data/review_platform.json
     volumes:
-      - reviewly_data:/app/data
+      - kindlyreview_data:/app/data
 
   # Optional Production Database (PostgreSQL 16)
   postgres:
     image: postgres:16-alpine
-    container_name: reviewly-postgres
+    container_name: kindlyreview-postgres
     restart: always
     environment:
-      POSTGRES_DB: reviewly_production
-      POSTGRES_USER: reviewly_admin
+      POSTGRES_DB: kindlyreview_production
+      POSTGRES_USER: kindlyreview_admin
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SecureProductionDbPassword2026!}
     ports:
       - "5432:5432"
@@ -39,5 +39,5 @@ services:
       - ./backend/src/db/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql
 
 volumes:
-  reviewly_data:
+  kindlyreview_data:
   postgres_data:

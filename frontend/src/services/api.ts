@@ -7,7 +7,7 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
   }
 
   // Dual auth: Attach token from localStorage as fallback when cookies are blocked over HTTP/proxies
-  const storedToken = typeof localStorage !== 'undefined' ? localStorage.getItem('reviewly_token') : null;
+  const storedToken = typeof localStorage !== 'undefined' ? (localStorage.getItem('kindlyreview_token') || localStorage.getItem('reviewly_token')) : null;
   if (storedToken && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${storedToken}`);
   }
@@ -31,7 +31,7 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
 
   // Persist token if provided in response
   if (json.data?.token && typeof localStorage !== 'undefined') {
-    localStorage.setItem('reviewly_token', json.data.token);
+    localStorage.setItem('kindlyreview_token', json.data.token);
   }
 
   return json.data;
@@ -45,6 +45,7 @@ export const api = {
   login: (data: any) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   logout: () => {
     if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('kindlyreview_token');
       localStorage.removeItem('reviewly_token');
     }
     return apiRequest('/auth/logout', { method: 'POST' });
@@ -56,6 +57,10 @@ export const api = {
     apiRequest('/auth/verify-email', { method: 'POST', body: JSON.stringify({ otp, email }) }),
   resendVerificationOtp: (email?: string) =>
     apiRequest('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
+  sendPhoneOtp: (phone: string, countryCode?: string) =>
+    apiRequest('/auth/send-phone-otp', { method: 'POST', body: JSON.stringify({ phone, countryCode }) }),
+  verifyPhoneOtp: (phone: string, otp: string, countryCode?: string) =>
+    apiRequest('/auth/verify-phone-otp', { method: 'POST', body: JSON.stringify({ phone, otp, countryCode }) }),
 
   // Business
   setupBusiness: (data: any) => apiRequest('/business/setup', { method: 'POST', body: JSON.stringify(data) }),
@@ -94,17 +99,25 @@ export const api = {
     customerComment?: string;
     dishesTried?: string[];
     reviewLength?: 'short' | 'medium' | 'detailed';
+    reviewFormat?: 'narrative' | 'bullet_highlights' | 'casual_conversational' | 'professional_critique';
   }) => apiRequest('/customer/generate', { method: 'POST', body: JSON.stringify(data) }),
   markCopied: (reviewId: string) => apiRequest('/customer/copied', { method: 'POST', body: JSON.stringify({ reviewId }) }),
   markGoogleClick: (reviewId: string) => apiRequest('/customer/google-click', { method: 'POST', body: JSON.stringify({ reviewId }) }),
+  trackSocialClick: (businessId: string, platform: 'instagram' | 'facebook' | 'whatsapp') =>
+    apiRequest('/customer/social-click', { method: 'POST', body: JSON.stringify({ businessId, platform }) }),
 
   // Payments & Plans
   getPlans: () => apiRequest('/payment/plans'),
-  createOrder: (businessId: string, planId: string) =>
+  createOrder: (businessId: string, planId: string, durationMonths: number = 1) =>
     apiRequest('/payment/create-order', {
       method: 'POST',
       headers: { 'X-Business-ID': businessId },
-      body: JSON.stringify({ planId }),
+      body: JSON.stringify({ planId, durationMonths }),
+    }),
+  convertMapsLink: (mapsUrl: string) =>
+    apiRequest('/business/convert-maps-link', {
+      method: 'POST',
+      body: JSON.stringify({ mapsUrl }),
     }),
   verifyPayment: (businessId: string, data: { orderId: string; paymentId: string; signature: string }) =>
     apiRequest('/payment/verify', {
@@ -150,4 +163,19 @@ export const api = {
     apiRequest(`/blogs${search ? `?search=${encodeURIComponent(search)}` : ''}`),
   getPublicBlogBySlug: (slug: string) =>
     apiRequest(`/blogs/${slug}`),
+
+  // Super Admin System API Keys Management
+  getAdminApiKeys: (service?: string) =>
+    apiRequest(`/admin/api-keys${service ? `?service=${service}` : ''}`),
+  createAdminApiKey: (data: { service: string; name: string; keyValue: string; secondaryValue?: string; isActive?: boolean }) =>
+    apiRequest('/admin/api-keys', { method: 'POST', body: JSON.stringify(data) }),
+  updateAdminApiKey: (id: string, data: any) =>
+    apiRequest(`/admin/api-keys/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteAdminApiKey: (id: string) =>
+    apiRequest(`/admin/api-keys/${id}`, { method: 'DELETE' }),
+  testAdminApiKey: (id: string) =>
+    apiRequest(`/admin/api-keys/${id}/test`, { method: 'POST' }),
+  testRawApiKey: (data: { service: string; keyValue: string; secondaryValue?: string }) =>
+    apiRequest('/admin/api-keys/test-raw', { method: 'POST', body: JSON.stringify(data) }),
 };
+

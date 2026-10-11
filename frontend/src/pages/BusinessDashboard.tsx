@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import {
+  KindlyReviewIcon,
   GoogleLogo,
   WhatsAppLogo,
+  InstagramLogo,
+  FacebookLogo,
   SparklesIcon,
   StarIcon,
   TrendingUpIcon,
@@ -11,8 +14,30 @@ import {
   PrinterIcon,
   UsersIcon,
   ChefIcon,
+  ChartBarIcon,
+  BroadcastIcon,
+  RefreshIcon,
+  PlusIcon,
+  MobileIcon,
+  ClipboardCopyIcon,
+  TrophyIcon,
+  ShieldCheckIcon,
+  ScaleIcon,
+  GiftIcon,
+  TicketIcon,
+  MapPinIcon,
+  StorefrontIcon,
+  SettingsIcon,
+  GridIcon,
+  DiceIcon,
+  CheckCircleIcon,
 } from '../components/Logos.js';
 import { EmailVerificationModal } from '../components/EmailVerificationModal.js';
+import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
+import { ScratchCard } from '../components/ScratchCard.js';
+import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
+import { PhoneInput } from '../components/PhoneInput.js';
+import { validatePhoneNumber } from '../utils/phoneValidator.js';
 
 interface Props {
   businessId: string;
@@ -38,6 +63,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const [settings, setSettings] = useState<any>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [plans, setPlans] = useState<any[]>([]);
+  const [planDurations, setPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({});
 
   // Reputation & Telemetry Controls
   const [rushMode, setRushMode] = useState(false);
@@ -54,9 +80,16 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     state: '',
     pincode: '',
     googleReviewUrl: '',
+    googleMapsShareUrl: '',
+    instagramUrl: '',
+    facebookUrl: '',
+    whatsappUrl: '',
     description: '',
     openingHours: '',
   });
+
+  const [convertingMapsLink, setConvertingMapsLink] = useState(false);
+  const [mapsLinkSuccessMsg, setMapsLinkSuccessMsg] = useState('');
 
   // Settings Tags State
   const [newHighlightTag, setNewHighlightTag] = useState('');
@@ -117,7 +150,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           key: order.keyId,
           amount: order.amount, // 200 paisa
           currency: order.currency,
-          name: 'Reviewly Platform',
+          name: 'KindlyReview Platform',
           description: '7-Day Free Trial Pass (₹2 Activation)',
           order_id: order.orderId,
           prefill: {
@@ -179,6 +212,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         state: bRes.state || '',
         pincode: bRes.pincode || '',
         googleReviewUrl: bRes.googleReviewUrl || '',
+        googleMapsShareUrl: bRes.googleMapsShareUrl || '',
+        instagramUrl: bRes.instagramUrl || '',
+        facebookUrl: bRes.facebookUrl || '',
+        whatsappUrl: bRes.whatsappUrl || '',
         description: bRes.description || '',
         openingHours: bRes.openingHours || '',
       });
@@ -203,6 +240,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   // 1. Save Profile Changes
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (profileForm.phone && profileForm.phone.trim()) {
+      const phoneVal = validatePhoneNumber(profileForm.phone);
+      if (!phoneVal.isValid) {
+        alert(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+        return;
+      }
+    }
     try {
       setSavingProfile(true);
       const updated = await api.updateBusiness(businessId, profileForm);
@@ -212,6 +256,31 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       alert(err.message || 'Failed to update business profile.');
     } finally {
       setSavingProfile(false);
+    }
+  };
+
+  // Convert Google Maps share link to direct review dialog link
+  const handleConvertMapsLink = async () => {
+    const rawToConvert = profileForm.googleMapsShareUrl || profileForm.googleReviewUrl;
+    if (!rawToConvert || !rawToConvert.trim()) {
+      showNotification('Please paste a Google Maps share link or location URL first.');
+      return;
+    }
+    setConvertingMapsLink(true);
+    setMapsLinkSuccessMsg('');
+    try {
+      const result = await convertGoogleMapsUrl(rawToConvert);
+      setProfileForm((prev) => ({
+        ...prev,
+        googleReviewUrl: result.directReviewUrl,
+        googleMapsShareUrl: prev.googleMapsShareUrl || rawToConvert,
+      }));
+      setMapsLinkSuccessMsg('Converted to direct 5-star Google Review link!');
+      showNotification('Converted to direct review link! Test it below.');
+    } catch (err: any) {
+      alert(err.message || 'Failed to convert Google Maps link.');
+    } finally {
+      setConvertingMapsLink(false);
     }
   };
 
@@ -257,6 +326,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   // 5. Submit Custom Software Inquiry
   const handleSubmitInquiry = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (inquiryForm.contactPhone && inquiryForm.contactPhone.trim()) {
+      const pVal = validatePhoneNumber(inquiryForm.contactPhone);
+      if (!pVal.isValid) {
+        alert(pVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+        return;
+      }
+    }
     try {
       setSubmittingInquiry(true);
       await api.submitSoftwareInquiry(businessId, inquiryForm);
@@ -277,6 +353,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   // 5b. Submit Help & Support Ticket
   const handleSendHelp = async (e: React.FormEvent) => {
     e.preventDefault();
+    const phoneToValidate = helpForm.phone || business?.phone;
+    if (phoneToValidate && phoneToValidate.trim()) {
+      const pVal = validatePhoneNumber(phoneToValidate);
+      if (!pVal.isValid) {
+        alert(pVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+        return;
+      }
+    }
     try {
       setSubmittingHelp(true);
       await api.submitSoftwareInquiry(businessId, {
@@ -433,7 +517,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h2 className="serif" style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.01em' }}>
+            <KindlyReviewIcon size={28} />
+            <h2 className="serif" style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}>
               {business.name}
             </h2>
             <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -769,11 +854,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span className="telemetry-pulse" />
-              <strong style={{ fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase', color: '#38bdf8' }}>
-                ✨ Aura AI Executive Copilot
+              <strong style={{ fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <SparklesIcon size={16} color="#38bdf8" />
+                <span>Executive Reputation &amp; Growth Insights</span>
               </strong>
               <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                · Monitoring 8 Dining Tables & Google Pack Position
+                · Monitoring {qrs.length} Touchpoints &amp; Google Maps Visibility
               </span>
             </div>
             <div style={{ fontSize: '12.5px', color: '#4ade80', fontWeight: 600 }}>
@@ -801,11 +887,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc', marginBottom: '4px' }}>
-                    {rec.id === 'dish_boost' && '🌟 '}
-                    {rec.id === 'waiter_bonus' && '🎖️ '}
-                    {rec.id === 'google_pack_gap' && '🚀 '}
-                    {rec.title}
+                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {rec.id === 'dish_boost' && <SparklesIcon size={15} color="#f59e0b" />}
+                    {rec.id === 'waiter_bonus' && <TrophyIcon size={15} color="#38bdf8" />}
+                    {rec.id === 'google_pack_gap' && <TrendingUpIcon size={15} color="#4ade80" />}
+                    <span>{rec.title}</span>
                   </div>
                   <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.45 }}>
                     {rec.desc}
@@ -825,11 +911,15 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     fontWeight: 600,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.25)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.15)')}
                 >
-                  ⚡ {rec.actionText} →
+                  <ZapIcon size={13} color="#38bdf8" />
+                  <span>{rec.actionText} →</span>
                 </button>
               </div>
             ))}
@@ -843,38 +933,50 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           <button
             className={`segmented-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            ⚡ Mission Control
+            <ChartBarIcon size={15} />
+            <span>Mission Control</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'qrs' ? 'active' : ''}`}
             onClick={() => setActiveTab('qrs')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            🎯 QR Stands &amp; Generator ({qrs.length})
+            <MobileIcon size={15} />
+            <span>QR Stands &amp; Generator ({qrs.length})</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'ai_settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('ai_settings')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            🛡️ AI Review Tone & Shield
+            <SettingsIcon size={15} />
+            <span>Review Engine &amp; Rewards</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            📋 Reviews & Interceptions ({reviews.length})
+            <ClipboardCopyIcon size={15} />
+            <span>Reviews &amp; Interceptions ({reviews.length})</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            ⚙️ Restaurant Profile
+            <StorefrontIcon size={15} />
+            <span>Business Profile</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'subscription' ? 'active' : ''}`}
             onClick={() => setActiveTab('subscription')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            💳 Subscription & Concierge
+            <ShieldCheckIcon size={15} />
+            <span>Subscription &amp; Plans</span>
           </button>
         </div>
 
@@ -925,6 +1027,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
             {/* Top 4 KPI Metrics Row */}
             <div
+              className="dashboard-kpi-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
@@ -932,43 +1035,43 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 marginBottom: '24px',
               }}
             >
-              <div className="card" style={{ padding: '22px' }}>
+              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Customer Satisfaction Index</div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <div style={{ fontSize: '36px', fontWeight: 800 }}>{analytics?.avgRating ? `${analytics.avgRating}` : '0.0'}</div>
+                  <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800 }}>{analytics?.avgRating ? `${analytics.avgRating}` : '0.0'}</div>
                   <div style={{ color: 'var(--star-active)', fontSize: '18px' }}>★★★★★</div>
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
-                  {reviews.length > 0 ? '● Verified rating active' : '● Awaiting initial customer ratings'}
+                  {reviews.length > 0 ? '● Verified rating active' : '● Awaiting initial ratings'}
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '22px' }}>
+              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-muted)' }}>
                   <GoogleLogo size={14} />
-                  <span>Google Maps Reviews Driven</span>
+                  <span>Google Maps Driven</span>
                 </div>
-                <div style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--success)' }}>
+                <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--success)' }}>
                   {analytics?.googleClicks ?? 0}
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  {analytics?.funnel?.copiedToGoogle ?? 0}% conversion from customer scans
+                  {analytics?.funnel?.copiedToGoogle ?? 0}% conversion from scans
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '22px' }}>
+              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>AI Reviews Generated</div>
-                <div style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--primary)' }}>
+                <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--primary)' }}>
                   {analytics?.generated ?? 0}
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  From {analytics?.ratings ?? 0} dining rating sessions
+                  From {analytics?.ratings ?? 0} rating sessions
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '22px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total Table QR Scans</div>
-                <div style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px' }}>
+              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total QR Scans</div>
+                <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px' }}>
                   {analytics?.scans ?? 0}
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -1395,6 +1498,15 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             </div>
 
+            {/* 3x3 GEO-GRID RANK TRACKER HEATMAP */}
+            <GeoGridHeatmap
+              geoGrid={analytics?.geoGrid}
+              businessName={business.name}
+              city={business.city || 'Local Area'}
+              onRefresh={handleRefreshMapsRankings}
+              isRefreshing={isRefreshingMaps}
+            />
+
             {/* GOOGLE MAPS KEYWORD RANKINGS & LOCAL 3-PACK TRACKER */}
             <div
               className="card"
@@ -1410,8 +1522,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', border: '1px solid #a7f3d0' }}>
-                    📈
+                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #a7f3d0' }}>
+                    <TrendingUpIcon size={22} color="#15803d" />
                   </div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1436,7 +1548,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
                     title="Run live AI Google Maps local 3-pack search analysis"
                   >
-                    <span>{isRefreshingMaps ? '⏳ Analyzing Maps...' : '🔄 Refresh Live Maps Rank'}</span>
+                    <RefreshIcon size={13} color="#ffffff" />
+                    <span>{isRefreshingMaps ? 'Analyzing Maps...' : 'Refresh Live Maps Rank'}</span>
                   </button>
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700, padding: '6px 12px' }}>
                     {localSeo.averageRankLift || 'Baseline Setup'}
@@ -2231,7 +2344,21 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       ))}
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Review Format &amp; Style</label>
+                        <select
+                          className="form-select"
+                          value={settings.reviewFormat || 'narrative'}
+                          onChange={(e) => setSettings({ ...settings, reviewFormat: e.target.value })}
+                        >
+                          <option value="narrative">Story Narrative (Flowing detailed experience)</option>
+                          <option value="bullet_highlights">Key Highlights &amp; Bullet Points</option>
+                          <option value="casual_conversational">Casual &amp; Conversational (Everyday punchy)</option>
+                          <option value="professional_critique">Professional Critique (Articulate evaluation)</option>
+                        </select>
+                      </div>
+
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label className="form-label">Review Length</label>
                         <select
@@ -2297,43 +2424,93 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       {/* Quick Select Suggestion Pills */}
                       <div style={{ marginBottom: '10px' }}>
                         <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
-                          ⚡ Click to quickly add popular highlights:
+                          ⚡ Click to quickly add recommended highlights:
                         </div>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                          {[
-                            'Woodfired Pizza Crust',
-                            'Craft Cocktails',
-                            'Truffle Risotto',
-                            'Warm Hospitality',
-                            'Fast Service',
-                            'Generous Portions',
-                            'Live Music',
-                            'Cozy Ambience',
-                          ].map((item) => (
-                            <button
-                              key={item}
-                              type="button"
-                              onClick={() => {
-                                if (!(settings.thingsToHighlight || []).includes(item)) {
-                                  setSettings({
-                                    ...settings,
-                                    thingsToHighlight: [...(settings.thingsToHighlight || []), item],
-                                  });
-                                }
-                              }}
-                              style={{
-                                background: (settings.thingsToHighlight || []).includes(item) ? '#fef2ee' : 'var(--surface)',
-                                border: '1px solid var(--border)',
-                                color: (settings.thingsToHighlight || []).includes(item) ? 'var(--primary)' : 'var(--text)',
-                                padding: '3px 9px',
-                                borderRadius: '12px',
-                                fontSize: '11px',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              + {item}
-                            </button>
-                          ))}
+                          {(() => {
+                            const cat = (business?.mainCategory || '').toUpperCase();
+                            const sub = (business?.subcategory || '').toLowerCase();
+                            const bName = (business?.name || '').toLowerCase();
+
+                            const isRetail =
+                              cat === 'RETAIL' ||
+                              /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                              /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+                            const isServices =
+                              cat === 'SERVICES' ||
+                              /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+                            const isHealth =
+                              cat === 'HEALTH & WELLNESS' ||
+                              /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+                            const items = isRetail
+                              ? [
+                                  'Genuine Components',
+                                  'Expert Consultation',
+                                  'Custom PC Builds',
+                                  'Quick Diagnostics',
+                                  'Competitive Pricing',
+                                  'Official Warranty',
+                                  'Clean Cable Management',
+                                  'Friendly Support',
+                                ]
+                              : isServices
+                              ? [
+                                  'Expert Diagnostics',
+                                  'Fast Turnaround',
+                                  'Genuine Spare Parts',
+                                  'Transparent Quotations',
+                                  'Clean Workshop',
+                                  'Honest Technicians',
+                                  'Reliable Service',
+                                ]
+                              : isHealth
+                              ? [
+                                  'Painless Treatment',
+                                  'Courteous Doctor',
+                                  'Immaculate Hygiene',
+                                  'Attentive Staff',
+                                  'Modern Equipment',
+                                  'Personalized Care',
+                                ]
+                              : [
+                                  'Signature Recipes',
+                                  'Craft Beverages',
+                                  'Prompt Service',
+                                  'Warm Hospitality',
+                                  'Generous Portions',
+                                  'Cozy Ambience',
+                                  'Fresh Ingredients',
+                                ];
+
+                            return items.map((item) => (
+                              <button
+                                key={item}
+                                type="button"
+                                onClick={() => {
+                                  if (!(settings.thingsToHighlight || []).includes(item)) {
+                                    setSettings({
+                                      ...settings,
+                                      thingsToHighlight: [...(settings.thingsToHighlight || []), item],
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  background: (settings.thingsToHighlight || []).includes(item) ? '#fef2ee' : 'var(--surface)',
+                                  border: '1px solid var(--border)',
+                                  color: (settings.thingsToHighlight || []).includes(item) ? 'var(--primary)' : 'var(--text)',
+                                  padding: '3px 9px',
+                                  borderRadius: '12px',
+                                  fontSize: '11px',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                + {item}
+                              </button>
+                            ));
+                          })()}
                         </div>
                       </div>
 
@@ -2475,9 +2652,233 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
+                {/* OPTIONAL CUSTOMER REWARDS & SCRATCH CARD (ADVANCED SETTINGS) */}
+                <div className="settings-section-row" style={{ borderTop: '1px solid var(--border-light)', paddingTop: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '15px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <GiftIcon size={18} color="var(--primary)" />
+                      <span>Post-Review Scratch Card &amp; Rewards</span>
+                      <span className="badge badge-neutral" style={{ fontSize: '10px' }}>Optional</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      Reward diners &amp; customers with an interactive digital scratch card right after they submit or copy their Google review.
+                    </div>
+                  </div>
+
+                  <div>
+                    {/* Enable Toggle Switch */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '14px 16px',
+                        background: settings.scratchCardEnabled ? '#f0fdf4' : 'var(--surface-container)',
+                        borderRadius: 'var(--radius-md)',
+                        border: settings.scratchCardEnabled ? '1.5px solid #86efac' : '1px solid var(--border)',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '14px', color: settings.scratchCardEnabled ? '#166534' : 'var(--text)' }}>
+                          {settings.scratchCardEnabled ? '✓ Scratch Card Reward Engine Active' : 'Scratch Card Engine Disabled'}
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          When active, customers are invited to scratch a digital card to reveal vouchers or discounts.
+                        </div>
+                      </div>
+                      <label style={{ position: 'relative', display: 'inline-block', width: '48px', height: '26px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(settings.scratchCardEnabled)}
+                          onChange={(e) => setSettings({ ...settings, scratchCardEnabled: e.target.checked })}
+                          style={{ opacity: 0, width: 0, height: 0 }}
+                        />
+                        <span
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: settings.scratchCardEnabled ? 'var(--primary)' : '#ccc',
+                            borderRadius: '26px',
+                            transition: '.2s',
+                          }}
+                        >
+                          <span
+                            style={{
+                              position: 'absolute',
+                              height: '20px',
+                              width: '20px',
+                              left: settings.scratchCardEnabled ? '24px' : '3px',
+                              bottom: '3px',
+                              backgroundColor: 'white',
+                              borderRadius: '50%',
+                              transition: '.2s',
+                            }}
+                          />
+                        </span>
+                      </label>
+                    </div>
+
+                    {settings.scratchCardEnabled && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {/* Scratch Card Visual Theme */}
+                        <div>
+                          <label className="form-label" style={{ fontWeight: 600 }}>Card Theme Style</label>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
+                            {[
+                              { id: 'golden_ticket', name: 'Golden Ticket', desc: 'Luxury gold foil', bg: '#f59e0b' },
+                              { id: 'neon_glow', name: 'Neon Glow', desc: 'Cyber purple glow', bg: '#8b5cf6' },
+                              { id: 'festive_confetti', name: 'Festive Fiesta', desc: 'Emerald celebration', bg: '#10b981' },
+                              { id: 'minimal_classic', name: 'Minimal Classic', desc: 'Sleek dark slate', bg: '#475569' },
+                            ].map((theme) => (
+                              <div
+                                key={theme.id}
+                                onClick={() => setSettings({ ...settings, scratchCardType: theme.id })}
+                                style={{
+                                  padding: '12px',
+                                  borderRadius: '10px',
+                                  border: (settings.scratchCardType || 'golden_ticket') === theme.id ? `2px solid ${theme.bg}` : '1px solid var(--border)',
+                                  background: (settings.scratchCardType || 'golden_ticket') === theme.id ? '#faf5ff' : 'var(--surface)',
+                                  cursor: 'pointer',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: theme.bg, margin: '0 auto 6px' }} />
+                                <div style={{ fontSize: '13px', fontWeight: 700 }}>{theme.name}</div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{theme.desc}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Win Probability Slider */}
+                        <div style={{ background: 'var(--surface-container)', padding: '14px 16px', borderRadius: '10px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <div>
+                              <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Client Win Probability</div>
+                              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                                Percentage of customers who win the reward vs receive a courtesy note.
+                              </div>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: 800,
+                                color: 'var(--primary)',
+                                background: '#fef2ee',
+                                padding: '4px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--border)',
+                              }}
+                            >
+                              {settings.scratchCardWinProbability ?? 100}% Win Chance
+                            </span>
+                          </div>
+
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="5"
+                            value={settings.scratchCardWinProbability ?? 100}
+                            onChange={(e) => setSettings({ ...settings, scratchCardWinProbability: Number(e.target.value) })}
+                            style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                          />
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            <span>0% (Rare prize)</span>
+                            <span>50% (Every 2nd customer)</span>
+                            <span>100% (Guaranteed reward for everyone)</span>
+                          </div>
+                        </div>
+
+                        {/* Reward Details Inputs */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Reward Title</label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              placeholder="e.g. 10% Off Your Next Visit, Free Dessert"
+                              value={settings.scratchCardRewardTitle || ''}
+                              onChange={(e) => setSettings({ ...settings, scratchCardRewardTitle: e.target.value })}
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Coupon / Voucher Code</label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              placeholder="e.g. VIPDINE, SAVE10, SWEETGIFT"
+                              value={settings.scratchCardCouponCode || ''}
+                              onChange={(e) => setSettings({ ...settings, scratchCardCouponCode: e.target.value })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label className="form-label">Reward Redemption Instructions</label>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="e.g. Present this screen to your server or cashier at billing"
+                            value={settings.scratchCardRewardDescription || ''}
+                            onChange={(e) => setSettings({ ...settings, scratchCardRewardDescription: e.target.value })}
+                          />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Custom Logo URL (Optional)</label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              placeholder="https://... (Leave blank to use storefront profile logo)"
+                              value={settings.scratchCardCustomLogoUrl || ''}
+                              onChange={(e) => setSettings({ ...settings, scratchCardCustomLogoUrl: e.target.value })}
+                            />
+                          </div>
+
+                          <div className="form-group" style={{ marginBottom: 0 }}>
+                            <label className="form-label">Polite Note on Miss (Loss Message)</label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              placeholder="e.g. Thank you for your feedback! Better luck next time!"
+                              value={settings.scratchCardLoseMessage || ''}
+                              onChange={(e) => setSettings({ ...settings, scratchCardLoseMessage: e.target.value })}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Live Interactive Scratch Card Preview in Settings */}
+                        <div style={{ marginTop: '10px', padding: '16px', background: '#fafaf9', borderRadius: '12px', border: '1px solid #e7e5e4' }}>
+                          <div style={{ fontSize: '12px', fontWeight: 700, color: '#78716c', marginBottom: '12px', textTransform: 'uppercase' }}>
+                            Live Scratch Card Preview (Try scratching):
+                          </div>
+                          <ScratchCard
+                            cardType={settings.scratchCardType || 'golden_ticket'}
+                            rewardTitle={settings.scratchCardRewardTitle || '10% Off Your Next Visit'}
+                            rewardDescription={settings.scratchCardRewardDescription || 'Show this code to redeem!'}
+                            couponCode={settings.scratchCardCouponCode || 'SAMPLE10'}
+                            businessName={business.name}
+                            customLogoUrl={settings.scratchCardCustomLogoUrl || business.logoUrl}
+                            winProbability={settings.scratchCardWinProbability ?? 100}
+                            loseMessage={settings.scratchCardLoseMessage || 'Thank you for your review!'}
+                            previewMode={true}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '28px' }}>
                   <button className="btn btn-primary" onClick={handleSaveSettings} disabled={savingSettings}>
-                    {savingSettings ? 'Saving...' : 'Save AI Tone & Keywords'}
+                    {savingSettings ? 'Saving...' : 'Save AI Tone, Format & Reward Engine'}
                   </button>
                 </div>
               </div>
@@ -2517,53 +2918,98 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               {/* Quick Preset Buttons */}
               <div style={{ marginBottom: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: '8px' }}>
                 <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  ⚡ Quick Add Standard Hospitality Criteria:
+                  ⚡ Quick Add Industry Recommended Rating Criteria:
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {[
-                    { label: '🍽️ Food Taste & Quality', key: 'food_taste' },
-                    { label: '⚡ Speed of Service', key: 'service_speed' },
-                    { label: '🥂 Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
-                    { label: '🎶 Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
-                    { label: '💰 Value for Price', key: 'value_money' },
-                  ].map((preset) => (
-                    <button
-                      key={preset.key}
-                      type="button"
-                      onClick={() => {
-                        const exists = questions.some((q) => q.label === preset.label);
-                        if (!exists) {
-                          setQuestions([
-                            ...questions,
-                            {
-                              questionKey: `q_${preset.key}_${Date.now()}`,
-                              label: preset.label,
-                              scaleType: '1-5_STARS',
-                              displayOrder: questions.length,
-                              isRequired: true,
-                              isActive: true,
-                            },
-                          ]);
-                          showNotification(`Added criterion: ${preset.label}`);
-                        } else {
-                          showNotification(`${preset.label} is already added!`);
-                        }
-                      }}
-                      style={{
-                        background: questions.some((q) => q.label === preset.label) ? '#f0fdf4' : 'var(--surface)',
-                        border: questions.some((q) => q.label === preset.label) ? '1px solid #86efac' : '1px solid var(--border)',
-                        color: questions.some((q) => q.label === preset.label) ? '#15803d' : 'var(--text)',
-                        padding: '5px 11px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        cursor: 'pointer',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {questions.some((q) => q.label === preset.label) ? '✓ ' : '+ '}
-                      {preset.label}
-                    </button>
-                  ))}
+                  {(() => {
+                    const cat = (business?.mainCategory || '').toUpperCase();
+                    const sub = (business?.subcategory || '').toLowerCase();
+                    const bName = (business?.name || '').toLowerCase();
+
+                    const isRetail =
+                      cat === 'RETAIL' ||
+                      /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                      /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+                    const isServices =
+                      cat === 'SERVICES' ||
+                      /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+                    const isHealth =
+                      cat === 'HEALTH & WELLNESS' ||
+                      /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+                    const presets = isRetail
+                      ? [
+                          { label: 'Product Authenticity & Genuine Quality', key: 'product_authenticity' },
+                          { label: 'Staff Technical Advice & Knowledge', key: 'tech_advice' },
+                          { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
+                          { label: 'Store Experience & Product Selection', key: 'store_selection' },
+                          { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
+                        ]
+                      : isServices
+                      ? [
+                          { label: 'Repair & Diagnostic Quality', key: 'diagnostic_quality' },
+                          { label: 'Turnaround Speed & Punctuality', key: 'turnaround_speed' },
+                          { label: 'Transparent Pricing & Estimates', key: 'transparent_pricing' },
+                          { label: 'Technician Professionalism', key: 'technician_prof' },
+                          { label: 'Overall Service Reliability', key: 'service_reliability' },
+                        ]
+                      : isHealth
+                      ? [
+                          { label: 'Treatment Quality & Results', key: 'treatment_quality' },
+                          { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
+                          { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
+                          { label: 'Appointment Punctuality', key: 'appointment_time' },
+                          { label: 'Value for Care & Consultation', key: 'care_value' },
+                        ]
+                      : [
+                          { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
+                          { label: 'Speed of Service', key: 'service_speed' },
+                          { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
+                          { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
+                          { label: 'Value for Price', key: 'value_money' },
+                        ];
+
+                    return presets.map((preset) => (
+                      <button
+                        key={preset.key}
+                        type="button"
+                        onClick={() => {
+                          const exists = questions.some((q) => q.label === preset.label);
+                          if (!exists) {
+                            setQuestions([
+                              ...questions,
+                              {
+                                questionKey: `q_${preset.key}_${Date.now()}`,
+                                label: preset.label,
+                                scaleType: '1-5_STARS',
+                                displayOrder: questions.length,
+                                isRequired: true,
+                                isActive: true,
+                              },
+                            ]);
+                            showNotification(`Added criterion: ${preset.label}`);
+                          } else {
+                            showNotification(`${preset.label} is already added!`);
+                          }
+                        }}
+                        style={{
+                          background: questions.some((q) => q.label === preset.label) ? '#f0fdf4' : 'var(--surface)',
+                          border: questions.some((q) => q.label === preset.label) ? '1px solid #86efac' : '1px solid var(--border)',
+                          color: questions.some((q) => q.label === preset.label) ? '#15803d' : 'var(--text)',
+                          padding: '5px 11px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {questions.some((q) => q.label === preset.label) ? '✓ ' : '+ '}
+                        {preset.label}
+                      </button>
+                    ));
+                  })()}
                 </div>
               </div>
 
@@ -2773,16 +3219,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     />
                   </div>
 
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Business Phone Number</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      value={profileForm.phone}
-                      onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                      required
-                    />
-                  </div>
+                  <PhoneInput
+                    label="Business Phone Number"
+                    value={profileForm.phone}
+                    onChange={(val) => setProfileForm({ ...profileForm, phone: val })}
+                    required
+                  />
                 </div>
               </div>
 
@@ -2790,23 +3232,59 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div>
                   <div style={{ fontSize: '15px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <GoogleLogo size={18} />
-                    <span>Google Maps Destination</span>
+                    <span>Google Maps &amp; Direct Review Link</span>
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                    Where customers paste their review.
+                    Paste your Google Maps share link to convert it into a direct 5-star review dialog link, or edit/change it anytime.
                   </div>
                 </div>
 
                 <div>
+                  {/* Share Link Input & Converter */}
+                  <div className="form-group" style={{ marginBottom: '14px' }}>
+                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Google Maps Share Link (From Maps App / Share Button)</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 400 }}>maps.app.goo.gl/... or goo.gl/maps/...</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="url"
+                        className="form-input"
+                        value={profileForm.googleMapsShareUrl}
+                        onChange={(e) => setProfileForm({ ...profileForm, googleMapsShareUrl: e.target.value })}
+                        placeholder="Paste share link (e.g. https://maps.app.goo.gl/xxx)"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleConvertMapsLink}
+                        disabled={convertingMapsLink || (!profileForm.googleMapsShareUrl && !profileForm.googleReviewUrl)}
+                        style={{ whiteSpace: 'nowrap', fontSize: '12.5px', padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        {convertingMapsLink ? 'Converting...' : '⚡ Convert to Review Link'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {mapsLinkSuccessMsg && (
+                    <div style={{ fontSize: '12px', color: '#15803d', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '8px 12px', borderRadius: '6px', marginBottom: '12px' }}>
+                      ✓ {mapsLinkSuccessMsg}
+                    </div>
+                  )}
+
+                  {/* Direct Google Review URL (Editable) */}
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Google Review URL</label>
+                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Direct 5-Star Review Submission URL (Editable)</span>
+                      <span className="badge badge-primary" style={{ fontSize: '10.5px' }}>Opens Direct 5★ Modal</span>
+                    </label>
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <input
                         type="url"
                         className="form-input"
                         value={profileForm.googleReviewUrl}
                         onChange={(e) => setProfileForm({ ...profileForm, googleReviewUrl: e.target.value })}
-                        placeholder="https://g.page/r/... or https://maps.google.com/?cid=..."
+                        placeholder="https://search.google.com/local/writereview?placeid=... or https://maps.google.com/?cid=..."
                         required
                       />
                       {profileForm.googleReviewUrl && (
@@ -2814,11 +3292,114 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                           href={profileForm.googleReviewUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="btn btn-secondary"
+                          className="btn btn-primary"
                           style={{ whiteSpace: 'nowrap', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                          title="Click to verify the Google review dialog opens"
                         >
                           <GoogleLogo size={14} />
                           <span>Test Link ↗</span>
+                        </a>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '5px' }}>
+                      When customers click &quot;Post on Google Maps&quot;, this exact URL directly opens their review submission popup.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Channels & Follow Links */}
+              <div className="settings-section-row">
+                <div>
+                  <div style={{ fontSize: '15px', fontWeight: 600 }}>Social Follow Channels (Optional)</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Grow your online brand. When added, clean follow badges appear on customer review screens. If left blank, nothing is displayed.
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {/* Instagram */}
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <InstagramLogo size={16} />
+                      <span>Instagram Profile or Handle</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={profileForm.instagramUrl}
+                        onChange={(e) => setProfileForm({ ...profileForm, instagramUrl: e.target.value })}
+                        placeholder="@yourbusiness or https://instagram.com/yourbusiness"
+                      />
+                      {profileForm.instagramUrl && (
+                        <a
+                          href={profileForm.instagramUrl.startsWith('http') ? profileForm.instagramUrl : `https://instagram.com/${profileForm.instagramUrl.replace(/^@/, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-secondary"
+                          style={{ whiteSpace: 'nowrap', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        >
+                          <InstagramLogo size={14} />
+                          <span>Test ↗</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* WhatsApp */}
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <WhatsAppLogo size={16} />
+                      <span>WhatsApp Business Number or Link</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={profileForm.whatsappUrl}
+                        onChange={(e) => setProfileForm({ ...profileForm, whatsappUrl: e.target.value })}
+                        placeholder="+919876543210 or https://wa.me/919876543210"
+                      />
+                      {profileForm.whatsappUrl && (
+                        <a
+                          href={profileForm.whatsappUrl.startsWith('http') ? profileForm.whatsappUrl : `https://wa.me/${profileForm.whatsappUrl.replace(/[^\d]/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-secondary"
+                          style={{ whiteSpace: 'nowrap', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        >
+                          <WhatsAppLogo size={14} />
+                          <span>Test ↗</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Facebook */}
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <FacebookLogo size={16} />
+                      <span>Facebook Page URL</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={profileForm.facebookUrl}
+                        onChange={(e) => setProfileForm({ ...profileForm, facebookUrl: e.target.value })}
+                        placeholder="https://facebook.com/yourbusiness"
+                      />
+                      {profileForm.facebookUrl && (
+                        <a
+                          href={profileForm.facebookUrl.startsWith('http') ? profileForm.facebookUrl : `https://facebook.com/${profileForm.facebookUrl.replace(/^\//, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-secondary"
+                          style={{ whiteSpace: 'nowrap', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                        >
+                          <FacebookLogo size={14} />
+                          <span>Test ↗</span>
                         </a>
                       )}
                     </div>
@@ -2985,75 +3566,157 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
               {plans
                 .filter((p) => p.slug !== 'trial')
-                .map((p) => (
-                  <div
-                    key={p.id}
-                    className="card"
-                    style={{
-                      padding: '24px 20px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      position: 'relative',
-                      border: p.slug === 'growth' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                    }}
-                  >
-                    {p.slug === 'growth' && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '-11px',
-                          right: '16px',
-                          background: 'var(--primary)',
-                          color: 'white',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          padding: '3px 12px',
-                          borderRadius: '12px',
-                        }}
-                      >
-                        MOST POPULAR
-                      </div>
-                    )}
+                .map((p) => {
+                  const selectedDuration = planDurations[p.id] || 1; // 1 | 3 | 6 | 12
 
-                    <div style={{ fontWeight: 700, fontSize: '17px' }}>{p.name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
-                      {p.offerBadge || 'Special First Month Offer'}
-                    </div>
+                  let activePrice = p.priceInr;
+                  let originalPrice = p.originalPriceInr || Math.round(p.priceInr * 1.5);
+                  let durationLabel = '1 Month';
+                  let durationSub = '/month';
+                  let reviewLimitDisplay = `${p.reviewGenerationLimit.toLocaleString()} Monthly Reviews`;
+                  let discountTag: string | null = null;
 
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '12px 0 16px' }}>
-                      <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)' }}>
-                        ₹{p.priceInr}
-                      </span>
-                      {p.originalPriceInr && (
-                        <span style={{ fontSize: '15px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                          ₹{p.originalPriceInr}
-                        </span>
+                  if (selectedDuration === 3) {
+                    activePrice = p.priceInr3Months || p.priceInr * 3;
+                    originalPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 3;
+                    durationLabel = '3 Months';
+                    durationSub = `for 3 mos (₹${Math.round(activePrice / 3)}/mo)`;
+                    reviewLimitDisplay = `${(p.reviewGenerationLimit * 3).toLocaleString()} Total Reviews (Quarterly)`;
+                    discountTag = 'Quarterly Pack';
+                  } else if (selectedDuration === 6) {
+                    activePrice = p.priceInr6Months || p.priceInr * 6;
+                    originalPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 6;
+                    durationLabel = '6 Months';
+                    durationSub = `for 6 mos (₹${Math.round(activePrice / 6)}/mo)`;
+                    reviewLimitDisplay = `${(p.reviewGenerationLimit * 6).toLocaleString()} Total Reviews (Semi-Annual)`;
+                    discountTag = 'Semi-Annual Pack';
+                  } else if (selectedDuration === 12) {
+                    // 1 Year Pack gets discount of 2 months!
+                    activePrice = p.priceInr1Year || (p.priceInr * 10);
+                    originalPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 12;
+                    durationLabel = '1 Year';
+                    durationSub = `for 1 yr (₹${Math.round(activePrice / 12)}/mo)`;
+                    reviewLimitDisplay = `${(p.reviewGenerationLimit * 12).toLocaleString()} Total Reviews (1-Year Pass)`;
+                    discountTag = '🎁 2 Months Free Applied!';
+                  }
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="card"
+                      style={{
+                        padding: '24px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        position: 'relative',
+                        border: p.slug === 'growth' ? '2px solid var(--primary)' : '1px solid var(--border)',
+                      }}
+                    >
+                      {p.slug === 'growth' && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '-11px',
+                            left: '20px',
+                            background: 'var(--primary)',
+                            color: 'white',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            padding: '3px 12px',
+                            borderRadius: '12px',
+                          }}
+                        >
+                          MOST POPULAR
+                        </div>
                       )}
-                      <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>/{p.billingPeriod}</span>
-                    </div>
 
-                    <ul style={{ listStyle: 'none', fontSize: '12.5px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                      <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {p.reviewGenerationLimit.toLocaleString()} Monthly Reviews</li>
-                      <li>✓ {p.qrCodeLimit} Smart QR Stands</li>
-                      <li>✓ Conversion Funnel Tracking</li>
-                      <li>✓ Aura Telemetry & Reputation Shield</li>
-                    </ul>
+                      {/* Header with Title and Month Duration Selector in Right Upper Container */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '18px' }}>{p.name}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
+                            {discountTag || p.offerBadge || 'Special First Month Offer'}
+                          </div>
+                        </div>
 
-                    <button
-                      className="btn btn-primary btn-block"
-                      style={{ marginTop: '18px', fontSize: '13.5px', padding: '10px' }}
-                      onClick={async () => {
-                        try {
-                          const order = await api.createOrder(businessId, p.id);
+                        {/* In right upper of container: Select Months */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+                          <span style={{ fontSize: '9.5px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.4px' }}>
+                            Select Months
+                          </span>
+                          <div style={{ display: 'inline-flex', background: 'var(--surface-container)', padding: '2px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                            {[
+                              { m: 1 as const, lbl: '1M' },
+                              { m: 3 as const, lbl: '3M' },
+                              { m: 6 as const, lbl: '6M' },
+                              { m: 12 as const, lbl: '1Y 🎁' },
+                            ].map((tab) => (
+                              <button
+                                key={tab.m}
+                                type="button"
+                                onClick={() => setPlanDurations((prev) => ({ ...prev, [p.id]: tab.m }))}
+                                style={{
+                                  background: selectedDuration === tab.m ? 'var(--primary)' : 'transparent',
+                                  color: selectedDuration === tab.m ? '#ffffff' : 'var(--text)',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '11px',
+                                  fontWeight: selectedDuration === tab.m ? 700 : 500,
+                                  padding: '3px 7px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                title={tab.m === 12 ? '1 Year Plan: 2 Months Free Discount!' : `${tab.m} Months`}
+                              >
+                                {tab.lbl}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0 14px' }}>
+                        <span style={{ fontSize: '30px', fontWeight: 800, color: 'var(--primary)' }}>
+                          ₹{activePrice}
+                        </span>
+                        {originalPrice && originalPrice > activePrice && (
+                          <span style={{ fontSize: '15px', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                            ₹{originalPrice}
+                          </span>
+                        )}
+                        <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                          {durationSub}
+                        </span>
+                      </div>
+
+                      {selectedDuration === 12 && (
+                        <div style={{ fontSize: '11.5px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px', fontWeight: 600 }}>
+                          🎉 1-Year Pack: 2 Months Free Discount Applied!
+                        </div>
+                      )}
+
+                      <ul style={{ listStyle: 'none', fontSize: '12.5px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                        <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviewLimitDisplay}</li>
+                        <li>✓ {p.qrCodeLimit} Smart QR Stands</li>
+                        <li>✓ Conversion Funnel Tracking</li>
+                        <li>✓ Aura Telemetry &amp; Reputation Shield</li>
+                      </ul>
+
+                      <button
+                        className="btn btn-primary btn-block"
+                        style={{ marginTop: '18px', fontSize: '13.5px', padding: '10px' }}
+                        onClick={async () => {
+                          try {
+                            const order = await api.createOrder(businessId, p.id, selectedDuration);
                           if ((window as any).Razorpay) {
                             const options = {
                               key: order.keyId,
                               amount: order.amount,
                               currency: order.currency,
-                              name: 'Reviewly Platform',
+                              name: 'KindlyReview Platform',
                               description: `Upgrade to ${p.name}`,
                               order_id: order.orderId,
                               prefill: {
@@ -3099,7 +3762,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       Select {p.name} (₹{p.priceInr})
                     </button>
                   </div>
-                ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -3362,14 +4026,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                <div className="form-group" style={{ marginTop: '14px' }}>
-                  <label className="form-label">Contact Phone Number</label>
-                  <input
-                    type="text"
-                    className="form-input"
+                <div style={{ marginTop: '14px' }}>
+                  <PhoneInput
+                    label="Contact Phone Number"
                     value={inquiryForm.contactPhone}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, contactPhone: e.target.value })}
-                    placeholder="+91 98765 43210"
+                    onChange={(val) => setInquiryForm({ ...inquiryForm, contactPhone: val })}
                     required
                   />
                 </div>
@@ -3473,17 +4134,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Callback Phone Number</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={helpForm.phone}
-                    onChange={(e) => setHelpForm({ ...helpForm, phone: e.target.value })}
-                    placeholder="+91 98765 43210"
-                    required
-                  />
-                </div>
+                <PhoneInput
+                  label="Callback Phone Number"
+                  value={helpForm.phone}
+                  onChange={(val) => setHelpForm({ ...helpForm, phone: val })}
+                  required
+                />
 
                 <div className="form-group">
                   <label className="form-label">How can we help? (Describe what happened)</label>
