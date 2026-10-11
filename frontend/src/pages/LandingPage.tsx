@@ -105,54 +105,44 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
         style={{
           background: 'var(--surface)',
           borderBottom: '1px solid var(--border-light)',
-          padding: '16px 28px',
+          padding: '12px 18px',
           position: 'sticky',
           top: 0,
           zIndex: 100,
         }}
       >
-        <div
-          style={{
-            maxWidth: '1280px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <KindlyReviewBrand iconSize={42} fontSize={26} />
+        <div className="landing-nav-container">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <KindlyReviewBrand iconSize={36} fontSize={22} />
             <span
-              className="stat-pill stat-pill-success"
+              className="stat-pill stat-pill-success hide-on-phone"
               style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
               ● #1 Local Reputation Suite
             </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
-              className="btn btn-secondary"
+              className="btn btn-secondary hide-on-phone"
               onClick={onNavigateLogin}
-              style={{ fontSize: '13px', padding: '8px 16px' }}
+              style={{ fontSize: '13px', padding: '7px 14px' }}
             >
               Merchant Login
             </button>
             <button
               className="btn btn-primary"
               onClick={onStartOnboarding}
-              style={{ fontSize: '13px', padding: '8px 18px' }}
+              style={{ fontSize: '13px', padding: '7px 14px' }}
             >
-              Start 7-Day Free Trial →
+              Start Free Trial →
             </button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section style={{ textAlign: 'center', padding: '68px 20px 48px', maxWidth: '980px', margin: '0 auto' }}>
+      <section style={{ textAlign: 'center', padding: '48px 16px 36px', maxWidth: '980px', margin: '0 auto' }}>
         <div
           style={{
             display: 'inline-flex',
@@ -160,30 +150,31 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             gap: '8px',
             background: 'var(--surface)',
             border: '1px solid var(--border)',
-            padding: '6px 16px',
+            padding: '6px 14px',
             borderRadius: '999px',
-            marginBottom: '20px',
+            marginBottom: '18px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            maxWidth: '100%',
           }}
         >
           <GoogleLogo size={16} />
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>
+          <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text)', whiteSpace: 'normal' }}>
             Google Local 3-Pack Growth Engine for Restaurants & Outlets
           </span>
         </div>
 
-        <h1 className="serif" style={{ fontSize: '50px', lineHeight: 1.15, marginBottom: '20px', letterSpacing: '-0.02em' }}>
+        <h1 className="serif serif-h1" style={{ fontSize: 'clamp(28px, 6vw, 50px)', lineHeight: 1.18, marginBottom: '18px', letterSpacing: '-0.02em' }}>
           Turn Happy Diners into 5-Star Google Reviews Automatically
         </h1>
-        <p style={{ fontSize: '18px', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '32px', maxWidth: '780px', margin: '0 auto 32px' }}>
+        <p style={{ fontSize: 'clamp(15px, 3.5vw, 18px)', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '28px', maxWidth: '780px', margin: '0 auto 28px' }}>
           Place smart acrylic QR stands at your dining tables. Guests tap ratings in 30 seconds, and our server-side AI crafts personalized, mouth-watering reviews ready to paste straight to Google Maps.
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap', marginBottom: '44px' }}>
-          <button className="btn btn-primary btn-lg" onClick={onStartOnboarding} style={{ padding: '14px 28px', fontSize: '15.5px' }}>
+        <div className="hero-cta-group" style={{ marginBottom: '36px' }}>
+          <button className="btn btn-primary btn-lg" onClick={onStartOnboarding} style={{ padding: '12px 24px', fontSize: '15px' }}>
             Start 7-Day Free Trial →
           </button>
-          <button className="btn btn-secondary btn-lg" onClick={onNavigateLogin} style={{ padding: '14px 28px', fontSize: '15.5px' }}>
+          <button className="btn btn-secondary btn-lg" onClick={onNavigateLogin} style={{ padding: '12px 24px', fontSize: '15px' }}>
             Explore Live Restaurant Demo
           </button>
         </div>

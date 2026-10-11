@@ -834,43 +834,154 @@ a {
 /* ======================================================== */
 /* ADVANCED MOBILE PHONE OPTIMIZATION (< 640px)             */
 /* ======================================================== */
-@media (max-width: 640px) {
+
+/* General Responsive Utilities */
+.form-grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.transformation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.wizard-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.wizard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.otp-digit-input {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-container, #ffffff);
+  color: var(--text);
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.otp-digit-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(154, 64, 24, 0.15);
+}
+
+.hero-cta-group {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.landing-nav-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 680px) {
   /* Prevent horizontal screen jiggle/overflow on mobile */
   html, body {
     overflow-x: hidden;
     width: 100%;
   }
 
-  /* Compact content container so small screens don't waste 30% on margins */
+  /* Compact content container so phones (Poco, Samsung, iPhone) fit screen cleanly */
   .desktop-container {
-    padding: 14px 12px !important;
+    padding: 12px 10px !important;
+  }
+
+  .wizard-container {
+    margin: 12px auto !important;
+    padding: 0 8px !important;
   }
 
   /* Responsive card padding: content feels neat and not bloated */
-  .card {
-    padding: 18px 14px !important;
+  .card, .wizard-card {
+    padding: 20px 14px !important;
     border-radius: var(--radius-md) !important;
+  }
+
+  /* Stack 2-column form grids into 1 clean column on mobile phones */
+  .form-grid-responsive {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .transformation-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
 
   /* Responsive typography scaling */
   h1, .serif-h1 {
-    font-size: 26px !important;
+    font-size: 24px !important;
     line-height: 1.25 !important;
   }
   h2, .serif-h2 {
-    font-size: 22px !important;
+    font-size: 20px !important;
     line-height: 1.3 !important;
   }
 
   /* Ensure inputs have at least 16px font-size to prevent iOS Safari auto-zoom */
   .form-input, .form-select, .form-textarea {
     font-size: 16px !important;
+    height: 46px !important;
   }
 
-  /* Compact HUD on phone */
-  .ironman-hud-strip {
-    padding: 14px 14px !important;
-    margin-bottom: 16px !important;
+  /* Full-width touch-friendly buttons on phone */
+  .mobile-btn-full {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 48px !important;
+    font-size: 15px !important;
+  }
+
+  .hero-cta-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .hero-cta-group .btn {
+    width: 100% !important;
+    height: 48px !important;
+  }
+
+  /* Mobile OTP inputs fit comfortably on any 360px - 412px phone screen */
+  .otp-digit-input {
+    width: 38px !important;
+    height: 48px !important;
+    font-size: 19px !important;
+  }
+
+  .otp-digits-container {
+    gap: 6px !important;
+  }
+
+  /* Compact landing navbar on phone */
+  .landing-nav-container {
+    padding: 0 !important;
   }
 
   /* Dashboard 2x2 metric grid on phones instead of long single column */
@@ -887,9 +998,9 @@ a {
 
   /* Responsive moving reviews cards */
   .moving-review-card {
-    width: 300px !important;
-    min-height: 250px !important;
-    padding: 16px 14px !important;
+    width: 290px !important;
+    min-height: 240px !important;
+    padding: 14px 12px !important;
   }
 
   /* Responsive tables with smooth horizontal swipe */

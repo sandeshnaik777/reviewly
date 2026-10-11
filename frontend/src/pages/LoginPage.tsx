@@ -37,7 +37,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
         style={{
           background: 'var(--surface)',
           borderBottom: '1px solid var(--border-light)',
-          padding: '16px 28px',
+          padding: '14px 18px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -48,50 +48,32 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
           style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
           title="Return to KindlyReview Home"
         >
-          <KindlyReviewBrand iconSize={38} fontSize={24} />
+          <KindlyReviewBrand iconSize={34} fontSize={22} />
         </div>
 
         <button
           onClick={onNavigateHome}
           className="btn btn-secondary"
-          style={{ fontSize: '13px', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
+          style={{ fontSize: '12.5px', padding: '6px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
         >
           ← Back to Home
         </button>
       </header>
 
       {/* Main Login Card Area */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 20px' }}>
-        <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '36px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <button
-              type="button"
-              onClick={onNavigateHome}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--primary)',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: 0,
-              }}
-            >
-              ← Back to Home
-            </button>
-            <span className="stat-pill stat-pill-primary" style={{ fontSize: '11px' }}>
-              Merchant Portal
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 14px' }}>
+        <div className="wizard-card" style={{ width: '100%', maxWidth: '440px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '18px' }}>
+            <span className="stat-pill stat-pill-primary" style={{ fontSize: '11px', padding: '4px 12px' }}>
+              ● Merchant Command Portal
             </span>
           </div>
 
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <h1 className="serif" style={{ fontSize: '28px', fontWeight: 700 }}>
+          <div style={{ textAlign: 'center', marginBottom: '22px' }}>
+            <h1 className="serif serif-h1" style={{ fontSize: '26px', fontWeight: 700, lineHeight: 1.25 }}>
               Sign in to KindlyReview
             </h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '4px' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '6px' }}>
               Access your restaurant analytics and reputation command center.
             </p>
           </div>

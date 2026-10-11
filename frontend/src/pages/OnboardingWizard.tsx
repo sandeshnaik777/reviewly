@@ -610,29 +610,29 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   };
 
   return (
-    <div className="desktop-container" style={{ maxWidth: '800px', margin: '30px auto' }}>
+    <div className="wizard-container">
       {/* Top Navigation Strip */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
         <button
           type="button"
           onClick={onNavigateHome || onNavigateLogin}
           className="btn btn-secondary"
-          style={{ fontSize: '13px', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          style={{ fontSize: '13px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          ← Back to Home
+          ← Back
         </button>
-        <KindlyReviewLogo height={34} />
-        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+        <KindlyReviewLogo height={32} />
+        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
           Step <strong>{step}</strong> of 9
         </span>
       </div>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <span className="badge badge-primary" style={{ marginBottom: '8px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <span className="badge badge-primary" style={{ marginBottom: '6px' }}>
           Step {step} of 9
         </span>
-        <h1 className="serif" style={{ fontSize: '32px' }}>
+        <h1 className="serif serif-h1" style={{ fontSize: '28px', lineHeight: 1.25 }}>
           {step === 1 && 'Create Your Account & Login'}
           {step === 2 && 'Choose Your Business Category'}
           {step === 3 && 'Restaurant & Business Details'}
@@ -643,7 +643,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           {step === 8 && 'Onboarding Complete!'}
           {step === 9 && 'Your First QR Code is Ready'}
         </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '6px' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '4px' }}>
           {step === 1 ? (
             <>
               Already have an account?{' '}
@@ -657,9 +657,9 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         </p>
       </div>
 
-      {error && <div className="alert alert-error" style={{ marginBottom: '20px' }}>{error}</div>}
+      {error && <div className="alert alert-error" style={{ marginBottom: '16px' }}>{error}</div>}
 
-      <div className="card" style={{ padding: '32px' }}>
+      <div className="wizard-card">
         {/* STEP 1: Account Login Credentials & Signup */}
         {step === 1 && (
           <div>
@@ -786,11 +786,14 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
                 <div
                   onPaste={handleOtpPaste}
+                  className="otp-digits-container"
                   style={{
                     display: 'flex',
-                    gap: '10px',
                     justifyContent: 'center',
                     marginBottom: '20px',
+                    width: '100%',
+                    maxWidth: '340px',
+                    margin: '0 auto 20px',
                   }}
                 >
                   {otpDigits.map((digit, idx) => (
@@ -806,17 +809,9 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                       onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                       disabled={otpLoading || otpSuccess}
+                      className="otp-digit-input"
                       style={{
-                        width: '46px',
-                        height: '54px',
-                        textAlign: 'center',
-                        fontSize: '22px',
-                        fontWeight: 700,
-                        borderRadius: '8px',
                         border: digit ? '2px solid var(--primary)' : '1.5px solid var(--border)',
-                        background: 'var(--surface-container, #ffffff)',
-                        color: 'var(--text)',
-                        outline: 'none',
                       }}
                     />
                   ))}
@@ -900,7 +895,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
             {!isAccountCreated && !showOtpVerification && (
               <form onSubmit={handleAccountSubmit}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+                <div className="form-grid-responsive">
                   <div className="form-group">
                     <label className="form-label">Full Name (Owner / Manager) *</label>
                     <input
@@ -984,12 +979,11 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   🔒 <strong>Bank-grade encryption:</strong> Your credentials are encrypted with bcrypt salt hashing. Next, you will configure your restaurant profile and customize your review criteria.
                 </div>
 
-                <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <button
                     type="submit"
-                    className="btn btn-primary btn-lg"
+                    className="btn btn-primary btn-lg mobile-btn-full"
                     disabled={loading}
-                    style={{ minWidth: '240px' }}
                   >
                     {loading ? (
                       <>
