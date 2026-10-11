@@ -1254,7 +1254,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="form-grid-responsive" style={{ marginBottom: '16px' }}>
               <div className="form-group">
                 <label className="form-label">Desired Review Tone</label>
                 <select
