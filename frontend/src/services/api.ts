@@ -108,12 +108,33 @@ export const api = {
 
   // Payments & Plans
   getPlans: () => apiRequest('/payment/plans'),
-  createOrder: (businessId: string, planId: string, durationMonths: number = 1) =>
-    apiRequest('/payment/create-order', {
+  createOrder: (
+    businessId: string,
+    planId: string,
+    options?: number | { durationMonths?: number; isTrial?: boolean; autoRenew?: boolean }
+  ) => {
+    const opts = typeof options === 'number' ? { durationMonths: options } : options || {};
+    return apiRequest('/payment/create-order', {
       method: 'POST',
       headers: { 'X-Business-ID': businessId },
-      body: JSON.stringify({ planId, durationMonths }),
+      body: JSON.stringify({
+        planId,
+        durationMonths: opts.durationMonths || 1,
+        isTrial: opts.isTrial,
+        autoRenew: opts.autoRenew,
+      }),
+    });
+  },
+  getSubscription: (businessId: string) =>
+    apiRequest('/payment/subscription', { headers: { 'X-Business-ID': businessId } }),
+  toggleAutoRenew: (businessId: string, autoRenew: boolean) =>
+    apiRequest('/payment/toggle-auto-renew', {
+      method: 'POST',
+      headers: { 'X-Business-ID': businessId },
+      body: JSON.stringify({ autoRenew }),
     }),
+  getPaymentHistory: (businessId: string) =>
+    apiRequest('/payment/history', { headers: { 'X-Business-ID': businessId } }),
   convertMapsLink: (mapsUrl: string) =>
     apiRequest('/business/convert-maps-link', {
       method: 'POST',

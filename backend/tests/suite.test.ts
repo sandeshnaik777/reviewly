@@ -1003,6 +1003,99 @@ test('14. AWS SNS SMS Phone Verification OTP & Security Lifecycle', async (t) =>
   });
 });
 
+test('15. Subscription Choice, Direct Activation & Monthly Recurring Billing Engine', async (t) => {
+  const recurringBusinessId = 'biz_recurring_test_001';
+  const plans = await db.listSubscriptionPlans();
+  const growthPlan = plans.find((p) => p.slug === 'growth') || plans[0];
+
+  await t.test('Creates direct payment order (no trial) with autoRenew flag and stores paymentType', async () => {
+    const directOrder = await paymentService.createOrder({
+      businessId: recurringBusinessId,
+      planId: growthPlan.id,
+      isTrial: false,
+      autoRenew: true,
+      durationMonths: 1,
+    });
+
+    assert.ok(directOrder.orderId);
+    assert.equal(directOrder.amountInr, growthPlan.priceInr);
+    assert.equal(directOrder.currency, 'INR');
+
+    const record = await db.findPaymentByOrderId(directOrder.orderId);
+    assert.ok(record);
+    assert.equal(record.paymentType, 'direct_subscription');
+    assert.equal(record.autoRenew, true);
+  });
+
+  await t.test('Captures direct payment, updates lastTransactionId and activates subscription with nextBillingDate', async () => {
+    const directOrder = await paymentService.createOrder({
+      businessId: recurringBusinessId,
+      planId: growthPlan.id,
+      isTrial: false,
+      autoRenew: true,
+      durationMonths: 1,
+    });
+
+    const testTxnId = 'pay_direct_tx_998877';
+    await paymentService.processPaymentSuccess(directOrder.orderId, testTxnId);
+
+    const sub = await paymentService.getSubscription(recurringBusinessId);
+    assert.ok(sub);
+    assert.equal(sub.status, 'ACTIVE');
+    assert.equal(sub.autoRenew, true);
+    assert.equal(sub.lastTransactionId, testTxnId);
+    assert.ok(sub.nextBillingDate);
+
+    // Verify stored payment record has transactionId
+    const record = await db.findPaymentByOrderId(directOrder.orderId);
+    assert.equal(record?.status, 'captured');
+    assert.equal(record?.transactionId, testTxnId);
+  });
+
+  await t.test('Toggles autoRenew setting on subscription', async () => {
+    const disabledSub = await paymentService.toggleAutoRenew(recurringBusinessId, false);
+    assert.equal(disabledSub?.autoRenew, false);
+
+    const enabledSub = await paymentService.toggleAutoRenew(recurringBusinessId, true);
+    assert.equal(enabledSub?.autoRenew, true);
+  });
+
+  await t.test('Recurring billing engine processes due subscriptions, records transaction ID and advances billing date', async () => {
+    // Set next billing date to yesterday so it is due
+    const sub = await paymentService.getSubscription(recurringBusinessId);
+    assert.ok(sub);
+
+    const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    await db.createOrUpdateSubscription({
+      ...sub,
+      nextBillingDate: pastDate,
+      autoRenew: true,
+    });
+
+    const billingRun = await paymentService.processRecurringBilling();
+    assert.ok(billingRun.length >= 1);
+
+    const matchingRun = billingRun.find((r) => r.businessId === recurringBusinessId);
+    assert.ok(matchingRun);
+    assert.ok(matchingRun?.transactionId.startsWith('pay_rec_'));
+    assert.equal(matchingRun?.amountInr, growthPlan.priceInr);
+
+    // Check renewed subscription has future billing date and updated lastTransactionId
+    const renewedSub = await paymentService.getSubscription(recurringBusinessId);
+    assert.ok(renewedSub);
+    assert.equal(renewedSub.lastTransactionId, matchingRun?.transactionId);
+    assert.ok(new Date(renewedSub.nextBillingDate!).getTime() > Date.now());
+
+    // Verify payment history contains the recurring record
+    const history = await paymentService.getPaymentHistory(recurringBusinessId);
+    const recRecord = history.find((h) => h.transactionId === matchingRun?.transactionId);
+    assert.ok(recRecord);
+    assert.equal(recRecord?.paymentType, 'recurring_monthly');
+    assert.equal(recRecord?.status, 'captured');
+  });
+});
+
+
 
 
 

@@ -162,6 +162,11 @@ export interface Subscription {
   trialStart?: string;
   trialEnd?: string;
   cancelAtPeriodEnd: boolean;
+  autoRenew?: boolean;
+  billingCycle?: 'monthly' | 'quarterly' | 'semi_annual' | 'yearly';
+  recurringMandateId?: string;
+  lastTransactionId?: string;
+  nextBillingDate?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -182,9 +187,12 @@ export interface PaymentRecord {
   planId?: string;
   orderId: string;
   paymentId?: string;
+  transactionId?: string;
   amountInr: number;
   currency: string;
   durationMonths?: number;
+  autoRenew?: boolean;
+  paymentType?: 'trial_verification' | 'direct_subscription' | 'recurring_monthly';
   status: 'created' | 'authorized' | 'captured' | 'failed' | 'refunded';
   provider: 'RAZORPAY' | 'STRIPE' | 'MOCK';
   providerReference?: string;

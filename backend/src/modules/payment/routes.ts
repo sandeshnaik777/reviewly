@@ -31,6 +31,8 @@ paymentRouter.post(
     z.object({
       planId: z.string().min(1, 'Plan ID is required'),
       durationMonths: z.number().int().min(1).max(12).default(1).optional(),
+      isTrial: z.boolean().optional(),
+      autoRenew: z.boolean().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -40,15 +42,20 @@ paymentRouter.post(
         throw new AppError('Invalid or inactive subscription plan', 400, 'INVALID_PLAN');
       }
 
+      const isTrial = Boolean(req.body.isTrial || plan.slug === 'trial');
       const durationMonths = Number(req.body.durationMonths) || 1;
-      let amountInr = plan.priceInr;
-      if (durationMonths === 3) {
-        amountInr = plan.priceInr3Months || (plan.priceInr * 3);
-      } else if (durationMonths === 6) {
-        amountInr = plan.priceInr6Months || (plan.priceInr * 6);
-      } else if (durationMonths === 12) {
-        // 1 Year Pack gets discount of 2 months!
-        amountInr = plan.priceInr1Year || (plan.priceInr * 10);
+      let amountInr = 2;
+
+      if (!isTrial) {
+        amountInr = plan.priceInr;
+        if (durationMonths === 3) {
+          amountInr = plan.priceInr3Months || (plan.priceInr * 3);
+        } else if (durationMonths === 6) {
+          amountInr = plan.priceInr6Months || (plan.priceInr * 6);
+        } else if (durationMonths === 12) {
+          // 1 Year Pack gets discount of 2 months!
+          amountInr = plan.priceInr1Year || (plan.priceInr * 10);
+        }
       }
 
       const order = await paymentService.createOrder({
@@ -56,6 +63,8 @@ paymentRouter.post(
         planId: plan.id,
         amountInr,
         durationMonths,
+        isTrial,
+        autoRenew: req.body.autoRenew !== false,
       });
 
       res.status(201).json({ success: true, data: order });
@@ -112,6 +121,95 @@ paymentRouter.post('/webhook', async (req: Request, res: Response, next: NextFun
     const result = await paymentService.processWebhookEvent(rawBody, signature);
 
     res.json({ success: true, received: true, event: result.event });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Tenant Protected: Get current business subscription details & status
+paymentRouter.get('/subscription', authenticate, requireTenant, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const sub = await db.getBusinessSubscription(req.tenantId!);
+    if (!sub) {
+      return res.json({ success: true, data: null });
+    }
+    const plan = await db.findPlanById(sub.planId);
+    res.json({
+      success: true,
+      data: {
+        ...sub,
+        plan,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Tenant Protected: Toggle Monthly Auto-Renewal ON or OFF
+paymentRouter.post(
+  '/toggle-auto-renew',
+  authenticate,
+  requireTenant,
+  validateBody(
+    z.object({
+      autoRenew: z.boolean(),
+    })
+  ),
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const updated = await paymentService.toggleAutoRenew(req.tenantId!, req.body.autoRenew);
+      res.json({ success: true, data: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Trigger Monthly Recurring Auto-Billing cycle (called by scheduler or super-admin)
+paymentRouter.post(
+  '/process-recurring',
+  authenticate,
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const results = await paymentService.processRecurringBilling();
+      res.json({ success: true, message: `Processed ${results.length} recurring billing cycle(s)`, data: results });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Tenant Protected: Get payment & transaction history with stored transaction IDs
+paymentRouter.get('/history', authenticate, requireTenant, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const payments = await db.listPayments(req.tenantId!);
+    const plans = await db.listSubscriptionPlans();
+    const plansMap = new Map(plans.map((p) => [p.id, p]));
+
+    const history = payments
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .map((p) => {
+        const plan = p.planId ? plansMap.get(p.planId) : undefined;
+        return {
+          id: p.id,
+          orderId: p.orderId,
+          paymentId: p.paymentId || p.transactionId,
+          transactionId: p.transactionId || p.paymentId || p.orderId,
+          amountInr: p.amountInr,
+          currency: p.currency,
+          durationMonths: p.durationMonths || 1,
+          status: p.status,
+          provider: p.provider,
+          paymentType: p.paymentType || (p.amountInr === 2 ? 'trial_verification' : 'direct_subscription'),
+          autoRenew: p.autoRenew,
+          planName: plan?.name || (p.amountInr === 2 ? '7-Day Free Trial Pass' : 'Growth Pack'),
+          planSlug: plan?.slug,
+          createdAt: p.createdAt,
+        };
+      });
+
+    res.json({ success: true, data: history });
   } catch (err) {
     next(err);
   }

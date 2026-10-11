@@ -6,9 +6,12 @@ import { PaymentRecord, Subscription } from '../../types/index.js';
 export interface CreateOrderParams {
   businessId: string;
   planId: string;
-  amountInr: number;
+  amountInr?: number;
   durationMonths?: number;
   currency?: string;
+  isTrial?: boolean;
+  autoRenew?: boolean;
+  paymentType?: 'trial_verification' | 'direct_subscription' | 'recurring_monthly';
 }
 
 export interface OrderResult {
@@ -24,6 +27,8 @@ export interface PaymentService {
   verifyPaymentSignature(orderId: string, paymentId: string, signature: string): boolean;
   processPaymentSuccess(orderId: string, paymentId: string, providerRef?: string): Promise<PaymentRecord>;
   processWebhookEvent(rawBody: string, signature: string): Promise<{ handled: boolean; event: string }>;
+  toggleAutoRenew(businessId: string, enabled: boolean): Promise<Subscription | undefined>;
+  processRecurringBilling(): Promise<Array<{ subscriptionId: string; businessId: string; transactionId: string; amountInr: number }>>;
 }
 
 export class RazorpayPaymentService implements PaymentService {
@@ -38,11 +43,16 @@ export class RazorpayPaymentService implements PaymentService {
   }
 
   async createOrder(params: CreateOrderParams): Promise<OrderResult> {
-    const { businessId, planId, amountInr, currency = 'INR', durationMonths = 1 } = params;
+    const { businessId, planId, amountInr, currency = 'INR', durationMonths = 1, isTrial, autoRenew = true } = params;
     let orderId = `order_${crypto.randomBytes(12).toString('hex')}`;
 
     let finalAmount = amountInr;
-    if (finalAmount === undefined || isNaN(finalAmount)) {
+    let paymentType: 'trial_verification' | 'direct_subscription' | 'recurring_monthly' = 'direct_subscription';
+
+    if (isTrial || finalAmount === 2) {
+      finalAmount = 2;
+      paymentType = 'trial_verification';
+    } else if (finalAmount === undefined || isNaN(finalAmount)) {
       const plan = await db.findPlanById(planId);
       if (plan) {
         if (durationMonths === 3) {
@@ -76,6 +86,8 @@ export class RazorpayPaymentService implements PaymentService {
             notes: {
               businessId,
               planId,
+              paymentType,
+              autoRenew: String(autoRenew),
             },
           }),
         });
@@ -94,7 +106,7 @@ export class RazorpayPaymentService implements PaymentService {
       }
     }
 
-    // Persist payment record in 'created' state with planId
+    // Persist payment record in 'created' state with planId and recurring options
     await db.createPaymentRecord({
       id: crypto.randomUUID(),
       businessId,
@@ -103,6 +115,8 @@ export class RazorpayPaymentService implements PaymentService {
       amountInr: finalAmount,
       durationMonths,
       currency,
+      autoRenew,
+      paymentType,
       status: 'created',
       provider: 'RAZORPAY',
       createdAt: new Date().toISOString(),
@@ -112,6 +126,7 @@ export class RazorpayPaymentService implements PaymentService {
     return {
       orderId,
       amount: finalAmount * 100, // Razorpay uses paisa
+      amountInr: finalAmount,
       currency,
       keyId: this.keyId,
     };
@@ -160,6 +175,7 @@ export class RazorpayPaymentService implements PaymentService {
 
     const updatedPayment = await db.updatePaymentRecord(payment.id, {
       paymentId,
+      transactionId: paymentId,
       status: 'captured',
       providerReference: providerRef || paymentId,
     });
@@ -168,7 +184,7 @@ export class RazorpayPaymentService implements PaymentService {
     const currentSub = await db.getBusinessSubscription(payment.businessId);
     const now = new Date();
     const plan = payment.planId ? await db.findPlanById(payment.planId) : undefined;
-    const isTrial = plan?.slug === 'trial' || payment.amountInr === 2;
+    const isTrial = payment.paymentType === 'trial_verification' || plan?.slug === 'trial' || payment.amountInr === 2;
     const durMonths = payment.durationMonths || 1;
     let periodDays = 30;
     if (isTrial) {
@@ -184,12 +200,18 @@ export class RazorpayPaymentService implements PaymentService {
     }
     const periodEnd = new Date(now.getTime() + periodDays * 24 * 60 * 60 * 1000);
 
+    const autoRenew = payment.autoRenew !== false;
     const newSub: Subscription = {
       id: currentSub?.id || crypto.randomUUID(),
       businessId: payment.businessId,
       planId: payment.planId || currentSub?.planId || 'c0000000-0000-0000-0000-000000000001',
       status: isTrial ? 'TRIAL' : 'ACTIVE',
-      trialActivated: true,
+      trialActivated: isTrial,
+      autoRenew,
+      billingCycle: durMonths === 12 ? 'yearly' : durMonths === 6 ? 'semi_annual' : durMonths === 3 ? 'quarterly' : 'monthly',
+      recurringMandateId: `mandate_${paymentId}`,
+      lastTransactionId: paymentId,
+      nextBillingDate: periodEnd.toISOString(),
       currentPeriodStart: now.toISOString(),
       currentPeriodEnd: periodEnd.toISOString(),
       trialStart: isTrial ? now.toISOString() : currentSub?.trialStart,
@@ -207,11 +229,116 @@ export class RazorpayPaymentService implements PaymentService {
       action: 'PAYMENT_CAPTURED',
       resourceType: 'PAYMENT',
       resourceId: payment.id,
-      details: { orderId, paymentId, amountInr: payment.amountInr },
+      details: { orderId, paymentId, transactionId: paymentId, amountInr: payment.amountInr, isTrial, autoRenew },
       createdAt: now.toISOString(),
     });
 
     return updatedPayment!;
+  }
+
+  async getSubscription(businessId: string): Promise<Subscription | undefined> {
+    return db.getBusinessSubscription(businessId);
+  }
+
+  async getPaymentHistory(businessId: string): Promise<PaymentRecord[]> {
+    return db.listPayments(businessId);
+  }
+
+  async toggleAutoRenew(businessId: string, enabled: boolean): Promise<Subscription | undefined> {
+    const sub = await db.getBusinessSubscription(businessId);
+    if (!sub) return undefined;
+    const updated = await db.createOrUpdateSubscription({
+      ...sub,
+      autoRenew: enabled,
+      updatedAt: new Date().toISOString(),
+    });
+    await db.logAudit({
+      id: crypto.randomUUID(),
+      businessId,
+      action: 'AUTO_RENEW_TOGGLED',
+      resourceType: 'SUBSCRIPTION',
+      resourceId: sub.id,
+      details: { autoRenew: enabled },
+      createdAt: new Date().toISOString(),
+    });
+    return updated;
+  }
+
+  async processRecurringBilling(): Promise<Array<{ subscriptionId: string; businessId: string; transactionId: string; amountInr: number }>> {
+    const allSubs = await db.listAllSubscriptions();
+    const now = new Date();
+    const results: Array<{ subscriptionId: string; businessId: string; transactionId: string; amountInr: number }> = [];
+
+    for (const sub of allSubs) {
+      if (!sub.autoRenew) continue;
+      if (sub.status !== 'ACTIVE' && sub.status !== 'TRIAL') continue;
+
+      const dueDate = sub.nextBillingDate ? new Date(sub.nextBillingDate) : new Date(sub.currentPeriodEnd);
+      // If billing cycle is reached
+      if (now >= dueDate) {
+        const plan = await db.findPlanById(sub.planId);
+        const renewalAmount = plan ? plan.priceInr : 149;
+        const recurringTxnId = `pay_rec_${Date.now().toString(36)}_${crypto.randomBytes(4).toString('hex')}`;
+        const recurringOrderId = `order_rec_${Date.now().toString(36)}_${crypto.randomBytes(4).toString('hex')}`;
+
+        // Create transaction record
+        await db.createPaymentRecord({
+          id: crypto.randomUUID(),
+          businessId: sub.businessId,
+          planId: sub.planId,
+          orderId: recurringOrderId,
+          paymentId: recurringTxnId,
+          transactionId: recurringTxnId,
+          amountInr: renewalAmount,
+          currency: 'INR',
+          durationMonths: 1,
+          autoRenew: true,
+          paymentType: 'recurring_monthly',
+          status: 'captured',
+          provider: 'RAZORPAY',
+          providerReference: `auto_recur_${sub.recurringMandateId || recurringTxnId}`,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+        });
+
+        // Advance subscription by 30 days
+        const nextPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        await db.createOrUpdateSubscription({
+          ...sub,
+          status: 'ACTIVE',
+          trialActivated: false,
+          currentPeriodStart: now.toISOString(),
+          currentPeriodEnd: nextPeriodEnd.toISOString(),
+          nextBillingDate: nextPeriodEnd.toISOString(),
+          lastTransactionId: recurringTxnId,
+          updatedAt: now.toISOString(),
+        });
+
+        await db.logAudit({
+          id: crypto.randomUUID(),
+          businessId: sub.businessId,
+          action: 'RECURRING_MONTHLY_PAYMENT_CAPTURED',
+          resourceType: 'PAYMENT',
+          resourceId: recurringTxnId,
+          details: {
+            transactionId: recurringTxnId,
+            orderId: recurringOrderId,
+            amountInr: renewalAmount,
+            nextBillingDate: nextPeriodEnd.toISOString(),
+          },
+          createdAt: now.toISOString(),
+        });
+
+        results.push({
+          subscriptionId: sub.id,
+          businessId: sub.businessId,
+          transactionId: recurringTxnId,
+          amountInr: renewalAmount,
+        });
+      }
+    }
+
+    return results;
   }
 
   async processWebhookEvent(rawBody: string, signature: string): Promise<{ handled: boolean; event: string }> {

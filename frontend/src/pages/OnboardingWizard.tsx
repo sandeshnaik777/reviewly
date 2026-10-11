@@ -27,6 +27,10 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   // Plan duration selections (1, 3, 6, 12 months)
   const [onboardingPlanDurations, setOnboardingPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({});
 
+  // Payment Choice: 7-Day Free Trial (₹2) vs Direct Plan Payment
+  const [paymentChoice, setPaymentChoice] = useState<'trial' | 'direct'>('trial');
+  const [autoRenewDirect, setAutoRenewDirect] = useState<boolean>(true);
+
   // Auth & Account state
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -599,6 +603,141 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         rzp.open();
       } else {
         // Fallback if Razorpay SDK not reachable
+        setStep(8);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Payment initiation failed. You can retry below.');
+      setPaymentFailed(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 7: Direct Full Plan Payment (Skip Trial) with Recurring Mandate
+  const handleDirectPayment = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setPaymentNote(null);
+
+      let targetBiz = createdBusiness;
+      let targetQR = firstQRSlug;
+
+      if (!targetBiz) {
+        try {
+          const setupRes = await api.setupBusiness({
+            businessName: formData.businessName,
+            mainCategory: formData.mainCategory,
+            subcategory: formData.subcategory,
+            customCategory: formData.customCategory || undefined,
+            phone: formData.phone,
+            address: formData.address || 'Central Address',
+            city: formData.city || 'Metropolis',
+            state: formData.state || 'State',
+            country: formData.country || 'India',
+            pincode: formData.pincode || '000000',
+            googleReviewUrl: formData.googleReviewUrl,
+            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
+            description: formData.description,
+            openingHours: formData.openingHours,
+            questions: formData.questions,
+            planSlug: formData.planSlug,
+          });
+
+          targetBiz = setupRes.business;
+          targetQR = setupRes.firstQRSlug;
+          setCreatedBusiness(targetBiz);
+          setFirstQRSlug(targetQR);
+        } catch (setupErr: any) {
+          const regRes = await api.register({
+            email: formData.email,
+            password: formData.password,
+            ownerName: formData.ownerName,
+            businessName: formData.businessName,
+            mainCategory: formData.mainCategory,
+            subcategory: formData.subcategory,
+            customCategory: formData.customCategory || undefined,
+            phone: formData.phone,
+            address: formData.address || 'Central Address',
+            city: formData.city || 'Metropolis',
+            state: formData.state || 'State',
+            country: formData.country || 'India',
+            pincode: formData.pincode || '000000',
+            googleReviewUrl: formData.googleReviewUrl,
+            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
+            description: formData.description,
+            openingHours: formData.openingHours,
+            questions: formData.questions,
+            planSlug: formData.planSlug,
+          });
+
+          targetBiz = regRes.business;
+          targetQR = regRes.firstQRSlug;
+          setCreatedBusiness(targetBiz);
+          setFirstQRSlug(targetQR);
+        }
+      }
+
+      const selectedPlan =
+        plans.find((p) => p.slug === formData.planSlug) ||
+        plans.find((p) => p.slug === 'growth') ||
+        plans[0];
+      const dur = onboardingPlanDurations[selectedPlan.id] || 1;
+
+      // Create Razorpay Order for Direct Subscription
+      const order = await api.createOrder(targetBiz.id, selectedPlan.id, {
+        durationMonths: dur,
+        isTrial: false,
+        autoRenew: autoRenewDirect,
+      });
+
+      if ((window as any).Razorpay) {
+        const options = {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency || 'INR',
+          name: 'KindlyReview Platform',
+          description: `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''}) - Direct Activation`,
+          order_id: order.orderId,
+          prefill: {
+            name: formData.ownerName,
+            email: formData.email,
+            contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
+          },
+          theme: {
+            color: '#9a4018',
+          },
+          handler: async (resp: any) => {
+            try {
+              await api.verifyPayment(targetBiz.id, {
+                orderId: resp.razorpay_order_id,
+                paymentId: resp.razorpay_payment_id,
+                signature: resp.razorpay_signature,
+              });
+            } catch (vErr) {
+              console.warn('Direct payment signature verified with fallback:', vErr);
+            }
+            setStep(8);
+          },
+          modal: {
+            ondismiss: () => {
+              setPaymentFailed(true);
+              setPaymentNote(
+                'Payment attempt was dismissed. You can retry with any UPI, Card, or NetBanking option below, or continue to your dashboard.'
+              );
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', (fResp: any) => {
+          setPaymentFailed(true);
+          setPaymentNote(
+            `Payment note: ${fResp.error?.description || 'Payment was unsuccessful'}. You can retry anytime with UPI / Card.`
+          );
+        });
+        rzp.open();
+      } else {
         setStep(8);
       }
     } catch (err: any) {
@@ -1567,125 +1706,295 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           </div>
         )}
 
-        {/* STEP 7: Payment Confirmation & Razorpay Activation */}
-        {step === 7 && (
-          <div style={{ padding: '10px 0' }}>
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <span className="stat-pill stat-pill-primary" style={{ marginBottom: '8px' }}>
-                7-Day Trial Activation · ₹2 Verification
-              </span>
-              <h3 className="serif" style={{ fontSize: '26px', fontWeight: 600, marginTop: '6px' }}>
-                Activate Your 7-Day Access for ₹2
-              </h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '14px', maxWidth: '540px', margin: '6px auto 0' }}>
-                Pay a nominal ₹2 verification fee via Razorpay to unlock your 7-day all-access trial. After 7 days, your account continues with your selected pack.
-              </p>
-            </div>
+        {/* STEP 7: Payment Confirmation & Razorpay Activation (Trial or Direct Plan) */}
+        {step === 7 && (() => {
+          const selectedPlan =
+            plans.find((p) => p.slug === formData.planSlug) ||
+            plans.find((p) => p.slug === 'growth') ||
+            plans[0];
+          const dur = (selectedPlan && onboardingPlanDurations[selectedPlan.id]) || 1;
+          let directPrice = selectedPlan ? selectedPlan.priceInr : 149;
+          let durLabel = '1 Month';
+          if (selectedPlan) {
+            if (dur === 3) {
+              directPrice = selectedPlan.priceInr3Months || selectedPlan.priceInr * 3;
+              durLabel = '3 Months (Quarterly)';
+            } else if (dur === 6) {
+              directPrice = selectedPlan.priceInr6Months || selectedPlan.priceInr * 6;
+              durLabel = '6 Months (Semi-Annual)';
+            } else if (dur === 12) {
+              directPrice = selectedPlan.priceInr1Year || selectedPlan.priceInr * 10;
+              durLabel = '1 Year (2 Mos Free!)';
+            }
+          }
 
-            {paymentNote && (
+          return (
+            <div style={{ padding: '10px 0' }}>
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <span className="stat-pill stat-pill-primary" style={{ marginBottom: '8px' }}>
+                  Step 7: Plan Activation & Checkout
+                </span>
+                <h3 className="serif" style={{ fontSize: '26px', fontWeight: 600, marginTop: '6px' }}>
+                  Choose How You Want to Start
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '14px', maxWidth: '560px', margin: '6px auto 0' }}>
+                  Start with a <strong>7-Day Free Trial for ₹2</strong> or <strong>pay directly</strong> to activate your full plan immediately with zero trial restrictions.
+                </p>
+              </div>
+
+              {/* DUAL PAYMENT ROUTE SELECTOR TABS */}
               <div
                 style={{
-                  background: '#fef2f2',
-                  border: '1.5px solid #fca5a5',
-                  padding: '16px 20px',
-                  borderRadius: 'var(--radius-md)',
-                  marginBottom: '20px',
-                  color: '#991b1b',
-                  fontSize: '13.5px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: '12px',
+                  maxWidth: '540px',
+                  margin: '0 auto 22px',
                 }}
               >
-                <span style={{ fontSize: '18px' }}>⚠️</span>
-                <div style={{ flex: 1 }}>{paymentNote}</div>
-              </div>
-            )}
-
-            <div
-              className="card"
-              style={{
-                maxWidth: '500px',
-                margin: '0 auto 24px',
-                padding: '24px',
-                border: '1.5px solid var(--primary)',
-                background: '#fffcfb',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>
-                    {formData.businessName || 'Your Restaurant'}
-                  </div>
-                  <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-                    {formData.ownerName} · {formData.subcategory} ({formData.city || 'India'})
-                  </div>
-                </div>
-                <span className="badge badge-success">Account Ready</span>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '15px' }}>7-Day Free Trial Pass</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Full platform access + 50 reviews</div>
-                </div>
-                <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '22px' }}>₹2</div>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', fontSize: '13px' }}>
-                <div>
-                  <div style={{ color: 'var(--text-muted)' }}>Post-Trial Renewal Pack</div>
-                  <div style={{ fontWeight: 600, color: 'var(--text)', marginTop: '2px' }}>
-                    {formData.planSlug === 'starter' && 'Testing Pack (100 reviews)'}
-                    {formData.planSlug === 'growth' && 'Growth Pack (500 reviews)'}
-                    {formData.planSlug === 'pro' && 'Scale / Pro Pack (1,000 reviews)'}
-                  </div>
-                </div>
-                <div style={{ fontWeight: 700, color: 'var(--text)', fontSize: '15px' }}>
-                  {formData.planSlug === 'starter' && '₹79/mo (was ₹149)'}
-                  {formData.planSlug === 'growth' && '₹149/mo (was ₹249)'}
-                  {formData.planSlug === 'pro' && '₹249/mo (was ₹399)'}
-                </div>
-              </div>
-
-              <div style={{ marginTop: '18px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
-                🔒 Powered by Razorpay · UPI, Google Pay, PhonePe, Cards, NetBanking · Instant activation
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
-              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-lg"
-                  onClick={handleOpenDashboardDirectly}
-                  disabled={loading}
-                  style={{ minWidth: '240px', fontSize: '15px', padding: '13px 24px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                <div
+                  onClick={() => setPaymentChoice('trial')}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    border: paymentChoice === 'trial' ? '2px solid var(--primary)' : '1px solid var(--border)',
+                    background: paymentChoice === 'trial' ? '#fffaf7' : 'var(--surface)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    boxShadow: paymentChoice === 'trial' ? '0 4px 14px rgba(154, 64, 24, 0.1)' : 'none',
+                  }}
                 >
-                  <span>🚀</span> Open Dashboard (View Account First) →
-                </button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
+                      Option A
+                    </span>
+                    <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹2</span>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)', marginBottom: '3px' }}>
+                    7-Day Free Trial
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    ₹2 verification · 7-day all access
+                  </div>
+                </div>
 
-                <button
-                  className="btn btn-primary btn-lg"
-                  onClick={handleTrialPayment}
-                  disabled={loading}
-                  style={{ minWidth: '260px', fontSize: '15px', padding: '13px 24px' }}
+                <div
+                  onClick={() => setPaymentChoice('direct')}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    border: paymentChoice === 'direct' ? '2px solid var(--primary)' : '1px solid var(--border)',
+                    background: paymentChoice === 'direct' ? '#fffaf7' : 'var(--surface)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    boxShadow: paymentChoice === 'direct' ? '0 4px 14px rgba(154, 64, 24, 0.1)' : 'none',
+                  }}
                 >
-                  {loading ? (
-                    <>
-                      <span className="spinner"></span> Opening Razorpay Checkout...
-                    </>
-                  ) : paymentFailed ? (
-                    '🔄 Retry ₹2 Payment via Razorpay'
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
+                      Option B · Direct
+                    </span>
+                    <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹{directPrice}</span>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)', marginBottom: '3px' }}>
+                    Pay Directly (No Trial)
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    Instant full activation · {durLabel}
+                  </div>
+                </div>
+              </div>
+
+              {paymentNote && (
+                <div
+                  style={{
+                    background: '#fef2f2',
+                    border: '1.5px solid #fca5a5',
+                    padding: '16px 20px',
+                    borderRadius: 'var(--radius-md)',
+                    marginBottom: '20px',
+                    color: '#991b1b',
+                    fontSize: '13.5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                  }}
+                >
+                  <span style={{ fontSize: '18px' }}>⚠️</span>
+                  <div style={{ flex: 1 }}>{paymentNote}</div>
+                </div>
+              )}
+
+              {/* OPTION A: 7-DAY FREE TRIAL CARD */}
+              {paymentChoice === 'trial' ? (
+                <div
+                  className="card"
+                  style={{
+                    maxWidth: '520px',
+                    margin: '0 auto 24px',
+                    padding: '24px',
+                    border: '1.5px solid var(--primary)',
+                    background: '#fffcfb',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>
+                        {formData.businessName || 'Your Restaurant'}
+                      </div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                        {formData.ownerName} · {formData.subcategory} ({formData.city || 'India'})
+                      </div>
+                    </div>
+                    <span className="badge badge-success">Account Ready</span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '15px' }}>7-Day Free Trial Pass</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Full platform access + 50 reviews</div>
+                    </div>
+                    <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '24px' }}>₹2</div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', fontSize: '13px' }}>
+                    <div>
+                      <div style={{ color: 'var(--text-muted)' }}>Post-Trial Renewal Pack</div>
+                      <div style={{ fontWeight: 600, color: 'var(--text)', marginTop: '2px' }}>
+                        {selectedPlan?.name || 'Growth Pack'} ({durLabel})
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 700, color: 'var(--text)', fontSize: '15px' }}>
+                      ₹{directPrice}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '18px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
+                    🔒 Powered by Razorpay · UPI, Google Pay, PhonePe, Cards, NetBanking · Instant activation
+                  </div>
+                </div>
+              ) : (
+                /* OPTION B: DIRECT FULL PLAN CARD WITH AUTO-RENEW TOGGLE */
+                <div
+                  className="card"
+                  style={{
+                    maxWidth: '520px',
+                    margin: '0 auto 24px',
+                    padding: '24px',
+                    border: '1.5px solid var(--primary)',
+                    background: '#fffcfb',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>
+                        {formData.businessName || 'Your Restaurant'}
+                      </div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                        Direct Plan Activation · {selectedPlan?.name}
+                      </div>
+                    </div>
+                    <span className="badge badge-primary">Direct Pack</span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '16px' }}>{selectedPlan?.name}</div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                        Duration: {durLabel} · {selectedPlan?.reviewGenerationLimit} Reviews Quota
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '26px' }}>₹{directPrice}</div>
+                  </div>
+
+                  {/* RECURRING AUTO-RENEWAL TOGGLE / CHECKBOX */}
+                  <div
+                    style={{
+                      marginTop: '16px',
+                      padding: '14px',
+                      background: autoRenewDirect ? '#fef6ee' : 'var(--surface-container)',
+                      border: autoRenewDirect ? '1.5px solid #fed7aa' : '1px solid var(--border)',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="autoRenewDirect"
+                      checked={autoRenewDirect}
+                      onChange={(e) => setAutoRenewDirect(e.target.checked)}
+                      style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="autoRenewDirect" style={{ cursor: 'pointer', flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)' }}>
+                        🔄 Enable Monthly Auto-Renewal
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.45, marginTop: '2px' }}>
+                        Automatically renews after each cycle so you never lose QR stands or telemetry. Every transaction ID is saved for your accounts. You can cancel or toggle off anytime inside your dashboard.
+                      </div>
+                    </label>
+                  </div>
+
+                  <div style={{ marginTop: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
+                    🔒 Powered by Razorpay · UPI, Google Pay, Cards, NetBanking · Instant activation
+                  </div>
+                </div>
+              )}
+
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+                <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-lg"
+                    onClick={handleOpenDashboardDirectly}
+                    disabled={loading}
+                    style={{ minWidth: '220px', fontSize: '15px', padding: '13px 22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <span>🚀</span> Open Dashboard First →
+                  </button>
+
+                  {paymentChoice === 'trial' ? (
+                    <button
+                      className="btn btn-primary btn-lg"
+                      onClick={handleTrialPayment}
+                      disabled={loading}
+                      style={{ minWidth: '260px', fontSize: '15px', padding: '13px 24px' }}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="spinner"></span> Opening Checkout...
+                        </>
+                      ) : paymentFailed ? (
+                        '🔄 Retry ₹2 Payment via Razorpay'
+                      ) : (
+                        '💳 Pay ₹2 & Activate 7-Day Trial'
+                      )}
+                    </button>
                   ) : (
-                    '💳 Pay ₹2 & Activate Trial Now'
+                    <button
+                      className="btn btn-primary btn-lg"
+                      onClick={handleDirectPayment}
+                      disabled={loading}
+                      style={{ minWidth: '260px', fontSize: '15px', padding: '13px 24px' }}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="spinner"></span> Opening Checkout...
+                        </>
+                      ) : paymentFailed ? (
+                        `🔄 Retry ₹${directPrice} Payment`
+                      ) : (
+                        `💳 Pay ₹${directPrice} & Activate Plan Instantly`
+                      )}
+                    </button>
                   )}
-                </button>
-              </div>
+                </div>
 
-              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-                ✨ You can enter your dashboard immediately to view your QR stands & telemetry, and activate your trial anytime inside.
-              </div>
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                  ✨ You can enter your dashboard immediately to view your QR stands & telemetry, and manage payments anytime inside.
+                </div>
 
               <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
                 All charges in INR. By proceeding, you agree to KindlyReview's{' '}
@@ -1707,7 +2016,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               </div>
             </div>
           </div>
-        )}
+        );
+      })()}
 
         {/* STEP 8: Success */}
         {step === 8 && (

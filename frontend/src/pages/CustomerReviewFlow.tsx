@@ -443,7 +443,43 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Quick 1-Tap 5-Star Banner */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #fff9f5 0%, #fef3eb 100%)',
+                  border: '1.5px solid #fed7aa',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  boxShadow: '0 2px 8px rgba(154, 64, 24, 0.06)',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#9a4018', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>⭐</span>
+                    <span>Quick 5-Star All (1-Tap)</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#78716c', marginTop: '2px' }}>
+                    Loved everything? Set all aspects to 5★ instantly
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allFives: Record<string, number> = {};
+                    questions.forEach((q: any) => { allFives[q.questionKey] = 5; });
+                    setRatings(allFives);
+                  }}
+                  className="btn btn-primary btn-sm"
+                  style={{ fontSize: '12.5px', padding: '8px 14px', whiteSpace: 'nowrap', borderRadius: '8px', fontWeight: 600 }}
+                >
+                  Rate All 5★
+                </button>
+              </div>
+
               {questions.map((q: any) => {
                 const currentRating = ratings[q.questionKey] || 5;
                 return (
@@ -451,20 +487,27 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                     key={q.questionKey}
                     className="card"
                     style={{
-                      padding: '16px',
+                      padding: '18px 16px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '8px',
+                      gap: '12px',
+                      borderRadius: '14px',
+                      border: '1px solid var(--border)',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 600, fontSize: '14.5px' }}>{q.label}</span>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>{q.label}</span>
+                        <span style={{ fontSize: '11px', color: '#78716c', background: '#f5f5f4', padding: '2px 8px', borderRadius: '10px', fontWeight: 500 }}>
+                          Optional
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>
                         {currentRating} / 5
                       </span>
                     </div>
 
-                    <div className="star-rating">
+                    <div className="star-rating" style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', padding: '4px 0' }}>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
@@ -472,8 +515,21 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                           className={`star-btn ${star <= currentRating ? 'active' : ''}`}
                           onClick={() => handleRatingChange(q.questionKey, star)}
                           aria-label={`Rate ${star} stars`}
+                          style={{
+                            padding: '8px',
+                            minWidth: '48px',
+                            minHeight: '48px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '10px',
+                            background: star <= currentRating ? '#fff8f4' : 'transparent',
+                            border: star <= currentRating ? '1px solid #fed7aa' : '1px solid transparent',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
                         >
-                          <StarIcon size={26} filled={star <= currentRating} />
+                          <StarIcon size={34} filled={star <= currentRating} />
                         </button>
                       ))}
                     </div>
@@ -826,7 +882,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               <textarea
                 className="form-textarea"
                 rows={reviewLength === 'detailed' ? 9 : 5}
-                style={{ fontSize: '14.5px', lineHeight: 1.6 }}
+                style={{ fontSize: '16px', lineHeight: 1.65, minHeight: '140px', padding: '14px' }}
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
               />

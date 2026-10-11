@@ -753,6 +753,10 @@ class DatabaseService {
     return this.data.subscriptions.find((s) => s.businessId === businessId);
   }
 
+  async listAllSubscriptions(): Promise<Subscription[]> {
+    return [...(this.data.subscriptions || [])];
+  }
+
   async createOrUpdateSubscription(subscription: Subscription): Promise<Subscription> {
     const idx = this.data.subscriptions.findIndex((s) => s.businessId === subscription.businessId);
     if (idx >= 0) {

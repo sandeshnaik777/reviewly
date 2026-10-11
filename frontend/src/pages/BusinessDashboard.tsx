@@ -64,6 +64,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const [analytics, setAnalytics] = useState<any>(null);
   const [plans, setPlans] = useState<any[]>([]);
   const [planDurations, setPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({});
+  const [subscriptionData, setSubscriptionData] = useState<any>(null);
+  const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
+  const [togglingAutoRenew, setTogglingAutoRenew] = useState(false);
+  const [copiedTxnId, setCopiedTxnId] = useState<string | null>(null);
 
   // Reputation & Telemetry Controls
   const [rushMode, setRushMode] = useState(false);
@@ -186,7 +190,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const loadAllData = async () => {
     try {
       setLoading(true);
-      const [bRes, uRes, qRes, rRes, qsRes, sRes, aRes, pRes, meRes, notifRes] = await Promise.all([
+      const [bRes, uRes, qRes, rRes, qsRes, sRes, aRes, pRes, meRes, notifRes, subRes, histRes] = await Promise.all([
         api.getBusiness(businessId),
         api.getUsage(businessId),
         api.getQRs(businessId),
@@ -197,6 +201,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         api.getPlans(),
         api.getMe().catch(() => null),
         api.getBusinessNotifications(businessId).catch(() => []),
+        api.getSubscription(businessId).catch(() => null),
+        api.getPaymentHistory(businessId).catch(() => []),
       ]);
 
       if (meRes?.user) {
@@ -230,10 +236,26 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       setAnalytics(aRes);
       setPlans(pRes);
       setSystemNotifications(notifRes || []);
+      setSubscriptionData(subRes);
+      setPaymentHistory(histRes || []);
     } catch (e: any) {
       console.error('Failed to load dashboard data:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleAutoRenew = async () => {
+    try {
+      setTogglingAutoRenew(true);
+      const newStatus = !subscriptionData?.autoRenew;
+      await api.toggleAutoRenew(businessId, newStatus);
+      setSubscriptionData((prev: any) => ({ ...prev, autoRenew: newStatus }));
+      showNotification(`Monthly Auto-Renewal ${newStatus ? 'enabled' : 'disabled'}.`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to toggle auto-renewal');
+    } finally {
+      setTogglingAutoRenew(false);
     }
   };
 
@@ -3538,23 +3560,69 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             )}
 
             <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                  <span className="stat-pill stat-pill-primary" style={{ marginBottom: '6px' }}>Current Active Plan</span>
-                  <h3 className="serif" style={{ fontSize: '22px' }}>{usage?.plan?.name || 'Testing Pack'}</h3>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-                    Quota: {usage?.reviewLimit?.toLocaleString()} reviews per monthly billing cycle
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span className="stat-pill stat-pill-primary">Current Active Plan</span>
+                    <span
+                      style={{
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        background: (subscriptionData?.status || usage?.subscription?.status) === 'ACTIVE' ? '#dcfce7' : '#fef3eb',
+                        color: (subscriptionData?.status || usage?.subscription?.status) === 'ACTIVE' ? '#166534' : '#9a4018',
+                      }}
+                    >
+                      {subscriptionData?.status || usage?.subscription?.status || 'TRIAL'}
+                    </span>
                   </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text)' }}>
-                    ₹{usage?.plan?.priceInr || 79} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ month</span>
+                  <h3 className="serif" style={{ fontSize: '24px', margin: 0 }}>
+                    {subscriptionData?.plan?.name || usage?.plan?.name || 'Growth Pack'}
+                  </h3>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '4px' }}>
+                    Quota: {usage?.reviewLimit?.toLocaleString()} reviews per billing cycle
                   </div>
-                  {usage?.plan?.offerBadge && (
-                    <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600 }}>
-                      {usage?.plan?.offerBadge}
+                  {subscriptionData?.nextBillingDate && (
+                    <div style={{ fontSize: '12.5px', color: '#78716c', marginTop: '4px' }}>
+                      📅 Next Billing Date:{' '}
+                      <strong>
+                        {new Date(subscriptionData.nextBillingDate).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </strong>
                     </div>
                   )}
+                  {subscriptionData?.lastTransactionId && (
+                    <div style={{ fontSize: '12px', color: '#78716c', marginTop: '3px', fontFamily: 'monospace' }}>
+                      Last Txn ID: {subscriptionData.lastTransactionId}
+                    </div>
+                  )}
+                </div>
+
+                {/* Auto-Renewal Status & Toggle */}
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text)' }}>
+                    ₹{subscriptionData?.plan?.priceInr || usage?.plan?.priceInr || 149}{' '}
+                    <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ month</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleToggleAutoRenew}
+                    disabled={togglingAutoRenew}
+                    className={`btn btn-sm ${subscriptionData?.autoRenew ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ fontSize: '12.5px', padding: '6px 14px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <span>{subscriptionData?.autoRenew ? '🔄 Auto-Renewal: ON' : '⏸️ Auto-Renewal: OFF'}</span>
+                  </button>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                    {subscriptionData?.autoRenew
+                      ? 'Automatically renews every month with transaction ID logged'
+                      : 'One-time billing. Will not renew automatically.'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -3764,6 +3832,130 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 );
               })}
+            </div>
+
+            {/* TRANSACTION ID & PAYMENT AUDIT LEDGER */}
+            <div className="card" style={{ padding: '24px', marginTop: '32px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>
+                    💳 Transaction History &amp; Payment Ledger
+                  </h4>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px', margin: 0 }}>
+                    Audited record of all trial activations, direct plan purchases, and recurring monthly charges with stored Transaction IDs.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => loadAllData()}
+                  style={{ fontSize: '12px' }}
+                >
+                  🔄 Refresh History
+                </button>
+              </div>
+
+              {paymentHistory.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '32px 16px', color: 'var(--text-muted)', fontSize: '13.5px' }}>
+                  No payment transactions recorded yet. When you activate your trial or plan, your transaction IDs will appear here.
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1.5px solid var(--border)', color: 'var(--text-muted)' }}>
+                        <th style={{ padding: '10px 12px', fontWeight: 600 }}>Date</th>
+                        <th style={{ padding: '10px 12px', fontWeight: 600 }}>Transaction ID</th>
+                        <th style={{ padding: '10px 12px', fontWeight: 600 }}>Plan / Purpose</th>
+                        <th style={{ padding: '10px 12px', fontWeight: 600 }}>Amount</th>
+                        <th style={{ padding: '10px 12px', fontWeight: 600 }}>Recurring</th>
+                        <th style={{ padding: '10px 12px', fontWeight: 600 }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paymentHistory.map((item: any) => {
+                        const txnId = item.transactionId || item.paymentId || item.orderId;
+                        const isCopied = copiedTxnId === txnId;
+                        return (
+                          <tr key={item.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                            <td style={{ padding: '12px', whiteSpace: 'nowrap' }}>
+                              {new Date(item.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </td>
+                            <td style={{ padding: '12px', fontFamily: 'monospace' }}>
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ background: '#f5f5f4', padding: '3px 7px', borderRadius: '4px', fontSize: '12px' }}>
+                                  {txnId}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(txnId);
+                                    setCopiedTxnId(txnId);
+                                    setTimeout(() => setCopiedTxnId(null), 2000);
+                                  }}
+                                  style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    color: isCopied ? 'var(--success)' : 'var(--primary)',
+                                    cursor: 'pointer',
+                                    fontSize: '11px',
+                                    fontWeight: 600,
+                                    padding: '2px 4px',
+                                  }}
+                                >
+                                  {isCopied ? '✓ Copied' : 'Copy'}
+                                </button>
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px', fontWeight: 500 }}>
+                              {item.planName}
+                            </td>
+                            <td style={{ padding: '12px', fontWeight: 700, color: 'var(--text)' }}>
+                              ₹{item.amountInr}
+                            </td>
+                            <td style={{ padding: '12px' }}>
+                              {item.paymentType === 'recurring_monthly' ? (
+                                <span style={{ color: '#166534', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}>
+                                  Auto-Renew
+                                </span>
+                              ) : item.autoRenew ? (
+                                <span style={{ color: '#9a4018', background: '#fef3eb', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}>
+                                  Recurring Enabled
+                                </span>
+                              ) : (
+                                <span style={{ color: '#78716c', background: '#f5f5f4', padding: '2px 8px', borderRadius: '12px', fontSize: '11px' }}>
+                                  One-time
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ padding: '12px' }}>
+                              <span
+                                style={{
+                                  background: item.status === 'captured' ? '#dcfce7' : '#fee2e2',
+                                  color: item.status === 'captured' ? '#166534' : '#991b1b',
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  textTransform: 'uppercase',
+                                }}
+                              >
+                                {item.status === 'captured' ? '✓ Paid' : item.status}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
