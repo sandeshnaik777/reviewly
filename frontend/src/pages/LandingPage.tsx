@@ -11,6 +11,32 @@ import {
   ZapIcon,
 } from '../components/Logos.js';
 import { LegalModals, LegalModalType } from '../components/LegalModals.js';
+import {
+  ShieldCheck,
+  Lock,
+  CreditCard,
+  Award,
+  TrendingUp,
+  Zap,
+  Check,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Sparkles,
+  BookOpen,
+  HelpCircle,
+  Store,
+  Utensils,
+  ShoppingBag,
+  Scissors,
+  Stethoscope,
+  GraduationCap,
+  Ticket,
+  Briefcase,
+  Globe,
+  Building2,
+  Gift,
+} from 'lucide-react';
 
 interface Props {
   onStartOnboarding: () => void;
@@ -40,7 +66,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
   // 6 Verified Real Business Reviews & Owner Case Studies Across Industries
   const movingReviews = [
     {
-      badge: '🏆 Rank #10 ➔ #1 on Maps',
+      badge: 'Rank #10 → #1 on Maps',
       pillClass: 'stat-pill-primary',
       title: '"Our bistro was ranked #10 in the city. Now we are officially #1 on Google Local Pack!"',
       text: '"Before KindlyRate, when anyone searched woodfired pizza nearby, we were buried at Rank #10. In 90 days of smart QR stands, we gathered 380+ verified 5-star Google reviews praising our sourdough crust. Today, we hold the permanent #1 search spot across the entire suburb!"',
@@ -48,10 +74,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       avatarBg: '#9a4018',
       author: 'Chef Kabir Deshmukh',
       business: 'Fire & Wood Artisanal Bistro',
-      highlight: '✔ Verified Merchant · 380+ Reviews Added',
+      highlight: 'Verified Merchant · 380+ Reviews Added',
     },
     {
-      badge: '⭐ Rating: 3.3 ★ ➔ 4.8 ★',
+      badge: 'Rating: 3.3 → 4.8 Stars',
       pillClass: 'stat-pill-success',
       title: '"We increased our clinic rating from a painful 3.3 to 4.8 stars in just 8 weeks."',
       text: '"Previously only upset patients left online complaints while 95% of happy patients left quietly. The Reputation Shield caught critical feedback privately, while satisfied patients posted 140+ glowing reviews. Our Google score climbed from 3.3 ★ to 4.8 ★!"',
@@ -59,10 +85,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       avatarBg: '#15803d',
       author: 'Dr. Sunita Rao',
       business: 'Apex Dental & Healthcare Clinic',
-      highlight: '✔ Verified Healthcare · 22 Critical Issues Resolved',
+      highlight: 'Verified Healthcare · 22 Critical Issues Resolved',
     },
     {
-      badge: '💰 Saved ₹42,000/mo on Ads',
+      badge: 'Saved ₹42,000/mo on Ads',
       pillClass: 'stat-pill-primary',
       title: '"I saved so much money on ads, and our electronics store reviews skyrocketed!"',
       text: '"We used to waste ₹35,000 every month on local print ads and sponsored social boosts with zero trackable return. With KindlyRate at our billing desk, customers do the selling for us. Our review volume shot up by 320%, saving over ₹42,000 straight into profit every month!"',
@@ -70,10 +96,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       avatarBg: '#d97706',
       author: 'Rajesh Verma',
       business: 'Verma Electronics & Gadgets',
-      highlight: '✔ Verified Retail Store · ₹84,000 Saved in Ads',
+      highlight: 'Verified Retail Store · ₹84,000 Saved in Ads',
     },
     {
-      badge: '📈 +₹1.8L/mo Walk-ins',
+      badge: '+₹1.8L/mo Walk-ins',
       pillClass: 'stat-pill-neutral',
       title: '"Salon revenue increased by ₹1.8 Lakhs/mo. Clients started pouring in from Google Maps."',
       text: '"When people search best salon near me, Google Maps recommends businesses with the highest volume of recent authentic reviews. Since placing KindlyRate smart stands at our billing counter, new client walk-ins jumped by 45%. Monthly revenue surged by ₹1,80,000!"',
@@ -81,10 +107,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       avatarBg: '#0284c7',
       author: 'Priya Sundaram',
       business: 'Glow & Glamour Unisex Salon & Spa',
-      highlight: '✔ Verified Salon & Spa · 45% Client Surge',
+      highlight: 'Verified Salon & Spa · 45% Client Surge',
     },
     {
-      badge: '⚡ 72% AI Review Rate',
+      badge: '72% AI Review Rate',
       pillClass: 'stat-pill-primary',
       title: '"Clients love that AI drafts their review in 15 seconds. Scan-to-Google rate hit 72%!"',
       text: '"Customers never wanted to type long paragraphs on their phone. With KindlyRate’s 1-click AI draft generation, 72% of clients who scan actually copy and post to Google Maps. Our review velocity jumped from 4 reviews/wk to 28 reviews/wk!"',
@@ -92,10 +118,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       avatarBg: '#7c3aed',
       author: 'Arjun Singhania',
       business: 'Royal Heritage Living & Suites',
-      highlight: '✔ Verified Hospitality · 72% Conversion Rate',
+      highlight: 'Verified Hospitality · 72% Conversion Rate',
     },
     {
-      badge: '🛡️ 100% Reputation Shield',
+      badge: '100% Reputation Shield',
       pillClass: 'stat-pill-success',
       title: '"Caught a repair delay complaint in 3 minutes and converted an upset car owner to a lifetime regular."',
       text: '"A customer had an unexpected service delay. Rather than venting publicly on Google Maps, KindlyRate diverted their rating to my manager inbox. We resolved the concern immediately. The owner left thrilled and posted 5 stars on their next visit!"',
@@ -103,7 +129,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       avatarBg: '#059669',
       author: 'Vikramaditya Rao',
       business: 'SpeedTech Auto Care & Motors',
-      highlight: '✔ Verified Auto Workshop · Zero Public 1-Star Leaks',
+      highlight: 'Verified Auto Workshop · Zero Public 1-Star Leaks',
     },
   ];
 
@@ -137,7 +163,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               onClick={() => (onNavigateBlog ? onNavigateBlog() : setLegalModal('blog'))}
               style={{ fontSize: '13px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             >
-              <span>📰</span> Articles &amp; Blog
+              <BookOpen size={14} style={{ marginRight: '4px' }} /> Articles &amp; Blog
             </button>
             <button
               className="btn btn-secondary hide-on-phone"
@@ -300,7 +326,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <span className="telemetry-pulse" />
-                <span>Moving Left to Right ➔</span>
+                <span>Moving Left to Right →</span>
               </span>
 
               <button
@@ -309,7 +335,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 style={{ fontSize: '12.5px', padding: '6px 14px' }}
                 title="Pause or Resume moving track"
               >
-                {isPaused ? '▶ Play Stream' : '⏸ Pause Stream'}
+                {isPaused ? 'Play Stream' : 'Pause Stream'}
               </button>
 
               <button
@@ -318,7 +344,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 style={{ fontSize: '12.5px', padding: '6px 12px' }}
                 title="Toggle stream velocity"
               >
-                {isFast ? '⚡ 1x Normal' : '🚀 2x Fast'}
+                {isFast ? '1x Normal' : '2x Speed'}
               </button>
             </div>
           </div>
@@ -413,27 +439,27 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#fca5a5', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>❌</span> Without KindlyRate (The Old Painful Way)
+                  <XCircle size={18} color="#f87171" /> Without KindlyRate (The Old Painful Way)
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px', color: '#cbd5e1' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+                    <AlertTriangle size={15} color="#f87171" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>Stuck at 3.3 ★ - 3.8 ★:</strong> Happy customers leave quietly; only angry customers post rants online.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+                    <AlertTriangle size={15} color="#f87171" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>Ranked #10 to #15 on Maps:</strong> Buried beneath local competitors; invisible to walk-in shoppers.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+                    <AlertTriangle size={15} color="#f87171" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>₹30,000+ Wasted on Ads:</strong> Paying high ad costs and agency retainers with zero permanent gain.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+                    <AlertTriangle size={15} color="#f87171" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>Lost Margins to Aggregators:</strong> Giving away 25-30% commissions on deliveries and listings.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
+                    <AlertTriangle size={15} color="#f87171" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>Unshielded Bad Reviews:</strong> Minor delays turn into permanent 1-star public damage.</div>
                   </div>
                 </div>
@@ -449,27 +475,27 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#86efac', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>✅</span> With KindlyRate Growth Engine
+                  <CheckCircle2 size={18} color="#4ade80" /> With KindlyRate Growth Engine
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px', color: '#f8fafc' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>✨</span>
+                    <Sparkles size={15} color="#4ade80" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>Surged to 4.8 ★ - 4.9 ★:</strong> AI drafts detailed 5-star reviews highlighting signature products and services.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>🏆</span>
+                    <Award size={15} color="#4ade80" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>#1 Leader on Google Local 3-Pack:</strong> Dominates local Maps searches and captures 45%+ foot traffic.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>💰</span>
+                    <TrendingUp size={15} color="#4ade80" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>₹0 Spent on Ads:</strong> Review velocity acts as an organic, permanent customer engine.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>📈</span>
+                    <Store size={15} color="#4ade80" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>+₹1,80,000 Walk-In & Customer Revenue:</strong> Filling stores and businesses with high-margin direct customers.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                    <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>🛡️</span>
+                    <ShieldCheck size={15} color="#4ade80" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div><strong>100% Reputation Shield:</strong> 1-star ratings intercepted to manager WhatsApp instantly!</div>
                   </div>
                 </div>
@@ -501,17 +527,17 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
             {[
-              { title: 'Food & Hospitality', desc: 'Fine Dine, Bistros, Cafés, Rooftops, Bakeries, Food Trucks, Pubs', icon: '🍽️' },
-              { title: 'Retail & Stores', desc: 'Supermarkets, Boutiques, Electronics, Jewellery', icon: '🛍️' },
-              { title: 'Personal Services', desc: 'Salons, Barbers, Spas, Car Washes, Studios', icon: '✂️' },
-              { title: 'Health & Wellness', desc: 'Clinics, Dental Centers, Gyms, Yoga, Diagnostic', icon: '🩺' },
-              { title: 'Education & Academies', desc: 'Coaching, Music, Dance, Training Institutes', icon: '🎓' },
-              { title: 'Entertainment & Venues', desc: 'Cinemas, Gaming Centers, Event Companies', icon: '🎟️' },
-              { title: 'Professional Services', desc: 'Lawyers, Accountants, Architects, IT Agencies', icon: '💼' },
-              { title: 'Custom Businesses', desc: 'Any specialized or unique local service', icon: '✨' },
+              { title: 'Food & Hospitality', desc: 'Fine Dine, Bistros, Cafés, Rooftops, Bakeries, Food Trucks, Pubs', icon: <Utensils size={26} color="var(--primary)" /> },
+              { title: 'Retail & Stores', desc: 'Supermarkets, Boutiques, Electronics, Jewellery', icon: <ShoppingBag size={26} color="var(--primary)" /> },
+              { title: 'Personal Services', desc: 'Salons, Barbers, Spas, Car Washes, Studios', icon: <Scissors size={26} color="var(--primary)" /> },
+              { title: 'Health & Wellness', desc: 'Clinics, Dental Centers, Gyms, Yoga, Diagnostic', icon: <Stethoscope size={26} color="var(--primary)" /> },
+              { title: 'Education & Academies', desc: 'Coaching, Music, Dance, Training Institutes', icon: <GraduationCap size={26} color="var(--primary)" /> },
+              { title: 'Entertainment & Venues', desc: 'Cinemas, Gaming Centers, Event Companies', icon: <Ticket size={26} color="var(--primary)" /> },
+              { title: 'Professional Services', desc: 'Lawyers, Accountants, Architects, IT Agencies', icon: <Briefcase size={26} color="var(--primary)" /> },
+              { title: 'Custom Businesses', desc: 'Any specialized or unique local service', icon: <Sparkles size={26} color="var(--primary)" /> },
             ].map((cat, idx) => (
               <div key={idx} className="card" style={{ textAlign: 'left', padding: '20px' }}>
-                <div style={{ fontSize: '28px', marginBottom: '8px' }}>{cat.icon}</div>
+                <div style={{ marginBottom: '10px' }}>{cat.icon}</div>
                 <h3 className="serif" style={{ fontSize: '18px', marginBottom: '6px' }}>{cat.title}</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{cat.desc}</p>
               </div>
@@ -524,8 +550,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       <section style={{ padding: '80px 20px' }}>
         <div className="desktop-container" style={{ textAlign: 'center', maxWidth: '1080px' }}>
           <div style={{ display: 'inline-block', marginBottom: '14px' }}>
-            <span className="stat-pill stat-pill-primary" style={{ fontSize: '13px', padding: '6px 16px' }}>
-              ⚡ ₹79 Starter Trial Offer
+            <span className="stat-pill stat-pill-primary" style={{ fontSize: '13px', padding: '6px 16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Zap size={14} /> ₹79 Starter Trial Offer
             </span>
           </div>
           <h2 className="serif" style={{ fontSize: '38px', marginBottom: '12px' }}>Simple, High-ROI Subscription Packs</h2>
@@ -541,7 +567,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               const reg = dur === 3 ? 447 : dur === 6 ? 894 : dur === 12 ? 1788 : 149;
               const sub = dur === 3 ? 'for 3 mos (₹76/mo)' : dur === 6 ? 'for 6 mos (₹75/mo)' : dur === 12 ? 'for 1 yr (₹66/mo)' : '/month';
               const reviews = dur === 3 ? '300 Total AI reviews (Quarterly)' : dur === 6 ? '600 Total AI reviews (Semi-Annual)' : dur === 12 ? '1,200 Total AI reviews (1-Year Pass)' : '100 AI reviews / month';
-              const tag = dur === 12 ? '🎁 2 Months Free Applied!' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹79 First Month Offer (Reg. ₹149)';
+              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹79 First Month Offer (Reg. ₹149)';
 
               return (
                 <div className="card" style={{ padding: '32px 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
@@ -562,7 +588,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                           { m: 1 as const, lbl: '1M' },
                           { m: 3 as const, lbl: '3M' },
                           { m: 6 as const, lbl: '6M' },
-                          { m: 12 as const, lbl: '1Y 🎁' },
+                          { m: 12 as const, lbl: '1Y Free' },
                         ].map((tab) => (
                           <button
                             key={tab.m}
@@ -596,7 +622,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
                   {dur === 12 && (
                     <div style={{ fontSize: '11.5px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px', fontWeight: 600 }}>
-                      🎉 1-Year Pack: 2 Months Free Discount Applied!
+                      1-Year Pass: 2 Months Free Discount Applied!
                     </div>
                   )}
 
@@ -622,7 +648,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               const reg = dur === 3 ? 747 : dur === 6 ? 1494 : dur === 12 ? 2988 : 249;
               const sub = dur === 3 ? 'for 3 mos (₹143/mo)' : dur === 6 ? 'for 6 mos (₹142/mo)' : dur === 12 ? 'for 1 yr (₹124/mo)' : '/month';
               const reviews = dur === 3 ? '1,500 Total AI reviews (Quarterly)' : dur === 6 ? '3,000 Total AI reviews (Semi-Annual)' : dur === 12 ? '6,000 Total AI reviews (1-Year Pass)' : '500 AI reviews / month';
-              const tag = dur === 12 ? '🎁 2 Months Free Applied!' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹149 First Month Offer (Reg. ₹249)';
+              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹149 First Month Offer (Reg. ₹249)';
 
               return (
                 <div className="card" style={{ padding: '32px 24px', textAlign: 'left', border: '2px solid var(--primary)', position: 'relative', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 30px rgba(154, 64, 24, 0.12)' }}>
@@ -647,7 +673,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                           { m: 1 as const, lbl: '1M' },
                           { m: 3 as const, lbl: '3M' },
                           { m: 6 as const, lbl: '6M' },
-                          { m: 12 as const, lbl: '1Y 🎁' },
+                          { m: 12 as const, lbl: '1Y Free' },
                         ].map((tab) => (
                           <button
                             key={tab.m}
@@ -681,7 +707,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
                   {dur === 12 && (
                     <div style={{ fontSize: '11.5px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px', fontWeight: 600 }}>
-                      🎉 1-Year Pack: 2 Months Free Discount Applied!
+                      1-Year Pass: 2 Months Free Discount Applied!
                     </div>
                   )}
 
@@ -708,7 +734,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               const reg = dur === 3 ? 1197 : dur === 6 ? 2394 : dur === 12 ? 4788 : 399;
               const sub = dur === 3 ? 'for 3 mos (₹233/mo)' : dur === 6 ? 'for 6 mos (₹233/mo)' : dur === 12 ? 'for 1 yr (₹208/mo)' : '/month';
               const reviews = dur === 3 ? '3,000 Total AI reviews (Quarterly)' : dur === 6 ? '6,000 Total AI reviews (Semi-Annual)' : dur === 12 ? '12,000 Total AI reviews (1-Year Pass)' : '1,000 AI reviews / month';
-              const tag = dur === 12 ? '🎁 2 Months Free Applied!' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹249 First Month Offer (Reg. ₹399)';
+              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹249 First Month Offer (Reg. ₹399)';
 
               return (
                 <div className="card" style={{ padding: '32px 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
@@ -729,7 +755,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                           { m: 1 as const, lbl: '1M' },
                           { m: 3 as const, lbl: '3M' },
                           { m: 6 as const, lbl: '6M' },
-                          { m: 12 as const, lbl: '1Y 🎁' },
+                          { m: 12 as const, lbl: '1Y Free' },
                         ].map((tab) => (
                           <button
                             key={tab.m}
@@ -763,7 +789,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
                   {dur === 12 && (
                     <div style={{ fontSize: '11.5px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px', fontWeight: 600 }}>
-                      🎉 1-Year Pack: 2 Months Free Discount Applied!
+                      1-Year Pass: 2 Months Free Discount Applied!
                     </div>
                   )}
 
@@ -787,7 +813,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             <div className="card" style={{ padding: '32px 24px', textAlign: 'left', display: 'flex', flexDirection: 'column', border: '1.5px solid #d97706', background: 'linear-gradient(180deg, #ffffff 0%, #fffdfa 100%)', position: 'relative' }}>
               <div style={{ position: 'absolute', top: '-13px', left: '20px' }}>
                 <span className="badge badge-warning" style={{ padding: '4px 14px', fontSize: '11px', background: '#d97706', color: '#ffffff', fontWeight: 700 }}>
-                  🏢 Enterprise &amp; Custom
+                  Enterprise &amp; Custom
                 </span>
               </div>
 
@@ -834,8 +860,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       <section style={{ padding: '72px 20px', background: '#faf8f5', borderTop: '1px solid var(--border-light)' }}>
         <div className="desktop-container" style={{ maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', marginBottom: '12px' }}>
-            <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px' }}>
-              📰 Knowledge &amp; Field Studies
+            <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <BookOpen size={13} /> Knowledge &amp; Field Studies
             </span>
           </div>
           <h2 className="serif" style={{ fontSize: '36px', fontWeight: 700, marginBottom: '10px' }}>
@@ -955,8 +981,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       <section id="faq" style={{ padding: '72px 20px 80px', background: 'var(--surface-container)', borderTop: '1px solid var(--border-light)' }}>
         <div className="desktop-container" style={{ maxWidth: '880px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', marginBottom: '12px' }}>
-            <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px' }}>
-              💬 Got Questions? We’ve Got Answers
+            <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <HelpCircle size={13} /> Frequently Asked Questions
             </span>
           </div>
           <h2 className="serif" style={{ fontSize: '36px', fontWeight: 700, marginBottom: '10px' }}>
@@ -1027,16 +1053,16 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             {/* Trust Badges */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#94a3b8' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🔒</span> <span>256-Bit SSL Bank-Grade Encryption</span>
+                <Lock size={14} color="#94a3b8" /> <span>256-Bit SSL Bank-Grade Encryption</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>💳</span> <span>Razorpay PCI-DSS Level 1 Verified</span>
+                <CreditCard size={14} color="#94a3b8" /> <span>Razorpay PCI-DSS Level 1 Verified</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🛡️</span> <span>India DPDP Act 2023 &amp; IT Act Compliant</span>
+                <ShieldCheck size={14} color="#94a3b8" /> <span>India DPDP Act 2023 &amp; IT Act Compliant</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🇮🇳</span> <span>Proudly Engineered &amp; Hosted in India</span>
+                <Globe size={14} color="#94a3b8" /> <span>Proudly Engineered &amp; Hosted in India</span>
               </div>
             </div>
           </div>

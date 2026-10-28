@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import {
-  KindlyReviewIcon,
+  KindlyRateIcon,
   GoogleLogo,
   WhatsAppLogo,
   InstagramLogo,
@@ -33,6 +33,22 @@ import {
   CheckCircleIcon,
 } from '../components/Logos.js';
 import { EmailVerificationModal } from '../components/EmailVerificationModal.js';
+import {
+  Bell,
+  Phone,
+  Mail,
+  Target,
+  Tag,
+  QrCode,
+  SlidersHorizontal,
+  Download,
+  Printer,
+  MapPin,
+  MessageSquare,
+  BarChart3,
+  CheckCircle2,
+  Zap,
+} from 'lucide-react';
 import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
 import { ScratchCard } from '../components/ScratchCard.js';
 import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
@@ -175,7 +191,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 paymentId: response.razorpay_payment_id,
                 signature: response.razorpay_signature,
               });
-              showNotification('🎉 Testing Pack Trial Activated for ₹79!');
+              showNotification('Testing Pack Trial Activated for ₹79!');
               loadAllData();
             } catch (vErr: any) {
               alert(`Trial activation verification note: ${vErr.message}`);
@@ -406,7 +422,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       setSubmittingInquiry(true);
       await api.submitSoftwareInquiry(businessId, inquiryForm);
       setShowInquiryModal(false);
-      showNotification('🚀 Custom software consultation request sent! Our systems engineering team will call you shortly.');
+      showNotification('Custom software consultation request sent! Our systems engineering team will call you shortly.');
       setInquiryForm({
         serviceType: 'Real-Time Delivery Fleet & Dispatch Logistics',
         contactPhone: business?.phone || '',
@@ -438,7 +454,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         requirements: helpForm.message,
       });
       setShowHelpModal(false);
-      showNotification('✅ Support request received! Our engineering response team will contact you promptly.');
+      showNotification('Support request received! Our engineering response team will contact you promptly.');
       setHelpForm({ subject: 'General Question / System Support', message: '', phone: business?.phone || '' });
     } catch (err: any) {
       alert(err.message || 'Failed to submit help ticket.');
@@ -460,7 +476,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         localSeoMetrics: freshMaps.localSeoMetrics,
         isAiGrounding: freshMaps.isAiGrounding,
       }));
-      showNotification('✅ Live Google Maps rankings evaluated in real-time via AI engine!');
+      showNotification('Live Google Maps rankings evaluated in real-time via AI engine!');
     } catch (err: any) {
       showNotification(`Failed to refresh Google Maps rankings: ${err.message || 'Error'}`);
     } finally {
@@ -478,13 +494,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         const newSettings = { ...settings, thingsToHighlight: updated, reviewTone: 'enthusiastic' };
         setSettings(newSettings);
         await api.saveSettings(businessId, newSettings);
-        showNotification('⚡ Aura Applied: Top offerings & hospitality injected into AI Prompt!');
+        showNotification('Aura Applied: Top offerings & hospitality injected into AI Prompt!');
       }
     } else if (leverId === 'waiter_bonus') {
-      showNotification('🏆 Recognition Logged: Team member recognition updated in Manager Log!');
+      showNotification('Recognition Logged: Team member recognition updated in Manager Log!');
     } else if (leverId === 'google_pack_gap') {
       setRushMode(true);
-      showNotification('🚀 Local Pack Sprint Mode Activated: Accelerated 1-click Google conversion prompts engaged!');
+      showNotification('Local Pack Sprint Mode Activated: Accelerated 1-click Google conversion prompts engaged!');
     }
   };
 
@@ -532,7 +548,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
         <div style={{ position: 'relative', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="spinner" style={{ width: '44px', height: '44px', borderWidth: '3.5px', borderTopColor: 'var(--primary)', borderColor: 'rgba(154, 64, 24, 0.15)' }}></div>
-          <span style={{ position: 'absolute', fontSize: '18px' }}>⚡</span>
+          <Zap size={18} color='var(--primary)' style={{ position: 'absolute' }} />
         </div>
         <div style={{ textAlign: 'center' }}>
           <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px 0', letterSpacing: '-0.3px' }}>
@@ -633,7 +649,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <KindlyReviewIcon size={28} />
+            <KindlyRateIcon size={28} />
             <h2 className="serif" style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}>
               {business.name}
             </h2>
@@ -643,7 +659,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             </span>
           </div>
           <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            📍 {business.city || 'Local Area'} · {business.subcategory} ·{' '}
+            <MapPin size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '3px' }} /> {business.city || 'Local Area'} · {business.subcategory} ·{' '}
             <strong style={{ color: 'var(--primary)' }}>{roi.googleLocalPackRank}</strong> ·{' '}
             <span style={{ color: 'var(--success)', fontWeight: 600 }}>{roi.reputationProtectionScore} Shield Defense Active</span>
           </div>
@@ -669,7 +685,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             }}
             title="System Announcements & Notifications"
           >
-            <span>🔔</span>
+            <Bell size={16} />
             <span className="hide-mobile">Alerts</span>
             {systemNotifications.length > 0 && (
               <span
@@ -705,7 +721,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             }}
             title="Get Help or Contact Support Anytime"
           >
-            <span>📞</span>
+            <Phone size={16} />
             <span>Help & Contact</span>
           </button>
 
@@ -715,7 +731,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               setRushMode(!rushMode);
               showNotification(
                 !rushMode
-                  ? '⚡ Turbo Rush Mode ON: Streamlined prompt brevity enabled for maximum dinner turnover!'
+                  ? 'Turbo Rush Mode ON: Streamlined prompt brevity enabled for maximum dinner turnover!'
                   : 'Standard Telemetry Mode restored.'
               );
             }}
@@ -805,10 +821,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>
               {systemNotifications[0].type === 'ALERT'
-                ? '🚨'
+                ? 'ALERT'
                 : systemNotifications[0].type === 'WARNING'
-                ? '⚠️'
-                : '📢'}
+                ? 'NOTICE'
+                : 'UPDATE'}
             </span>
             <strong>{systemNotifications[0].title}:</strong>
             <span>{systemNotifications[0].message}</span>
@@ -846,7 +862,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '18px' }}>✉️</span>
+            <Mail size={16} />
             <span style={{ fontSize: '13.5px', color: '#854d0e' }}>
               <strong>Your email is unverified:</strong> Please confirm <strong>{currentUser.email}</strong> to activate staff review notifications and telemetry alerts.
             </span>
@@ -942,7 +958,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               >
                 <div style={{ maxWidth: '740px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <span className="badge badge-warning">⚡ Testing Pack Trial Ready</span>
+                    <span className="badge badge-warning">Testing Pack Trial Ready</span>
                     <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 600 }}>Introductory ₹79 Starter Offer</span>
                   </div>
                   <h3 className="serif" style={{ fontSize: '20px', margin: '4px 0 6px', color: '#78350f' }}>
@@ -957,7 +973,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   onClick={handlePayTrial}
                   style={{ fontSize: '14.5px', padding: '12px 24px', whiteSpace: 'nowrap' }}
                 >
-                  💳 Pay ₹79 &amp; Activate Trial Now →
+                  Pay ₹79 &amp; Activate Trial Now →
                 </button>
               </div>
             )}
@@ -1031,7 +1047,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '24px' }}>🎯</span>
+                  <Target size={22} color="var(--primary)" />
                   <div>
                     <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                       Target Keywords &amp; Services to Mention in Reviews
@@ -1165,7 +1181,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 return (
                   <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span>⚡</span>
+                      <Zap size={14} color="var(--primary)" />
                       <span>Click to add suggested keywords for {business.subcategory || business.mainCategory || 'your business'}:</span>
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -1423,8 +1439,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
-                    ✨
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <SparklesIcon size={20} color="#38bdf8" />
                   </div>
                   <div>
                     <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
@@ -1444,7 +1460,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '16px' }}>🏷️</span>
+                      <Tag size={16} color="var(--primary)" />
                       <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Highlight Target Keywords in Reviews</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
@@ -1459,14 +1475,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       showNotification('Navigated to Review Settings to configure target keywords');
                     }}
                   >
-                    ⚡ Manage Target Keywords →
+                    Manage Target Keywords →
                   </button>
                 </div>
 
                 <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '16px' }}>🛡️</span>
+                      <ShieldCheckIcon size={16} />
                       <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Enable Strict Shield for Peak Hours</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
@@ -1481,14 +1497,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       showNotification(shieldStrictness === 'strict' ? 'Reputation Shield returned to Standard' : 'Reputation Shield set to Strict (100% negative feedback intercepted)');
                     }}
                   >
-                    {shieldStrictness === 'strict' ? '✓ Strict Shield Active' : '🛡️ Activate Strict Shield'}
+                    {shieldStrictness === 'strict' ? '✓ Strict Shield Active' : 'Activate Strict Shield'}
                   </button>
                 </div>
 
                 <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '16px' }}>🎯</span>
+                      <QrCode size={16} color="var(--primary)" />
                       <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Position Stand at Billing Counter</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
@@ -1503,14 +1519,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       showNotification('Navigated to QR Stands Generator');
                     }}
                   >
-                    🎯 Generate Counter Stand →
+                    Generate Counter Stand →
                   </button>
                 </div>
 
                 <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '16px' }}>📋</span>
+                      <SlidersHorizontal size={16} color="var(--primary)" />
                       <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Set Review Prompting to Detailed (9–10 lines)</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
@@ -1525,7 +1541,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       showNotification('Opening Review Generation settings');
                     }}
                   >
-                    ⚙️ Check Tone Settings →
+                    Check Tone Settings →
                   </button>
                 </div>
               </div>
@@ -1608,7 +1624,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {competitors.length === 0 ? (
                     <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🎯</div>
+                      <div style={{ marginBottom: '6px' }}><Target size={20} color="var(--primary)" /></div>
                       <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Competitor Radar Initializing</div>
                       <div style={{ fontSize: '12px', marginTop: '4px' }}>Live competitor benchmarks will populate as reviews and Google Maps data are collected.</div>
                     </div>
@@ -1736,7 +1752,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   gap: '12px',
                 }}
               >
-                <span style={{ fontSize: '24px' }}>🎉</span>
+                <TrophyIcon size={24} color="#f59e0b" />
                 <div style={{ fontSize: '13.5px', color: '#166534', lineHeight: 1.5, fontWeight: 500 }}>
                   <strong>Client Growth Milestone:</strong> {localSeo.rankingMessage}
                 </div>
@@ -1827,9 +1843,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     {keywordRankings.length === 0 ? (
                       <tr>
                         <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                          <div style={{ fontSize: '24px', marginBottom: '8px' }}>📍</div>
+                          <div style={{ marginBottom: '8px' }}><MapPin size={24} color="var(--primary)" /></div>
                           <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Awaiting Live Google Maps Telemetry</div>
-                          <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Click "🔄 Refresh Live Maps Rank" above or generate your first customer reviews to track real-time 3-pack positions.</div>
+                          <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Click "Refresh Live Maps Rank" above or generate your first customer reviews to track real-time 3-pack positions.</div>
                         </td>
                       </tr>
                     ) : (
@@ -1954,7 +1970,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div key={idx} style={{ padding: '10px 14px', background: shift.isPeak ? '#fef3ee' : 'var(--surface-container)', borderRadius: 'var(--radius-sm)', border: shift.isPeak ? '1px solid #fed7aa' : 'none' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                           <div style={{ fontWeight: 600, fontSize: '13.5px', color: shift.isPeak ? 'var(--primary)' : 'var(--text)' }}>
-                            {shift.shift} {shift.isPeak && '🔥'}
+                            {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 5px', marginLeft: '4px' }}>Peak</span>}
                           </div>
                           <div style={{ fontSize: '13px', fontWeight: 700 }}>
                             {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>{shift.turnRate}</span>
@@ -1987,7 +2003,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(!analytics?.sentimentTopics || analytics.sentimentTopics.length === 0) ? (
                     <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>💬</div>
+                      <div style={{ marginBottom: '6px' }}><MessageSquare size={20} color="var(--primary)" /></div>
                       <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Topic Intelligence Initializing</div>
                       <div style={{ fontSize: '12px' }}>Customer praise themes and product/service mentions will appear here once customers submit reviews.</div>
                     </div>
@@ -1995,7 +2011,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     analytics.sentimentTopics.map((t: any, i: number) => (
                       <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)' }}>
                         <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                          {t.score >= 85 ? '🟢' : '🟡'} {t.topic}
+                          {t.score >= 85 ? <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block', marginRight: 4 }} /> : <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#eab308', display: 'inline-block', marginRight: 4 }} />} {t.topic}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{t.count} mentions</span>
@@ -2163,7 +2179,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       gap: '6px',
                     }}
                   >
-                    <span>🎯 QR Stands &amp; Generator</span>
+                    <span>QR Stands &amp; Generator</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('ai_settings')}
@@ -2200,7 +2216,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <h3 className="serif" style={{ fontSize: '24px', fontWeight: 700 }}>
-                    🎯 QR Stands &amp; Instant Generator
+                    QR Stands &amp; Instant Generator
                   </h3>
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '11px' }}>
                     ● {qrs.length} Active Stands
@@ -2237,7 +2253,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '20px' }}>📊</span>
+                    <BarChart3 size={20} />
                     <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                       QR Stand Conversion Telemetry
                     </h4>
@@ -2312,7 +2328,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             {/* Quick Generator Box */}
             <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border-light)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <span style={{ fontSize: '18px' }}>⚡</span>
+                <Zap size={18} />
                 <h4 style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
                   Quick Stand Generator
                 </h4>
@@ -2340,7 +2356,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   />
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ padding: '10px 22px', whiteSpace: 'nowrap', height: '42px' }}>
-                  ⚡ Generate &amp; Add Stand
+                  Generate &amp; Add Stand
                 </button>
               </form>
             </div>
@@ -2348,7 +2364,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             {/* Stands Grid */}
             {qrs.length === 0 ? (
               <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '42px', marginBottom: '12px' }}>🎯</div>
+                <div style={{ marginBottom: '12px' }}><QrCode size={40} color="var(--primary)" /></div>
                 <h4 style={{ margin: '0 0 6px', fontSize: '18px' }}>No QR Stands Generated Yet</h4>
                 <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginBottom: '16px' }}>
                   Create your first counter stand or table QR to start collecting 5-star Google reviews.
@@ -2386,7 +2402,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               {qr.name}
                             </h4>
                             <span className="badge badge-neutral" style={{ fontSize: '11px' }}>
-                              📍 {qr.locationTag || 'Front Counter'}
+                              <MapPin size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '3px' }} /> {qr.locationTag || 'Front Counter'}
                             </span>
                           </div>
                           <span className="stat-pill stat-pill-success" style={{ fontSize: '11px' }}>
@@ -2443,7 +2459,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               showNotification(`Copied link for ${qr.name} to clipboard!`);
                             }}
                           >
-                            📋 Copy
+                            Copy
                           </button>
                         </div>
 
@@ -2459,7 +2475,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ fontSize: '13px' }}>📊</span>
+                              <BarChart3 size={13} />
                               <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                                 Stand Analytics
                               </span>
@@ -2468,7 +2484,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               className={`stat-pill ${(qr.conversionRate || 60) >= 55 ? 'stat-pill-success' : 'stat-pill-primary'}`}
                               style={{ fontSize: '10.5px', padding: '2px 8px', fontWeight: 600 }}
                             >
-                              {(qr.conversionRate || 60) >= 60 ? '🔥 Top Converting' : '📈 Steady Traffic'}
+                              {(qr.conversionRate || 60) >= 60 ? 'Top Converting' : 'Steady Traffic'}
                             </span>
                           </div>
 
@@ -2518,7 +2534,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                             className="btn btn-primary"
                             style={{ fontSize: '12px', padding: '8px 10px', textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                           >
-                            📥 Download PNG
+                            Download PNG
                           </a>
                           <a
                             href={svgDownloadUrl}
@@ -2526,7 +2542,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                             className="btn btn-secondary"
                             style={{ fontSize: '12px', padding: '8px 10px', textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                           >
-                            📥 Download SVG
+                            Download SVG
                           </a>
                         </div>
 
@@ -2539,7 +2555,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               window.open(targetCustomerUrl, '_blank');
                             }}
                           >
-                            🔗 Test Scan
+                            Test Scan
                           </button>
                           <button
                             type="button"
@@ -2547,7 +2563,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                             style={{ fontSize: '12px', padding: '6px 10px' }}
                             onClick={() => window.print()}
                           >
-                            🖨️ Print Stand
+                            Print Stand
                           </button>
                         </div>
                       </div>
@@ -2590,7 +2606,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div
                         onClick={() => {
                           setShieldStrictness('standard');
-                          showNotification('Standard Shield: 1-2★ ratings intercepted privately; 3-5★ proceed to Google.');
+                          showNotification('Standard Shield: 1-2 Star ratings intercepted privately; 3-5 Star proceed to Google.');
                         }}
                         style={{
                           padding: '14px',
@@ -2609,7 +2625,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div
                         onClick={() => {
                           setShieldStrictness('strict');
-                          showNotification('Strict Shield: 1-3★ ratings intercepted privately; only pure 4-5★ flow to Google.');
+                          showNotification('Strict Shield: 1-3 Star ratings intercepted privately; only pure 4-5 Star flow to Google.');
                         }}
                         style={{
                           padding: '14px',
@@ -2757,7 +2773,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       {/* Quick Select Suggestion Pills */}
                       <div style={{ marginBottom: '10px' }}>
                         <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
-                          ⚡ Click to quickly add recommended highlights:
+                          Click to quickly add recommended highlights:
                         </div>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                           {(() => {
@@ -2909,7 +2925,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       {/* Quick Select Avoid Pills */}
                       <div style={{ marginBottom: '10px' }}>
                         <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
-                          ⚡ Click to quickly forbid common negative terms:
+                          Click to quickly forbid common negative terms:
                         </div>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                           {[
@@ -3253,7 +3269,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               {/* Quick Preset Buttons */}
               <div style={{ marginBottom: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: '8px' }}>
                 <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  ⚡ Quick Add Industry Recommended Rating Criteria:
+                  Quick Add Industry Recommended Rating Criteria:
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {(() => {
@@ -3386,8 +3402,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       }}
                     >
                       <option value="1-5_STARS">⭐ 1–5 Stars</option>
-                      <option value="1-10_NUMERIC">🔢 1–10 Scale</option>
-                      <option value="THUMBS_UP_DOWN">👍 Thumbs Up/Down</option>
+                      <option value="1-10_NUMERIC">1–10 Numeric Scale</option>
+                      <option value="THUMBS_UP_DOWN">Thumbs Up / Down</option>
                     </select>
                     <button
                       type="button"
@@ -3468,7 +3484,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span className={`stat-pill ${isShielded ? 'stat-pill-neutral' : 'stat-pill-success'}`}>
-                            {isShielded ? '🛡️ Shield Intercepted' : 'Delighted 5★'}
+                            {isShielded ? 'Shield Intercepted' : 'Delighted 5★'}
                           </span>
                           <span style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>
                             {new Date(r.createdAt).toLocaleDateString()}
@@ -3494,7 +3510,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       {isShielded && (
                         <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                           <span style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600 }}>
-                            ⚠️ Prevented from Google Maps. Guest can be recovered.
+                            Prevented from Google Maps. Guest can be recovered.
                           </span>
                           <button
                             onClick={() => {
@@ -3596,7 +3612,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         disabled={convertingMapsLink || (!profileForm.googleMapsShareUrl && !profileForm.googleReviewUrl)}
                         style={{ whiteSpace: 'nowrap', fontSize: '12.5px', padding: '9px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
                       >
-                        {convertingMapsLink ? 'Converting...' : '⚡ Convert to Review Link'}
+                        {convertingMapsLink ? 'Converting...' : 'Convert to Review Link'}
                       </button>
                     </div>
                   </div>
@@ -3866,7 +3882,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     style={{ fontSize: '14px', padding: '10px 20px', background: 'var(--primary)' }}
                     onClick={handlePayTrial}
                   >
-                    💳 Pay ₹79 &amp; Activate Trial
+                    Pay ₹79 &amp; Activate Trial
                   </button>
                 )}
               </div>
@@ -3898,7 +3914,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                   {subscriptionData?.nextBillingDate && (
                     <div style={{ fontSize: '12.5px', color: '#78716c', marginTop: '4px' }}>
-                      📅 Next Billing Date:{' '}
+                      Next Billing Date:{' '}
                       <strong>
                         {new Date(subscriptionData.nextBillingDate).toLocaleDateString('en-IN', {
                           day: 'numeric',
@@ -3929,7 +3945,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     className={`btn btn-sm ${subscriptionData?.autoRenew ? 'btn-primary' : 'btn-secondary'}`}
                     style={{ fontSize: '12.5px', padding: '6px 14px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                   >
-                    <span>{subscriptionData?.autoRenew ? '🔄 Auto-Renewal: ON' : '⏸️ Auto-Renewal: OFF'}</span>
+                    <span>{subscriptionData?.autoRenew ? 'Auto-Renewal: ON' : 'Auto-Renewal: OFF'}</span>
                   </button>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     {subscriptionData?.autoRenew
@@ -3981,7 +3997,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     durationLabel = '1 Year';
                     durationSub = `for 1 yr (₹${Math.round(activePrice / 12)}/mo)`;
                     reviewLimitDisplay = `${(p.reviewGenerationLimit * 12).toLocaleString()} Total Reviews (1-Year Pass)`;
-                    discountTag = '🎁 2 Months Free Applied!';
+                    discountTag = '2 Months Free Applied!';
                   }
 
                   return (
@@ -4033,7 +4049,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               { m: 1 as const, lbl: '1M' },
                               { m: 3 as const, lbl: '3M' },
                               { m: 6 as const, lbl: '6M' },
-                              { m: 12 as const, lbl: '1Y 🎁' },
+                              { m: 12 as const, lbl: '1Y (2M Free)' },
                             ].map((tab) => (
                               <button
                                 key={tab.m}
@@ -4075,7 +4091,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                       {selectedDuration === 12 && (
                         <div style={{ fontSize: '11.5px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px', fontWeight: 600 }}>
-                          🎉 1-Year Pack: 2 Months Free Discount Applied!
+                          1-Year Pack: 2 Months Free Discount Applied!
                         </div>
                       )}
 
@@ -4118,7 +4134,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                                     paymentId: response.razorpay_payment_id,
                                     signature: response.razorpay_signature,
                                   });
-                                  showNotification(`🎉 Payment Successful! Account upgraded to ${p.name}.`);
+                                  showNotification(`Payment Successful! Account upgraded to ${p.name}.`);
                                   loadAllData();
                                 } catch (vErr: any) {
                                   alert(`Payment verification failed: ${vErr.message}`);
@@ -4223,7 +4239,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
                 <div>
                   <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>
-                    💳 Transaction History &amp; Payment Ledger
+                    Transaction History &amp; Payment Ledger
                   </h4>
                   <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px', margin: 0 }}>
                     Audited record of all trial activations, direct plan purchases, and recurring monthly charges with stored Transaction IDs.
@@ -4235,7 +4251,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   onClick={() => loadAllData()}
                   style={{ fontSize: '12px' }}
                 >
-                  🔄 Refresh History
+                  Refresh History
                 </button>
               </div>
 
@@ -4373,28 +4389,28 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           {/* 4 Feature Columns */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
             <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>🛵 Delivery Fleet & Dispatch</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Delivery Fleet & Dispatch</div>
               <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
                 Real-time rider GPS tracking, live customer ETA links, automated dispatch routing, and SMS/WhatsApp driver alerts.
               </div>
             </div>
 
             <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>🏢 Enterprise ERP & CRM</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Enterprise ERP & CRM</div>
               <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
                 Multi-branch inventory ledger, vendor procurement, customer CRM, staff payroll, and real-time financial reporting.
               </div>
             </div>
 
             <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>💳 Omnichannel POS & Billing</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Omnichannel POS & Billing</div>
               <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
                 Barcode scanning, thermal receipt printing, GST compliance, offline-sync billing, and multi-store warehouse transfers.
               </div>
             </div>
 
             <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>📱 Bespoke Mobile Apps & Automation</div>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Bespoke Mobile Apps & Automation</div>
               <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
                 You tell us what you need, we build it. Custom iOS/Android apps, third-party webhooks, and automated workflows.
               </div>
@@ -4573,12 +4589,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       {[
-                        '🛵 Delivery Fleet & Dispatch Management',
-                        '🏢 Enterprise ERP & CRM Suite',
-                        '💳 Omnichannel Billing & POS',
-                        '📱 Custom Mobile App (iOS / Android)',
-                        '⚙️ Custom Workflow Automation',
-                        '🛒 Online Ordering & E-Commerce',
+                        'Delivery Fleet & Dispatch Management',
+                        'Enterprise ERP & CRM Suite',
+                        'Omnichannel Billing & POS',
+                        'Custom Mobile App (iOS / Android)',
+                        'Custom Workflow Automation',
+                        'Online Ordering & E-Commerce',
                       ].map((preset) => (
                         <button
                           key={preset}
@@ -4655,7 +4671,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             <div className="card" style={{ width: '100%', maxWidth: '480px', padding: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>📞</span>
+                  <Phone size={20} />
                   <h3 className="serif" style={{ fontSize: '19px', fontWeight: 600 }}>
                     Help & Technical Support
                   </h3>
@@ -4679,7 +4695,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   className="btn btn-secondary"
                   style={{ fontSize: '12.5px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                  <span>📞 Call Hotline</span>
+                  <span>Call Hotline</span>
                 </a>
                 <a
                   href={`https://wa.me/919876543210?text=${encodeURIComponent(
@@ -4690,7 +4706,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   className="btn btn-primary"
                   style={{ background: '#25D366', borderColor: '#25D366', fontSize: '12.5px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                  <span>💬 WhatsApp Support</span>
+                  <span>WhatsApp Support</span>
                 </a>
               </div>
 
@@ -4762,7 +4778,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             <div className="card" style={{ width: '100%', maxWidth: '520px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>📢</span>
+                  <Bell size={20} />
                   <h3 className="serif" style={{ fontSize: '19px', fontWeight: 600 }}>
                     System Announcements ({systemNotifications.length})
                   </h3>
@@ -4783,10 +4799,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 ) : (
                   systemNotifications.map((n) => {
                     const typeColors: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-                      ALERT: { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', icon: '🚨 ALERT' },
-                      WARNING: { bg: '#fffbeb', border: '#fcd34d', text: '#b45309', icon: '⚠️ NOTICE' },
-                      SUCCESS: { bg: '#f0fdf4', border: '#86efac', text: '#16a34a', icon: '✅ UPDATE' },
-                      PROMO: { bg: '#faf5ff', border: '#d8b4fe', text: '#7e22ce', icon: '🎁 PROMO' },
+                      ALERT: { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', icon: 'ALERT' },
+                      WARNING: { bg: '#fffbeb', border: '#fcd34d', text: '#b45309', icon: 'NOTICE' },
+                      SUCCESS: { bg: '#f0fdf4', border: '#86efac', text: '#16a34a', icon: 'UPDATE' },
+                      PROMO: { bg: '#faf5ff', border: '#d8b4fe', text: '#7e22ce', icon: 'PROMO' },
                       INFO: { bg: '#eff6ff', border: '#93c5fd', text: '#1d4ed8', icon: 'ℹ️ INFO' },
                     };
                     const c = typeColors[n.type] || typeColors.INFO;
@@ -4843,7 +4859,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           email={currentUser?.email || business?.email || ''}
           onClose={() => setShowEmailVerifyModal(false)}
           onSuccess={() => {
-            showNotification('🎉 Email successfully verified!');
+            showNotification('Email successfully verified!');
             loadAllData();
           }}
         />

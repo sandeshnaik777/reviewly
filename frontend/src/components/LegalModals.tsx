@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
+import {
+  Scale,
+  X,
+  Building2,
+  BookOpen,
+  HelpCircle,
+  FileText,
+  Lock,
+  CreditCard,
+  CheckCircle2,
+  Store,
+  Zap,
+  Truck,
+  Tag,
+  Mail,
+  Phone,
+  MessageSquare,
+  Search,
+} from 'lucide-react';
 
 export type LegalModalType = 'terms' | 'privacy' | 'refund' | 'help' | 'blog' | 'enterprise' | null;
 
@@ -142,8 +161,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
             gap: '12px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '22px' }}>⚖️</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Scale size={22} color="var(--primary)" />
             <div>
               <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0 }}>
                 KindlyRate Trust, Legal &amp; Support Portal
@@ -158,9 +177,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={onClose}
-            style={{ padding: '6px 12px', fontSize: '13px' }}
+            style={{ padding: '6px 12px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
           >
-            ✕ Close
+            <X size={14} /> Close
           </button>
         </div>
 
@@ -175,12 +194,12 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
           }}
         >
           {[
-            { id: 'enterprise', label: 'Custom Enterprise / Software', icon: '🏢' },
-            { id: 'blog', label: 'Articles & Growth Guides', icon: '📰' },
-            { id: 'help', label: 'Help & Merchant Support', icon: '💬' },
-            { id: 'terms', label: 'Terms of Service', icon: '📜' },
-            { id: 'privacy', label: 'Privacy Policy', icon: '🔒' },
-            { id: 'refund', label: 'Refund & Cancellation', icon: '💳' },
+            { id: 'enterprise', label: 'Custom Enterprise / Software', icon: <Building2 size={15} /> },
+            { id: 'blog', label: 'Articles & Growth Guides', icon: <BookOpen size={15} /> },
+            { id: 'help', label: 'Help & Merchant Support', icon: <HelpCircle size={15} /> },
+            { id: 'terms', label: 'Terms of Service', icon: <FileText size={15} /> },
+            { id: 'privacy', label: 'Privacy Policy', icon: <Lock size={15} /> },
+            { id: 'refund', label: 'Refund & Cancellation', icon: <CreditCard size={15} /> },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -215,7 +234,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
             <div>
               {enterpriseSubmitted ? (
                 <div style={{ padding: '36px 20px', textAlign: 'center', background: '#f0fdf4', borderRadius: '12px', border: '1.5px solid #86efac' }}>
-                  <div style={{ fontSize: '42px', marginBottom: '12px' }}>🎉</div>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                    <CheckCircle2 size={42} color="#16a34a" />
+                  </div>
                   <h3 className="serif" style={{ fontSize: '24px', fontWeight: 700, color: '#166534', margin: '0 0 8px' }}>
                     Consultation Request Successfully Received!
                   </h3>
@@ -244,8 +265,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               ) : (
                 <div>
                   <div style={{ marginBottom: '22px' }}>
-                    <span className="badge badge-warning" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>
-                      🏢 Enterprise &amp; Custom Systems
+                    <span className="badge badge-warning" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <Building2 size={13} /> Enterprise &amp; Custom Systems
                     </span>
                     <h2 className="serif" style={{ fontSize: '26px', fontWeight: 700, margin: '8px 0 6px', color: '#0f172a' }}>
                       Custom Enterprise &amp; Bespoke Software Solutions
@@ -258,28 +279,36 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   {/* 4 Capability Cards */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '24px' }}>
                     <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🏬</div>
+                      <div style={{ marginBottom: '6px' }}>
+                        <Store size={22} color="var(--primary)" />
+                      </div>
                       <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>Multi-Branch Command</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         Centralized headquarters dashboard across all locations with regional manager access.
                       </div>
                     </div>
                     <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>⚡</div>
+                      <div style={{ marginBottom: '6px' }}>
+                        <Zap size={22} color="var(--primary)" />
+                      </div>
                       <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>POS &amp; ERP Integration</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         Seamless synchronization with Tally, SAP, Marg, Busy, Zoho, or proprietary billing APIs.
                       </div>
                     </div>
                     <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🛵</div>
+                      <div style={{ marginBottom: '6px' }}>
+                        <Truck size={22} color="var(--primary)" />
+                      </div>
                       <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>Delivery Fleet Logistics</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         In-house rider dispatch, live map tracking, and zero commission markups.
                       </div>
                     </div>
                     <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🏷️</div>
+                      <div style={{ marginBottom: '6px' }}>
+                        <Tag size={22} color="var(--primary)" />
+                      </div>
                       <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>Branded Hardware Stands</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         Custom laser-engraved acrylic, brass, or wooden NFC stands matching brand aesthetics.
@@ -556,7 +585,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               {/* Direct Contact Cards */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '14px', marginBottom: '24px' }}>
                 <div style={{ background: 'var(--surface-container)', padding: '16px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '4px' }}>✉️</div>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Mail size={20} color="var(--primary)" />
+                  </div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>Email Support</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Avg response &lt; 2 hrs</div>
                   <a href="mailto:support@kindlyrate.com" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
@@ -565,7 +596,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                 </div>
 
                 <div style={{ background: 'var(--surface-container)', padding: '16px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '4px' }}>📞</div>
+                  <div style={{ marginBottom: '6px' }}>
+                    <Phone size={20} color="var(--primary)" />
+                  </div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>Helpline Phone</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Mon–Sat: 9 AM – 9 PM</div>
                   <a href="tel:+918047192200" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
@@ -574,7 +607,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                 </div>
 
                 <div style={{ background: 'var(--surface-container)', padding: '16px', borderRadius: '10px' }}>
-                  <div style={{ fontSize: '20px', marginBottom: '4px' }}>💬</div>
+                  <div style={{ marginBottom: '6px' }}>
+                    <MessageSquare size={20} color="#16a34a" />
+                  </div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>WhatsApp Concierge</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Instant merchant chat</div>
                   <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" style={{ fontSize: '13px', fontWeight: 600, color: '#16a34a', marginTop: '6px', display: 'inline-block' }}>
@@ -594,7 +629,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
                 {supportSubmitted ? (
                   <div style={{ background: 'rgba(34, 197, 94, 0.12)', border: '1px solid #22c55e', borderRadius: '8px', padding: '16px', textAlign: 'center', color: '#15803d' }}>
-                    <div style={{ fontSize: '24px', marginBottom: '4px' }}>✅</div>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px' }}>
+                      <CheckCircle2 size={26} color="#16a34a" />
+                    </div>
                     <strong>Ticket Created Successfully!</strong>
                     <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Ticket #RV-{Math.floor(100000 + Math.random() * 900000)} assigned. We will email you shortly.</div>
                   </div>
@@ -668,8 +705,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                       <button type="button" className="btn btn-secondary" onClick={onClose}>
                         Cancel
                       </button>
-                      <button type="submit" className="btn btn-primary" style={{ padding: '8px 20px' }}>
-                        🚀 Send Support Ticket
+                      <button type="submit" className="btn btn-primary" style={{ padding: '8px 20px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        Send Support Ticket →
                       </button>
                     </div>
                   </form>
@@ -733,7 +770,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               ) : (
                 <div>
                   <div style={{ marginBottom: '20px' }}>
-                    <span className="badge badge-primary">KindlyRate Knowledge & Growth</span>
+                    <span className="badge badge-primary">KindlyRate Knowledge &amp; Growth</span>
                     <h2 className="serif" style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0 4px', color: '#0f172a' }}>
                       Articles, Field Studies &amp; Playbooks
                     </h2>
@@ -752,8 +789,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                       onChange={(e) => setBlogSearch(e.target.value)}
                       style={{ flex: 1, padding: '10px 14px' }}
                     />
-                    <button type="submit" className="btn btn-primary" style={{ padding: '10px 18px', whiteSpace: 'nowrap' }}>
-                      🔍 Search
+                    <button type="submit" className="btn btn-primary" style={{ padding: '10px 18px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <Search size={14} /> Search
                     </button>
                     {blogSearch && (
                       <button
@@ -775,7 +812,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                     </div>
                   ) : blogs.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '40px', background: 'var(--surface-container)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ fontSize: '32px', marginBottom: '8px' }}>🔍</div>
+                      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+                        <Search size={32} color="var(--text-muted)" />
+                      </div>
                       <h4 style={{ margin: '0 0 4px' }}>No articles found</h4>
                       <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>
                         Try searching for a different keyword or reset filters.

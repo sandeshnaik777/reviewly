@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import { LegalModals } from '../components/LegalModals.js';
-import { KindlyReviewLogo } from '../components/Logos.js';
+import { KindlyRateLogo } from '../components/Logos.js';
 import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
 import { PhoneInput } from '../components/PhoneInput.js';
 import { validatePhoneNumber } from '../utils/phoneValidator.js';
+import {
+  Key,
+  Mail,
+  Terminal,
+  Eye,
+  EyeOff,
+  Lock,
+  Link2,
+  Zap,
+  Lightbulb,
+  AlertTriangle,
+  Download,
+  CheckCircle2,
+} from 'lucide-react';
 
 interface Props {
   onComplete: (business: any) => void;
@@ -761,7 +775,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         >
           ← Back
         </button>
-        <KindlyReviewLogo height={32} />
+        <KindlyRateLogo height={32} />
         <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
           Step <strong>{step}</strong> of 9
         </span>
@@ -850,8 +864,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   marginBottom: '24px',
                 }}
               >
-                <div style={{ fontWeight: 700, color: '#92400e', fontSize: '15px', marginBottom: '6px' }}>
-                  🔑 Account with this email already exists
+                <div style={{ fontWeight: 700, color: '#92400e', fontSize: '15px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Key size={16} /> Account with this email already exists
                 </div>
                 <p style={{ fontSize: '13px', color: '#b45309', margin: '0 0 14px' }}>
                   Enter your password below to sign in and continue setting up your business without losing progress:
@@ -891,7 +905,9 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: '36px', marginBottom: '12px' }}>✉️</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+                  <Mail size={36} color="var(--primary)" />
+                </div>
                 <h3 className="serif" style={{ fontSize: '22px', marginBottom: '8px' }}>
                   Verify Your Email Address
                 </h3>
@@ -973,7 +989,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     }}
                     title="Click to automatically fill code"
                   >
-                    🛠️ <strong>Development Mode:</strong> Your code is{' '}
+                    <Terminal size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+                    <strong>Development Mode:</strong> Your code is{' '}
                     <span style={{ fontFamily: 'monospace', fontWeight: 800, background: '#dbeafe', padding: '2px 6px', borderRadius: '4px' }}>
                       {signupDevOtp}
                     </span>{' '}
@@ -1010,7 +1027,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                       ? 'Sending code...'
                       : otpCooldown > 0
                       ? `Resend code in ${otpCooldown}s`
-                      : '🔄 Resend Verification Code'}
+                      : 'Resend Verification Code'}
                   </button>
 
                   <button
@@ -1085,12 +1102,13 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
-                          fontSize: '15px',
+                          display: 'flex',
+                          alignItems: 'center',
                           color: 'var(--text-muted)',
                         }}
                         title={showPassword ? 'Hide password' : 'Show password'}
                       >
-                        {showPassword ? '👁️‍🗨️' : '👁️'}
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                   </div>
@@ -1116,7 +1134,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     marginTop: '20px',
                   }}
                 >
-                  🔒 <strong>Bank-grade encryption:</strong> Your credentials are encrypted with bcrypt salt hashing. Next, you will configure your business profile and review questions.
+                  <Lock size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> <strong>Bank-grade encryption:</strong> Your credentials are encrypted with bcrypt salt hashing. Next, you will configure your business profile and review questions.
                 </div>
 
                 <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1430,7 +1448,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             {/* 1. Google Maps Share Link Converter */}
             <div className="card" style={{ padding: '20px', marginBottom: '20px', border: '1.5px dashed var(--primary)', background: '#fffcfb' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                <span style={{ fontSize: '18px' }}>🔗</span>
+                <Link2 size={18} color="var(--primary)" />
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '15px' }}>Paste Any Google Maps Share Link</div>
                   <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
@@ -1461,7 +1479,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     </>
                   ) : (
                     <>
-                      <span>⚡</span>
+                      <Zap size={14} />
                       <span>Convert to Review Link</span>
                     </>
                   )}
@@ -1524,7 +1542,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 color: 'var(--text-muted)',
               }}
             >
-              💡 <strong>Tips for your Google review link:</strong>
+              <Lightbulb size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> <strong>Tips for your Google review link:</strong>
               <ol style={{ paddingLeft: '18px', marginTop: '6px' }}>
                 <li>Paste your standard Google Maps share link above and click <strong>Convert to Review Link</strong>.</li>
                 <li>Or go to Google Maps on desktop, search your business, and click <strong>Ask for reviews</strong>.</li>
@@ -1580,7 +1598,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     origPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 12;
                     subLabel = `for 1 yr (₹${Math.round(activePrice / 12)}/mo)`;
                     reviewsDisplay = `${(p.reviewGenerationLimit * 12).toLocaleString()} Total Reviews (1-Year Pass)`;
-                    tag = '🎁 2 Months Free Applied!';
+                    tag = '2 Months Free Applied!';
                   }
 
                   return (
@@ -1640,7 +1658,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                               { m: 1 as const, lbl: '1M' },
                               { m: 3 as const, lbl: '3M' },
                               { m: 6 as const, lbl: '6M' },
-                              { m: 12 as const, lbl: '1Y 🎁' },
+                              { m: 12 as const, lbl: '1Y (2M Free)' },
                             ].map((tab) => (
                               <button
                                 key={tab.m}
@@ -1680,7 +1698,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
                       {dur === 12 && (
                         <div style={{ fontSize: '11px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '5px 8px', borderRadius: '6px', marginBottom: '10px', fontWeight: 600 }}>
-                          🎉 1-Year Pack: 2 Months Free Discount Applied!
+                          1-Year Pack: 2 Months Free Discount Applied!
                         </div>
                       )}
 
@@ -1821,7 +1839,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     gap: '10px',
                   }}
                 >
-                  <span style={{ fontSize: '18px' }}>⚠️</span>
+                  <AlertTriangle size={18} color="#b91c1c" />
                   <div style={{ flex: 1 }}>{paymentNote}</div>
                 </div>
               )}
@@ -1871,7 +1889,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </div>
 
                   <div style={{ marginTop: '18px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
-                    🔒 Powered by Razorpay · UPI, Google Pay, PhonePe, Cards, NetBanking · Instant activation
+                    <Lock size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+                    Powered by Razorpay · UPI, Google Pay, PhonePe, Cards, NetBanking · Instant activation
                   </div>
                 </div>
               ) : (
@@ -1930,7 +1949,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     />
                     <label htmlFor="autoRenewDirect" style={{ cursor: 'pointer', flex: 1 }}>
                       <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)' }}>
-                        🔄 Enable Monthly Auto-Renewal
+                        Enable Monthly Auto-Renewal
                       </div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.45, marginTop: '2px' }}>
                         Automatically renews after each cycle so you never lose QR stands or telemetry. Every transaction ID is saved for your accounts. You can cancel or toggle off anytime inside your dashboard.
@@ -1939,7 +1958,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </div>
 
                   <div style={{ marginTop: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
-                    🔒 Powered by Razorpay · UPI, Google Pay, Cards, NetBanking · Instant activation
+                    <Lock size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+                    Powered by Razorpay · UPI, Google Pay, Cards, NetBanking · Instant activation
                   </div>
                 </div>
               )}
@@ -1953,7 +1973,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     disabled={loading}
                     style={{ minWidth: '220px', fontSize: '15px', padding: '13px 22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                   >
-                    <span>🚀</span> Open Dashboard First →
+                    Open Dashboard First →
                   </button>
 
                   {paymentChoice === 'trial' ? (
@@ -1968,9 +1988,9 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                           <span className="spinner"></span> Opening Checkout...
                         </>
                       ) : paymentFailed ? (
-                        '🔄 Retry ₹79 Payment via Razorpay'
+                        'Retry ₹79 Payment via Razorpay'
                       ) : (
-                        '💳 Pay ₹79 & Start Testing Pack Trial'
+                        'Pay ₹79 & Start Testing Pack Trial'
                       )}
                     </button>
                   ) : (
@@ -1985,16 +2005,16 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                           <span className="spinner"></span> Opening Checkout...
                         </>
                       ) : paymentFailed ? (
-                        `🔄 Retry ₹${directPrice} Payment`
+                        `Retry ₹${directPrice} Payment`
                       ) : (
-                        `💳 Pay ₹${directPrice} & Activate Plan Instantly`
+                        `Pay ₹${directPrice} & Activate Plan Instantly`
                       )}
                     </button>
                   )}
                 </div>
 
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-                  ✨ You can enter your dashboard immediately to view your QR stands & telemetry, and manage payments anytime inside.
+                  You can enter your dashboard immediately to view your QR stands & telemetry, and manage payments anytime inside.
                 </div>
 
               <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
@@ -2023,7 +2043,9 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         {/* STEP 8: Success */}
         {step === 8 && (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <span style={{ fontSize: '48px' }}>🎉</span>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <CheckCircle2 size={48} color="#16a34a" />
+            </div>
             <h2 className="serif" style={{ fontSize: '28px', marginTop: '12px', marginBottom: '8px' }}>
               Welcome, {formData.businessName}!
             </h2>
@@ -2067,15 +2089,17 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 href={`/api/qrs/${firstQRSlug}/image?format=png`}
                 download
                 className="btn btn-secondary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                📥 Download PNG
+                <Download size={14} /> Download PNG
               </a>
               <a
                 href={`/api/qrs/${firstQRSlug}/image?format=svg`}
                 download
                 className="btn btn-secondary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                📥 Download SVG
+                <Download size={14} /> Download SVG
               </a>
               <button
                 className="btn btn-primary"

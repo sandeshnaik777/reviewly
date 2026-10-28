@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
+import { MapPin } from 'lucide-react';
 import {
-  KindlyReviewLogo,
+  KindlyRateLogo,
   GoogleLogo,
   SparklesIcon,
   DirectReviewIcon,
@@ -214,8 +215,8 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
         <h1 className="serif" style={{ fontSize: '26px', lineHeight: 1.25, marginBottom: '6px' }}>
           {business.name}
         </h1>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-          📍 {business.city} · Verified Google Business
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <MapPin size={13} /> {business.city} · Verified Google Business
         </p>
       </div>
 
@@ -892,7 +893,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
             <div className="card" style={{ padding: '16px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary)' }}>
-                  {reviewLength === 'detailed' ? '🌟 7+ Line Foodie Story' : 'Personalized Review Draft'}
+                  {reviewLength === 'detailed' ? 'Detailed Experience Story' : 'Personalized Review Draft'}
                 </span>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   {editedText.split('\n').filter(Boolean).length} lines · {editedText.length} characters
@@ -1117,7 +1118,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
         <div style={{ textAlign: 'center', marginTop: '32px', marginBottom: '12px' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.75, fontSize: '12px', color: 'var(--text-muted)' }}>
             <span>Powered by</span>
-            <KindlyReviewLogo height={18} />
+            <KindlyRateLogo height={18} />
           </div>
         </div>
       </div>
@@ -1139,7 +1140,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
             ) : (
               <>
                 <SparklesIcon size={18} color="white" />
-                <span>Generate Review Draft ✨</span>
+                <span>Generate Review Draft</span>
               </>
             )}
           </button>

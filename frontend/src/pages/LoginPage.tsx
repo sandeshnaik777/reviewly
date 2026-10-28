@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../services/api.js';
 import { LegalModals } from '../components/LegalModals.js';
-import { KindlyReviewBrand } from '../components/Logos.js';
+import { KindlyRateBrand } from '../components/Logos.js';
 
 interface Props {
   onLoginSuccess: (user: any, businesses: any[]) => void;
@@ -48,7 +48,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
           style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
           title="Return to KindlyRate Home"
         >
-          <KindlyReviewBrand iconSize={34} fontSize={22} />
+          <KindlyRateBrand iconSize={34} fontSize={22} />
         </div>
 
         <button

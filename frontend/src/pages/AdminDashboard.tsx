@@ -1,3 +1,4 @@
+import { Search, Bell, Building2, BookOpen, Key, Phone, Mail, MapPin, Trash2, Edit3, Plus, RefreshCw, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import {
@@ -377,7 +378,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
         type: broadcastForm.type,
         targetBusinessId: broadcastForm.targetBusinessId || undefined,
       });
-      showNotification('📢 System Announcement successfully broadcasted to merchants!');
+      showNotification('System Announcement successfully broadcasted to merchants!');
       setShowBroadcastModal(false);
       setBroadcastForm({ title: '', message: '', type: 'INFO', targetBusinessId: '' });
       loadAdminData();
@@ -848,7 +849,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 </p>
               </div>
               <button className="btn btn-secondary" onClick={loadAdminData} style={{ fontSize: '13px' }}>
-                🔄 Refresh Analytics
+                Refresh Analytics
               </button>
             </div>
 
@@ -870,7 +871,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   {stats?.funnelAnalytics?.overallConversionRate || 0}%
                 </div>
                 <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--success)', fontWeight: 600 }}>
-                  Scans ➔ Google Reviews
+                  Scans → Google Reviews
                 </div>
               </div>
 
@@ -1102,7 +1103,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '14px 16px', borderRadius: 'var(--radius-md)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, color: '#166534', fontSize: '14px' }}>🌟 Enthusiastic 5-Star Reviews</span>
+                      <span style={{ fontWeight: 700, color: '#166534', fontSize: '14px' }}>Enthusiastic 5-Star Reviews</span>
                       <span style={{ fontWeight: 800, fontSize: '18px', color: '#166534' }}>
                         {stats?.sentimentBreakdown?.positive || 0}
                       </span>
@@ -1114,7 +1115,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
                   <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '14px 16px', borderRadius: 'var(--radius-md)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, color: '#334155', fontSize: '14px' }}>⚖️ Neutral / Balanced Reviews</span>
+                      <span style={{ fontWeight: 700, color: '#334155', fontSize: '14px' }}>Neutral / Balanced Reviews</span>
                       <span style={{ fontWeight: 800, fontSize: '18px', color: '#334155' }}>
                         {stats?.sentimentBreakdown?.neutral || 0}
                       </span>
@@ -1126,7 +1127,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
                   <div style={{ background: '#fdf4ff', border: '1px solid #f0abfc', padding: '14px 16px', borderRadius: 'var(--radius-md)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, color: '#86198f', fontSize: '14px' }}>🛡️ Reputation Shield Diverted</span>
+                      <span style={{ fontWeight: 700, color: '#86198f', fontSize: '14px' }}>Reputation Shield Diverted</span>
                       <span style={{ fontWeight: 800, fontSize: '18px', color: '#86198f' }}>
                         {stats?.sentimentBreakdown?.shieldDivertedCount || 0}
                       </span>
@@ -1141,7 +1142,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
             {/* Row 5: Top Performing Businesses Leaderboard */}
             <div className="card" style={{ padding: '22px' }}>
-              <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>🏆 Top Performing Merchant Leaderboard</h4>
+              <h4 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>Top Performing Merchant Leaderboard</h4>
               <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '16px' }}>
                 Merchants generating highest review volume and Google Maps conversion
               </p>
@@ -1207,7 +1208,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 </p>
               </div>
               <button className="btn btn-primary" onClick={() => setShowAddBusinessModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>➕</span> Add Business Manually
+                Add Business Manually
               </button>
             </div>
 
@@ -1233,10 +1234,11 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       top: '50%',
                       transform: 'translateY(-50%)',
                       color: 'var(--text-muted)',
-                      fontSize: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
                     }}
                   >
-                    🔍
+                    <Search size={15} />
                   </span>
                   <input
                     type="text"
@@ -1301,7 +1303,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   >
                     <option value="ALL">All Payments</option>
                     <option value="ACTIVE">✓ Active / Paid</option>
-                    <option value="PAST_DUE">⚠️ Overdue / Unpaid</option>
+                    <option value="PAST_DUE">Overdue / Unpaid</option>
                     <option value="TRIAL">⏳ In Trial</option>
                   </select>
                 </div>
@@ -1389,7 +1391,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
             <div className="card" style={{ padding: '20px', overflowX: 'auto' }}>
               {filteredBusinesses.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '38px', marginBottom: '12px' }}>🔍</div>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}><Search size={38} color='var(--text-muted)' /></div>
                   <h4 className="serif" style={{ fontSize: '18px', color: 'var(--text)', marginBottom: '6px' }}>
                     No businesses matching your search
                   </h4>
@@ -1488,7 +1490,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                                 border: isOverdue ? '1px solid #f87171' : undefined,
                               }}
                             >
-                              {b.subscription?.status === 'PAST_DUE' ? '⚠️ OVERDUE / UNPAID' : b.subscription?.status}
+                              {b.subscription?.status === 'PAST_DUE' ? 'OVERDUE / UNPAID' : b.subscription?.status}
                             </span>
                           </td>
 
@@ -1512,7 +1514,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                                   setContactNote('');
                                 }}
                               >
-                                📞 Call / Contact
+                                Call / Contact
                               </button>
 
                               {/* Quota Limit Adjustment */}
@@ -1525,7 +1527,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                                   setNewLimitValue(b.subscription?.reviewLimit || 1000);
                                 }}
                               >
-                                ⚙️ Limit
+                                Limit
                               </button>
 
                               {/* Payment Status Toggle */}
@@ -1598,7 +1600,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   {/* Payment Warning Banner */}
                   {selectedContactBusiness.subscription?.status === 'PAST_DUE' && (
                     <div className="alert alert-error" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '20px' }}>⚠️</span>
+                      <span style={{ fontWeight: 700, color: '#f59e0b' }}>[Notice]</span>
                       <div>
                         <strong>Payment Overdue / Unpaid:</strong> Plan {selectedContactBusiness.subscription?.planName} (₹{selectedContactBusiness.subscription?.planPriceInr}/mo). Call to collect payment or extend grace period.
                       </div>
@@ -1618,7 +1620,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         className="btn btn-primary"
                         style={{ flex: 1, padding: '10px' }}
                       >
-                        📞 Call Phone: {selectedContactBusiness.owner?.phone}
+                        Call Phone: {selectedContactBusiness.owner?.phone}
                       </a>
                       <a
                         href={`https://wa.me/${(selectedContactBusiness.owner?.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
@@ -1629,13 +1631,13 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         className="btn btn-secondary"
                         style={{ flex: 1, padding: '10px', color: '#16a34a', borderColor: '#16a34a' }}
                       >
-                        💬 WhatsApp
+                        WhatsApp
                       </a>
                     </div>
 
                     <div style={{ marginTop: '12px', fontSize: '13px' }}>
-                      <div>✉️ Email: <a href={`mailto:${selectedContactBusiness.owner?.email}`}>{selectedContactBusiness.owner?.email}</a></div>
-                      <div>📍 City & Address: {selectedContactBusiness.address}, {selectedContactBusiness.city}</div>
+                      <div>Email: <a href={`mailto:${selectedContactBusiness.owner?.email}`}>{selectedContactBusiness.owner?.email}</a></div>
+                      <div>City & Address: {selectedContactBusiness.address}, {selectedContactBusiness.city}</div>
                     </div>
                   </div>
 
@@ -1673,7 +1675,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         Close
                       </button>
                       <button type="submit" className="btn btn-primary">
-                        💾 Save Call Note
+                        Save Call Note
                       </button>
                     </div>
                   </form>
@@ -1821,7 +1823,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         });
                       }}
                     >
-                      ⚙️ Edit Plan Pricing &amp; Review Quotas
+                      Edit Plan Pricing &amp; Review Quotas
                     </button>
                   </div>
                 );
@@ -2086,14 +2088,14 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 onClick={() => setShowBroadcastModal(true)}
                 style={{ background: '#7c3aed', borderColor: '#7c3aed', color: '#ffffff', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
               >
-                <span>📢</span>
+                <Bell size={16} />
                 <span>Post New Announcement</span>
               </button>
             </div>
 
             {notifications.length === 0 ? (
               <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '36px', marginBottom: '12px' }}>📢</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}><Bell size={36} color='var(--text-muted)' /></div>
                 <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>No Broadcast Notifications Yet</h4>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '420px', margin: '0 auto 18px' }}>
                   Keep your merchants informed about scheduled maintenance, new software launches, or promotional packages.
@@ -2106,10 +2108,10 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {notifications.map((n) => {
                   const typeColors: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-                    ALERT: { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', icon: '🚨 ALERT' },
-                    WARNING: { bg: '#fffbeb', border: '#fcd34d', text: '#b45309', icon: '⚠️ WARNING' },
-                    SUCCESS: { bg: '#f0fdf4', border: '#86efac', text: '#16a34a', icon: '✅ SUCCESS' },
-                    PROMO: { bg: '#faf5ff', border: '#d8b4fe', text: '#7e22ce', icon: '🎁 PROMO' },
+                    ALERT: { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', icon: 'ALERT' },
+                    WARNING: { bg: '#fffbeb', border: '#fcd34d', text: '#b45309', icon: 'WARNING' },
+                    SUCCESS: { bg: '#f0fdf4', border: '#86efac', text: '#16a34a', icon: 'SUCCESS' },
+                    PROMO: { bg: '#faf5ff', border: '#d8b4fe', text: '#7e22ce', icon: 'PROMO' },
                     INFO: { bg: '#eff6ff', border: '#93c5fd', text: '#1d4ed8', icon: 'ℹ️ INFO' },
                   };
                   const color = typeColors[n.type] || typeColors.INFO;
@@ -2167,7 +2169,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                           onClick={() => handleDeleteNotification(n.id)}
                           style={{ fontSize: '12.5px', color: '#dc2626', borderColor: '#fca5a5' }}
                         >
-                          🗑️ Retract / Delete
+                          Retract / Delete
                         </button>
                       </div>
                     </div>
@@ -2218,7 +2220,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
             {inquiries.length === 0 ? (
               <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '36px', marginBottom: '12px' }}>💼</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}><Building2 size={36} color='var(--text-muted)' /></div>
                 <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>No Software Inquiries Yet</h4>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '420px', margin: '0 auto' }}>
                   When merchants request custom software (Delivery, ERP, Billing, Apps) from their dashboard, their lead details appear here.
@@ -2272,7 +2274,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         </h4>
 
                         <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
-                          🏢 {inq.businessName || 'Business Client'} · <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>{inq.ownerEmail || 'No email provided'}</span>
+                          {inq.businessName || 'Business Client'} · <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>{inq.ownerEmail || 'No email provided'}</span>
                         </div>
 
                         {inq.requirements && (
@@ -2300,7 +2302,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                             className="btn btn-secondary"
                             style={{ fontSize: '12.5px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', flex: 1, justifyContent: 'center' }}
                           >
-                            📞 Call {inq.contactPhone}
+                            Call {inq.contactPhone}
                           </a>
                           <a
                             href={`https://wa.me/${inq.contactPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
@@ -2356,7 +2358,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   onClick={openNewBlog}
                   style={{ background: '#0284c7', borderColor: '#0284c7', color: '#ffffff', fontWeight: 600 }}
                 >
-                  ✍️ Write New Article
+                  Write New Article
                 </button>
               </div>
             </div>
@@ -2379,7 +2381,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   style={{ flex: 1 }}
                 />
                 <button type="submit" className="btn btn-primary" style={{ padding: '8px 20px' }}>
-                  🔍 Search
+                  Search
                 </button>
                 {blogSearch && (
                   <button
@@ -2403,13 +2405,13 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
               </div>
             ) : blogs.length === 0 ? (
               <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-                <div style={{ fontSize: '36px', marginBottom: '10px' }}>📰</div>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}><BookOpen size={36} color='var(--text-muted)' /></div>
                 <h4 style={{ margin: '0 0 6px' }}>No articles found</h4>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
                   Create your first article or search with a different keyword.
                 </p>
                 <button className="btn btn-primary" onClick={openNewBlog}>
-                  ✍️ Write New Article
+                  Write New Article
                 </button>
               </div>
             ) : (
@@ -2468,14 +2470,14 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         onClick={() => openEditBlog(b)}
                         style={{ fontSize: '12px' }}
                       >
-                        ✏️ Edit
+                        Edit
                       </button>
                       <button
                         className="btn btn-outline btn-sm"
                         onClick={() => handleDeleteBlog(b.id)}
                         style={{ fontSize: '12px', color: '#dc2626', borderColor: '#fca5a5' }}
                       >
-                        🗑️ Delete
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -2579,7 +2581,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 gap: '12px',
               }}
             >
-              <span style={{ fontSize: '22px' }}>🛡️</span>
+              <ShieldCheck size={22} color='var(--primary)' />
               <div style={{ fontSize: '13px', color: '#166534', lineHeight: 1.5 }}>
                 <strong>Zero-Downtime Multi-Key Failover:</strong> When diners scan QR stands, KindlyRate rotates requests across all active Gemini API keys. If any individual key hits Google rate limits (HTTP 429) or quota caps, the engine automatically fails over to the next active key instantly.
               </div>
@@ -2595,7 +2597,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   className={`btn btn-sm ${filterKeyService === srv ? 'btn-primary' : 'btn-secondary'}`}
                   style={{ fontSize: '12px' }}
                 >
-                  {srv === 'ALL' ? '🌐 All Services' : srv}
+                  {srv === 'ALL' ? 'All Services' : srv}
                 </button>
               ))}
             </div>
@@ -2631,7 +2633,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                               fontSize: '11px',
                             }}
                           >
-                            {isGemini ? '🤖 ' : '⚙️ '}
+                            ''
                             {key.service}
                           </span>
                           <span className={`badge ${key.isActive ? 'badge-success' : 'badge-warning'}`} style={{ fontSize: '11px' }}>
@@ -2662,13 +2664,13 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                             style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: 'var(--primary)' }}
                             title="Copy full key"
                           >
-                            📋
+                            Copy
                           </button>
                         </div>
 
                         {key.lastError && (
                           <div style={{ fontSize: '11.5px', color: '#b91c1c', marginTop: '6px', fontWeight: 500 }}>
-                            ⚠️ Recent notice: {key.lastError}
+                            Notice: {key.lastError}
                           </div>
                         )}
                       </div>
@@ -2702,7 +2704,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                           onClick={() => handleTestApiKey(key.id)}
                           style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
                         >
-                          {testingKeyId === key.id ? 'Testing...' : '⚡ Test Connection'}
+                          {testingKeyId === key.id ? 'Testing...' : 'Test Connection'}
                         </button>
                         <button
                           type="button"
@@ -2718,7 +2720,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                           onClick={() => handleDeleteApiKey(key.id, key.name)}
                           style={{ fontSize: '12px', color: '#dc2626', borderColor: '#fca5a5' }}
                         >
-                          🗑️
+                          Delete
                         </button>
                       </div>
                     </div>
@@ -2727,7 +2729,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
               {apiKeys.length === 0 && (
                 <div className="card" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>🔑</div>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}><Key size={32} color='var(--text-muted)' /></div>
                   <div style={{ fontSize: '16px', fontWeight: 600 }}>No API Keys Registered</div>
                   <p style={{ fontSize: '13px', margin: '4px 0 16px' }}>
                     Add one or more Google Gemini API keys to enable seamless AI review generation with automatic rotation.
@@ -2785,7 +2787,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. 🚀 Platform Upgrade or ⚠️ Scheduled Maintenance"
+                    placeholder="e.g. Platform Upgrade or Scheduled Maintenance"
                     value={broadcastForm.title}
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, title: e.target.value })}
                     required
@@ -2800,10 +2802,10 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, type: e.target.value as any })}
                   >
                     <option value="INFO">ℹ️ INFO (General Updates & Tips)</option>
-                    <option value="SUCCESS">✅ SUCCESS (Feature Releases & Milestones)</option>
-                    <option value="WARNING">⚠️ WARNING (Scheduled Maintenance / Latency)</option>
-                    <option value="ALERT">🚨 ALERT (Urgent System Notices)</option>
-                    <option value="PROMO">🎁 PROMO (Special Offers & Upgrade Discounts)</option>
+                    <option value="SUCCESS">SUCCESS (Feature Releases & Milestones)</option>
+                    <option value="WARNING">WARNING (Scheduled Maintenance / Latency)</option>
+                    <option value="ALERT">ALERT (Urgent System Notices)</option>
+                    <option value="PROMO">PROMO (Special Offers & Upgrade Discounts)</option>
                   </select>
                 </div>
 
@@ -2814,10 +2816,10 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     value={broadcastForm.targetBusinessId}
                     onChange={(e) => setBroadcastForm({ ...broadcastForm, targetBusinessId: e.target.value })}
                   >
-                    <option value="">🌐 All Merchants (Global Broadcast)</option>
+                    <option value="">All Merchants (Global Broadcast)</option>
                     {businesses.map((b) => (
                       <option key={b.id} value={b.id}>
-                        🏢 Only: {b.name} ({b.ownerEmail})
+                        Only: {b.name} ({b.ownerEmail})
                       </option>
                     ))}
                   </select>
@@ -2845,7 +2847,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     disabled={sendingBroadcast}
                     style={{ background: '#7c3aed', borderColor: '#7c3aed', color: '#ffffff' }}
                   >
-                    {sendingBroadcast ? 'Broadcasting...' : '📢 Broadcast Now'}
+                    {sendingBroadcast ? 'Broadcasting...' : 'Broadcast Now'}
                   </button>
                 </div>
               </form>
@@ -2991,7 +2993,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary" style={{ padding: '8px 24px' }}>
-                    {editingBlog ? '💾 Update Article' : '🚀 Publish Article'}
+                    {editingBlog ? 'Update Article' : 'Publish Article'}
                   </button>
                 </div>
               </form>
@@ -3078,7 +3080,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                           textDecoration: 'underline',
                         }}
                       >
-                        🎲 Generate Random
+                        Generate Random
                       </button>
                     </div>
                     <div style={{ position: 'relative' }}>
@@ -3107,7 +3109,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                           fontWeight: 500,
                         }}
                       >
-                        {showPassword ? 'Hide 👁️' : 'Show 👁️'}
+                        {showPassword ? 'Hide' : 'Show'}
                       </button>
                     </div>
                     <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -3250,7 +3252,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     Cancel
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    🚀 Create Subscriber & Credentials
+                    Create Subscriber & Credentials
                   </button>
                 </div>
               </form>
@@ -3354,13 +3356,13 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   className="btn btn-primary"
                   style={{ flex: 1, padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 600 }}
                   onClick={() => {
-                    const text = `🎉 Welcome to KindlyRate!\n\nYour business account for *${createdSubscriberModal.businessName}* is activated.\n\n🌐 Login URL: ${createdSubscriberModal.loginUrl}\n📧 Email: ${createdSubscriberModal.email}\n🔑 Password: ${createdSubscriberModal.password}\n\n✓ No OTP required. You can log in directly anytime.`;
+                    const text = `Welcome to KindlyRate!\n\nYour business account for *${createdSubscriberModal.businessName}* is activated.\n\nLogin URL: ${createdSubscriberModal.loginUrl}\nEmail: ${createdSubscriberModal.email}\nPassword: ${createdSubscriberModal.password}\n\n✓ No OTP required. You can log in directly anytime.`;
                     navigator.clipboard.writeText(text);
                     setCopiedCredentials(true);
                     setTimeout(() => setCopiedCredentials(false), 3000);
                   }}
                 >
-                  {copiedCredentials ? '✅ Copied to Clipboard!' : '📋 Copy Login Credentials'}
+                  {copiedCredentials ? 'Copied to Clipboard!' : 'Copy Login Credentials'}
                 </button>
                 <button
                   type="button"
@@ -3395,7 +3397,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
             <div className="card" style={{ width: '100%', maxWidth: '540px', padding: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>🔑</span>
+                  <Key size={20} />
                   <h3 className="serif" style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>
                     Register System API Key
                   </h3>
@@ -3429,12 +3431,12 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       setTestResult(null);
                     }}
                   >
-                    <option value="GEMINI">🤖 Google Gemini AI (Review Generation)</option>
-                    <option value="AWS_SMS">📱 AWS SNS SMS (Phone Verification OTP)</option>
-                    <option value="GOOGLE_MAPS">📍 Google Maps API (Local Telemetry &amp; CID)</option>
-                    <option value="RAZORPAY">💳 Razorpay (Subscriptions &amp; Verification)</option>
-                    <option value="EMAIL">✉️ SMTP / Email Service (OTP &amp; Receipts)</option>
-                    <option value="OTHER">⚙️ Other Custom Integration</option>
+                    <option value="GEMINI">Google Gemini AI (Review Generation)</option>
+                    <option value="AWS_SMS">AWS SNS SMS (Phone Verification OTP)</option>
+                    <option value="GOOGLE_MAPS">Google Maps API (Local Telemetry &amp; CID)</option>
+                    <option value="RAZORPAY">Razorpay (Subscriptions &amp; Verification)</option>
+                    <option value="EMAIL">SMTP / Email Service (OTP &amp; Receipts)</option>
+                    <option value="OTHER">Other Custom Integration</option>
                   </select>
                 </div>
 
@@ -3458,7 +3460,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       onClick={() => setShowKeySecret(!showKeySecret)}
                       style={{ background: 'none', border: 'none', fontSize: '11.5px', color: 'var(--primary)', cursor: 'pointer' }}
                     >
-                      {showKeySecret ? 'Hide 👁️' : 'Show 👁️'}
+                      {showKeySecret ? 'Hide' : 'Show'}
                     </button>
                   </div>
                   <input
@@ -3499,7 +3501,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     className="btn btn-secondary btn-sm"
                     style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
-                    {testingRaw ? 'Pinging Google Gemini...' : '⚡ Test Key Live Before Saving'}
+                    {testingRaw ? 'Pinging Google Gemini...' : 'Test Key Live Before Saving'}
                   </button>
 
                   {testResult && (

@@ -137,7 +137,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
     ctx.font = 'bold 13px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('✨ ' + themeStyles.scratchText + ' ✨', width / 2, height / 2 - 10);
+    ctx.fillText(themeStyles.scratchText, width / 2, height / 2 - 10);
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.font = '11px system-ui, sans-serif';
@@ -355,7 +355,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
                   marginBottom: '10px',
                 }}
               >
-                <span>🎉 YOU WON!</span>
+                <span>REWARD UNLOCKED</span>
               </div>
 
               <h3
@@ -495,7 +495,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
               textDecoration: 'underline',
             }}
           >
-            Quick Reveal Prize ➔
+            Quick Reveal Prize →
           </button>
         </div>
       )}

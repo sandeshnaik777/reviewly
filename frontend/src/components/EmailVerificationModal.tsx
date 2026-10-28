@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
+import { Mail, Terminal } from 'lucide-react';
 
 interface EmailVerificationModalProps {
   email: string;
@@ -210,11 +211,10 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '26px',
               margin: '0 auto 16px',
             }}
           >
-            ✉️
+            <Mail size={24} color="#d97706" />
           </div>
           <h2 className="serif" style={{ fontSize: '24px', marginBottom: '8px' }}>
             Verify Your Email
@@ -312,7 +312,8 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
             }}
             title="Click to automatically fill code"
           >
-            🛠️ <strong>Development Mode:</strong> Your code is{' '}
+            <Terminal size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
+            <strong>Development Mode:</strong> Your code is{' '}
             <span style={{ fontFamily: 'monospace', fontWeight: 800, letterSpacing: '2px', background: '#dbeafe', padding: '2px 6px', borderRadius: '4px' }}>
               {devOtp}
             </span>{' '}
@@ -349,7 +350,7 @@ export const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
               ? 'Sending code...'
               : cooldown > 0
               ? `Resend code in ${cooldown}s`
-              : '🔄 Resend Verification Code'}
+              : 'Resend Verification Code'}
           </button>
 
           <button

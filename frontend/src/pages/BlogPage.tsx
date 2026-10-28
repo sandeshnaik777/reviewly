@@ -609,7 +609,7 @@ export const BlogPage: React.FC<Props> = ({
                   onClick={handleShareCopy}
                   style={{ fontSize: '12px', padding: '6px 12px' }}
                 >
-                  {copiedLink ? '✓ Copied!' : '🔗 Copy Link'}
+                  {copiedLink ? '✓ Copied!' : 'Copy Link'}
                 </button>
                 <a
                   href={`https://api.whatsapp.com/send?text=${encodeURIComponent(currentBlog.title + ' ' + window.location.href)}`}
