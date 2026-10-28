@@ -119,21 +119,26 @@ export function quickParseMapsUrl(input: string): MapsLinkConversionResult | nul
     };
   }
 
-  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> converted to genuine Google Place ID
+  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> Google Search #lrd review dialog
   const hexPair = targetUrl.match(/!1s(0x[a-fA-F0-9]+):(0x[a-fA-F0-9]+)/);
   if (hexPair && hexPair[1] && hexPair[2]) {
     try {
-      const pId = hexPairToPlaceId(hexPair[1], hexPair[2]);
+      const hexFeatureId = `${hexPair[1]}:${hexPair[2]}`;
       const decimalCid = BigInt(hexPair[2]).toString();
-      if (pId) {
-        return {
-          originalUrl: raw,
-          directReviewUrl: `https://search.google.com/local/writereview?placeid=${pId}`,
-          detectedType: 'HEX_PROTO_PLACE_ID',
-          placeId: pId,
-          cid: decimalCid,
-        };
-      }
+
+      // Extract business name if present in URL (/maps/place/Business+Name/...)
+      const nameMatch = targetUrl.match(/\/maps\/place\/([^/@?]+)/i);
+      const name = nameMatch && nameMatch[1] ? decodeURIComponent(nameMatch[1].replace(/\+/g, ' ')) : '';
+      const queryTerm = name || 'Google Review';
+      const lrdUrl = `https://www.google.com/search?q=${encodeURIComponent(queryTerm)}#lrd=${hexFeatureId},3`;
+
+      return {
+        originalUrl: raw,
+        directReviewUrl: lrdUrl,
+        detectedType: 'HEX_LRD_REVIEW_DIALOG',
+        cid: decimalCid,
+        businessName: name,
+      };
     } catch {
       // ignore
     }
