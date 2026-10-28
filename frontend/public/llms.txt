@@ -1,0 +1,40 @@
+# KindlyRate — Multi-Tenant Business Review & Local SEO Platform
+
+> Turn happy in-store customers into verified 5-star Google Maps reviews automatically in under 30 seconds. Powered by server-side AI review drafting, Smart QR and NFC stands, and a real-time private Reputation Shield.
+
+## Platform Overview
+KindlyRate (https://kindlyrate.com/) is an enterprise-grade reputation management and local search ranking growth engine designed for physical retail businesses, clinics, restaurants, salons, automotive centers, and multi-location franchises. 
+
+Physical businesses place smart acrylic QR and NFC stands at cashier counters, reception desks, and dining tables. When customers scan, they answer 3 quick criteria in 15 seconds. Server-side AI synthesizes their genuine feedback into an authentic, personalized review draft in natural everyday language, copies it to the customer's phone clipboard, and deep-links directly into Google Maps for instant 1-tap posting.
+
+## Core Features & Capabilities
+- **Smart QR & NFC Hardware Integration**: Instant touchless review collection at checkout counters and dining tables.
+- **AI-Powered Review Synthesis**: Converts customer ratings into diverse, unique, human-sounding reviews tailored to outlet tone.
+- **Semantic Keyword Injection**: Naturally weaves high-intent local search terms (e.g. "best dermatologist in Indiranagar", "fastest oil change") into customer reviews to propel businesses to Rank #1 on Google Maps Local 3-Pack.
+- **Maximum Defense Reputation Shield**: Privately intercepts 1 to 3-star ratings, routing customer dissatisfaction directly to store managers via WhatsApp and dashboard before public posting, protecting public Google ratings.
+- **Aura Live Telemetry & Staff Leaderboards**: Track scan-to-review conversion rates, hourly footfall heatmaps, and staff service speed in real time.
+- **Multi-Location Centralized Architecture**: Manage branch networks from a unified dashboard with localized QR slugs, role-based access control, and cross-outlet performance benchmarking.
+
+## Subscription Packs & Pricing
+KindlyRate offers flexible monthly and discounted multi-month passes in Indian Rupees (INR):
+- **Testing Pack**: ₹79/month (100 AI review drafts/month, 2 Smart QR Stands, ideal for trial & outlet testing).
+- **Growth Pack**: ₹149/month (500 AI review drafts/month, 5 Smart QR Stands, full custom questions & telemetry heatmap).
+- **Scale / Pro Pack**: ₹249/month (1,000 AI review drafts/month, unlimited QR stands, multi-user RBAC, priority WhatsApp support).
+- **Custom Enterprise & Bespoke Software**: Tailored quote for multi-location corporate chains, POS/ERP syncing, custom hardware fabrication, and dedicated account management.
+
+## In-Depth Local SEO & Reputation Engineering Guides
+- [How to Dominate Google Maps Local 3-Pack Rankings in 2026](https://kindlyrate.com/blog/how-to-dominate-google-maps-local-3-pack-rankings-2026): Comprehensive masterclass on Google's ranking factors, proximity signals, review velocity, and CTR optimization.
+- [Smart NFC & QR Stands vs. SMS & WhatsApp Review Requests](https://kindlyrate.com/blog/smart-nfc-qr-stands-vs-sms-whatsapp-review-requests): Comparative study showing why physical point-of-sale stands achieve an 82% conversion rate compared to 3% for post-visit SMS links.
+- [Shielding Your Business from Unfair 1-Star & Fake Google Reviews Legally](https://kindlyrate.com/blog/shielding-business-from-unfair-1-star-fake-reviews-legally): Legal frameworks, Google Business Profile policy compliance, and automated private feedback interception.
+- [Keyword Injection & Semantic Search in Customer Reviews](https://kindlyrate.com/blog/keyword-injection-and-semantic-search-in-customer-reviews): How Google Gemini and Maps search algorithms parse keyword density in user-generated content to boost organic visibility.
+- [Why Businesses Are Replacing Generic Aggregators with Bespoke Software](https://kindlyrate.com/blog/why-businesses-are-replacing-generic-aggregators-with-bespoke-software): The business case for purpose-built review software over bloated, expensive legacy aggregators.
+- [Enterprise Multi-Location Review Architecture](https://kindlyrate.com/blog/enterprise-multi-location-review-architecture): Technical blueprint for managing franchise reputation across 50+ branches with unified RBAC and telemetry.
+
+## Legal, Compliance & Support
+- [Terms of Service](https://kindlyrate.com/terms)
+- [Privacy Policy](https://kindlyrate.com/privacy)
+- [Refund & Cancellation Policy](https://kindlyrate.com/refund)
+- [Merchant Help Center](https://kindlyrate.com/help)
+- Support Email: support@kindlyrate.com
+- Grievance Email: grievance@kindlyrate.com
+- Official Website: https://kindlyrate.com

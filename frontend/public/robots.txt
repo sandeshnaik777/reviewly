@@ -1,19 +1,97 @@
 # ====================================================================
-# Robots.txt — KindlyRate Multi-Tenant Business Review Platform
-# https://kindlyrate.com/
+# Robots.txt — KindlyRate Platform
+# Official Website: https://kindlyrate.com/
+# Last Updated: 2026-10-28
 # ====================================================================
 
-User-agent: *
+# --------------------------------------------------------------------
+# 1. Primary Search Engine Crawlers (Google, Bing, DuckDuckGo)
+# --------------------------------------------------------------------
+User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Googlebot-Mobile
+User-agent: Bingbot
+User-agent: DuckDuckBot
+User-agent: Slurp
+User-agent: Baiduspider
+User-agent: YandexBot
 Allow: /
+Allow: /blog
+Allow: /blog/*
+Allow: /help
+Allow: /terms
+Allow: /privacy
+Allow: /refund
 Allow: /r/*
-
-# Disallow internal backend APIs, auth endpoints, and platform admin
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /sitemap.xml
 Disallow: /api/
 Disallow: /admin
+Disallow: /admin/*
 Disallow: /onboarding/checkout
-
-# Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# XML Sitemaps
+# --------------------------------------------------------------------
+# 2. Modern AI, LLM & Answer Engine Crawlers
+# (ChatGPT, Perplexity, Claude, Gemini, Apple Intelligence, Copilot)
+# LLM Knowledge Base Manifests:
+# - Summary: https://kindlyrate.com/llms.txt
+# - Full Documentation: https://kindlyrate.com/llms-full.txt
+# --------------------------------------------------------------------
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: YouBot
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: Diffbot
+User-agent: Omgilibot
+Allow: /
+Allow: /blog
+Allow: /blog/*
+Allow: /help
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+Allow: /r/*
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /sitemap.xml
+Disallow: /api/
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /onboarding/checkout
+
+# --------------------------------------------------------------------
+# 3. Default Policy for All Other Agents
+# --------------------------------------------------------------------
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /blog/*
+Allow: /help
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+Allow: /r/*
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /sitemap.xml
+Disallow: /api/
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /onboarding/checkout
+Crawl-delay: 1
+
+# --------------------------------------------------------------------
+# 4. Host & XML Sitemaps
+# --------------------------------------------------------------------
+Host: https://kindlyrate.com
 Sitemap: https://kindlyrate.com/sitemap.xml
