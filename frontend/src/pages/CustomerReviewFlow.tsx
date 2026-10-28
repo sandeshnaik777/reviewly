@@ -557,8 +557,10 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 cat === 'HEALTH & WELLNESS' ||
                 /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
 
-              const suggestions = isRetail
+              const targetKeywords: string[] = data?.targetKeywords || [];
+              const rawSuggestions = isRetail
                 ? [
+                    '16GB RAM Upgrade',
                     'Custom Gaming PC Build',
                     'Laptop Upgrade & SSD',
                     'Mechanical Keyboard',
@@ -600,6 +602,8 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                     'Tasting Platter',
                     'Warm Hospitality',
                   ];
+
+              const suggestions = Array.from(new Set([...targetKeywords, ...rawSuggestions]));
 
               const sectionTitle = isRetail
                 ? 'Products, Hardware or Services Purchased'
@@ -790,9 +794,9 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px' }}>
                 {[
-                  { id: 'short', label: 'Crisp & Quick', desc: '1–2 sentences' },
-                  { id: 'medium', label: 'Balanced', desc: '3–4 sentences' },
-                  { id: 'detailed', label: 'Comprehensive', desc: 'Full experience story' },
+                  { id: 'short', label: 'Crisp & Quick', desc: '1–2 lines' },
+                  { id: 'medium', label: 'Balanced', desc: '3–4 lines' },
+                  { id: 'detailed', label: 'Detailed Story', desc: '9–10 lines in-depth' },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -819,10 +823,10 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               </div>
               <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0', lineHeight: 1.4 }}>
                 {reviewLength === 'detailed'
-                  ? 'Comprehensive Experience: Crafts a detailed, organic narrative highlighting specific strengths and quality.'
+                  ? 'Detailed Story (9–10 lines): Crafts a comprehensive, natural experience covering reason for visit, service/items, honesty, and recommendation.'
                   : reviewLength === 'short'
-                  ? 'Crisp & Quick: Direct 1-2 sentence recommendation for swift reading.'
-                  : 'Balanced: Standard 3-4 sentence natural Google review.'}
+                  ? 'Crisp & Quick: Direct 1-2 line everyday recommendation for quick posting.'
+                  : 'Balanced: Standard 3-4 line natural conversational Google review.'}
               </p>
             </div>
 

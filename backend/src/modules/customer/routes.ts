@@ -90,6 +90,8 @@ customerRouter.get('/qr/:slug', qrScanRateLimiter, async (req: Request, res: Res
           isRequired: q.isRequired,
         })),
         preferredReviewFormat: settings?.reviewFormat || 'narrative',
+        preferredReviewLength: settings?.reviewLength || 'medium',
+        targetKeywords: settings?.targetKeywords || settings?.thingsToHighlight || [],
         scratchCard: settings?.scratchCardEnabled
           ? {
               enabled: true,

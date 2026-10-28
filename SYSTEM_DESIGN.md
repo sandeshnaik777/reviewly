@@ -564,9 +564,46 @@ flowchart TD
 
     Mutation["Write Mutation\n(e.g., Update Profile, Save Settings, Record Review)"] --> MemUpdate["1. Update In-Memory Array & Map Indexes\n(Immediate O(1) Availability)"]
     MemUpdate --> WriteLock["2. Acquire Async Write Lock Sequence"]
-    WriteLock --> LocalJSON["3. Atomic Write to Local JSON Store"]
+    WriteLock --> LocalJSON["3. Atomic Write to Local JSON Store\n(CPU-Optimized Single Compact JSON)"]
     LocalJSON --> PGStore["4. UPSERT into PostgreSQL Cluster\nkindlyreview_store (id = 'primary')"]
-    PGStore --> Ack["5. Return Verified Response to Client"]
+    LocalJSON --> RelationalSync["5. Direct Dual-Write to Relational Tables\n(payment_records & system_audit_logs)"]
+    PGStore --> Ack["6. Return Verified Response to Client"]
+    RelationalSync --> Ack
 ```
+
+### 11.7 Flow 7: Target Keyword Injection, Humanized Review Voice & 9–10 Line Story Flow
+Illustrates how merchant-configured target keywords (e.g., "16GB RAM", "SSD Upgrade", "Honest Pricing") are combined with smart category suggestions, surfaced on customer mobile touchpoints, and naturally woven into authentic, non-formal everyday English reviews.
+
+```mermaid
+flowchart TD
+    Merchant["Merchant in Dashboard"] --> SetKw["1. Configures Target Keywords\n(e.g., '16GB RAM', 'SSD Upgrade')\nOr Clicks Smart Category Suggestions"]
+    SetKw --> SaveSettings["PUT /api/business/:id/settings\n(Persisted in targetKeywords & PostgreSQL)"]
+    
+    Customer["In-Store Customer"] --> ScanQR["2. Scans QR Counter Stand\nGET /api/customer/qr/:slug"]
+    SaveSettings -.-> ScanQR
+    ScanQR --> MobileView["3. Customer Mobile View Loads\nDisplays Target Keyword Chips\n+ 9-10 Line Story Option"]
+    
+    MobileView --> TapItems["4. Customer Taps Keyword Chips\n(Optional) & Chooses Review Length"]
+    TapItems --> SubmitRatings["5. POST /api/customer/generate\n(Ratings + Chosen Keywords + Length: detailed)"]
+    
+    SubmitRatings --> AIEngine["6. Gemini AI / High-Entropy Combinatorial Engine"]
+    
+    subgraph NaturalHumanVoiceRules ["Everyday Human English Rules"]
+        R1["Strictly casual, everyday conversational tone"]
+        R2["FORBIDDEN: 'impeccable', 'culinary delight', 'testament', 'patronage', 'ambiance'"]
+        R3["MUST sound like real customer writing on smartphone"]
+        R4["9–10 Line Detailed Story Structure:\nReason for visit -> Staff -> Keyword/Item -> Quality -> Honest Price -> Turnaround -> Testing -> Recommendation"]
+    end
+    
+    AIEngine --> NaturalHumanVoiceRules
+    NaturalHumanVoiceRules --> ReviewOutput["7. 9–10 Line Authentic Customer Review Generated"]
+    ReviewOutput --> ShieldCheck{"Customer Rating Check"}
+    ShieldCheck -->|4-5 Stars| OneTapGoogle["8. 1-Tap Copy & Forward to Google Maps"]
+    ShieldCheck -->|1-3 Stars| PrivateShield["8. Private Interception into Merchant Inbox"]
+    
+    OneTapGoogle --> AuditLog["9. Log Audited to PostgreSQL system_audit_logs"]
+    PrivateShield --> AuditLog
+```
+
 
 

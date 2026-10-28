@@ -93,6 +93,7 @@ export interface BusinessSettings {
   customInstructions?: string;
   wordsToAvoid: string[];
   thingsToHighlight: string[];
+  targetKeywords?: string[];
   autoRedirectGoogle: boolean;
   // Scratch Card & Rewards Engine (Optional)
   scratchCardEnabled?: boolean;

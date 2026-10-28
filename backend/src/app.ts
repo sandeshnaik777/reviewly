@@ -58,15 +58,8 @@ export function createApp(): Express {
   );
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-  // 4. Global API Rate Limiting
-  app.use(
-    '/api',
-    rateLimiter({
-      windowMs: config.rateLimits.globalApiWindowMs,
-      max: config.rateLimits.globalApiMaxPerIp,
-      message: 'Global API rate limit exceeded.',
-    })
-  );
+  // 4. Body parsing complete. Global API routes are unlimited for smooth merchant & customer experience.
+  // Sensitive personal actions (login, OTP dispatch, reviews) enforce dedicated route-level rate limiters.
 
   // 5. Health Check & SEO Meta Crawlers
   app.get('/api/health', (req, res) => {

@@ -98,6 +98,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   // Settings Tags State
   const [newHighlightTag, setNewHighlightTag] = useState('');
   const [newAvoidTag, setNewAvoidTag] = useState('');
+  const [newTargetKeyword, setNewTargetKeyword] = useState('');
 
   // Create QR Modal State
   const [showQRModal, setShowQRModal] = useState(false);
@@ -476,10 +477,49 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         showNotification('⚡ Aura Applied: Signature dishes & hospitality injected into Tonight’s AI Prompt!');
       }
     } else if (leverId === 'waiter_bonus') {
-      showNotification('🏆 Server Recognition Logged: Team member flagged as Server of the Week in Manager Log!');
+      showNotification('🏆 Recognition Logged: Team member recognition updated in Manager Log!');
     } else if (leverId === 'google_pack_gap') {
       setRushMode(true);
       showNotification('🚀 Local Pack Sprint Mode Activated: Accelerated 1-click Google conversion prompts engaged!');
+    }
+  };
+
+  const handleAddTargetKeyword = async (keyword: string) => {
+    const trimmed = keyword.trim();
+    if (!trimmed || !settings) return;
+    const currentKeywords = settings.targetKeywords || settings.thingsToHighlight || [];
+    if (currentKeywords.includes(trimmed)) return;
+    const updated = [...currentKeywords, trimmed];
+    const newSettings = {
+      ...settings,
+      targetKeywords: updated,
+      thingsToHighlight: updated,
+    };
+    setSettings(newSettings);
+    setNewTargetKeyword('');
+    try {
+      await api.saveSettings(business.id, newSettings);
+      showNotification(`Target keyword "${trimmed}" saved`);
+    } catch (e: any) {
+      console.warn('Failed saving target keyword:', e);
+    }
+  };
+
+  const handleRemoveTargetKeyword = async (keyword: string) => {
+    if (!settings) return;
+    const currentKeywords = settings.targetKeywords || settings.thingsToHighlight || [];
+    const updated = currentKeywords.filter((k: string) => k !== keyword);
+    const newSettings = {
+      ...settings,
+      targetKeywords: updated,
+      thingsToHighlight: updated,
+    };
+    setSettings(newSettings);
+    try {
+      await api.saveSettings(business.id, newSettings);
+      showNotification(`Removed keyword "${keyword}"`);
+    } catch (e: any) {
+      console.warn('Failed removing target keyword:', e);
     }
   };
 
@@ -820,185 +860,6 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       {/* Main Content Area - Generous 1380px Width for Laptop Clarity */}
       <div className="desktop-container" style={{ maxWidth: '1380px' }}>
         {/* ======================================================== */}
-        {/* IRON MAN MISSION CONTROL FLIGHT DECK (HUD STATS STRIP)   */}
-        {/* ======================================================== */}
-        <div className="ironman-hud-strip">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-            {/* HUD KPI Metrics */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
-              <div>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                  Total Net Monthly Value
-                </div>
-                <div style={{ fontSize: '28px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
-                  +₹{(financial.totalMonthlyImpactInr ?? 0).toLocaleString()}
-                </div>
-                <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
-                  Walk-ins + Aggregator commission saved
-                </div>
-              </div>
-
-              <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                  Reputation Defense Shield
-                </div>
-                <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                  {roi.negativeReviewsShielded ?? 0} Intercepted
-                </div>
-                <div style={{ fontSize: '11px', color: '#4ade80' }}>
-                  100% Negative Leaks Contained
-                </div>
-              </div>
-
-              <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                  Google Local Pack Rank
-                </div>
-                <div style={{ fontSize: '28px', fontWeight: 800, color: '#fde047', marginTop: '2px' }}>
-                  {roi.googleLocalPackRank || 'Awaiting Initial Reviews'}
-                </div>
-                <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
-                  {reviews.length} Reviews · {analytics?.avgRating ? `${analytics.avgRating} ★` : '0.0 ★'} Rating
-                </div>
-              </div>
-
-              <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
-                <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                  Weekly Review Velocity
-                </div>
-                <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                  {roi.reviewsVelocityPerWeek ?? 0} reviews/wk
-                </div>
-                <div style={{ fontSize: '11px', color: '#4ade80' }}>
-                  {reviews.length > 0 ? '▲ Active Review Acceleration' : 'Initial Baseline Setup'}
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Action Buttons */}
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <button
-                onClick={() => setActiveTab('qrs')}
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  color: '#ffffff',
-                  padding: '9px 16px',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span>🎯 QR Stands &amp; Generator</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('ai_settings')}
-                style={{
-                  background: 'var(--primary)',
-                  border: 'none',
-                  color: '#ffffff',
-                  padding: '9px 16px',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                <ShieldIcon size={14} color="#ffffff" />
-                <span>Shield Settings</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ======================================================== */}
-        {/* ======================================================== */}
-        {/* AURA EXECUTIVE AI COPILOT BRIEFING & LEVERS               */}
-        {/* ======================================================== */}
-        <div className="aura-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="telemetry-pulse" />
-              <strong style={{ fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <SparklesIcon size={16} color="#38bdf8" />
-                <span>Executive Reputation &amp; Growth Insights</span>
-              </strong>
-              <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                · Monitoring {qrs.length} Touchpoints &amp; Google Maps Visibility
-              </span>
-            </div>
-            <div style={{ fontSize: '12.5px', color: '#4ade80', fontWeight: 600 }}>
-              ● {aura.defenseShieldHealth}
-            </div>
-          </div>
-
-          <p style={{ fontSize: '13.5px', color: '#cbd5e1', marginBottom: '16px', lineHeight: 1.5 }}>
-            {aura.statusText}
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
-            {aura.recommendations.map((rec: any) => (
-              <div
-                key={rec.id}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.09)',
-                  borderRadius: '8px',
-                  padding: '14px 16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  gap: '10px',
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {rec.id === 'dish_boost' && <SparklesIcon size={15} color="#f59e0b" />}
-                    {rec.id === 'waiter_bonus' && <TrophyIcon size={15} color="#38bdf8" />}
-                    {rec.id === 'google_pack_gap' && <TrendingUpIcon size={15} color="#4ade80" />}
-                    <span>{rec.title}</span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.45 }}>
-                    {rec.desc}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleExecuteAuraLever(rec.id)}
-                  style={{
-                    alignSelf: 'flex-start',
-                    background: 'rgba(56, 189, 248, 0.15)',
-                    border: '1px solid rgba(56, 189, 248, 0.4)',
-                    color: '#38bdf8',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.25)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.15)')}
-                >
-                  <ZapIcon size={13} color="#38bdf8" />
-                  <span>{rec.actionText} →</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ======================================================== */}
         {/* SEGMENTED NAVIGATION CONTROL (HIGH DENSITY HUD TABS)     */}
         {/* ======================================================== */}
         <div className="segmented-nav">
@@ -1149,6 +1010,224 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
                   Across {qrs.length} active QR stations
                 </div>
+              </div>
+            </div>
+
+            {/* TARGET KEYWORDS & MENTION SUGGESTIONS ENGINE */}
+            <div
+              className="card"
+              style={{
+                background: '#ffffff',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '24px 28px',
+                marginBottom: '24px',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '24px' }}>🎯</span>
+                  <div>
+                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      Target Keywords &amp; Services to Mention in Reviews
+                    </h3>
+                    <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+                      Specify custom keywords (e.g. <strong>"16GB RAM"</strong>, <strong>"SSD Upgrade"</strong>, <strong>"Painless Treatment"</strong>, <strong>"Fair Pricing"</strong>). Our AI will weave them naturally into customer reviews.
+                    </p>
+                  </div>
+                </div>
+
+                <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d' }}>
+                  ● Active Keyword Injection
+                </span>
+              </div>
+
+              {/* Active Target Keywords Chips */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Active Target Keywords ({((settings?.targetKeywords || settings?.thingsToHighlight) || []).length}):
+                </div>
+                {((settings?.targetKeywords || settings?.thingsToHighlight) || []).length === 0 ? (
+                  <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic', marginBottom: '8px' }}>
+                    No target keywords added yet. Click suggestions below or type custom keywords.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {((settings?.targetKeywords || settings?.thingsToHighlight) || []).map((kw: string, i: number) => (
+                      <span
+                        key={i}
+                        style={{
+                          background: '#f0fdf4',
+                          border: '1.5px solid #86efac',
+                          color: '#15803d',
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          padding: '6px 14px',
+                          borderRadius: '20px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        }}
+                      >
+                        <span>✓ {kw}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTargetKeyword(kw)}
+                          title="Remove keyword"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#15803d',
+                            cursor: 'pointer',
+                            padding: '0 2px',
+                            fontWeight: 800,
+                            fontSize: '14px',
+                            lineHeight: 1,
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Smart Category Keyword Suggestions */}
+              {(() => {
+                const cat = (business?.mainCategory || '').toUpperCase();
+                const sub = (business?.subcategory || '').toLowerCase();
+                const bName = (business?.name || '').toLowerCase();
+
+                const isRetailOrTech =
+                  cat === 'RETAIL' ||
+                  /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                  /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+                const isServices =
+                  cat === 'SERVICES' ||
+                  /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+                const isHealth =
+                  cat === 'HEALTH & WELLNESS' ||
+                  /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+                const suggestions = isRetailOrTech
+                  ? [
+                      '16GB RAM',
+                      'SSD Upgrade',
+                      'Custom Gaming PC',
+                      'Genuine Warranty',
+                      'Quick Diagnostics',
+                      'Fair Pricing',
+                      'Clean Setup',
+                      'Helpful Staff',
+                      'Official Parts',
+                      'Fast Turnaround',
+                    ]
+                  : isServices
+                  ? [
+                      'Quick Diagnostics',
+                      'Honest Mechanic',
+                      'Original Spare Parts',
+                      'Transparent Billing',
+                      'Neat Workmanship',
+                      'Affordable Charges',
+                      'Punctual Service',
+                      'Reliable Quality',
+                    ]
+                  : isHealth
+                  ? [
+                      'Painless Treatment',
+                      'Friendly Doctor',
+                      'Clean Clinic',
+                      'Accurate Diagnostics',
+                      'Short Waiting Time',
+                      'Caring Staff',
+                      'Modern Equipment',
+                    ]
+                  : [
+                      'Quick Service',
+                      'Fresh Quality',
+                      'Honest Team',
+                      'Fair Price',
+                      'Clean Space',
+                      'Great Hospitality',
+                      'Highly Recommended',
+                    ];
+
+                return (
+                  <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>⚡</span>
+                      <span>Click to add suggested keywords for {business.subcategory || business.mainCategory || 'your business'}:</span>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {suggestions.map((sug: string) => {
+                        const isAdded = ((settings?.targetKeywords || settings?.thingsToHighlight) || []).includes(sug);
+                        return (
+                          <button
+                            key={sug}
+                            type="button"
+                            onClick={() => {
+                              if (isAdded) {
+                                handleRemoveTargetKeyword(sug);
+                              } else {
+                                handleAddTargetKeyword(sug);
+                              }
+                            }}
+                            style={{
+                              background: isAdded ? '#dcfce7' : '#ffffff',
+                              border: isAdded ? '1.5px solid #22c55e' : '1px solid #cbd5e1',
+                              color: isAdded ? '#15803d' : '#334155',
+                              fontWeight: isAdded ? 700 : 500,
+                              fontSize: '12px',
+                              padding: '5px 12px',
+                              borderRadius: '16px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                          >
+                            <span>{isAdded ? '✓' : '+'}</span>
+                            <span>{sug}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Add Custom Keyword Input */}
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', maxWidth: '640px' }}>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Type custom keyword (e.g. 16GB RAM, SSD Upgrade, Doctor Care)..."
+                  value={newTargetKeyword}
+                  onChange={(e) => setNewTargetKeyword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTargetKeyword(newTargetKeyword);
+                    }
+                  }}
+                  style={{ flex: 1, padding: '10px 14px', fontSize: '13.5px' }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => handleAddTargetKeyword(newTargetKeyword)}
+                  disabled={!newTargetKeyword.trim()}
+                  style={{ whiteSpace: 'nowrap', padding: '10px 20px', fontSize: '13.5px', fontWeight: 600 }}
+                >
+                  + Add Keyword
+                </button>
               </div>
             </div>
 
@@ -1362,10 +1441,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '16px' }}>🏷️</span>
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Highlight Signature Items in AI Tone</strong>
+                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Highlight Target Keywords in Reviews</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Diners frequently mention great taste without specifying dishes. Injecting "Truffle Pasta, Woodfired Pizza, Craft Cocktails" into Highlight Tags will make Gemini generate keyword-rich reviews that rank 2.4x higher on Google Maps.
+                      Customers often praise overall service without naming key offerings. Injecting target keywords (e.g. "16GB RAM, SSD Upgrade, Honest Service") makes Gemini generate rich reviews that rank 2.4x higher on Google Maps.
                     </p>
                   </div>
                   <button
@@ -1373,10 +1452,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     style={{ background: '#38bdf8', color: '#0f172a', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
                     onClick={() => {
                       setActiveTab('ai_settings');
-                      showNotification('Navigated to AI Tone settings to configure highlight keywords');
+                      showNotification('Navigated to Review Settings to configure target keywords');
                     }}
                   >
-                    ⚡ Update Highlight Tags →
+                    ⚡ Manage Target Keywords →
                   </button>
                 </div>
 
@@ -1384,10 +1463,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '16px' }}>🛡️</span>
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Enable Strict Shield for Peak Rush</strong>
+                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Enable Strict Shield for Peak Hours</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Weekend dinner shifts have higher table wait times. Switching the Reputation Shield from Standard to Strict ensures 100% of 1 to 3-star dining feedback is routed to your private manager inbox before it can reach Google.
+                      Peak customer rush hours can have occasional delays. Switching the Reputation Shield from Standard to Strict ensures 100% of 1 to 3-star customer feedback is routed to your private manager inbox before it can reach Google.
                     </p>
                   </div>
                   <button
@@ -1406,10 +1485,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '16px' }}>🎯</span>
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Deploy Stand at Payment Counter</strong>
+                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Position Stand at Billing Counter</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Telemetry shows dining QR stands at checkout convert 82% of customers paying by UPI or Card. Generate a dedicated "Cashier / Counter Stand" to collect reviews while receipts are generated.
+                      Telemetry shows QR stands at checkout convert 82% of customers paying by UPI or Card. Position a dedicated "Cashier / Counter Stand" to collect reviews while receipts or invoices are generated.
                     </p>
                   </div>
                   <button
@@ -1428,10 +1507,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
                       <span style={{ fontSize: '16px' }}>📋</span>
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Set Review Prompting to Detailed</strong>
+                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Set Review Prompting to Detailed (9–10 lines)</strong>
                     </div>
                     <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Longer reviews (3+ sentences) receive 3.8x more helpfulness upvotes and trigger Google Local SEO algorithms faster. Aura recommends keeping review length configured to "Balanced" or "Detailed".
+                      Longer in-depth reviews (9–10 lines) receive 4x more Google engagement and boost local 3-pack rank. Aura recommends setting review length to "Detailed Story (9–10 lines)".
                     </p>
                   </div>
                   <button
@@ -1926,6 +2005,184 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </div>
               </div>
             </div>
+
+            {/* ======================================================== */}
+            {/* AURA EXECUTIVE AI BRIEFING & LEVERS (BOTTOM OF OVERVIEW) */}
+            {/* ======================================================== */}
+            <div className="aura-card" style={{ marginTop: '28px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span className="telemetry-pulse" />
+                  <strong style={{ fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <SparklesIcon size={16} color="#38bdf8" />
+                    <span>Executive Reputation &amp; Growth Insights</span>
+                  </strong>
+                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                    · Monitoring {qrs.length} Touchpoints &amp; Google Maps Visibility
+                  </span>
+                </div>
+                <div style={{ fontSize: '12.5px', color: '#4ade80', fontWeight: 600 }}>
+                  ● {aura.defenseShieldHealth}
+                </div>
+              </div>
+
+              <p style={{ fontSize: '13.5px', color: '#cbd5e1', marginBottom: '16px', lineHeight: 1.5 }}>
+                {aura.statusText}
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
+                {aura.recommendations.map((rec: any) => (
+                  <div
+                    key={rec.id}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.09)',
+                      borderRadius: '8px',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '10px',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {rec.id === 'dish_boost' && <SparklesIcon size={15} color="#f59e0b" />}
+                        {rec.id === 'waiter_bonus' && <TrophyIcon size={15} color="#38bdf8" />}
+                        {rec.id === 'google_pack_gap' && <TrendingUpIcon size={15} color="#4ade80" />}
+                        <span>{rec.title}</span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.45 }}>
+                        {rec.desc}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleExecuteAuraLever(rec.id)}
+                      style={{
+                        alignSelf: 'flex-start',
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        border: '1px solid rgba(56, 189, 248, 0.4)',
+                        color: '#38bdf8',
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.25)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.15)')}
+                    >
+                      <ZapIcon size={13} color="#38bdf8" />
+                      <span>{rec.actionText} →</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ======================================================== */}
+            {/* IRON MAN MISSION CONTROL FLIGHT DECK (BOTTOM HUD STRIP)  */}
+            {/* ======================================================== */}
+            <div className="ironman-hud-strip" style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+                {/* HUD KPI Metrics */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
+                      Total Net Monthly Value
+                    </div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
+                      +₹{(financial.totalMonthlyImpactInr ?? 0).toLocaleString()}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
+                      Walk-ins + Aggregator commission saved
+                    </div>
+                  </div>
+
+                  <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
+                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
+                      Reputation Defense Shield
+                    </div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                      {roi.negativeReviewsShielded ?? 0} Intercepted
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#4ade80' }}>
+                      100% Negative Leaks Contained
+                    </div>
+                  </div>
+
+                  <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
+                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
+                      Google Local Pack Rank
+                    </div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#fde047', marginTop: '2px' }}>
+                      {roi.googleLocalPackRank || 'Awaiting Initial Reviews'}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
+                      {reviews.length} Reviews · {analytics?.avgRating ? `${analytics.avgRating} ★` : '0.0 ★'} Rating
+                    </div>
+                  </div>
+
+                  <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
+                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
+                      Weekly Review Velocity
+                    </div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
+                      {roi.reviewsVelocityPerWeek ?? 0} reviews/wk
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#4ade80' }}>
+                      {reviews.length > 0 ? '▲ Active Review Acceleration' : 'Initial Baseline Setup'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Action Buttons */}
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button
+                    onClick={() => setActiveTab('qrs')}
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      color: '#ffffff',
+                      padding: '9px 16px',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <span>🎯 QR Stands &amp; Generator</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('ai_settings')}
+                    style={{
+                      background: 'var(--primary)',
+                      border: 'none',
+                      color: '#ffffff',
+                      padding: '9px 16px',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <ShieldIcon size={14} color="#ffffff" />
+                    <span>Shield Settings</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -2341,7 +2598,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       >
                         <div style={{ fontWeight: 600, fontSize: '14px' }}>Standard Shield (1–2★)</div>
                         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          Intercepts severe issues (cold food, delays) while allowing neutral/positive to flow.
+                          Intercepts severe issues (unhappy customer, service issues) while allowing neutral/positive to flow.
                         </div>
                       </div>
 
@@ -2381,7 +2638,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       {[
                         { id: 'enthusiastic', title: 'Enthusiastic', desc: 'High praise, passionate, thrilled' },
                         { id: 'warm', title: 'Warm & Hospitable', desc: 'Cozy, friendly, personal' },
-                        { id: 'professional', title: 'Fine Dining / Polished', desc: 'Refined, articulate, balanced' },
+                        { id: 'professional', title: 'Polished & Professional', desc: 'Refined, articulate, balanced' },
                         { id: 'casual', title: 'Casual & Relaxed', desc: 'Everyday conversational tone' },
                         { id: 'concise', title: 'Concise & Short', desc: 'Direct, 1–2 sentence review' },
                       ].map((t) => (
@@ -2440,7 +2697,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         >
                           <option value="short">Short (1–2 sentences)</option>
                           <option value="medium">Balanced (2–3 natural sentences)</option>
-                          <option value="detailed">In-depth (Full paragraph)</option>
+                          <option value="detailed">Detailed Story (9–10 lines in-depth)</option>
                         </select>
                       </div>
 
@@ -2519,13 +2776,15 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                             const items = isRetail
                               ? [
+                                  '16GB RAM',
+                                  'SSD Upgrade',
                                   'Genuine Components',
                                   'Expert Consultation',
                                   'Custom PC Builds',
                                   'Quick Diagnostics',
                                   'Competitive Pricing',
                                   'Official Warranty',
-                                  'Clean Cable Management',
+                                  'Clean Setup',
                                   'Friendly Support',
                                 ]
                               : isServices
@@ -2590,7 +2849,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         <input
                           type="text"
                           className="form-input"
-                          placeholder="Type custom topic (e.g. woodfired crust, craft cocktails, valet)..."
+                          placeholder="Type custom keyword (e.g. 16GB RAM, SSD Upgrade, Painless Treatment, Fair Pricing)..."
                           value={newHighlightTag}
                           onChange={(e) => setNewHighlightTag(e.target.value)}
                           onKeyDown={(e) => {

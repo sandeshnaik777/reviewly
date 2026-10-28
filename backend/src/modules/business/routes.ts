@@ -248,6 +248,7 @@ businessRouter.put(
       customInstructions: z.string().optional(),
       wordsToAvoid: z.array(z.string()).default([]),
       thingsToHighlight: z.array(z.string()).default([]),
+      targetKeywords: z.array(z.string()).default([]).optional(),
       autoRedirectGoogle: z.boolean().default(false),
       // Scratch Card & Reward Engine
       scratchCardEnabled: z.boolean().default(false).optional(),

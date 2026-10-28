@@ -4,6 +4,7 @@ export interface CategoryDefinition {
   name: MainCategory;
   subcategories: string[];
   defaultQuestions: { key: string; label: string }[];
+  keywordSuggestions: string[];
 }
 
 export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
@@ -34,6 +35,18 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'ambience', label: 'Ambience & Atmosphere' },
       { key: 'value_for_money', label: 'Value for Money' },
     ],
+    keywordSuggestions: [
+      'Fresh Food',
+      'Fast Service',
+      'Clean Ambience',
+      'Tasty Starters',
+      'Pocket Friendly',
+      'Humble Staff',
+      'Signature Dish',
+      'Good Portions',
+      'Quick Table Service',
+      'Hygienic Kitchen',
+    ],
   },
   RETAIL: {
     name: 'RETAIL',
@@ -61,6 +74,20 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'product_variety', label: 'Product Variety & Selection' },
       { key: 'pricing', label: 'Price & Value' },
       { key: 'overall_experience', label: 'Overall Shopping Experience' },
+    ],
+    keywordSuggestions: [
+      '16GB RAM',
+      'SSD Upgrade',
+      'Custom Gaming PC',
+      'Genuine Warranty',
+      'Quick Diagnostics',
+      'Fair Pricing',
+      'Clean Store',
+      'Helpful Staff',
+      'Original Products',
+      'Fast Billing',
+      'Competitive Rates',
+      'Honest Advice',
     ],
   },
   SERVICES: {
@@ -90,6 +117,18 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'value_for_money', label: 'Value for Money' },
       { key: 'overall_experience', label: 'Overall Experience' },
     ],
+    keywordSuggestions: [
+      'Quick Turnaround',
+      'Honest Technician',
+      'Original Spare Parts',
+      'Transparent Billing',
+      'Neat Workmanship',
+      'Affordable Charges',
+      'Punctual Service',
+      'Friendly Staff',
+      'Detailed Explanation',
+      'Quality Repair',
+    ],
   },
   'HEALTH & WELLNESS': {
     name: 'HEALTH & WELLNESS',
@@ -112,6 +151,18 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'communication', label: 'Communication & Explanation' },
       { key: 'overall_experience', label: 'Overall Experience' },
     ],
+    keywordSuggestions: [
+      'Painless Treatment',
+      'Friendly Doctor',
+      'Clean Clinic',
+      'Accurate Diagnostics',
+      'Short Waiting Time',
+      'Caring Staff',
+      'Affordable Consultation',
+      'Modern Equipment',
+      'Hygienic Setup',
+      'Detailed Checkup',
+    ],
   },
   EDUCATION: {
     name: 'EDUCATION',
@@ -132,6 +183,16 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'value_for_money', label: 'Value for Money' },
       { key: 'overall_experience', label: 'Overall Experience' },
     ],
+    keywordSuggestions: [
+      'Friendly Faculty',
+      'Practical Sessions',
+      'Clear Concept Explanation',
+      'Good Study Material',
+      'Affordable Fees',
+      'Supportive Staff',
+      'Individual Attention',
+      'Doubt Clearing Sessions',
+    ],
   },
   ENTERTAINMENT: {
     name: 'ENTERTAINMENT',
@@ -149,6 +210,16 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'cleanliness', label: 'Cleanliness' },
       { key: 'pricing', label: 'Ticket Price & Food Value' },
       { key: 'overall_experience', label: 'Overall Experience' },
+    ],
+    keywordSuggestions: [
+      'Great Ambience',
+      'High Quality Sound',
+      'Clean Seating',
+      'Helpful Staff',
+      'Worth Visiting',
+      'Family Friendly',
+      'Fun Experience',
+      'Safe Environment',
     ],
   },
   PROFESSIONAL: {
@@ -168,7 +239,17 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'quality_of_work', label: 'Quality of Deliverables' },
       { key: 'professionalism', label: 'Integrity & Professionalism' },
       { key: 'value_for_money', label: 'Value for Money' },
-      { key: 'recommendation', label: 'Likelihood to Recommend' },
+      { key: 'overall_experience', label: 'Overall Experience' },
+    ],
+    keywordSuggestions: [
+      'Prompt Response',
+      'Clear Advice',
+      'Transparent Pricing',
+      'Smooth Execution',
+      'Highly Trustworthy',
+      'Professional Team',
+      'On Time Delivery',
+      'Expert Guidance',
     ],
   },
   OTHER: {
@@ -181,6 +262,15 @@ export const CATEGORIES_CATALOG: Record<MainCategory, CategoryDefinition> = {
       { key: 'cleanliness', label: 'Cleanliness & Presentation' },
       { key: 'pricing', label: 'Fair Pricing' },
       { key: 'overall_experience', label: 'Overall Experience' },
+    ],
+    keywordSuggestions: [
+      'Great Quality',
+      'Quick Turnaround',
+      'Fair Pricing',
+      'Honest People',
+      'Helpful Team',
+      'Clean Space',
+      'Highly Recommended',
     ],
   },
 };
