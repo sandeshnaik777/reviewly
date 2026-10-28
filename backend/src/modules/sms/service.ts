@@ -210,7 +210,7 @@ export class AwsSmsService {
 
   private printConsoleOtp(phone: string, otp: string) {
     console.log('\n=============================================================');
-    console.log('📱 [AWS SNS SMS DISPATCH - OTP VERIFICATION]');
+    console.log('[AWS SNS SMS DISPATCH - OTP VERIFICATION]');
     console.log(`    RECIPIENT: ${phone}`);
     console.log(`    OTP CODE:  [ ${otp.split('').join(' ')} ]`);
     console.log('    STATUS:    VALID FOR 10 MINUTES (Transactional OTP)');

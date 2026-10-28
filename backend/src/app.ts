@@ -24,6 +24,17 @@ const __dirname = path.dirname(__filename);
 export function createApp(): Express {
   const app = express();
 
+  // Resolve static dist directory for SPA and SEO assets
+  const possibleStaticPaths = [
+    path.resolve(__dirname, '../../frontend/dist'),
+    path.resolve(__dirname, '../frontend/dist'),
+    path.resolve(process.cwd(), 'frontend/dist'),
+    path.resolve(process.cwd(), '../frontend/dist'),
+    path.resolve(__dirname, '../dist/public'),
+    path.resolve(__dirname, '../public'),
+  ];
+  const staticPath = possibleStaticPaths.find((p) => fs.existsSync(p)) || possibleStaticPaths[0];
+
   // Trust reverse proxy (Nginx) for accurate client IP in multi-user environments
   app.set('trust proxy', 1);
 
@@ -58,10 +69,7 @@ export function createApp(): Express {
   );
   app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-  // 4. Body parsing complete. Global API routes are unlimited for smooth merchant & customer experience.
-  // Sensitive personal actions (login, OTP dispatch, reviews) enforce dedicated route-level rate limiters.
-
-  // 5. Health Check & SEO Meta Crawlers
+  // 4. Health Check & Diagnostics
   app.get('/api/health', (req, res) => {
     res.json({
       success: true,
@@ -78,15 +86,26 @@ export function createApp(): Express {
     });
   });
 
-  // SEO: Dynamic Robots.txt
+  // 5. SEO & AI Crawler Endpoints (robots.txt, sitemap.xml, llms.txt)
   app.get('/robots.txt', (_req, res) => {
+    const robotsPath = path.join(staticPath, 'robots.txt');
+    if (fs.existsSync(robotsPath)) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.sendFile(robotsPath);
+    }
     res.type('text/plain');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.send(`User-agent: *\nAllow: /\nAllow: /r/*\nDisallow: /api/\nDisallow: /admin\nCrawl-delay: 1\nSitemap: ${config.appUrl}/sitemap.xml\n`);
   });
 
-  // SEO: Dynamic Sitemap.xml
   app.get('/sitemap.xml', (_req, res) => {
+    const sitemapPath = path.join(staticPath, 'sitemap.xml');
+    if (fs.existsSync(sitemapPath)) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.sendFile(sitemapPath);
+    }
     res.type('application/xml');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
     res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${config.appUrl}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
@@ -99,6 +118,15 @@ export function createApp(): Express {
   <url><loc>${config.appUrl}/privacy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>${config.appUrl}/refund</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>`);
+  });
+
+  app.get('/llms.txt', (_req, res, next) => {
+    const llmsPath = path.join(staticPath, 'llms.txt');
+    if (fs.existsSync(llmsPath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.sendFile(llmsPath);
+    }
+    next();
   });
 
   // 6. API Modules
@@ -143,23 +171,28 @@ export function createApp(): Express {
     }
   });
 
-  // 7. Serve Static Frontend in Production
-  const possibleStaticPaths = [
-    path.resolve(__dirname, '../../frontend/dist'),
-    path.resolve(__dirname, '../frontend/dist'),
-    path.resolve(process.cwd(), 'frontend/dist'),
-    path.resolve(process.cwd(), '../frontend/dist'),
-    path.resolve(__dirname, '../dist/public'),
-    path.resolve(__dirname, '../public'),
-  ];
-  const staticPath = possibleStaticPaths.find((p) => fs.existsSync(p)) || possibleStaticPaths[0];
+  // 7. Serve Static Frontend in Production with Caching Optimizations
+  app.use(
+    express.static(staticPath, {
+      maxAge: '1d',
+      setHeaders: (res, filePath) => {
+        // Hashed assets (JS, CSS, fonts, SVG) can be cached immutably for 1 year
+        if (filePath.includes('/assets/') || filePath.includes('\\assets\\')) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (filePath.endsWith('.html')) {
+          // HTML files should never be cached permanently so users get updates instantly
+          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+        }
+      },
+    })
+  );
 
-  app.use(express.static(staticPath));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
     const indexFile = path.join(staticPath, 'index.html');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.sendFile(indexFile, (err) => {
       if (err) next();
     });

@@ -104,7 +104,7 @@ export class EmailService {
 
     // 2. Development / Local Fallback Console Display
     console.log('\n' + '='.repeat(64));
-    console.log('📧  [KINDLYRATE EMAIL SERVICE — VERIFICATION CODE]');
+    console.log('[KINDLYRATE EMAIL SERVICE — VERIFICATION CODE]');
     console.log(`    Recipient: ${email}`);
     if (recipientName) console.log(`    Name:      ${recipientName}`);
     console.log(`    CODE:      [ ${otp.split('').join(' ')} ]`);
@@ -197,7 +197,7 @@ export class EmailService {
     }
 
     console.log('\n' + '='.repeat(64));
-    console.log('🔑  [KINDLYRATE EMAIL SERVICE — PASSWORD RESET]');
+    console.log('[KINDLYRATE EMAIL SERVICE — PASSWORD RESET]');
     console.log(`    Recipient: ${email}`);
     if (recipientName) console.log(`    Name:      ${recipientName}`);
     console.log(`    CODE:      [ ${otp.split('').join(' ')} ]`);

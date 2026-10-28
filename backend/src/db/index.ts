@@ -126,7 +126,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr6Months: 1349,
     priceInr1Year: 2490, // 2 Months Free (10 × ₹249)
     originalPriceInr: 399,
-    offerBadge: '🚀 Scale & Multi-Outlet · ₹249 (Reg. ₹399)',
+    offerBadge: 'Scale & Multi-Outlet · ₹249 (Reg. ₹399)',
     billingPeriod: 'month',
     reviewGenerationLimit: 1000,
     qrCodeLimit: 15,
@@ -271,24 +271,24 @@ class DatabaseService {
         const res = await client.query('SELECT data FROM kindlyreview_store WHERE id = $1', ['primary']);
         if (res.rows.length > 0 && res.rows[0].data) {
           this.data = { ...this.data, ...res.rows[0].data };
-          console.log('🐘 [PostgreSQL] Successfully synchronized persistent state from PostgreSQL (kindlyreview_store).');
+          console.log('[PostgreSQL] Successfully synchronized persistent state from PostgreSQL (kindlyreview_store).');
         } else {
           await client.query(
             'INSERT INTO kindlyreview_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()',
             ['primary', JSON.stringify(this.data)]
           );
-          console.log('🐘 [PostgreSQL] Initialized PostgreSQL kindlyreview_store with seed state.');
+          console.log('[PostgreSQL] Initialized PostgreSQL kindlyreview_store with seed state.');
         }
 
         this.pgConnected = true;
-        console.log('🐘 [PostgreSQL] Active connection established to PostgreSQL cluster.');
+        console.log('[PostgreSQL] Active connection established to PostgreSQL cluster.');
         await this.initSeeds();
         this.rebuildIndexes();
       } finally {
         client.release();
       }
     } catch (err) {
-      console.warn('⚠️ [PostgreSQL] Failed to connect to PostgreSQL, operating in file store mode:', (err as Error).message);
+      console.warn('[PostgreSQL] Failed to connect to PostgreSQL, operating in file store mode:', (err as Error).message);
       this.pgConnected = false;
     }
   }
@@ -315,14 +315,14 @@ class DatabaseService {
           parsed.systemNotifications = [
             {
               id: 'notif-1',
-              title: '🚀 Platform Upgrade: Custom Software Module Live',
+              title: 'Platform Upgrade: Custom Software Module Live',
               message: 'We now build custom software systems — from Fleet Delivery & Dispatch Tracking to Enterprise ERP and Omnichannel POS. Request a direct consultation anytime!',
               type: 'INFO',
               createdAt: new Date().toISOString(),
             },
             {
               id: 'notif-2',
-              title: '⭐ KindlyRate Reputation Engine Operational',
+              title: 'KindlyRate Reputation Engine Operational',
               message: 'All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.',
               type: 'SUCCESS',
               createdAt: new Date().toISOString(),
@@ -380,14 +380,14 @@ class DatabaseService {
       systemNotifications: [
         {
           id: 'notif-1',
-          title: '🚀 Platform Upgrade: Custom Software Module Live',
+          title: 'Platform Upgrade: Custom Software Module Live',
           message: 'We now build custom software systems — from Fleet Delivery & Dispatch Tracking to Enterprise ERP and Omnichannel POS. Request a direct consultation anytime!',
           type: 'INFO',
           createdAt: new Date().toISOString(),
         },
         {
           id: 'notif-2',
-          title: '⭐ KindlyRate Reputation Engine Operational',
+          title: 'KindlyRate Reputation Engine Operational',
           message: 'All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.',
           type: 'SUCCESS',
           createdAt: new Date().toISOString(),

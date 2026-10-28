@@ -513,3 +513,4 @@ export const ForgotPasswordModal: React.FC<Props> = ({
     </div>
   );
 };
+
