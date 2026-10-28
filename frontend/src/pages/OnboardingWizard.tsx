@@ -381,10 +381,10 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
       }
     }
 
-    // Step 3 validation (Restaurant Info)
+    // Step 3 validation (Business Info)
     if (step === 3) {
       if (!formData.businessName.trim()) {
-        setError('Please enter your restaurant or business name.');
+        setError('Please enter your business or store name.');
         return;
       }
       if (formData.phone) {
@@ -775,7 +775,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         <h1 className="serif serif-h1" style={{ fontSize: '28px', lineHeight: 1.25 }}>
           {step === 1 && 'Create Your Account & Login'}
           {step === 2 && 'Choose Your Business Category'}
-          {step === 3 && 'Restaurant & Business Details'}
+          {step === 3 && 'Business Profile & Store Details'}
           {step === 4 && 'Configure Review Questions'}
           {step === 5 && 'Connect Your Google Review URL'}
           {step === 6 && 'Select Your Subscription Plan'}
@@ -792,7 +792,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               </a>
             </>
           ) : (
-            `Signed in as ${formData.ownerName || formData.email || 'Merchant'}`
+            `Signed in as ${formData.ownerName || formData.email || 'Business Owner'}`
           )}
         </p>
       </div>
@@ -804,7 +804,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         {step === 1 && (
           <div>
             <p style={{ marginBottom: '20px', color: 'var(--text-muted)', fontSize: '14px' }}>
-              First, create your secure merchant credentials. Your login will be set up immediately so you can always access your restaurant dashboard and manage your reviews.
+              First, create your business login credentials. Your account is activated immediately so you can access your dashboard anytime on mobile or desktop.
             </p>
 
             {isAccountCreated && (
@@ -834,7 +834,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   onClick={() => setStep(2)}
                   style={{ fontSize: '13px' }}
                 >
-                  Continue to Restaurant Info →
+                  Continue to Business Details →
                 </button>
               </div>
             )}
@@ -854,7 +854,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   🔑 Account with this email already exists
                 </div>
                 <p style={{ fontSize: '13px', color: '#b45309', margin: '0 0 14px' }}>
-                  Enter your password below to sign in and continue setting up your restaurant without losing progress:
+                  Enter your password below to sign in and continue setting up your business without losing progress:
                 </p>
                 <form onSubmit={handleInlineLogin} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1 }}>
@@ -1052,7 +1052,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     <input
                       type="email"
                       className="form-input"
-                      placeholder="owner@myrestaurant.com"
+                      placeholder="owner@mybusiness.com"
                       value={formData.email}
                       onChange={(e) => {
                         setEmailExistsNotice(false);
@@ -1116,7 +1116,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     marginTop: '20px',
                   }}
                 >
-                  🔒 <strong>Bank-grade encryption:</strong> Your credentials are encrypted with bcrypt salt hashing. Next, you will configure your restaurant profile and customize your review criteria.
+                  🔒 <strong>Bank-grade encryption:</strong> Your credentials are encrypted with bcrypt salt hashing. Next, you will configure your business profile and review questions.
                 </div>
 
                 <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1223,14 +1223,14 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           </div>
         )}
 
-        {/* STEP 3: Restaurant / Business Info */}
+        {/* STEP 3: Business & Store Details */}
         {step === 3 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="form-label">Restaurant / Business Name *</label>
+              <label className="form-label">Business / Store Name *</label>
               <input
                 className="form-input"
-                placeholder="e.g. Urban Spoon Bistro"
+                placeholder="e.g. Metro Lifestyle Store or Apollo Clinic"
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                 required

@@ -49,6 +49,83 @@ businessRouter.get('/my', authenticate, async (req: AuthenticatedRequest, res: R
   }
 });
 
+// Tenant Protected: Unified Dashboard Bootstrap (High Speed Single Round-Trip)
+businessRouter.get('/:businessId/dashboard-bootstrap', authenticate, requireTenant, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const businessId = req.tenantId!;
+    const currentPeriodMonth = new Date().toISOString().slice(0, 7);
+
+    const [
+      business,
+      usage,
+      qrs,
+      reviews,
+      questions,
+      settings,
+      analytics,
+      plans,
+      subscription,
+      notifications,
+      payments,
+    ] = await Promise.all([
+      db.findBusinessById(businessId),
+      db.getUsageRecord(businessId, currentPeriodMonth),
+      db.listQRCodes(businessId),
+      db.listBusinessReviews(businessId),
+      db.getBusinessQuestions(businessId),
+      db.getBusinessSettings(businessId),
+      db.getBusinessAnalytics(businessId),
+      db.listSubscriptionPlans(),
+      db.getBusinessSubscription(businessId),
+      db.listNotifications(businessId),
+      db.listPayments(businessId),
+    ]);
+
+    const plansMap = new Map<string, any>((plans || []).map((p: any) => [p.id, p]));
+    const paymentHistory = ((payments as any[]) || [])
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .map((p: any) => {
+        const plan = p.planId ? plansMap.get(p.planId) : undefined;
+        return {
+          id: p.id,
+          orderId: p.orderId,
+          paymentId: p.paymentId || p.transactionId,
+          transactionId: p.transactionId || p.paymentId || p.orderId,
+          amountInr: p.amountInr,
+          currency: p.currency,
+          durationMonths: p.durationMonths || 1,
+          status: p.status,
+          provider: p.provider,
+          paymentType: p.paymentType || (p.amountInr === 79 || p.amountInr === 2 ? 'trial_verification' : 'direct_subscription'),
+          autoRenew: p.autoRenew,
+          plan: plan ? { id: (plan as any).id, name: (plan as any).name, slug: (plan as any).slug } : undefined,
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt,
+        };
+      });
+
+    res.json({
+      success: true,
+      data: {
+        business,
+        usage,
+        qrs,
+        reviews,
+        questions,
+        settings: settings || null,
+        analytics,
+        plans,
+        user: req.user,
+        subscription: subscription || null,
+        notifications: notifications || [],
+        paymentHistory,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Tenant Protected: Get single business details
 businessRouter.get('/:businessId', authenticate, requireTenant, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {

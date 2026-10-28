@@ -39,13 +39,13 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
     pro: 1,
   });
 
-  // 6 Verified Real Restaurant Reviews & Owner Case Studies
+  // 6 Verified Real Business Reviews & Owner Case Studies Across Industries
   const movingReviews = [
     {
       badge: '🏆 Rank #10 ➔ #1 on Maps',
       pillClass: 'stat-pill-primary',
-      title: '"My restaurant was ranked #10 in the city. Now we are officially #1 on Google Local Pack!"',
-      text: '"Before KindlyReview, when anyone searched woodfired pizza nearby, we were buried at Rank #10. In 90 days of smart table tent QRs, we gathered 380+ verified 5-star Google reviews praising our sourdough crust. Today, we hold the permanent #1 search spot across the entire suburb!"',
+      title: '"Our bistro was ranked #10 in the city. Now we are officially #1 on Google Local Pack!"',
+      text: '"Before KindlyReview, when anyone searched woodfired pizza nearby, we were buried at Rank #10. In 90 days of smart QR stands, we gathered 380+ verified 5-star Google reviews praising our sourdough crust. Today, we hold the permanent #1 search spot across the entire suburb!"',
       initials: 'KD',
       avatarBg: '#9a4018',
       author: 'Chef Kabir Deshmukh',
@@ -55,57 +55,57 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
     {
       badge: '⭐ Rating: 3.3 ★ ➔ 4.8 ★',
       pillClass: 'stat-pill-success',
-      title: '"We increased our rating from a painful 3.3 to 4.8 stars in just 8 weeks."',
-      text: '"Only disgruntled diners took time to write 1-star rants, while 95% of happy diners left quietly. The Reputation Shield intercepted 22 critical comments privately to my WhatsApp, while happy diners posted 140+ glowing reviews. Our Google score climbed from 3.3 ★ to 4.8 ★!"',
-      initials: 'AS',
+      title: '"We increased our clinic rating from a painful 3.3 to 4.8 stars in just 8 weeks."',
+      text: '"Previously only upset patients left online complaints while 95% of happy patients left quietly. The Reputation Shield caught critical feedback privately, while satisfied patients posted 140+ glowing reviews. Our Google score climbed from 3.3 ★ to 4.8 ★!"',
+      initials: 'SR',
       avatarBg: '#15803d',
-      author: 'Arjun Singhania',
-      business: 'Royal Heritage Fine Dine',
-      highlight: '✔ Verified Merchant · 22 Bad Reviews Shielded',
+      author: 'Dr. Sunita Rao',
+      business: 'Apex Dental & Healthcare Clinic',
+      highlight: '✔ Verified Healthcare · 22 Critical Issues Resolved',
     },
     {
       badge: '💰 Saved ₹42,000/mo on Ads',
       pillClass: 'stat-pill-primary',
-      title: '"I saved so much money on ads and delivery cuts, and my restaurant reviews skyrocketed!"',
-      text: '"We used to waste ₹35,000 every month on influencer tastings and sponsored Instagram ads with zero trackable return. With KindlyReview, our customers do the selling for us. In our first 60 days, our review volume shot up by 320%, and we saved over ₹42,000 straight back into our profit every month!"',
-      initials: 'VR',
+      title: '"I saved so much money on ads, and our electronics store reviews skyrocketed!"',
+      text: '"We used to waste ₹35,000 every month on local print ads and sponsored social boosts with zero trackable return. With KindlyReview at our billing desk, customers do the selling for us. Our review volume shot up by 320%, saving over ₹42,000 straight into profit every month!"',
+      initials: 'RV',
       avatarBg: '#d97706',
-      author: 'Vikramaditya Rao',
-      business: 'Coastal Spice Bistro',
-      highlight: '✔ Verified Merchant · ₹84,000 Saved in Ads',
+      author: 'Rajesh Verma',
+      business: 'Verma Electronics & Gadgets',
+      highlight: '✔ Verified Retail Store · ₹84,000 Saved in Ads',
     },
     {
       badge: '📈 +₹1.8L/mo Walk-ins',
       pillClass: 'stat-pill-neutral',
-      title: '"Revenue increased by ₹1.8 Lakhs/mo. Customers started pouring in from Google Maps."',
-      text: '"When people search best rooftop dinner on Friday evening, Google Maps recommends places with the highest volume of fresh reviews. Since installing KindlyReview on our rooftop tables, weekend walk-ins jumped by 45%. Monthly dine-in turnover went up by ₹1,80,000!"',
-      initials: 'NM',
+      title: '"Salon revenue increased by ₹1.8 Lakhs/mo. Clients started pouring in from Google Maps."',
+      text: '"When people search best salon near me, Google Maps recommends businesses with the highest volume of recent authentic reviews. Since placing KindlyReview smart stands at our billing counter, new client walk-ins jumped by 45%. Monthly revenue surged by ₹1,80,000!"',
+      initials: 'PS',
       avatarBg: '#0284c7',
-      author: 'Natasha Mehta',
-      business: 'Skyline Terrace & Tapas',
-      highlight: '✔ Verified Merchant · 45% Walk-in Surge',
+      author: 'Priya Sundaram',
+      business: 'Glow & Glamour Unisex Salon & Spa',
+      highlight: '✔ Verified Salon & Spa · 45% Client Surge',
     },
     {
       badge: '⚡ 72% AI Review Rate',
       pillClass: 'stat-pill-primary',
-      title: '"Diners love that AI crafts their review in 15 seconds. Scan-to-Google rate hit 72%!"',
-      text: '"Customers never wanted to type long paragraphs on their phone. With KindlyReview’s 1-click AI draft generation, 72% of diners who scan actually copy and post to Google Maps. Our review velocity jumped from 4 reviews/wk to 28 reviews/wk!"',
-      initials: 'RV',
+      title: '"Clients love that AI drafts their review in 15 seconds. Scan-to-Google rate hit 72%!"',
+      text: '"Customers never wanted to type long paragraphs on their phone. With KindlyReview’s 1-click AI draft generation, 72% of clients who scan actually copy and post to Google Maps. Our review velocity jumped from 4 reviews/wk to 28 reviews/wk!"',
+      initials: 'AS',
       avatarBg: '#7c3aed',
-      author: 'Rohan Varma',
-      business: 'The Belgian Waffle & Crepe Co.',
-      highlight: '✔ Verified Merchant · 72% Conversion Rate',
+      author: 'Arjun Singhania',
+      business: 'Royal Heritage Living & Suites',
+      highlight: '✔ Verified Hospitality · 72% Conversion Rate',
     },
     {
       badge: '🛡️ 100% Reputation Shield',
       pillClass: 'stat-pill-success',
-      title: '"Caught a slow dessert complaint in 3 minutes and converted an upset guest to a regular."',
-      text: '"A guest had a dessert delay. Rather than venting publicly on Google Maps, KindlyReview diverted the rating to my manager inbox. We sent a warm apology and complimentary dessert to their table. They left thrilled and gave us 5 stars on their next visit!"',
-      initials: 'SK',
+      title: '"Caught a repair delay complaint in 3 minutes and converted an upset car owner to a lifetime regular."',
+      text: '"A customer had an unexpected service delay. Rather than venting publicly on Google Maps, KindlyReview diverted their rating to my manager inbox. We resolved the concern immediately. The owner left thrilled and posted 5 stars on their next visit!"',
+      initials: 'VR',
       avatarBg: '#059669',
-      author: 'Sunil K.',
-      business: 'Saffron Artisanal Bistro & Bar',
-      highlight: '✔ Verified Merchant · Zero Public 1-Star Leaks',
+      author: 'Vikramaditya Rao',
+      business: 'SpeedTech Auto Care & Motors',
+      highlight: '✔ Verified Auto Workshop · Zero Public 1-Star Leaks',
     },
   ];
 
@@ -177,15 +177,15 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
         >
           <GoogleLogo size={16} />
           <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text)', whiteSpace: 'normal' }}>
-            Google Local 3-Pack Growth Engine for Restaurants & Outlets
+            Google Local 3-Pack Growth Engine for Every Local Business & Store
           </span>
         </div>
 
         <h1 className="serif serif-h1" style={{ fontSize: 'clamp(28px, 6vw, 50px)', lineHeight: 1.18, marginBottom: '18px', letterSpacing: '-0.02em' }}>
-          Turn Happy Diners into 5-Star Google Reviews Automatically
+          Turn Happy In-Person Customers into 5-Star Google Reviews Automatically
         </h1>
         <p style={{ fontSize: 'clamp(15px, 3.5vw, 18px)', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '28px', maxWidth: '780px', margin: '0 auto 28px' }}>
-          Place smart acrylic QR stands at your dining tables. Guests tap ratings in 30 seconds, and our server-side AI crafts personalized, mouth-watering reviews ready to paste straight to Google Maps.
+          Place smart acrylic QR stands at your billing counters, reception, or tables. Customers tap ratings in 30 seconds, and our server-side AI crafts personalized, authentic reviews ready to paste straight to Google Maps.
         </p>
 
         <div className="hero-cta-group" style={{ marginBottom: '36px' }}>
@@ -193,7 +193,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             Start Testing Pack (₹79 Trial) →
           </button>
           <button className="btn btn-secondary btn-lg" onClick={onNavigateLogin} style={{ padding: '12px 24px', fontSize: '15px' }}>
-            Explore Live Restaurant Demo
+            Explore Live Business Demo
           </button>
         </div>
 
@@ -400,7 +400,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 The Growth Transformation
               </span>
               <h3 className="serif" style={{ fontSize: '26px', fontWeight: 700, color: '#ffffff', marginTop: '4px' }}>
-                Your Restaurant Before vs After KindlyReview
+                Your Business Before vs After KindlyReview
               </h3>
             </div>
 
@@ -420,19 +420,19 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px', color: '#cbd5e1' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
-                    <div><strong>Stuck at 3.3 ★ - 3.8 ★:</strong> Happy customers leave quietly; only angry guests post online.</div>
+                    <div><strong>Stuck at 3.3 ★ - 3.8 ★:</strong> Happy customers leave quietly; only angry customers post rants online.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
-                    <div><strong>Ranked #10 to #15 on Maps:</strong> Buried beneath local competitors; invisible to tourists.</div>
+                    <div><strong>Ranked #10 to #15 on Maps:</strong> Buried beneath local competitors; invisible to walk-in shoppers.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
-                    <div><strong>₹30,000+ Wasted on Ads:</strong> Paying food influencers and social ads with zero permanent gain.</div>
+                    <div><strong>₹30,000+ Wasted on Ads:</strong> Paying high ad costs and agency retainers with zero permanent gain.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
-                    <div><strong>High 28% Delivery Cut:</strong> Losing massive restaurant profit margins to Swiggy and Zomato.</div>
+                    <div><strong>Lost Margins to Aggregators:</strong> Giving away 25-30% commissions on deliveries and listings.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#f87171', flexShrink: 0, marginTop: '1px' }}>⚠️</span>
@@ -451,16 +451,16 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#86efac', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>✅</span> With KindlyReview Mission Control
+                  <span>✅</span> With KindlyReview Growth Engine
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px', color: '#f8fafc' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>✨</span>
-                    <div><strong>Surged to 4.8 ★ - 4.9 ★:</strong> AI generates detailed 5-star reviews mentioning signature dishes.</div>
+                    <div><strong>Surged to 4.8 ★ - 4.9 ★:</strong> AI drafts detailed 5-star reviews highlighting signature products and services.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>🏆</span>
-                    <div><strong>#1 Leader on Google Local 3-Pack:</strong> Dominates local Maps searches and captures 45%+ diners.</div>
+                    <div><strong>#1 Leader on Google Local 3-Pack:</strong> Dominates local Maps searches and captures 45%+ foot traffic.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>💰</span>
@@ -468,7 +468,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>📈</span>
-                    <div><strong>+₹1,80,000 Dine-In Walk-In Revenue:</strong> Filling empty tables with high-margin dine-in guests.</div>
+                    <div><strong>+₹1,80,000 Walk-In & Customer Revenue:</strong> Filling stores and businesses with high-margin direct customers.</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                     <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '1px' }}>🛡️</span>
@@ -484,7 +484,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 onClick={onStartOnboarding}
                 style={{ padding: '12px 28px', fontSize: '15px', fontWeight: 700 }}
               >
-                Take Your Restaurant to #1 Today →
+                Take Your Business to #1 Today →
               </button>
             </div>
           </div>
@@ -799,10 +799,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </span>
           </div>
           <h2 className="serif" style={{ fontSize: '36px', fontWeight: 700, marginBottom: '10px' }}>
-            Restaurant Growth &amp; Google SEO Guides
+            Business Growth &amp; Google SEO Guides
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '15px', maxWidth: '640px', margin: '0 auto 36px' }}>
-            Actionable playbooks written by hospitality leaders to optimize reviews, shield ratings, and build custom restaurant software.
+            Actionable playbooks to optimize customer reviews, shield your rating, dominate Google Maps, and scale your business.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', textAlign: 'left' }}>
@@ -954,7 +954,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               <KindlyReviewBrand iconSize={42} fontSize={26} darkBg={true} />
             </div>
             <p style={{ fontSize: '13.5px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '20px' }}>
-              The #1 AI-powered Google Local 3-Pack Growth Engine for restaurants, bistros, and service outlets across India.
+              The #1 AI-powered Google Local 3-Pack Growth Engine for every local business, retail store, clinic, salon, and service outlet across India.
             </p>
 
             {/* Trust Badges */}

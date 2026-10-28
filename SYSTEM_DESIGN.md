@@ -8,13 +8,13 @@
 
 ## 1. Executive Summary & Core Objectives
 
-**KindlyReview** is an enterprise-grade, multi-tenant SaaS platform engineered specifically for restaurants, cafes, bars, and retail establishments. Its core mission is to **bridge the friction gap between happy in-person diners and authoritative 5-star Google Maps reviews**, while providing an automated **Reputation Shield** that intercepts dissatisfied customers privately before negative reviews reach the public domain.
+**KindlyReview** is an enterprise-grade, multi-tenant SaaS platform engineered specifically for **every local in-person business** — spanning Retail Stores, Healthcare & Dental Clinics, Salons & Spas, Gyms & Fitness Centers, Automobile Care & Workshops, Hotels & Hospitality, Cafes & Restaurants, and Professional Services. Its core mission is to **bridge the friction gap between happy in-person customers and authoritative 5-star Google Maps reviews**, while providing an automated **Reputation Shield** that intercepts dissatisfied customers privately before negative feedback reaches the public domain.
 
 ### Key Value Propositions
-1. **Zero-App Diner Experience:** Diners never install an app or register. Scanning a physical table QR code instantly launches an ultra-lightweight mobile browser experience (Chrome/Safari) taking under 30 seconds to complete.
-2. **Authentic, Humanized AI Generation:** Rather than asking diners to write lengthy essays on mobile keyboards, our server-side Google Gemini Flash AI engine synthesizes natural customer ratings and dishes into mouth-watering, conversational review drafts with 1-tap **Copy & Post to Google Maps**.
-3. **Reputation Shield (Private Interception):** Ratings of 1 to 3 stars bypass Google Maps entirely and route directly to the manager's dashboard and WhatsApp/SMS for immediate in-venue resolution.
-4. **Starter Trial Pack (₹79) & Recurring Monthly Subscriptions:** High-converting entry pack at ₹79 (30 days access, 100 reviews, 2 QR stands) with seamless Razorpay integration, automated monthly recurring billing, and persistent transaction ID auditing.
+1. **Zero-App In-Person Customer Experience:** Customers never install an app or register. Scanning a physical counter, desk, or table QR code instantly launches an ultra-lightweight mobile browser experience (Chrome/Safari) taking under 30 seconds to complete.
+2. **Authentic, Humanized AI Review Drafting:** Rather than asking customers to write lengthy essays on mobile keyboards, our server-side Google Gemini Flash AI engine synthesizes natural customer ratings and selected highlights into natural, conversational review drafts with 1-tap **Copy & Post to Google Maps**.
+3. **Reputation Shield (Private Interception):** Ratings of 1 to 3 stars bypass Google Maps entirely and route directly to the manager's dashboard and WhatsApp/SMS for immediate in-store private resolution.
+4. **Starter Trial Pack (₹79) & Recurring Monthly Subscriptions:** High-converting introductory pack at ₹79 (30 days access, 100 reviews, 2 QR stands) with seamless Razorpay integration, automated monthly recurring billing, and persistent transaction ID auditing.
 
 ---
 
@@ -25,8 +25,8 @@ The following diagram illustrates the end-to-end topology across the client laye
 ```mermaid
 flowchart TD
     subgraph Clients["1. Client Layer"]
-        Diner["Mobile Diner Phone\n(QR Camera Scan -> /r/:slug)"]
-        Merchant["Merchant / Owner\n(Mobile & Desktop Dashboard -> /app)"]
+        Customer["Mobile Customer Phone\n(QR Camera Scan -> /r/:slug)"]
+        Merchant["Business Owner / Manager\n(Mobile & Desktop Dashboard -> /app)"]
         Admin["Platform Super-Admin\n(/admin)"]
     end
 
@@ -371,7 +371,202 @@ curl -s http://localhost:4000/api/health
 - `GET  /api/payment/history` — Returns complete payment ledger with copyable transaction IDs.
 - `POST /api/payment/process-recurring` — Processes due monthly recurring charges and advances billing dates.
 
+### Business & High-Speed Dashboard
+- `GET  /api/business/:businessId/dashboard-bootstrap` — High-speed single round-trip bootstrap endpoint bundling business, usage, QRs, recent reviews, questions, settings, analytics summary, subscription, notifications, and payment ledger.
+- `GET  /api/business/:businessId` — Returns single business details and settings.
+- `PUT  /api/business/:businessId` — Updates business contact, Google Maps URLs, and operational hours.
+- `GET  /api/plans` — Public endpoint returning all active subscription tiers.
+
 ### Knowledge, Articles & System Telemetry
 - `GET  /api/blogs` — Public search and listing of published articles and growth guides.
 - `GET  /api/blogs/:slug` — Fetches individual published blog article by slug.
 - `GET  /api/health` — Verifies API health, environment status, and PostgreSQL connectivity.
+
+---
+
+## 11. Complete End-to-End System Design & Data Flow Architecture
+
+### 11.1 Flow 1: Macro End-to-End Platform Lifecycle
+The macro system flowchart connects merchant onboarding, physical QR deployment, in-person customer scanning, AI synthesis, reputation shielding, and automated revenue expansion.
+
+```mermaid
+flowchart TD
+    Start([Merchant Visits Platform]) --> Signup["1. Merchant Sign Up\n(Name, Email, Password, Mobile)"]
+    Signup --> CatSelect["2. Choose Business Category\n(Retail, Dining, Healthcare, Salon, Auto, Gym, Services)"]
+    CatSelect --> BizDetails["3. Enter Store & Business Details\n(Name, Address, Phone, Hours)"]
+    BizDetails --> GoogleLink["4. Connect Google Review Link\n(Place ID, Hex CID, or Direct URL)"]
+    GoogleLink --> PlanChoice{"5. Subscription Choice"}
+    PlanChoice -->|Testing Pack Trial| PayTrial["₹79 Razorpay Payment\n(30 Days Access, 100 Reviews, 2 QRs)"]
+    PlanChoice -->|Direct Paid Tier| PayPaid["₹149 Growth / ₹249 Pro\n(Auto-Renewal Enabled)"]
+    PayTrial --> Dashboard["6. Business Dashboard Activated"]
+    PayPaid --> Dashboard
+    
+    Dashboard --> DeployQR["7. Deploy Physical QR Stands\n(Billing Counter, Reception, Tables)"]
+    DeployQR --> CustScan["8. Customer Scans QR with Phone\n(No App Download Required)"]
+    CustScan --> RateTap["9. Customer Taps Quick Ratings\n(Quality, Service, Value, Speed: 1-5 Stars)"]
+    
+    RateTap --> SentimentCheck{"Rating Sentiment Check"}
+    SentimentCheck -->|4 or 5 Stars - Happy| AISynth["10. Server-Side AI Synthesizes\nNatural 5-Star Review Draft"]
+    AISynth --> CopyClick["11. 1-Tap 'Copy & Post to Google Maps'"]
+    CopyClick --> GoogleMaps["12. Review Posted on Google Business Profile\nSurges Local 3-Pack SEO Rank"]
+    
+    SentimentCheck -->|1 to 3 Stars - Critical| ShieldRouter["10B. Reputation Shield Activated\nBypasses Public Google Maps"]
+    ShieldRouter --> PrivateResolution["11B. Intercepted Directly to Manager\nSMS / WhatsApp Alert for Instant Resolution"]
+    
+    GoogleMaps --> VelocityEngine["13. Review Velocity Tracked in Analytics"]
+    PrivateResolution --> VelocityEngine
+    VelocityEngine --> RecurringBilling["14. Monthly Recurring Billing Engine\nAuto-Advances Cycle & Audits Transactions"]
+```
+
+---
+
+### 11.2 Flow 2: Merchant Authentication & Onboarding Lifecycle
+This sequence tracks the registration, bcrypt hashing, dual-channel verification (AWS SNS SMS + Email OTP), and multi-tenant business creation.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Owner as Business Owner
+    participant Client as Frontend SPA (React)
+    participant API as Express API Server
+    participant DB as Database Service
+    participant SMS as AWS SNS SMS Service
+    participant Mail as Email OTP Service
+
+    Owner->>Client: Enters Name, Email, Password, Mobile Phone
+    Client->>API: POST /api/auth/signup
+    API->>DB: Check if email already registered
+    alt Email exists
+        API-->>Client: 409 Conflict (Inline sign-in box offered)
+    else New Account
+        API->>API: Bcrypt salt hash (10 rounds)
+        API->>DB: Persist User (isActive: true, emailVerified: false)
+        API->>Mail: Dispatch 6-digit transactional email OTP
+        API->>SMS: Dispatch 6-digit transactional SMS OTP (E.164)
+        API-->>Client: 201 Created (Token + Session Cookie)
+    end
+    Owner->>Client: Enters 6-digit OTP code
+    Client->>API: POST /api/auth/verify-email
+    API->>DB: Validate codeHash & expiry (10-min window)
+    API->>DB: Mark emailVerified = true
+    API-->>Client: 200 OK (Account Fully Verified)
+    Owner->>Client: Completes Category & Store Details
+    Client->>API: POST /api/business/setup
+    API->>DB: Create Business + Default Questions for Category
+    API->>DB: Auto-generate Initial Smart QR Stand
+    API-->>Client: 200 OK (Business Initialized)
+```
+
+---
+
+### 11.3 Flow 3: Customer QR Scan, Category AI Synthesis & Reputation Shield
+This sequence diagram shows the zero-friction customer interaction, AI prompt generation with anti-hallucination guards, and private routing.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Customer as In-Store Customer
+    participant Mobile as Mobile Browser
+    participant API as Express API
+    participant AI as Google Gemini Flash AI
+    participant DB as In-Memory / PostgreSQL
+    participant Maps as Google Maps App / Web
+    actor Mgr as Store Manager
+
+    Customer->>Mobile: Points camera at QR Stand (/r/:slug)
+    Mobile->>API: GET /api/customer/qr/:slug
+    API->>DB: Fetch business profile, category, & active questions
+    API->>DB: Record QR_SCAN analytics event
+    API-->>Mobile: 200 OK (Business details, category-specific criteria)
+    Customer->>Mobile: Selects ratings (e.g., Food: 5★, Ambience: 5★, Service: 5★)
+    Customer->>Mobile: Taps "Generate My Review"
+    Mobile->>API: POST /api/customer/generate { ratings, comments, format }
+    
+    alt Overall Rating >= 4 Stars (Positive Experience)
+        API->>AI: Synthesize conversational, humanized review draft
+        AI-->>API: Returns natural review (no clichés, category vocabulary)
+        API->>DB: Record REVIEW_GENERATED event
+        API-->>Mobile: 200 OK { reviewText, directGoogleMapsUrl }
+        Customer->>Mobile: Taps "Copy Review" -> Clipboard updated
+        Customer->>Mobile: Taps "Open Google Maps"
+        Mobile->>Maps: Launches direct review dialog on Google Maps
+        Customer->>Maps: Pastes draft & hits Submit
+    else Overall Rating <= 3 Stars (Reputation Shield Triggered)
+        API->>DB: Record SHIELD_INTERCEPT event
+        API-->>Mobile: 200 OK { shielded: true, managerFeedbackReceived: true }
+        API->>Mgr: Immediate Alert (Manager SMS / WhatsApp notification)
+        Customer->>Mobile: Sees warm thank you: "Manager alerted directly for resolution"
+    end
+```
+
+---
+
+### 11.4 Flow 4: High-Performance Unified Dashboard Bootstrap Flow
+Rather than firing 12 individual requests that choke mobile browsers under the standard 6-connection pool limit, the unified bootstrap endpoint fetches everything in a single round trip.
+
+```mermaid
+flowchart LR
+    Browser["Client Browser\n(Dashboard Mount)"] -->|1 Single HTTP GET\n/api/business/:id/dashboard-bootstrap| Nginx["Nginx Reverse Proxy"]
+    Nginx --> Express["Express Route Handler\n(Auth & Tenant Verified ONCE)"]
+    
+    Express --> P1["db.findBusinessById()"]
+    Express --> P2["db.getUsageRecord()"]
+    Express --> P3["db.listQRCodes()"]
+    Express --> P4["db.listBusinessReviews()"]
+    Express --> P5["db.getBusinessQuestions()"]
+    Express --> P6["db.getBusinessSettings()"]
+    Express --> P7["db.getBusinessAnalytics()"]
+    Express --> P8["db.listSubscriptionPlans()"]
+    Express --> P9["subscriptionService.getActiveSubscription()"]
+    Express --> P10["db.listNotifications()"]
+    Express --> P11["db.listPayments()"]
+
+    P1 & P2 & P3 & P4 & P5 & P6 & P7 & P8 & P9 & P10 & P11 --> Aggregator["Bundle Single JSON Payload\n(Gzip Compressed ~3KB)"]
+    Aggregator -->|Instant ~50ms Response| Browser
+```
+
+---
+
+### 11.5 Flow 5: Subscription Activation & Recurring Billing Engine
+The lifecycle of payment order creation, webhook verification, 30-day period activation, and automated monthly recurring renewals.
+
+```mermaid
+flowchart TD
+    Checkout["Merchant Chooses Plan\n(Testing Pack ₹79 or Paid ₹149/₹249)"] --> CreateOrder["POST /api/payment/create-order\n(Razorpay Order Created)"]
+    CreateOrder --> RzpModal["Razorpay Modal Opens on Client\n(UPI, Card, Netbanking)"]
+    RzpModal -->|Customer Pays| RzpCallback["Client Receives Signature & PaymentId"]
+    RzpCallback --> VerifyCall["POST /api/payment/verify\n(Payload: orderId, paymentId, signature)"]
+    
+    VerifyCall --> HMAC["Verify HMAC-SHA256 Signature\nUsing Razorpay Key Secret"]
+    HMAC -->|Signature Match| RecordTxn["1. Record in Payment Ledger\n(Stores Transaction ID, Provider, Amount)"]
+    RecordTxn --> ActivateSub["2. Activate Subscription Status = 'ACTIVE'\n(Sets Period End = +30 Days, nextBillingDate)"]
+    ActivateSub --> AuditLog["3. Write System Audit Log\n(Multi-Tenant Ledger Verified)"]
+    AuditLog --> ActiveState["Merchant Enjoys Full Features"]
+
+    ActiveState --> CronJob["Automated Recurring Billing Engine\n(Runs Daily at 00:00 UTC)"]
+    CronJob --> DueCheck{"Is nextBillingDate <= NOW()\nAND autoRenew == true?"}
+    DueCheck -->|Yes| RenewTxn["Process Recurring Charge\nRecord New Transaction ID"]
+    RenewTxn --> AdvanceDate["Advance nextBillingDate by +1 Month"]
+    DueCheck -->|No / Paused| NoOp["Skip Until Next Cycle"]
+```
+
+---
+
+### 11.6 Flow 6: High-Concurrency In-Memory Map Indexing & Dual Persistence
+Ensures $O(1)$ sub-millisecond query performance in memory while guaranteeing zero data loss via PostgreSQL write-through synchronization.
+
+```mermaid
+flowchart TD
+    Req["Incoming API Request\n(e.g., Tenant Check or QR Query)"] --> MapCheck{"Check In-Memory Map Index\n(usersById, businessesById, settingsById)"}
+    MapCheck -->|Cache Hit: O(1) ~0.02ms| ReturnDirect["Return Object Instantly"]
+    MapCheck -->|Cache Miss| ArrayScan["Scan Array & Populate Map Index"]
+    ArrayScan --> ReturnDirect
+
+    Mutation["Write Mutation\n(e.g., Update Profile, Save Settings, Record Review)"] --> MemUpdate["1. Update In-Memory Array & Map Indexes\n(Immediate O(1) Availability)"]
+    MemUpdate --> WriteLock["2. Acquire Async Write Lock Sequence"]
+    WriteLock --> LocalJSON["3. Atomic Write to Local JSON Store"]
+    LocalJSON --> PGStore["4. UPSERT into PostgreSQL Cluster\nkindlyreview_store (id = 'primary')"]
+    PGStore --> Ack["5. Return Verified Response to Client"]
+```
+
+

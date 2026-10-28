@@ -194,17 +194,17 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. Acceptance of Terms</h4>
               <p>
-                By creating an account, paying verification fees, or deploying KindlyReview QR stands in your establishment, you agree to be bound by these Terms of Service. If you are registering on behalf of a restaurant or commercial enterprise, you warrant that you hold legal authority to bind that entity.
+                By creating an account, paying verification fees, or deploying KindlyReview QR stands in your establishment, you agree to be bound by these Terms of Service. If you are registering on behalf of a business, store, or commercial enterprise, you warrant that you hold legal authority to bind that entity.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Fair Use &amp; Review Authenticity</h4>
               <p>
-                KindlyReview provides assistive AI drafting and reputation telemetry designed to help real, in-person dining customers express their feedback smoothly. Merchants agree <strong>NOT</strong> to:
+                KindlyReview provides assistive AI drafting and reputation telemetry designed to help real, in-person customers express their feedback smoothly. Merchants agree <strong>NOT</strong> to:
               </p>
               <ul style={{ paddingLeft: '20px', marginBottom: '12px' }}>
                 <li>Manufacture fake reviews or incentivize non-customers to post fraudulent claims.</li>
                 <li>Prevent dissatisfied customers from voicing their truthful opinions on Google Maps.</li>
-                <li>Tamper with QR verification links or inject malicious scripts into dining table stands.</li>
+                <li>Tamper with QR verification links or inject malicious scripts into counter or table stands.</li>
               </ul>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>3. Multi-Tenant Subscriptions &amp; Billing</h4>
@@ -228,17 +228,17 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   Privacy &amp; Data Protection Policy
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
-                  Transparent details on how business records and customer dining ratings are stored and secured.
+                  Transparent details on how business records and customer ratings are stored and secured.
                 </p>
               </div>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. Data We Collect</h4>
               <p>
-                We collect only the data necessary to provide review routing and dining telemetry:
+                We collect only the data necessary to provide review routing and customer telemetry:
               </p>
               <ul style={{ paddingLeft: '20px', marginBottom: '12px' }}>
-                <li><strong>Merchant Data:</strong> Business name, email, phone number, Google Review URL, dining sections, and staff attribution records.</li>
-                <li><strong>Customer Session Data:</strong> Ratings submitted (1-5 stars per category), dining dish mentions, and anonymous QR scan timestamps. Diners are <em>never</em> required to sign up or disclose passwords.</li>
+                <li><strong>Merchant Data:</strong> Business name, email, phone number, Google Review URL, store locations, and staff attribution records.</li>
+                <li><strong>Customer Session Data:</strong> Ratings submitted (1-5 stars per category), product/service feedback, and anonymous QR scan timestamps. Customers are <em>never</em> required to sign up or disclose passwords.</li>
                 <li><strong>Payment Data:</strong> Handled entirely through Razorpay. KindlyReview never stores credit card or debit card numbers on internal servers.</li>
               </ul>
 
@@ -306,7 +306,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   Merchant Help Center &amp; Direct Support
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
-                  Our restaurant success engineers are available to resolve queries, setup table tents, or optimize your Google Maps rank.
+                  Our business success engineers are available to resolve queries, setup QR stands, or optimize your Google Maps rank.
                 </p>
               </div>
 
@@ -375,7 +375,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                           type="email"
                           required
                           className="form-input"
-                          placeholder="owner@restaurant.com"
+                          placeholder="owner@business.com"
                           value={supportForm.email}
                           onChange={(e) => setSupportForm({ ...supportForm, email: e.target.value })}
                         />
@@ -384,12 +384,12 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                       <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label className="form-label" style={{ fontSize: '12px' }}>Restaurant / Outlet Name *</label>
+                        <label className="form-label" style={{ fontSize: '12px' }}>Business / Store Name *</label>
                         <input
                           type="text"
                           required
                           className="form-input"
-                          placeholder="e.g. Saffron Bistro"
+                          placeholder="e.g. Metro Store or Saffron Bistro"
                           value={supportForm.outletName}
                           onChange={(e) => setSupportForm({ ...supportForm, outletName: e.target.value })}
                         />

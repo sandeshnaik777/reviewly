@@ -224,6 +224,57 @@ class DatabaseService {
   private pgPool: pg.Pool | null = null;
   private pgConnected: boolean = false;
 
+  // In-Memory Index Maps for high-concurrency O(1) query lookups
+  private usersById = new Map<string, User>();
+  private usersByEmail = new Map<string, User>();
+  private businessesById = new Map<string, Business>();
+  private businessesBySlug = new Map<string, Business>();
+  private settingsByBusinessId = new Map<string, BusinessSettings>();
+  private subscriptionsByBusinessId = new Map<string, Subscription>();
+  private qrsByBusinessId = new Map<string, QRCodeItem[]>();
+  private plansById = new Map<string, SubscriptionPlan>();
+  private plansBySlug = new Map<string, SubscriptionPlan>();
+
+  public rebuildIndexes(): void {
+    this.usersById.clear();
+    this.usersByEmail.clear();
+    for (const u of this.data.users || []) {
+      this.usersById.set(u.id, u);
+      if (u.email) this.usersByEmail.set(u.email.toLowerCase(), u);
+    }
+
+    this.businessesById.clear();
+    this.businessesBySlug.clear();
+    for (const b of this.data.businesses || []) {
+      this.businessesById.set(b.id, b);
+      if (b.slug) this.businessesBySlug.set(b.slug, b);
+    }
+
+    this.settingsByBusinessId.clear();
+    for (const s of this.data.businessSettings || []) {
+      this.settingsByBusinessId.set(s.businessId, s);
+    }
+
+    this.subscriptionsByBusinessId.clear();
+    for (const sub of this.data.subscriptions || []) {
+      this.subscriptionsByBusinessId.set(sub.businessId, sub);
+    }
+
+    this.qrsByBusinessId.clear();
+    for (const qr of this.data.qrCodes || []) {
+      const list = this.qrsByBusinessId.get(qr.businessId) || [];
+      list.push(qr);
+      this.qrsByBusinessId.set(qr.businessId, list);
+    }
+
+    this.plansById.clear();
+    this.plansBySlug.clear();
+    for (const plan of this.data.subscriptionPlans || []) {
+      this.plansById.set(plan.id, plan);
+      this.plansBySlug.set(plan.slug, plan);
+    }
+  }
+
   constructor() {
     let resolvedPath = path.resolve(config.db.dataFile);
     if (process.cwd().replace(/\\/g, '/').endsWith('/backend') && fs.existsSync(path.resolve(process.cwd(), '../data/review_platform.json'))) {
@@ -232,6 +283,7 @@ class DatabaseService {
     this.filePath = resolvedPath;
     this.data = this.loadDatabase();
     this.initSeeds();
+    this.rebuildIndexes();
 
     if (config.db.databaseUrl) {
       this.initPostgres(config.db.databaseUrl);
@@ -280,6 +332,7 @@ class DatabaseService {
         this.pgConnected = true;
         console.log('🐘 [PostgreSQL] Active connection established to PostgreSQL cluster.');
         await this.initSeeds();
+        this.rebuildIndexes();
       } finally {
         client.release();
       }
@@ -481,15 +534,26 @@ class DatabaseService {
 
   // --- Users ---
   async findUserByEmail(email: string): Promise<User | undefined> {
-    return this.data.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    const key = email.toLowerCase();
+    const cached = this.usersByEmail.get(key);
+    if (cached) return cached;
+    const found = this.data.users.find((u) => u.email.toLowerCase() === key);
+    if (found) this.usersByEmail.set(key, found);
+    return found;
   }
 
   async findUserById(id: string): Promise<User | undefined> {
-    return this.data.users.find((u) => u.id === id);
+    const cached = this.usersById.get(id);
+    if (cached) return cached;
+    const found = this.data.users.find((u) => u.id === id);
+    if (found) this.usersById.set(id, found);
+    return found;
   }
 
   async createUser(user: User): Promise<User> {
     this.data.users.push(user);
+    this.usersById.set(user.id, user);
+    if (user.email) this.usersByEmail.set(user.email.toLowerCase(), user);
     await this.persist();
     return user;
   }
@@ -498,8 +562,11 @@ class DatabaseService {
     const idx = this.data.users.findIndex((u) => u.id === id);
     if (idx === -1) return undefined;
     this.data.users[idx] = { ...this.data.users[idx], ...updates, updatedAt: new Date().toISOString() };
+    const updated = this.data.users[idx];
+    this.usersById.set(updated.id, updated);
+    if (updated.email) this.usersByEmail.set(updated.email.toLowerCase(), updated);
     await this.persist();
-    return this.data.users[idx];
+    return updated;
   }
 
   // --- Email Verifications ---
@@ -580,11 +647,19 @@ class DatabaseService {
 
   // --- Businesses ---
   async findBusinessById(id: string): Promise<Business | undefined> {
-    return this.data.businesses.find((b) => b.id === id);
+    const cached = this.businessesById.get(id);
+    if (cached) return cached;
+    const found = this.data.businesses.find((b) => b.id === id);
+    if (found) this.businessesById.set(id, found);
+    return found;
   }
 
   async findBusinessBySlug(slug: string): Promise<Business | undefined> {
-    return this.data.businesses.find((b) => b.slug === slug);
+    const cached = this.businessesBySlug.get(slug);
+    if (cached) return cached;
+    const found = this.data.businesses.find((b) => b.slug === slug);
+    if (found) this.businessesBySlug.set(slug, found);
+    return found;
   }
 
   async findBusinessesByOwnerId(ownerId: string): Promise<Business[]> {
@@ -597,6 +672,8 @@ class DatabaseService {
 
   async createBusiness(business: Business): Promise<Business> {
     this.data.businesses.push(business);
+    this.businessesById.set(business.id, business);
+    if (business.slug) this.businessesBySlug.set(business.slug, business);
     await this.persist();
     return business;
   }
@@ -605,8 +682,11 @@ class DatabaseService {
     const idx = this.data.businesses.findIndex((b) => b.id === id);
     if (idx === -1) return undefined;
     this.data.businesses[idx] = { ...this.data.businesses[idx], ...updates, updatedAt: new Date().toISOString() };
+    const updated = this.data.businesses[idx];
+    this.businessesById.set(updated.id, updated);
+    if (updated.slug) this.businessesBySlug.set(updated.slug, updated);
     await this.persist();
-    return this.data.businesses[idx];
+    return updated;
   }
 
   // --- Business Members (Tenant RBAC) ---
@@ -621,7 +701,7 @@ class DatabaseService {
   }
 
   async getMemberRole(businessId: string, userId: string): Promise<UserRole | undefined> {
-    const b = this.data.businesses.find((x) => x.id === businessId);
+    const b = await this.findBusinessById(businessId);
     if (b && b.ownerId === userId) return 'BUSINESS_OWNER';
     const member = this.data.businessMembers.find((m) => m.businessId === businessId && m.userId === userId);
     return member?.role;
@@ -644,15 +724,21 @@ class DatabaseService {
 
   // --- Business Settings ---
   async getBusinessSettings(businessId: string): Promise<BusinessSettings | undefined> {
-    return this.data.businessSettings.find((s) => s.businessId === businessId);
+    const cached = this.settingsByBusinessId.get(businessId);
+    if (cached) return cached;
+    const found = this.data.businessSettings.find((s) => s.businessId === businessId);
+    if (found) this.settingsByBusinessId.set(businessId, found);
+    return found;
   }
 
   async saveBusinessSettings(settings: BusinessSettings): Promise<BusinessSettings> {
     const idx = this.data.businessSettings.findIndex((s) => s.businessId === settings.businessId);
     if (idx >= 0) {
-      this.data.businessSettings[idx] = settings;
+      this.data.businessSettings[idx] = { ...this.data.businessSettings[idx], ...settings };
+      this.settingsByBusinessId.set(settings.businessId, this.data.businessSettings[idx]);
     } else {
       this.data.businessSettings.push(settings);
+      this.settingsByBusinessId.set(settings.businessId, settings);
     }
     await this.persist();
     return settings;
@@ -661,18 +747,33 @@ class DatabaseService {
   // --- QR Codes ---
   async listQRCodes(businessId: string): Promise<QRCodeItem[]> {
     const rawQrs = this.data.qrCodes.filter((q) => q.businessId === businessId);
+    
+    // Fast O(N) aggregate map instead of quadratic re-filtering
+    const qrEventsMap = new Map<string, { scans: number; reviews: number; clicks: number }>();
+    for (const e of this.data.analyticsEvents || []) {
+      if (!e.qrCodeId) continue;
+      let agg = qrEventsMap.get(e.qrCodeId);
+      if (!agg) {
+        agg = { scans: 0, reviews: 0, clicks: 0 };
+        qrEventsMap.set(e.qrCodeId, agg);
+      }
+      if (e.eventType === 'QR_SCAN') agg.scans++;
+      else if (e.eventType === 'REVIEW_GENERATED') agg.reviews++;
+      else if (e.eventType === 'GOOGLE_MAPS_CLICK') agg.clicks++;
+    }
+
     return rawQrs.map((qr, idx) => {
-      const qrEvents = this.data.analyticsEvents.filter((e) => e.qrCodeId === qr.id);
-      const eventScans = qrEvents.filter((e) => e.eventType === 'QR_SCAN').length;
+      const agg = qrEventsMap.get(qr.id);
+      const eventScans = agg?.scans || 0;
       const scanCount = Math.max(qr.scanCount || 0, eventScans, idx === 0 ? 32 : idx === 1 ? 21 : 16);
 
-      const eventReviews = qrEvents.filter((e) => e.eventType === 'REVIEW_GENERATED').length;
+      const eventReviews = agg?.reviews || 0;
       const reviewsGenerated = Math.max(
         eventReviews,
         Math.round(scanCount * (idx === 0 ? 0.65 : idx === 1 ? 0.57 : 0.50))
       );
 
-      const eventGoogle = qrEvents.filter((e) => e.eventType === 'GOOGLE_MAPS_CLICK').length;
+      const eventGoogle = agg?.clicks || 0;
       const googleClicks = Math.max(eventGoogle, Math.round(reviewsGenerated * 0.78));
 
       const conversionRate = scanCount > 0 ? Math.round((reviewsGenerated / scanCount) * 100) : 0;

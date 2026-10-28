@@ -190,6 +190,48 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const loadAllData = async () => {
     try {
       setLoading(true);
+
+      // Fast single round-trip bootstrap load
+      try {
+        const boot = await api.getDashboardBootstrap(businessId);
+        if (boot && boot.business) {
+          if (boot.user) setCurrentUser(boot.user);
+          const bRes = boot.business;
+          setBusiness(bRes);
+          setProfileForm({
+            name: bRes.name || '',
+            phone: bRes.phone || '',
+            address: bRes.address || '',
+            city: bRes.city || '',
+            state: bRes.state || '',
+            pincode: bRes.pincode || '',
+            googleReviewUrl: bRes.googleReviewUrl || '',
+            googleMapsShareUrl: bRes.googleMapsShareUrl || '',
+            instagramUrl: bRes.instagramUrl || '',
+            facebookUrl: bRes.facebookUrl || '',
+            whatsappUrl: bRes.whatsappUrl || '',
+            description: bRes.description || '',
+            openingHours: bRes.openingHours || '',
+          });
+          setInquiryForm((prev) => ({ ...prev, contactPhone: bRes.phone || '' }));
+          setHelpForm((prev) => ({ ...prev, phone: bRes.phone || '' }));
+
+          setUsage(boot.usage);
+          setQrs(boot.qrs || []);
+          setReviews(boot.reviews || []);
+          setQuestions(boot.questions || []);
+          setSettings(boot.settings);
+          setAnalytics(boot.analytics);
+          setPlans(boot.plans || []);
+          setSystemNotifications(boot.notifications || []);
+          setSubscriptionData(boot.subscription);
+          setPaymentHistory(boot.paymentHistory || []);
+          return;
+        }
+      } catch (bootErr) {
+        console.warn('Bootstrap request fallback to parallel endpoints:', bootErr);
+      }
+
       const [bRes, uRes, qRes, rRes, qsRes, sRes, aRes, pRes, meRes, notifRes, subRes, histRes] = await Promise.all([
         api.getBusiness(businessId),
         api.getUsage(businessId),
@@ -443,10 +485,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
   if (loading || !business) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', flexDirection: 'column', gap: '16px' }}>
-        <div className="spinner" style={{ borderTopColor: 'var(--primary)', borderColor: 'var(--border)' }}></div>
-        <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 600 }}>
-          Initializing Mission Control Telemetry...
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
+        <div style={{ position: 'relative', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="spinner" style={{ width: '44px', height: '44px', borderWidth: '3.5px', borderTopColor: 'var(--primary)', borderColor: 'rgba(154, 64, 24, 0.15)' }}></div>
+          <span style={{ position: 'absolute', fontSize: '18px' }}>⚡</span>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-main)', margin: '0 0 6px 0', letterSpacing: '-0.3px' }}>
+            Loading your business dashboard
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: 0, maxWidth: '320px', lineHeight: 1.5 }}>
+            Syncing customer reviews, smart QR stands, and real-time growth insights
+          </p>
         </div>
       </div>
     );
@@ -1034,7 +1084,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Welcome to Your Dashboard! Activate Starter Trial for ₹79
                   </h3>
                   <p style={{ margin: 0, fontSize: '13.5px', color: '#92400e', lineHeight: 1.5 }}>
-                    Your restaurant environment and smart table stands are ready! Complete the introductory ₹79 payment via Razorpay to activate 30 days of full AI review generation and Google conversion tracking.
+                    Your business environment and smart QR counter stands are ready! Complete the introductory ₹79 payment via Razorpay to activate 30 days of full AI review generation and Google conversion tracking.
                   </p>
                 </div>
                 <button
@@ -3209,7 +3259,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         )}
 
         {/* ======================================================== */}
-        {/* TAB 6: RESTAURANT PROFILE                                */}
+        {/* TAB 6: BUSINESS PROFILE                                  */}
         {/* ======================================================== */}
         {activeTab === 'profile' && (
           <div className="card" style={{ padding: '36px' }}>

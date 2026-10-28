@@ -67,6 +67,7 @@ export const api = {
   getCategories: () => apiRequest('/business/categories'),
   getMyBusinesses: () => apiRequest('/business/my'),
   getBusiness: (id: string) => apiRequest(`/business/${id}`),
+  getDashboardBootstrap: (id: string) => apiRequest(`/business/${id}/dashboard-bootstrap`),
   updateBusiness: (id: string, data: any) => apiRequest(`/business/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   getQuestions: (id: string) => apiRequest(`/business/${id}/questions`),
   saveQuestions: (id: string, questions: any[]) => apiRequest(`/business/${id}/questions`, { method: 'PUT', body: JSON.stringify({ questions }) }),

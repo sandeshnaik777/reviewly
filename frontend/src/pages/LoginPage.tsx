@@ -65,7 +65,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
         <div className="wizard-card" style={{ width: '100%', maxWidth: '440px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '18px' }}>
             <span className="stat-pill stat-pill-primary" style={{ fontSize: '11px', padding: '4px 12px' }}>
-              ● Merchant Command Portal
+              ● Business Owner Portal
             </span>
           </div>
 
@@ -74,7 +74,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
               Sign in to KindlyReview
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '6px' }}>
-              Access your restaurant analytics and reputation command center.
+              Access your business analytics, customer reviews, and growth center.
             </p>
           </div>
 

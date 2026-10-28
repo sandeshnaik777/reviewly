@@ -1248,7 +1248,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       height: '42px',
                       background: 'var(--surface-container)',
                     }}
-                    placeholder="Search by restaurant name, owner, email, phone, city..."
+                    placeholder="Search by business name, owner, email, phone, city..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
