@@ -26,7 +26,16 @@ export const App: React.FC = () => {
       return;
     }
 
-    // Check existing authentication session
+    // Check existing authentication session only if a token exists in storage
+    const hasToken = typeof localStorage !== 'undefined' && Boolean(
+      localStorage.getItem('kindlyreview_token') || localStorage.getItem('reviewly_token')
+    );
+
+    if (!hasToken) {
+      setLoading(false);
+      return;
+    }
+
     api
       .getMe()
       .then((res) => {
@@ -41,7 +50,7 @@ export const App: React.FC = () => {
         }
       })
       .catch(() => {
-        // Not authenticated
+        // Not authenticated or token expired
       })
       .finally(() => {
         setLoading(false);

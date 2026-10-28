@@ -38,6 +38,7 @@ import { ScratchCard } from '../components/ScratchCard.js';
 import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
 import { PhoneInput } from '../components/PhoneInput.js';
 import { validatePhoneNumber } from '../utils/phoneValidator.js';
+import { loadRazorpay } from '../utils/razorpay.js';
 
 interface Props {
   businessId: string;
@@ -149,8 +150,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const handlePayTrial = async () => {
     try {
       const trialPlan = plans.find((p) => p.slug === 'starter') || plans[0];
-      const order = await api.createOrder(businessId, trialPlan.id, { isTrial: true });
-      if ((window as any).Razorpay) {
+      const [order, isLoaded] = await Promise.all([
+        api.createOrder(businessId, trialPlan.id, { isTrial: true }),
+        loadRazorpay(),
+      ]);
+      if (isLoaded && (window as any).Razorpay) {
         const options = {
           key: order.keyId,
           amount: order.amount, // 7900 paisa (₹79)
@@ -4087,8 +4091,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         style={{ marginTop: '18px', fontSize: '13.5px', padding: '10px' }}
                         onClick={async () => {
                           try {
-                            const order = await api.createOrder(businessId, p.id, selectedDuration);
-                          if ((window as any).Razorpay) {
+                            const [order, isLoaded] = await Promise.all([
+                              api.createOrder(businessId, p.id, selectedDuration),
+                              loadRazorpay(),
+                            ]);
+                            if (isLoaded && (window as any).Razorpay) {
                             const options = {
                               key: order.keyId,
                               amount: order.amount,
