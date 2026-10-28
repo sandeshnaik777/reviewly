@@ -10,6 +10,39 @@ export interface MapsLinkConversionResult {
 }
 
 /**
+ * Convert Google Maps hex coordinates (!1s0x...:0x...) to a valid Google Place ID via protobuf encoding
+ */
+export function hexPairToPlaceId(hex1: string, hex2: string): string {
+  try {
+    const toVarint = (val: string): number[] => {
+      let v = BigInt(val);
+      const bytes: number[] = [];
+      while (v > 127n) {
+        bytes.push(Number((v & 127n) | 128n));
+        v >>= 7n;
+      }
+      bytes.push(Number(v & 127n));
+      return bytes;
+    };
+
+    const v1 = toVarint(hex1);
+    const v2 = toVarint(hex2);
+    const f1 = [0x08, ...v1];
+    const f2 = [0x10, ...v2];
+    const payload = [0x0a, f1.length + f2.length, ...f1, ...f2];
+
+    if (typeof Buffer !== 'undefined') {
+      return Buffer.from(payload).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    }
+    const binary = String.fromCharCode(...payload);
+    return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  } catch (err) {
+    console.warn('Failed to convert hex pair to Place ID:', err);
+    return '';
+  }
+}
+
+/**
  * Client-side instant heuristic parser for Google Maps URLs
  */
 export function quickParseMapsUrl(input: string): MapsLinkConversionResult | null {
@@ -68,7 +101,7 @@ export function quickParseMapsUrl(input: string): MapsLinkConversionResult | nul
     const cid = cidParam[1];
     return {
       originalUrl: raw,
-      directReviewUrl: `https://search.google.com/local/writereview?cid=${cid}`,
+      directReviewUrl: `https://maps.google.com/?cid=${cid}`,
       detectedType: 'PARAM_CID',
       cid,
     };
@@ -86,14 +119,34 @@ export function quickParseMapsUrl(input: string): MapsLinkConversionResult | nul
     };
   }
 
-  // 7. Hex CID in data (!1s0x...:0x[HEX])
+  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> converted to genuine Google Place ID
+  const hexPair = targetUrl.match(/!1s(0x[a-fA-F0-9]+):(0x[a-fA-F0-9]+)/);
+  if (hexPair && hexPair[1] && hexPair[2]) {
+    try {
+      const pId = hexPairToPlaceId(hexPair[1], hexPair[2]);
+      const decimalCid = BigInt(hexPair[2]).toString();
+      if (pId) {
+        return {
+          originalUrl: raw,
+          directReviewUrl: `https://search.google.com/local/writereview?placeid=${pId}`,
+          detectedType: 'HEX_PROTO_PLACE_ID',
+          placeId: pId,
+          cid: decimalCid,
+        };
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // 8. Hex CID in data (!1s0x...:0x[HEX]) fallback
   const hexCid = targetUrl.match(/!1s0x[a-fA-F0-9]+:0x([a-fA-F0-9]+)/);
   if (hexCid && hexCid[1]) {
     try {
       const decimalCid = BigInt('0x' + hexCid[1]).toString();
       return {
         originalUrl: raw,
-        directReviewUrl: `https://search.google.com/local/writereview?cid=${decimalCid}`,
+        directReviewUrl: `https://maps.google.com/?cid=${decimalCid}`,
         detectedType: 'HEX_CID_DECODED',
         cid: decimalCid,
       };

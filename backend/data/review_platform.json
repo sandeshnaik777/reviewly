@@ -171,6 +171,18 @@
       "failedLoginAttempts": 0,
       "createdAt": "2026-10-07T11:01:17.521Z",
       "updatedAt": "2026-10-07T11:01:17.521Z"
+    },
+    {
+      "id": "8f37bd1e-277e-4592-8668-9edc58ddbe15",
+      "email": "demo@kindlyrate.com",
+      "passwordHash": "$2b$10$d61LXveSsyStFTqj4Ql69ey390c4YslRkijiliSh.qXT4wEnRoDLK",
+      "name": "KindlyRate Demo Merchant",
+      "role": "BUSINESS_OWNER",
+      "isActive": true,
+      "emailVerified": true,
+      "failedLoginAttempts": 0,
+      "createdAt": "2026-10-28T16:01:40.241Z",
+      "updatedAt": "2026-10-28T16:01:40.253Z"
     }
   ],
   "businesses": [
@@ -346,9 +358,39 @@
       "isActive": true,
       "createdAt": "2026-10-07T11:01:17.528Z",
       "updatedAt": "2026-10-07T11:01:17.528Z"
+    },
+    {
+      "id": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "ownerId": "8f37bd1e-277e-4592-8668-9edc58ddbe15",
+      "name": "KindlyRate Demo Store",
+      "slug": "kindlyrate-demo-store",
+      "mainCategory": "FOOD & HOSPITALITY",
+      "subcategory": "Cafe & Bistro",
+      "phone": "+919876543210",
+      "email": "demo@kindlyrate.com",
+      "address": "100 Feet Road, Indiranagar",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "country": "India",
+      "pincode": "560038",
+      "googleReviewUrl": "https://maps.google.com/?cid=12345678901234567890",
+      "isActive": true,
+      "createdAt": "2026-10-28T16:01:40.255Z",
+      "updatedAt": "2026-10-28T16:01:40.255Z"
     }
   ],
-  "businessMembers": [],
+  "businessMembers": [
+    {
+      "id": "e6f041eb-cf81-49f0-8f93-7a236a8a04be",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "userId": "8f37bd1e-277e-4592-8668-9edc58ddbe15",
+      "role": "BUSINESS_OWNER",
+      "permissions": [
+        "ALL"
+      ],
+      "createdAt": "2026-10-28T16:01:40.255Z"
+    }
+  ],
   "businessQuestions": [
     {
       "id": "90267e82-a3d8-4079-8778-7be473c68e8b",
@@ -421,6 +463,45 @@
       "displayOrder": 5,
       "isRequired": true,
       "isActive": true
+    },
+    {
+      "id": "344489c4-dec2-4bb0-a37f-3c3958747849",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "questionKey": "food_quality",
+      "label": "How was the food and drink quality?",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "weight": 1,
+      "isRequired": true,
+      "displayOrder": 1,
+      "createdAt": "2026-10-28T16:01:40.255Z"
+    },
+    {
+      "id": "fef06392-f02f-406a-b321-d9af54228b47",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "questionKey": "service_speed",
+      "label": "How was the speed and attentiveness of our team?",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "weight": 1,
+      "isRequired": true,
+      "displayOrder": 2,
+      "createdAt": "2026-10-28T16:01:40.255Z"
+    },
+    {
+      "id": "a4c00a20-96f6-4307-974a-8d213b4f55ad",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "questionKey": "ambience_cleanliness",
+      "label": "How would you rate the ambience and cleanliness?",
+      "scaleType": "1-5_STARS",
+      "minValue": 1,
+      "maxValue": 5,
+      "weight": 1,
+      "isRequired": true,
+      "displayOrder": 3,
+      "createdAt": "2026-10-28T16:01:40.255Z"
     }
   ],
   "businessSettings": [
@@ -432,6 +513,21 @@
       "wordsToAvoid": [],
       "thingsToHighlight": [],
       "autoRedirectGoogle": false
+    },
+    {
+      "id": "45b3f094-e680-4a0a-83c6-753b5397a502",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "minGoogleStars": 4,
+      "negativeFeedbackDestination": "BOTH",
+      "negativeFeedbackPhone": "+919876543210",
+      "negativeFeedbackEmail": "demo@kindlyrate.com",
+      "reputationShieldEnabled": true,
+      "incentiveEnabled": false,
+      "googleReviewUrl": "https://maps.google.com/?cid=12345678901234567890",
+      "primaryColor": "#00383b",
+      "welcomeMessage": "Thank you for visiting KindlyRate Demo Store! We appreciate your honest feedback.",
+      "createdAt": "2026-10-28T16:01:40.255Z",
+      "updatedAt": "2026-10-28T16:01:40.255Z"
     }
   ],
   "qrCodes": [
@@ -456,6 +552,21 @@
       "scanCount": 0,
       "createdAt": "2026-10-07T11:20:02.641Z",
       "updatedAt": "2026-10-07T11:20:02.641Z"
+    },
+    {
+      "id": "1c22ad11-4009-4e2e-a06f-d4edd6abf508",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "identifier": "counter-main",
+      "locationName": "Billing Counter Main",
+      "qrType": "TABLE_STAND",
+      "targetUrl": "https://kindlyrate.com/r/kindlyrate-demo-store?qr=counter-main",
+      "scansCount": 42,
+      "uniqueVisitorsCount": 38,
+      "reviewsStartedCount": 29,
+      "reviewsCompletedCount": 26,
+      "isActive": true,
+      "createdAt": "2026-10-28T16:01:40.255Z",
+      "updatedAt": "2026-10-28T16:01:40.255Z"
     }
   ],
   "subscriptionPlans": [
@@ -625,6 +736,20 @@
       "cancelAtPeriodEnd": false,
       "createdAt": "2026-10-07T13:43:27.584Z",
       "updatedAt": "2026-10-07T13:43:27.584Z"
+    },
+    {
+      "id": "76e5778a-9e49-4524-ad1a-21727a81810a",
+      "businessId": "5e751573-1348-408b-b321-e6d4fb605a7c",
+      "planId": "starter",
+      "status": "ACTIVE",
+      "currentPeriodStart": "2026-10-28T16:01:40.255Z",
+      "currentPeriodEnd": "2026-11-27T16:01:40.255Z",
+      "reviewLimitMonthly": 100,
+      "reviewsGeneratedThisMonth": 12,
+      "qrCodeLimit": 2,
+      "qrCodesActive": 1,
+      "createdAt": "2026-10-28T16:01:40.255Z",
+      "updatedAt": "2026-10-28T16:01:40.255Z"
     }
   ],
   "usageRecords": [
