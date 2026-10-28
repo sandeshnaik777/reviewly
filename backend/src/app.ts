@@ -113,6 +113,16 @@ export function createApp(): Express {
   app.use('/api/payment', paymentRouter);
   app.use('/api/admin', adminRouter);
 
+  // Public Subscription Plans API
+  app.get('/api/plans', async (_req, res, next) => {
+    try {
+      const plans = await db.listSubscriptionPlans();
+      res.json({ success: true, data: plans, plans });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // Public Blog Articles API
   app.get('/api/blogs', async (req, res, next) => {
     try {

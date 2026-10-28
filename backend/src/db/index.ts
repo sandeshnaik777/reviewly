@@ -279,6 +279,7 @@ class DatabaseService {
 
         this.pgConnected = true;
         console.log('🐘 [PostgreSQL] Active connection established to PostgreSQL cluster.');
+        await this.initSeeds();
       } finally {
         client.release();
       }
@@ -440,14 +441,20 @@ class DatabaseService {
         const existing = this.data.subscriptionPlans.find((p) => p.id === defaultPlan.id || p.slug === defaultPlan.slug);
         if (!existing) return defaultPlan;
         return {
-          ...defaultPlan,
           ...existing,
-          priceInr3Months: existing.priceInr3Months ?? defaultPlan.priceInr3Months,
-          priceInr6Months: existing.priceInr6Months ?? defaultPlan.priceInr6Months,
-          priceInr1Year: existing.priceInr1Year ?? defaultPlan.priceInr1Year,
+          ...defaultPlan, // Canonical settings: name, priceInr, offerBadge, features, isActive
+          priceInr3Months: defaultPlan.priceInr3Months ?? existing.priceInr3Months,
+          priceInr6Months: defaultPlan.priceInr6Months ?? existing.priceInr6Months,
+          priceInr1Year: defaultPlan.priceInr1Year ?? existing.priceInr1Year,
         };
       });
     }
+
+    // Seed default blogs if missing or empty
+    if (!this.data.blogPosts || this.data.blogPosts.length === 0) {
+      this.data.blogPosts = DEFAULT_BLOGS;
+    }
+
     this.persist();
 
     // Seed default platform admin if absent
