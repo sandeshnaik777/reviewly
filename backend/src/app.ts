@@ -24,6 +24,9 @@ const __dirname = path.dirname(__filename);
 export function createApp(): Express {
   const app = express();
 
+  // Trust reverse proxy (Nginx) for accurate client IP in multi-user environments
+  app.set('trust proxy', 1);
+
   // 1. Security Headers (Helmet)
   app.use(
     helmet({
