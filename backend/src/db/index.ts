@@ -23,6 +23,7 @@ import {
   AnalyticsEvent,
   AuditLog,
   EmailVerificationRecord,
+  PasswordResetRecord,
   PhoneVerificationRecord,
   SystemNotification,
   CustomSoftwareInquiry,
@@ -36,6 +37,7 @@ import { DEFAULT_BLOGS } from './blogs.js';
 interface DatabaseSchema {
   users: User[];
   emailVerifications: EmailVerificationRecord[];
+  passwordResets: PasswordResetRecord[];
   phoneVerifications: PhoneVerificationRecord[];
   businesses: Business[];
   businessMembers: BusinessMember[];
@@ -303,6 +305,9 @@ class DatabaseService {
         if (!parsed.emailVerifications) {
           parsed.emailVerifications = [];
         }
+        if (!parsed.passwordResets) {
+          parsed.passwordResets = [];
+        }
         if (!parsed.phoneVerifications) {
           parsed.phoneVerifications = [];
         }
@@ -356,6 +361,7 @@ class DatabaseService {
     return {
       users: [],
       emailVerifications: [],
+      passwordResets: [],
       phoneVerifications: [],
       businesses: [],
       businessMembers: [],
@@ -556,6 +562,44 @@ class DatabaseService {
   async deleteVerificationRecordsByEmail(email: string): Promise<void> {
     if (!this.data.emailVerifications) return;
     this.data.emailVerifications = this.data.emailVerifications.filter(
+      (r) => r.email.toLowerCase() !== email.toLowerCase()
+    );
+    await this.persist();
+  }
+
+  // --- Password Resets ---
+  async createPasswordReset(record: PasswordResetRecord): Promise<PasswordResetRecord> {
+    if (!this.data.passwordResets) this.data.passwordResets = [];
+    this.data.passwordResets.push(record);
+    await this.persist();
+    return record;
+  }
+
+  async findLatestPasswordResetByEmail(email: string): Promise<PasswordResetRecord | undefined> {
+    if (!this.data.passwordResets) return undefined;
+    const records = this.data.passwordResets
+      .filter((r) => r.email.toLowerCase() === email.toLowerCase())
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return records[0];
+  }
+
+  async findPasswordResetByToken(token: string): Promise<PasswordResetRecord | undefined> {
+    if (!this.data.passwordResets) return undefined;
+    return this.data.passwordResets.find((r) => r.token === token);
+  }
+
+  async updatePasswordResetRecord(id: string, updates: Partial<PasswordResetRecord>): Promise<PasswordResetRecord | undefined> {
+    if (!this.data.passwordResets) return undefined;
+    const idx = this.data.passwordResets.findIndex((r) => r.id === id);
+    if (idx === -1) return undefined;
+    this.data.passwordResets[idx] = { ...this.data.passwordResets[idx], ...updates };
+    await this.persist();
+    return this.data.passwordResets[idx];
+  }
+
+  async deletePasswordResetsByEmail(email: string): Promise<void> {
+    if (!this.data.passwordResets) return;
+    this.data.passwordResets = this.data.passwordResets.filter(
       (r) => r.email.toLowerCase() !== email.toLowerCase()
     );
     await this.persist();

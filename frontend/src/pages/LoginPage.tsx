@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import { LegalModals } from '../components/LegalModals.js';
 import { KindlyRateBrand } from '../components/Logos.js';
+import { ForgotPasswordModal } from '../components/ForgotPasswordModal.js';
 
 interface Props {
   onLoginSuccess: (user: any, businesses: any[]) => void;
@@ -15,6 +16,26 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [legalModal, setLegalModal] = useState<'terms' | 'privacy' | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [initialResetToken, setInitialResetToken] = useState<string | undefined>(undefined);
+
+  // Automatically detect ?resetToken=xxx&email=xxx from direct email links
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tokenParam = params.get('resetToken');
+      const emailParam = params.get('email');
+      if (tokenParam) {
+        setInitialResetToken(tokenParam);
+        if (emailParam) {
+          setEmail(emailParam);
+        }
+        setShowForgotPassword(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +115,24 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
             </div>
 
             <div className="form-group" style={{ marginBottom: '24px' }}>
-              <label className="form-label">Password</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Password</label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary)',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
               <input
                 type="password"
                 className="form-input"
@@ -184,6 +222,16 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
       {legalModal && (
         <LegalModals type={legalModal} onClose={() => setLegalModal(null)} />
       )}
+
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        initialEmail={email}
+        initialToken={initialResetToken}
+        onSuccessLogin={(user, businesses) => {
+          onLoginSuccess(user, businesses);
+        }}
+      />
     </div>
   );
 };

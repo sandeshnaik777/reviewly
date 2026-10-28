@@ -275,6 +275,18 @@ export interface EmailVerificationRecord {
   createdAt: string;
 }
 
+export interface PasswordResetRecord {
+  id: string;
+  userId: string;
+  email: string;
+  codeHash: string;
+  token: string;
+  expiresAt: string;
+  attempts: number;
+  used: boolean;
+  createdAt: string;
+}
+
 export interface PhoneVerificationRecord {
   id: string;
   userId?: string;

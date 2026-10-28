@@ -9,7 +9,7 @@ import { AppError } from '../../middleware/errorHandler.js';
 import { authenticate, AuthenticatedRequest } from '../../middleware/auth.js';
 import { loginRateLimiter } from '../../middleware/rateLimiter.js';
 import { validateBody } from '../../middleware/validate.js';
-import { User, Business, Subscription, BusinessSettings } from '../../types/index.js';
+import { User, Business, Subscription, BusinessSettings, PasswordResetRecord } from '../../types/index.js';
 import { getDefaultQuestionsForCategory } from '../business/categories.js';
 import { emailService } from '../email/service.js';
 import { smsService } from '../sms/service.js';
@@ -436,6 +436,200 @@ authRouter.post('/logout', (req: Request, res: Response) => {
   res.clearCookie(config.jwt.cookieName, { path: '/' });
   res.json({ success: true, data: { message: 'Logged out successfully.' } });
 });
+
+/**
+ * POST /api/auth/forgot-password
+ * Initiates a password reset by generating a secure 6-digit OTP + reset token
+ * and dispatching an email to the user.
+ */
+authRouter.post(
+  '/forgot-password',
+  loginRateLimiter,
+  validateBody(
+    z.object({
+      email: z.string().email('Please enter a valid email address'),
+    })
+  ),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const email = req.body.email.toLowerCase().trim();
+      const user = await db.findUserByEmail(email);
+
+      // Return consistent success message to prevent user enumeration
+      if (!user) {
+        return res.json({
+          success: true,
+          message: 'If an account exists with this email, a password reset code has been sent.',
+          data: { email },
+        });
+      }
+
+      // Check 60-second cooldown between reset requests
+      const latest = await db.findLatestPasswordResetByEmail(email);
+      if (latest && !latest.used) {
+        const elapsedMs = Date.now() - new Date(latest.createdAt).getTime();
+        if (elapsedMs < 60 * 1000) {
+          const waitSec = Math.ceil((60 * 1000 - elapsedMs) / 1000);
+          throw new AppError(
+            `Please wait ${waitSec}s before requesting a new password reset code.`,
+            429,
+            'RATE_LIMIT_COOLDOWN'
+          );
+        }
+      }
+
+      // 6-digit OTP code & 24-byte hex token
+      const otp = crypto.randomInt(100000, 999999).toString();
+      const codeHash = crypto.createHash('sha256').update(otp).digest('hex');
+      const token = crypto.randomBytes(24).toString('hex');
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
+
+      await db.createPasswordReset({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        email,
+        codeHash,
+        token,
+        expiresAt,
+        attempts: 0,
+        used: false,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Construct direct 1-click reset URL
+      const appUrl = config.appUrl || 'https://kindlyrate.com';
+      const resetLink = `${appUrl}/login?resetToken=${token}&email=${encodeURIComponent(email)}`;
+
+      await emailService.sendPasswordResetEmail(user.email, otp, resetLink, user.name);
+
+      res.json({
+        success: true,
+        message: 'A 6-digit password reset code has been sent to your email.',
+        data: {
+          email,
+          devOtp: config.nodeEnv === 'development' ? otp : undefined,
+          devToken: config.nodeEnv === 'development' ? token : undefined,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
+ * POST /api/auth/reset-password
+ * Validates the 6-digit OTP or reset token and updates the user's password.
+ */
+authRouter.post(
+  '/reset-password',
+  loginRateLimiter,
+  validateBody(
+    z.object({
+      email: z.string().email('Please enter a valid email address'),
+      otp: z.string().length(6, 'Reset code must be 6 digits').optional(),
+      token: z.string().min(10, 'Invalid reset token').optional(),
+      newPassword: z.string().min(8, 'New password must be at least 8 characters'),
+    }).refine((data) => data.otp || data.token, {
+      message: 'Either a 6-digit code or a reset token is required',
+      path: ['otp'],
+    })
+  ),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email: rawEmail, otp, token, newPassword } = req.body;
+      const email = rawEmail.toLowerCase().trim();
+
+      const user = await db.findUserByEmail(email);
+      if (!user) {
+        throw new AppError('No account found for this email address.', 404, 'USER_NOT_FOUND');
+      }
+
+      let resetRecord: PasswordResetRecord | undefined;
+
+      if (token) {
+        resetRecord = await db.findPasswordResetByToken(token);
+        if (!resetRecord || resetRecord.email.toLowerCase() !== email) {
+          throw new AppError('Invalid or expired password reset link.', 400, 'INVALID_RESET_TOKEN');
+        }
+      } else if (otp) {
+        resetRecord = await db.findLatestPasswordResetByEmail(email);
+        if (!resetRecord) {
+          throw new AppError('No active password reset request found. Please request a new code.', 400, 'NO_ACTIVE_REQUEST');
+        }
+      }
+
+      if (!resetRecord || resetRecord.used) {
+        throw new AppError('This password reset request has already been used or is invalid. Please request a new code.', 400, 'RESET_CODE_USED');
+      }
+
+      // Check expiration
+      if (new Date(resetRecord.expiresAt).getTime() < Date.now()) {
+        throw new AppError('Password reset code has expired. Please request a new code.', 400, 'RESET_CODE_EXPIRED');
+      }
+
+      // Check max attempts
+      if (resetRecord.attempts >= 5) {
+        throw new AppError('Too many invalid attempts. For security, please request a new reset code.', 429, 'TOO_MANY_ATTEMPTS');
+      }
+
+      // If verifying by OTP, check hash
+      if (otp) {
+        const inputHash = crypto.createHash('sha256').update(otp).digest('hex');
+        if (inputHash !== resetRecord.codeHash) {
+          await db.updatePasswordResetRecord(resetRecord.id, {
+            attempts: resetRecord.attempts + 1,
+          });
+          const remaining = 5 - (resetRecord.attempts + 1);
+          throw new AppError(
+            `Invalid 6-digit reset code. ${remaining > 0 ? `${remaining} attempts remaining.` : 'Please request a new code.'}`,
+            400,
+            'INVALID_OTP'
+          );
+        }
+      }
+
+      // Mark reset record used
+      await db.updatePasswordResetRecord(resetRecord.id, { used: true });
+
+      // Hash new password with bcrypt salt
+      const salt = bcrypt.genSaltSync(12);
+      const passwordHash = bcrypt.hashSync(newPassword, salt);
+
+      // Update user password and clear any lockout / failed attempts
+      await db.updateUser(user.id, {
+        passwordHash,
+        failedLoginAttempts: 0,
+        lockoutUntil: undefined,
+      });
+
+      // Clear any older resets
+      await db.deletePasswordResetsByEmail(email);
+
+      // Create a fresh session token so the user can be immediately authenticated
+      const sessionToken = sendAuthToken(user, res, req);
+      const businesses = await db.findBusinessesByOwnerId(user.id);
+
+      res.json({
+        success: true,
+        message: 'Password has been successfully updated! You are now signed in.',
+        data: {
+          token: sessionToken,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            emailVerified: user.emailVerified,
+          },
+          businesses,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 /**
  * GET /api/auth/me

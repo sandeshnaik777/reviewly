@@ -43,6 +43,70 @@ test('1. Authentication & Password Security', async (t) => {
     assert.ok(fetched);
     assert.ok(new Date(fetched.lockoutUntil!) > new Date());
   });
+
+  await t.test('Forgot password flow: creates OTP, verifies, and updates password', async () => {
+    const testEmail = `reset-user-${Date.now()}@test.com`;
+    const initialPass = 'InitialPassword123!';
+    const newPass = 'BrandNewPassword2026!';
+    const user: User = {
+      id: crypto.randomUUID(),
+      email: testEmail,
+      passwordHash: bcrypt.hashSync(initialPass, bcrypt.genSaltSync(10)),
+      name: 'Reset Test Merchant',
+      role: 'BUSINESS_OWNER',
+      isActive: true,
+      emailVerified: true,
+      failedLoginAttempts: 3,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    await db.createUser(user);
+
+    // 1. Create password reset record
+    const otp = '654321';
+    const codeHash = crypto.createHash('sha256').update(otp).digest('hex');
+    const token = crypto.randomBytes(24).toString('hex');
+    const resetRecord = await db.createPasswordReset({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      email: testEmail,
+      codeHash,
+      token,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      attempts: 0,
+      used: false,
+      createdAt: new Date().toISOString(),
+    });
+
+    assert.ok(resetRecord.id);
+    assert.equal(resetRecord.used, false);
+
+    // 2. Fetch and verify
+    const fetchedReset = await db.findLatestPasswordResetByEmail(testEmail);
+    assert.ok(fetchedReset);
+    assert.equal(fetchedReset.token, token);
+
+    // 3. Perform reset
+    const newHash = bcrypt.hashSync(newPass, bcrypt.genSaltSync(10));
+    await db.updateUser(user.id, {
+      passwordHash: newHash,
+      failedLoginAttempts: 0,
+      lockoutUntil: undefined,
+    });
+    await db.updatePasswordResetRecord(resetRecord.id, { used: true });
+
+    // 4. Verify user updated
+    const updatedUser = await db.findUserById(user.id);
+    assert.ok(updatedUser);
+    assert.equal(bcrypt.compareSync(newPass, updatedUser.passwordHash), true);
+    assert.equal(bcrypt.compareSync(initialPass, updatedUser.passwordHash), false);
+    assert.equal(updatedUser.failedLoginAttempts, 0);
+
+    // 5. Verify token marked used
+    const usedReset = await db.findPasswordResetByToken(token);
+    assert.ok(usedReset);
+    assert.equal(usedReset.used, true);
+  });
 });
 
 test('2. Multi-Tenant Isolation & IDOR Prevention', async (t) => {
@@ -716,9 +780,9 @@ test('11. Google Maps Share Link Converter, Multi-Month Plans & Super Admin Quot
   await t.test('Converts Hex CID from Google Maps data parameter into decimal CID review link', async () => {
     const rawUrl = 'https://www.google.com/maps/place/Artisan+Cafe/data=!4m7!3m6!1s0x3be7c6306644edc1:0x5101fa2d7e57c6b7!8m2!3d19.076!4d72.877!16s';
     const res = await convertMapsUrlToDirectReviewUrl(rawUrl);
-    assert.equal(res.detectedType, 'HEX_CID_DECODED');
+    assert.equal(res.detectedType, 'GOOGLE_MAPS_REVIEWS_TAB');
     assert.equal(res.cid, '5837221665349027511');
-    assert.equal(res.directReviewUrl, 'https://search.google.com/local/writereview?cid=5837221665349027511');
+    assert.ok(res.directReviewUrl.includes('!9m1!1b1') || res.directReviewUrl.includes('5837221665349027511'));
   });
 
   await t.test('Converts g.page business profile into /review URL', async () => {

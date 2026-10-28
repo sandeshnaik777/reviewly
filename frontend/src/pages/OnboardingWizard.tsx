@@ -5,6 +5,7 @@ import { KindlyRateLogo } from '../components/Logos.js';
 import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
 import { PhoneInput } from '../components/PhoneInput.js';
 import { validatePhoneNumber } from '../utils/phoneValidator.js';
+import { ForgotPasswordModal } from '../components/ForgotPasswordModal.js';
 import {
   Key,
   Mail,
@@ -49,6 +50,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   const [isAccountCreated, setIsAccountCreated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [emailExistsNotice, setEmailExistsNotice] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [inlinePassword, setInlinePassword] = useState('');
   const [inlineLoginLoading, setInlineLoginLoading] = useState(false);
 
@@ -890,6 +892,25 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     {inlineLoginLoading ? 'Signing In...' : 'Sign In & Continue →'}
                   </button>
                 </form>
+
+                <div style={{ marginTop: '10px', textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#b45309',
+                      fontSize: '12.5px',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Forgot your password?
+                  </button>
+                </div>
               </div>
             )}
 
@@ -2136,6 +2157,22 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
       {legalModal && (
         <LegalModals type={legalModal} onClose={() => setLegalModal(null)} />
       )}
+
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        initialEmail={formData.email}
+        onSuccessLogin={(user) => {
+          setIsAccountCreated(true);
+          setEmailExistsNotice(false);
+          setShowForgotPassword(false);
+          setFormData((prev: any) => ({
+            ...prev,
+            ownerName: user?.name || prev.ownerName,
+          }));
+          setStep(2);
+        }}
+      />
     </div>
   );
 };

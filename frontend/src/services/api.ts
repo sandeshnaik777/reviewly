@@ -61,6 +61,10 @@ export const api = {
     apiRequest('/auth/verify-email', { method: 'POST', body: JSON.stringify({ otp, email }) }),
   resendVerificationOtp: (email?: string) =>
     apiRequest('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
+  forgotPassword: (email: string) =>
+    apiRequest('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (data: { email: string; otp?: string; token?: string; newPassword: string }) =>
+    apiRequest('/auth/reset-password', { method: 'POST', body: JSON.stringify(data) }),
   sendPhoneOtp: (phone: string, countryCode?: string) =>
     apiRequest('/auth/send-phone-otp', { method: 'POST', body: JSON.stringify({ phone, countryCode }) }),
   verifyPhoneOtp: (phone: string, otp: string, countryCode?: string) =>
