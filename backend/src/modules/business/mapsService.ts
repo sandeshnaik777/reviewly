@@ -552,23 +552,21 @@ export async function convertMapsUrlToDirectReviewUrl(input: string): Promise<{
     };
   }
 
-  // 7. Try extracting Hex coordinates pair from data (!1s0x...:0x...) -> Google Search #lrd review dialog
+  // 7. Try extracting Hex coordinates pair from data (!1s0x...:0x...) -> Direct Google Maps App link (opens natively in Maps app)
   const hexPairMatch = targetUrl.match(/!1s(0x[a-fA-F0-9]+):(0x[a-fA-F0-9]+)/);
-  if (hexPairMatch && hexPairMatch[1] && hexPairMatch[2]) {
+  if (hexPairMatch && hexPairMatch[2]) {
     try {
-      const hexFeatureId = `${hexPairMatch[1]}:${hexPairMatch[2]}`;
       const decimalCid = BigInt(hexPairMatch[2]).toString();
 
       // Extract business name if present in URL (/maps/place/Business+Name/...)
       const nameMatch = targetUrl.match(/\/maps\/place\/([^/@?]+)/i);
       const name = nameMatch && nameMatch[1] ? decodeURIComponent(nameMatch[1].replace(/\+/g, ' ')) : '';
-      const queryTerm = name || 'Google Review';
-      const lrdUrl = `https://www.google.com/search?q=${encodeURIComponent(queryTerm)}#lrd=${hexFeatureId},3`;
+      const mapsAppUrl = `https://maps.google.com/?cid=${decimalCid}`;
 
       return {
         originalUrl: raw,
-        directReviewUrl: lrdUrl,
-        detectedType: 'HEX_LRD_REVIEW_DIALOG',
+        directReviewUrl: mapsAppUrl,
+        detectedType: 'GOOGLE_MAPS_APP_DIRECT',
         cid: decimalCid,
         businessName: name,
       };

@@ -119,23 +119,21 @@ export function quickParseMapsUrl(input: string): MapsLinkConversionResult | nul
     };
   }
 
-  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> Google Search #lrd review dialog
+  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> Direct Google Maps App link (opens Google Maps natively on phone)
   const hexPair = targetUrl.match(/!1s(0x[a-fA-F0-9]+):(0x[a-fA-F0-9]+)/);
-  if (hexPair && hexPair[1] && hexPair[2]) {
+  if (hexPair && hexPair[2]) {
     try {
-      const hexFeatureId = `${hexPair[1]}:${hexPair[2]}`;
       const decimalCid = BigInt(hexPair[2]).toString();
 
       // Extract business name if present in URL (/maps/place/Business+Name/...)
       const nameMatch = targetUrl.match(/\/maps\/place\/([^/@?]+)/i);
       const name = nameMatch && nameMatch[1] ? decodeURIComponent(nameMatch[1].replace(/\+/g, ' ')) : '';
-      const queryTerm = name || 'Google Review';
-      const lrdUrl = `https://www.google.com/search?q=${encodeURIComponent(queryTerm)}#lrd=${hexFeatureId},3`;
+      const mapsAppUrl = `https://maps.google.com/?cid=${decimalCid}`;
 
       return {
         originalUrl: raw,
-        directReviewUrl: lrdUrl,
-        detectedType: 'HEX_LRD_REVIEW_DIALOG',
+        directReviewUrl: mapsAppUrl,
+        detectedType: 'GOOGLE_MAPS_APP_DIRECT',
         cid: decimalCid,
         businessName: name,
       };
