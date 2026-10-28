@@ -4,14 +4,41 @@
   "description": "Turn happy customers into 5-star Google Maps reviews automatically using smart QR stands and server-side AI assistance.",
   "icons": [
     {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/favicon.svg",
       "type": "image/svg+xml",
-      "sizes": "192x192 512x512"
+      "sizes": "any"
     }
   ],
   "start_url": "/",
   "background_color": "#faf8f5",
-  "theme_color": "#9a4018",
+  "theme_color": "#00383B",
   "display": "standalone",
   "orientation": "portrait"
 }

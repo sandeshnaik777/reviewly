@@ -129,6 +129,17 @@ export function createApp(): Express {
     next();
   });
 
+  // Favicon direct handler (Googlebot & Browser Root Fallback)
+  app.get('/favicon.ico', (_req, res, next) => {
+    const icoPath = path.join(staticPath, 'favicon.ico');
+    if (fs.existsSync(icoPath)) {
+      res.setHeader('Content-Type', 'image/x-icon');
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+      return res.sendFile(icoPath);
+    }
+    next();
+  });
+
   // 6. API Modules
   app.use('/api/auth', authRouter);
   app.use('/api/business', businessRouter);
