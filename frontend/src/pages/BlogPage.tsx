@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { DEFAULT_BLOGS, BlogPost } from '../data/defaultBlogs.js';
-import { KindlyReviewBrand, StarIcon } from '../components/Logos.js';
+import { KindlyRateBrand, StarIcon } from '../components/Logos.js';
 
 interface Props {
   initialSlug?: string;
@@ -472,7 +472,7 @@ export const BlogPage: React.FC<Props> = ({
             }}
             style={{ cursor: 'pointer' }}
           >
-            <KindlyReviewBrand />
+            <KindlyRateBrand />
           </div>
 
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -1018,3 +1018,4 @@ export const BlogPage: React.FC<Props> = ({
     </div>
   );
 };
+

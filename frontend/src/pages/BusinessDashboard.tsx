@@ -159,7 +159,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           key: order.keyId,
           amount: order.amount, // 7900 paisa (₹79)
           currency: order.currency,
-          name: 'KindlyReview Platform',
+          name: 'KindlyRate Platform',
           description: 'Testing Pack (₹79 Starter Trial)',
           order_id: order.orderId,
           prefill: {
@@ -4100,7 +4100,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               key: order.keyId,
                               amount: order.amount,
                               currency: order.currency,
-                              name: 'KindlyReview Platform',
+                              name: 'KindlyRate Platform',
                               description: `Upgrade to ${p.name}`,
                               order_id: order.orderId,
                               prefill: {

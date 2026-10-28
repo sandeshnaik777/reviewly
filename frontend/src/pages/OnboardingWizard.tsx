@@ -561,7 +561,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           key: order.keyId,
           amount: order.amount, // 7900 paisa (₹79)
           currency: order.currency || 'INR',
-          name: 'KindlyReview Platform',
+          name: 'KindlyRate Platform',
           description: 'Testing Pack (₹79 Starter Trial)',
           order_id: order.orderId,
           prefill: {
@@ -697,7 +697,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           key: order.keyId,
           amount: order.amount,
           currency: order.currency || 'INR',
-          name: 'KindlyReview Platform',
+          name: 'KindlyRate Platform',
           description: `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''}) - Direct Activation`,
           order_id: order.orderId,
           prefill: {
@@ -1135,7 +1135,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </button>
 
                   <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                    By creating an account, you agree to KindlyReview's{' '}
+                    By creating an account, you agree to KindlyRate's{' '}
                     <button
                       type="button"
                       onClick={() => setLegalModal('terms')}
@@ -1998,7 +1998,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 </div>
 
               <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                All charges in INR. By proceeding, you agree to KindlyReview's{' '}
+                All charges in INR. By proceeding, you agree to KindlyRate's{' '}
                 <button
                   type="button"
                   onClick={() => setLegalModal('terms')}

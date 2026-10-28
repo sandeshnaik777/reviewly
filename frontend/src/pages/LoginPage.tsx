@@ -46,7 +46,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
         <div
           onClick={onNavigateHome}
           style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-          title="Return to KindlyReview Home"
+          title="Return to KindlyRate Home"
         >
           <KindlyReviewBrand iconSize={34} fontSize={22} />
         </div>
@@ -71,7 +71,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
 
           <div style={{ textAlign: 'center', marginBottom: '22px' }}>
             <h1 className="serif serif-h1" style={{ fontSize: '26px', fontWeight: 700, lineHeight: 1.25 }}>
-              Sign in to KindlyReview
+              Sign in to KindlyRate
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '6px' }}>
               Access your business analytics, customer reviews, and growth center.
@@ -112,7 +112,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
 
           {/* Terms & Privacy Policy Legal Agreement Notice */}
           <div style={{ marginTop: '14px', textAlign: 'center', fontSize: '11.5px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            By signing in, you agree to KindlyReview's{' '}
+            By signing in, you agree to KindlyRate's{' '}
             <button
               type="button"
               onClick={() => setLegalModal('terms')}

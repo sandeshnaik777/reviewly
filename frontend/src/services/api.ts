@@ -7,7 +7,9 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
   }
 
   // Dual auth: Attach token from localStorage as fallback when cookies are blocked over HTTP/proxies
-  const storedToken = typeof localStorage !== 'undefined' ? (localStorage.getItem('kindlyreview_token') || localStorage.getItem('reviewly_token')) : null;
+  const storedToken = typeof localStorage !== 'undefined'
+    ? (localStorage.getItem('kindlyrate_token') || localStorage.getItem('kindlyreview_token') || localStorage.getItem('reviewly_token'))
+    : null;
   if (storedToken && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${storedToken}`);
   }
@@ -31,6 +33,7 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
 
   // Persist token if provided in response
   if (json.data?.token && typeof localStorage !== 'undefined') {
+    localStorage.setItem('kindlyrate_token', json.data.token);
     localStorage.setItem('kindlyreview_token', json.data.token);
   }
 
@@ -45,6 +48,7 @@ export const api = {
   login: (data: any) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   logout: () => {
     if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('kindlyrate_token');
       localStorage.removeItem('kindlyreview_token');
       localStorage.removeItem('reviewly_token');
     }

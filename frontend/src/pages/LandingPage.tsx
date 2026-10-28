@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  KindlyReviewBrand,
-  KindlyReviewLogo,
+  KindlyRateBrand,
+  KindlyRateLogo,
   GoogleLogo,
   WhatsAppLogo,
   StarIcon,
@@ -43,7 +43,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       badge: '🏆 Rank #10 ➔ #1 on Maps',
       pillClass: 'stat-pill-primary',
       title: '"Our bistro was ranked #10 in the city. Now we are officially #1 on Google Local Pack!"',
-      text: '"Before KindlyReview, when anyone searched woodfired pizza nearby, we were buried at Rank #10. In 90 days of smart QR stands, we gathered 380+ verified 5-star Google reviews praising our sourdough crust. Today, we hold the permanent #1 search spot across the entire suburb!"',
+      text: '"Before KindlyRate, when anyone searched woodfired pizza nearby, we were buried at Rank #10. In 90 days of smart QR stands, we gathered 380+ verified 5-star Google reviews praising our sourdough crust. Today, we hold the permanent #1 search spot across the entire suburb!"',
       initials: 'KD',
       avatarBg: '#9a4018',
       author: 'Chef Kabir Deshmukh',
@@ -65,7 +65,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       badge: '💰 Saved ₹42,000/mo on Ads',
       pillClass: 'stat-pill-primary',
       title: '"I saved so much money on ads, and our electronics store reviews skyrocketed!"',
-      text: '"We used to waste ₹35,000 every month on local print ads and sponsored social boosts with zero trackable return. With KindlyReview at our billing desk, customers do the selling for us. Our review volume shot up by 320%, saving over ₹42,000 straight into profit every month!"',
+      text: '"We used to waste ₹35,000 every month on local print ads and sponsored social boosts with zero trackable return. With KindlyRate at our billing desk, customers do the selling for us. Our review volume shot up by 320%, saving over ₹42,000 straight into profit every month!"',
       initials: 'RV',
       avatarBg: '#d97706',
       author: 'Rajesh Verma',
@@ -76,7 +76,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       badge: '📈 +₹1.8L/mo Walk-ins',
       pillClass: 'stat-pill-neutral',
       title: '"Salon revenue increased by ₹1.8 Lakhs/mo. Clients started pouring in from Google Maps."',
-      text: '"When people search best salon near me, Google Maps recommends businesses with the highest volume of recent authentic reviews. Since placing KindlyReview smart stands at our billing counter, new client walk-ins jumped by 45%. Monthly revenue surged by ₹1,80,000!"',
+      text: '"When people search best salon near me, Google Maps recommends businesses with the highest volume of recent authentic reviews. Since placing KindlyRate smart stands at our billing counter, new client walk-ins jumped by 45%. Monthly revenue surged by ₹1,80,000!"',
       initials: 'PS',
       avatarBg: '#0284c7',
       author: 'Priya Sundaram',
@@ -87,7 +87,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       badge: '⚡ 72% AI Review Rate',
       pillClass: 'stat-pill-primary',
       title: '"Clients love that AI drafts their review in 15 seconds. Scan-to-Google rate hit 72%!"',
-      text: '"Customers never wanted to type long paragraphs on their phone. With KindlyReview’s 1-click AI draft generation, 72% of clients who scan actually copy and post to Google Maps. Our review velocity jumped from 4 reviews/wk to 28 reviews/wk!"',
+      text: '"Customers never wanted to type long paragraphs on their phone. With KindlyRate’s 1-click AI draft generation, 72% of clients who scan actually copy and post to Google Maps. Our review velocity jumped from 4 reviews/wk to 28 reviews/wk!"',
       initials: 'AS',
       avatarBg: '#7c3aed',
       author: 'Arjun Singhania',
@@ -98,7 +98,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       badge: '🛡️ 100% Reputation Shield',
       pillClass: 'stat-pill-success',
       title: '"Caught a repair delay complaint in 3 minutes and converted an upset car owner to a lifetime regular."',
-      text: '"A customer had an unexpected service delay. Rather than venting publicly on Google Maps, KindlyReview diverted their rating to my manager inbox. We resolved the concern immediately. The owner left thrilled and posted 5 stars on their next visit!"',
+      text: '"A customer had an unexpected service delay. Rather than venting publicly on Google Maps, KindlyRate diverted their rating to my manager inbox. We resolved the concern immediately. The owner left thrilled and posted 5 stars on their next visit!"',
       initials: 'VR',
       avatarBg: '#059669',
       author: 'Vikramaditya Rao',
@@ -122,7 +122,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       >
         <div className="landing-nav-container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <KindlyReviewBrand iconSize={36} fontSize={22} />
+            <KindlyRateBrand iconSize={36} fontSize={22} />
             <span
               className="stat-pill stat-pill-success hide-on-phone"
               style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
@@ -398,7 +398,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 The Growth Transformation
               </span>
               <h3 className="serif" style={{ fontSize: '26px', fontWeight: 700, color: '#ffffff', marginTop: '4px' }}>
-                Your Business Before vs After KindlyReview
+                Your Business Before vs After KindlyRate
               </h3>
             </div>
 
@@ -413,7 +413,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#fca5a5', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>❌</span> Without KindlyReview (The Old Painful Way)
+                  <span>❌</span> Without KindlyRate (The Old Painful Way)
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px', color: '#cbd5e1' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -449,7 +449,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#86efac', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>✅</span> With KindlyReview Growth Engine
+                  <span>✅</span> With KindlyRate Growth Engine
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13.5px', color: '#f8fafc' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -973,12 +973,12 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 a: 'When a customer scans the QR stand at your billing counter, desk, or table, they rate their experience across customized criteria in 30 seconds. Our server-side AI immediately synthesizes their genuine ratings into an authentic, personalized draft in natural everyday English. Customers tap "Copy & Post to Google Maps", opening your listing’s native review form with the text pre-copied ready to paste.',
               },
               {
-                q: 'Does KindlyReview comply with Google Business Profile & Maps policies?',
-                a: 'Yes, 100%. KindlyReview does NOT use bots or proxy IP networks (which get banned by Google algorithms). Real in-person customers scan the stand from their own smartphones and post voluntarily using their personal, verified Google accounts, ensuring high authority and permanent indexation.',
+                q: 'Does KindlyRate comply with Google Business Profile & Maps policies?',
+                a: 'Yes, 100%. KindlyRate does NOT use bots or proxy IP networks (which get banned by Google algorithms). Real in-person customers scan the stand from their own smartphones and post voluntarily using their personal, verified Google accounts, ensuring high authority and permanent indexation.',
               },
               {
                 q: 'What is the Reputation Shield and how does it prevent 1-star reviews?',
-                a: 'If a customer experiences an issue and rates their experience 1 to 3 stars, KindlyReview intercepts the feedback privately. Rather than directing them to Google Maps, it routes their complaint directly to your manager WhatsApp and dashboard. This allows your team to resolve the issue privately on the spot before it hurts your public score.',
+                a: 'If a customer experiences an issue and rates their experience 1 to 3 stars, KindlyRate intercepts the feedback privately. Rather than directing them to Google Maps, it routes their complaint directly to your manager WhatsApp and dashboard. This allows your team to resolve the issue privately on the spot before it hurts your public score.',
               },
               {
                 q: 'Do customers need to download an app or register an account?',
@@ -990,7 +990,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               },
               {
                 q: 'Can I print branded acrylic counter stands for my business?',
-                a: 'Yes! KindlyReview includes a built-in Printable Acrylic Stand Studio. You can customize location/counter tags, brand accent colors, custom welcome greetings, and print high-resolution 4"×6" counter stand inserts immediately, or order custom laser-engraved stands.',
+                a: 'Yes! KindlyRate includes a built-in Printable Acrylic Stand Studio. You can customize location/counter tags, brand accent colors, custom welcome greetings, and print high-resolution 4"×6" counter stand inserts immediately, or order custom laser-engraved stands.',
               },
             ].map((faq, idx) => {
               const isOpen = expandedFaq === idx;
@@ -1018,7 +1018,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           {/* Column 1: Brand & Trust Badges */}
           <div>
             <div style={{ marginBottom: '14px' }}>
-              <KindlyReviewBrand iconSize={42} fontSize={26} darkBg={true} />
+              <KindlyRateBrand iconSize={42} fontSize={26} darkBg={true} />
             </div>
             <p style={{ fontSize: '13.5px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '20px' }}>
               The #1 AI-powered Google Local 3-Pack Growth Engine for every local business, retail store, clinic, salon, and service outlet across India.
@@ -1187,7 +1187,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           }}
         >
           <div>
-            © 2026 KindlyReview Technologies Pvt. Ltd. All rights reserved. Registered Office: Indiranagar, Bengaluru, KA 560038.
+            © 2026 KindlyRate Technologies Pvt. Ltd. All rights reserved. Registered Office: Indiranagar, Bengaluru, KA 560038.
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <span>INR (₹) Accepted via UPI &amp; Cards</span>

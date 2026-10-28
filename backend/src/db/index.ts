@@ -317,7 +317,7 @@ class DatabaseService {
             },
             {
               id: 'notif-2',
-              title: '⭐ KindlyReview Reputation Engine Operational',
+              title: '⭐ KindlyRate Reputation Engine Operational',
               message: 'All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.',
               type: 'SUCCESS',
               createdAt: new Date().toISOString(),
@@ -381,7 +381,7 @@ class DatabaseService {
         },
         {
           id: 'notif-2',
-          title: '⭐ KindlyReview Reputation Engine Operational',
+          title: '⭐ KindlyRate Reputation Engine Operational',
           message: 'All QR table tent stands, live telemetry, and Aura AI sentiment verification are running at 100% capacity.',
           type: 'SUCCESS',
           createdAt: new Date().toISOString(),
@@ -1655,7 +1655,7 @@ class DatabaseService {
     facebookUrl?: string;
     whatsappUrl?: string;
   }) {
-    const rawPassword = params.password?.trim() || 'KindlyReview@123';
+    const rawPassword = params.password?.trim() || 'KindlyRate@123';
     const salt = bcrypt.genSaltSync(10);
     const passwordHash = bcrypt.hashSync(rawPassword, salt);
     const userId = crypto.randomUUID();

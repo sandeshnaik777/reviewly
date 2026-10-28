@@ -146,7 +146,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
             <span style={{ fontSize: '22px' }}>⚖️</span>
             <div>
               <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0 }}>
-                KindlyReview Trust, Legal &amp; Support Portal
+                KindlyRate Trust, Legal &amp; Support Portal
               </h3>
               <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
                 Official Policies compliant with IT Act 2000, DPDP Act 2023 &amp; Razorpay Standards
@@ -431,18 +431,18 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   Terms of Service &amp; SaaS Agreement
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '12.5px' }}>
-                  Governing usage of KindlyReview multi-tenant SaaS, table stands, and server-side review assistance.
+                  Governing usage of KindlyRate multi-tenant SaaS, table stands, and server-side review assistance.
                 </p>
               </div>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. Acceptance of Terms</h4>
               <p>
-                By creating an account, paying verification fees, or deploying KindlyReview QR stands in your establishment, you agree to be bound by these Terms of Service. If you are registering on behalf of a business, store, or commercial enterprise, you warrant that you hold legal authority to bind that entity.
+                By creating an account, paying verification fees, or deploying KindlyRate QR stands in your establishment, you agree to be bound by these Terms of Service. If you are registering on behalf of a business, store, or commercial enterprise, you warrant that you hold legal authority to bind that entity.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Fair Use &amp; Review Authenticity</h4>
               <p>
-                KindlyReview provides assistive AI drafting and reputation telemetry designed to help real, in-person customers express their feedback smoothly. Merchants agree <strong>NOT</strong> to:
+                KindlyRate provides assistive AI drafting and reputation telemetry designed to help real, in-person customers express their feedback smoothly. Merchants agree <strong>NOT</strong> to:
               </p>
               <ul style={{ paddingLeft: '20px', marginBottom: '12px' }}>
                 <li>Manufacture fake reviews or incentivize non-customers to post fraudulent claims.</li>
@@ -482,7 +482,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               <ul style={{ paddingLeft: '20px', marginBottom: '12px' }}>
                 <li><strong>Merchant Data:</strong> Business name, email, phone number, Google Review URL, store locations, and staff attribution records.</li>
                 <li><strong>Customer Session Data:</strong> Ratings submitted (1-5 stars per category), product/service feedback, and anonymous QR scan timestamps. Customers are <em>never</em> required to sign up or disclose passwords.</li>
-                <li><strong>Payment Data:</strong> Handled entirely through Razorpay. KindlyReview never stores credit card or debit card numbers on internal servers.</li>
+                <li><strong>Payment Data:</strong> Handled entirely through Razorpay. KindlyRate never stores credit card or debit card numbers on internal servers.</li>
               </ul>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Data Encryption &amp; Security</h4>
@@ -517,7 +517,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. Testing Pack &amp; Starter Trial</h4>
               <p>
-                The ₹79 promotional starter trial provides 30-day access to KindlyReview services (including 100 AI review drafts and 2 Smart QR Stands). This initial introductory trial fee is processed via Razorpay.
+                The ₹79 promotional starter trial provides 30-day access to KindlyRate services (including 100 AI review drafts and 2 Smart QR Stands). This initial introductory trial fee is processed via Razorpay.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Cancelling Your Subscription Anytime</h4>
@@ -733,7 +733,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
               ) : (
                 <div>
                   <div style={{ marginBottom: '20px' }}>
-                    <span className="badge badge-primary">KindlyReview Knowledge & Growth</span>
+                    <span className="badge badge-primary">KindlyRate Knowledge & Growth</span>
                     <h2 className="serif" style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0 4px', color: '#0f172a' }}>
                       Articles, Field Studies &amp; Playbooks
                     </h2>

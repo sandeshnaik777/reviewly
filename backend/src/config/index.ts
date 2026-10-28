@@ -55,7 +55,7 @@ export const config = {
     smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
     smtpUser: process.env.SMTP_USER || '',
     smtpPass: process.env.SMTP_PASS || '',
-    from: process.env.EMAIL_FROM || 'KindlyReview <no-reply@kindlyreview.local>',
+    from: process.env.EMAIL_FROM || 'KindlyRate <no-reply@kindlyrate.com>',
   },
 
   awsSms: {

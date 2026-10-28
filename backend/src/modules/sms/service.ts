@@ -108,7 +108,7 @@ export class AwsSmsService {
   async sendPhoneOtp(phone: string, otp: string, recipientName?: string): Promise<SmsSendResult> {
     const e164Phone = this.formatE164(phone);
     const greeting = recipientName ? `Hello ${recipientName}, ` : '';
-    const message = `${greeting}Your KindlyReview verification code is: ${otp}. Valid for 10 minutes. Do not share this code.`;
+    const message = `${greeting}Your KindlyRate verification code is: ${otp}. Valid for 10 minutes. Do not share this code.`;
 
     const snsSetup = await this.getSnsClient();
 

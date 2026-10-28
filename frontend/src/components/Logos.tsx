@@ -74,7 +74,7 @@ export const KindlyReviewLogo: React.FC<{
         letterSpacing="-3"
       >
         <tspan fill="#00383B">kindly</tspan>
-        <tspan fill="url(#krWordGreen)">review</tspan>
+        <tspan fill="url(#krWordGreen)">rate</tspan>
       </text>
     </svg>
   );
@@ -172,11 +172,16 @@ export const KindlyReviewBrand: React.FC<{
           WebkitTextFillColor: 'transparent',
         }}
       >
-        review
+        rate
       </span>
     </span>
   </div>
 );
+
+// Backward-compatible & Canonical Brand Exports
+export const KindlyRateBrand = KindlyReviewBrand;
+export const KindlyRateLogo = KindlyReviewLogo;
+export const KindlyRateIcon = KindlyReviewIcon;
 
 // Authentic Official 4-color Google "G" Logo
 export const GoogleLogo: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (

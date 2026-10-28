@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import {
-  KindlyReviewLogo,
+  KindlyRateLogo,
   GoogleLogo,
   InstagramLogo,
   FacebookLogo,
@@ -48,7 +48,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
     category: 'Google Maps SEO',
     excerpt: '',
     content: '',
-    author: 'KindlyReview Editorial Team',
+    author: 'KindlyRate Editorial Team',
     readTime: '4 min read',
     tags: 'google-reviews, local-seo',
     isPublished: true,
@@ -126,7 +126,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
     businessName: '',
     ownerName: '',
     email: '',
-    password: 'KindlyReview@123',
+    password: 'KindlyRate@123',
     phone: '',
     mainCategory: 'FOOD & HOSPITALITY',
     subcategory: 'Restaurant',
@@ -299,7 +299,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
       category: 'Google Maps SEO',
       excerpt: '',
       content: '',
-      author: 'KindlyReview Editorial Team',
+      author: 'KindlyRate Editorial Team',
       readTime: '4 min read',
       tags: 'google-reviews, local-seo',
       isPublished: true,
@@ -478,7 +478,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
       setShowAddBusinessModal(false);
 
       const loginUrl = `${window.location.origin}/login`;
-      const pass = res?.credentials?.password || newBizForm.password || 'KindlyReview@123';
+      const pass = res?.credentials?.password || newBizForm.password || 'KindlyRate@123';
       const email = res?.credentials?.email || newBizForm.email;
 
       setCreatedSubscriberModal({
@@ -494,7 +494,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
         businessName: '',
         ownerName: '',
         email: '',
-        password: 'KindlyReview@123',
+        password: 'KindlyRate@123',
         phone: '',
         mainCategory: 'FOOD & HOSPITALITY',
         subcategory: 'Restaurant',
@@ -612,7 +612,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <KindlyReviewLogo height={34} />
+          <KindlyRateLogo height={34} />
           <span style={{ color: 'var(--border)', height: '22px', borderLeft: '1px solid var(--border)' }} />
           <h2 className="serif" style={{ fontSize: '20px', margin: 0 }}>Super-Admin Portal</h2>
           <span className="badge badge-primary">Operations & Finance</span>
@@ -1622,7 +1622,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       </a>
                       <a
                         href={`https://wa.me/${(selectedContactBusiness.owner?.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-                          `Hello ${selectedContactBusiness.owner?.name}, this is KindlyReview Platform Administration regarding your account for ${selectedContactBusiness.name}.`
+                          `Hello ${selectedContactBusiness.owner?.name}, this is KindlyRate Platform Administration regarding your account for ${selectedContactBusiness.name}.`
                         )}`}
                         target="_blank"
                         rel="noreferrer"
@@ -2581,7 +2581,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
             >
               <span style={{ fontSize: '22px' }}>🛡️</span>
               <div style={{ fontSize: '13px', color: '#166534', lineHeight: 1.5 }}>
-                <strong>Zero-Downtime Multi-Key Failover:</strong> When diners scan QR stands, KindlyReview rotates requests across all active Gemini API keys. If any individual key hits Google rate limits (HTTP 429) or quota caps, the engine automatically fails over to the next active key instantly.
+                <strong>Zero-Downtime Multi-Key Failover:</strong> When diners scan QR stands, KindlyRate rotates requests across all active Gemini API keys. If any individual key hits Google rate limits (HTTP 429) or quota caps, the engine automatically fails over to the next active key instantly.
               </div>
             </div>
 
@@ -2931,7 +2931,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="e.g. KindlyReview Editorial Team"
+                      placeholder="e.g. KindlyRate Editorial Team"
                       value={blogForm.author}
                       onChange={(e) => setBlogForm({ ...blogForm, author: e.target.value })}
                     />
@@ -3085,7 +3085,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       <input
                         type={showPassword ? 'text' : 'password'}
                         className="form-input"
-                        placeholder="e.g. KindlyReview@123"
+                        placeholder="e.g. KindlyRate@123"
                         value={newBizForm.password}
                         onChange={(e) => setNewBizForm({ ...newBizForm, password: e.target.value })}
                         required
@@ -3354,7 +3354,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   className="btn btn-primary"
                   style={{ flex: 1, padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 600 }}
                   onClick={() => {
-                    const text = `🎉 Welcome to KindlyReview!\n\nYour business account for *${createdSubscriberModal.businessName}* is activated.\n\n🌐 Login URL: ${createdSubscriberModal.loginUrl}\n📧 Email: ${createdSubscriberModal.email}\n🔑 Password: ${createdSubscriberModal.password}\n\n✓ No OTP required. You can log in directly anytime.`;
+                    const text = `🎉 Welcome to KindlyRate!\n\nYour business account for *${createdSubscriberModal.businessName}* is activated.\n\n🌐 Login URL: ${createdSubscriberModal.loginUrl}\n📧 Email: ${createdSubscriberModal.email}\n🔑 Password: ${createdSubscriberModal.password}\n\n✓ No OTP required. You can log in directly anytime.`;
                     navigator.clipboard.writeText(text);
                     setCopiedCredentials(true);
                     setTimeout(() => setCopiedCredentials(false), 3000);

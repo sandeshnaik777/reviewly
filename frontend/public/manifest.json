@@ -1,7 +1,7 @@
 {
-  "short_name": "KindlyReview",
-  "name": "KindlyReview — Multi-Tenant Business Review Platform",
-  "description": "Turn happy diners and customers into 5-star Google Maps reviews automatically using smart QR stands and server-side AI assistance.",
+  "short_name": "KindlyRate",
+  "name": "KindlyRate — Multi-Tenant Business Review & Local SEO Platform",
+  "description": "Turn happy customers into 5-star Google Maps reviews automatically using smart QR stands and server-side AI assistance.",
   "icons": [
     {
       "src": "/favicon.svg",
