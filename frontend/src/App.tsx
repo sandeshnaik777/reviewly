@@ -6,22 +6,33 @@ import { BusinessDashboard } from './pages/BusinessDashboard.js';
 import { AdminDashboard } from './pages/AdminDashboard.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { LandingPage } from './pages/LandingPage.js';
+import { BlogPage } from './pages/BlogPage.js';
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentBusiness, setCurrentBusiness] = useState<any>(null);
-  const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer'>('landing');
+  const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog'>('landing');
   const [customerSlug, setCustomerSlug] = useState<string>('');
+  const [blogSlug, setBlogSlug] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if customer is scanning QR code (/r/:slug)
     const path = window.location.pathname;
-    const match = path.match(/^\/r\/([^/]+)/);
 
+    // Check if customer is scanning QR code (/r/:slug)
+    const match = path.match(/^\/r\/([^/]+)/);
     if (match && match[1]) {
       setCustomerSlug(match[1]);
       setView('customer');
+      setLoading(false);
+      return;
+    }
+
+    // Check if visitor is navigating to /blog or /blog/:slug
+    const blogMatch = path.match(/^\/blog(?:\/([^/]+))?/);
+    if (blogMatch) {
+      setBlogSlug(blogMatch[1] || '');
+      setView('blog');
       setLoading(false);
       return;
     }
@@ -134,11 +145,36 @@ export const App: React.FC = () => {
     );
   }
 
+  // Blog Hub & Dedicated Article Reader
+  if (view === 'blog') {
+    return (
+      <BlogPage
+        initialSlug={blogSlug}
+        onNavigateHome={() => {
+          setView('landing');
+          window.history.pushState({}, '', '/');
+        }}
+        onStartOnboarding={() => setView('onboarding')}
+        onNavigateLogin={() => setView('login')}
+      />
+    );
+  }
+
   // Public Landing Page
   return (
     <LandingPage
       onStartOnboarding={() => setView('onboarding')}
       onNavigateLogin={() => setView('login')}
+      onNavigateBlog={(slug?: string) => {
+        if (slug) {
+          window.history.pushState({}, '', `/blog/${slug}`);
+          setBlogSlug(slug);
+        } else {
+          window.history.pushState({}, '', '/blog');
+          setBlogSlug('');
+        }
+        setView('blog');
+      }}
     />
   );
 };

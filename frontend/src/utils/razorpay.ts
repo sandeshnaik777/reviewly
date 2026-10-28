@@ -26,3 +26,4 @@ export function loadRazorpay(): Promise<boolean> {
     document.body.appendChild(script);
   });
 }
+

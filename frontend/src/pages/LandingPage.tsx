@@ -15,20 +15,18 @@ import { LegalModals, LegalModalType } from '../components/LegalModals.js';
 interface Props {
   onStartOnboarding: () => void;
   onNavigateLogin: () => void;
+  onNavigateBlog?: (slug?: string) => void;
 }
 
-export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin }) => {
+export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin, onNavigateBlog }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isFast, setIsFast] = useState(false);
   const [legalModal, setLegalModal] = useState<LegalModalType>(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname;
-      if (p.includes('/blog') || p.includes('/articles')) return 'blog';
       if (p.includes('/terms')) return 'terms';
       if (p.includes('/privacy')) return 'privacy';
       if (p.includes('/refund')) return 'refund';
-      const sp = new URLSearchParams(window.location.search);
-      if (sp.get('modal') === 'blog') return 'blog';
     }
     return null;
   });
@@ -136,7 +134,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
               className="btn btn-secondary hide-on-phone"
-              onClick={() => setLegalModal('blog')}
+              onClick={() => (onNavigateBlog ? onNavigateBlog() : setLegalModal('blog'))}
               style={{ fontSize: '13px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
             >
               <span>📰</span> Articles &amp; Blog
@@ -850,6 +848,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', textAlign: 'left' }}>
             {[
               {
+                slug: 'how-to-dominate-google-maps-local-3-pack-rankings-2026',
                 title: 'The Definitive 2026 Guide to Dominating Google Maps Local 3-Pack Rankings',
                 category: 'LOCAL SEO MASTERY',
                 readTime: '15 min read',
@@ -857,6 +856,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 tag: 'Google Maps 3-Pack',
               },
               {
+                slug: 'smart-nfc-qr-stands-vs-sms-whatsapp-review-requests',
                 title: 'Physical Smart NFC & QR Stands vs. SMS/WhatsApp Blasts: Why Tap-to-Review Converts at 48%',
                 category: 'CONVERSION OPTIMIZATION',
                 readTime: '13 min read',
@@ -864,6 +864,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 tag: 'QR Stands & NFC',
               },
               {
+                slug: 'shielding-business-from-unfair-1-star-fake-reviews-legally',
                 title: 'The Complete Legal & Algorithmic Defense Guide: Protecting Against 1-Star Fake Reviews',
                 category: 'REPUTATION DEFENSE',
                 readTime: '16 min read',
@@ -871,6 +872,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 tag: 'Negative Review Defense',
               },
               {
+                slug: 'keyword-injection-and-semantic-search-in-customer-reviews',
                 title: 'Keyword Injection & Semantic Search: How Specific Customer Mentions Drive Foot Traffic',
                 category: 'SEARCH ALGORITHMS',
                 readTime: '12 min read',
@@ -878,6 +880,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 tag: 'Keyword SEO',
               },
               {
+                slug: 'why-businesses-are-replacing-generic-aggregators-with-bespoke-software',
                 title: 'Why Retail Stores, Clinics, Salons & Gyms Are Replacing Generic Aggregators with Bespoke Software',
                 category: 'CUSTOM SOFTWARE',
                 readTime: '14 min read',
@@ -885,6 +888,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 tag: 'Bespoke ERP & POS',
               },
               {
+                slug: 'enterprise-multi-location-review-architecture',
                 title: 'Enterprise Multi-Location Review Architecture: Scaling Brand Reputation Across 50+ Branches',
                 category: 'ENTERPRISE SCALING',
                 readTime: '17 min read',
@@ -895,7 +899,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               <div
                 key={aIdx}
                 className="card"
-                onClick={() => setLegalModal('blog')}
+                onClick={() => (onNavigateBlog ? onNavigateBlog(article.slug) : setLegalModal('blog'))}
                 style={{
                   padding: '24px',
                   cursor: 'pointer',
@@ -936,7 +940,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ marginTop: '32px' }}>
             <button
               className="btn btn-secondary"
-              onClick={() => setLegalModal('blog')}
+              onClick={() => (onNavigateBlog ? onNavigateBlog() : setLegalModal('blog'))}
               style={{ fontSize: '14px', padding: '10px 22px' }}
             >
               View All Articles &amp; Playbooks →
@@ -1094,7 +1098,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               <li>
                 <button
                   type="button"
-                  onClick={() => setLegalModal('blog')}
+                  onClick={() => (onNavigateBlog ? onNavigateBlog() : setLegalModal('blog'))}
                   style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
                 >
                   Articles &amp; Growth Blog
