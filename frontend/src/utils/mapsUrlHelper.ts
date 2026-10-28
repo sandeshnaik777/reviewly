@@ -119,7 +119,7 @@ export function quickParseMapsUrl(input: string): MapsLinkConversionResult | nul
     };
   }
 
-  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> Direct Google Maps App link (opens Google Maps natively on phone)
+  // 7. Hex coordinates pair in data (!1s0x...:0x...) -> Direct Google Maps Reviews Tab
   const hexPair = targetUrl.match(/!1s(0x[a-fA-F0-9]+):(0x[a-fA-F0-9]+)/);
   if (hexPair && hexPair[2]) {
     try {
@@ -128,12 +128,18 @@ export function quickParseMapsUrl(input: string): MapsLinkConversionResult | nul
       // Extract business name if present in URL (/maps/place/Business+Name/...)
       const nameMatch = targetUrl.match(/\/maps\/place\/([^/@?]+)/i);
       const name = nameMatch && nameMatch[1] ? decodeURIComponent(nameMatch[1].replace(/\+/g, ' ')) : '';
-      const mapsAppUrl = `https://maps.google.com/?cid=${decimalCid}`;
+
+      // If full maps place URL is available, append Google Maps Reviews tab trigger (!9m1!1b1)
+      let reviewsDirectUrl = `https://maps.google.com/?cid=${decimalCid}`;
+      if (targetUrl.includes('/maps/place/')) {
+        const basePlace = targetUrl.split('?')[0];
+        reviewsDirectUrl = basePlace.includes('!9m1!1b1') ? basePlace : `${basePlace}!9m1!1b1`;
+      }
 
       return {
         originalUrl: raw,
-        directReviewUrl: mapsAppUrl,
-        detectedType: 'GOOGLE_MAPS_APP_DIRECT',
+        directReviewUrl: reviewsDirectUrl,
+        detectedType: 'GOOGLE_MAPS_REVIEWS_TAB',
         cid: decimalCid,
         businessName: name,
       };
