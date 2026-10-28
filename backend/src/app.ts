@@ -118,7 +118,7 @@ export function createApp(): Express {
     try {
       const { search } = req.query as { search?: string };
       const blogs = await db.listBlogPosts(search, true);
-      res.json({ success: true, data: blogs });
+      res.json({ success: true, data: blogs, blogs });
     } catch (err) {
       next(err);
     }
@@ -131,7 +131,7 @@ export function createApp(): Express {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Article not found' } });
         return;
       }
-      res.json({ success: true, data: blog });
+      res.json({ success: true, data: blog, blog });
     } catch (err) {
       next(err);
     }

@@ -296,11 +296,11 @@ authRouter.post('/register', validateBody(registerSchema), async (req: Request, 
     };
     await db.saveBusinessSettings(settings);
 
-    // 5. Subscription Setup (7-day trial pass with ₹2 verification)
+    // 5. Subscription Setup (Testing Pack trial starter with ₹79 offer)
     const postTrialPlan = (await db.findPlanBySlug(data.planSlug)) || (await db.findPlanBySlug('starter'))!;
-    const trialPlan = (await db.findPlanBySlug('trial')) || postTrialPlan;
+    const trialPlan = (await db.findPlanBySlug('starter')) || postTrialPlan;
     const now = new Date();
-    const periodEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
     const subscription: Subscription = {
       id: crypto.randomUUID(),
@@ -308,7 +308,7 @@ authRouter.post('/register', validateBody(registerSchema), async (req: Request, 
       planId: trialPlan.id,
       selectedNextPlanId: postTrialPlan.id,
       status: 'TRIAL',
-      trialActivated: false, // Activated upon ₹2 payment
+      trialActivated: false, // Activated upon payment
       currentPeriodStart: now.toISOString(),
       currentPeriodEnd: periodEnd.toISOString(),
       trialStart: now.toISOString(),

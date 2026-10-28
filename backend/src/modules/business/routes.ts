@@ -487,11 +487,11 @@ businessRouter.post(
         });
       }
 
-      // Subscription Setup (7-day trial pass with ₹2 verification)
+      // Subscription Setup (Testing Pack trial starter with ₹79 offer)
       const postTrialPlan = (await db.findPlanBySlug(data.planSlug)) || (await db.findPlanBySlug('starter'))!;
-      const trialPlan = (await db.findPlanBySlug('trial')) || postTrialPlan;
+      const trialPlan = (await db.findPlanBySlug('starter')) || postTrialPlan;
       const now = new Date();
-      const periodEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       const existingSub = await db.getBusinessSubscription(businessId);
       if (!existingSub) {

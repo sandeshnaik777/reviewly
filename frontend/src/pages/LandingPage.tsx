@@ -20,7 +20,18 @@ interface Props {
 export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isFast, setIsFast] = useState(false);
-  const [legalModal, setLegalModal] = useState<LegalModalType>(null);
+  const [legalModal, setLegalModal] = useState<LegalModalType>(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname;
+      if (p.includes('/blog') || p.includes('/articles')) return 'blog';
+      if (p.includes('/terms')) return 'terms';
+      if (p.includes('/privacy')) return 'privacy';
+      if (p.includes('/refund')) return 'refund';
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('modal') === 'blog') return 'blog';
+    }
+    return null;
+  });
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [landingPlanDurations, setLandingPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({
     starter: 1,
@@ -125,6 +136,13 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
               className="btn btn-secondary hide-on-phone"
+              onClick={() => setLegalModal('blog')}
+              style={{ fontSize: '13px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+            >
+              <span>📰</span> Articles &amp; Blog
+            </button>
+            <button
+              className="btn btn-secondary hide-on-phone"
               onClick={onNavigateLogin}
               style={{ fontSize: '13px', padding: '7px 14px' }}
             >
@@ -135,7 +153,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               onClick={onStartOnboarding}
               style={{ fontSize: '13px', padding: '7px 14px' }}
             >
-              Start Free Trial →
+              Start for ₹79 →
             </button>
           </div>
         </div>
@@ -172,7 +190,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
         <div className="hero-cta-group" style={{ marginBottom: '36px' }}>
           <button className="btn btn-primary btn-lg" onClick={onStartOnboarding} style={{ padding: '12px 24px', fontSize: '15px' }}>
-            Start 7-Day Free Trial →
+            Start Testing Pack (₹79 Trial) →
           </button>
           <button className="btn btn-secondary btn-lg" onClick={onNavigateLogin} style={{ padding: '12px 24px', fontSize: '15px' }}>
             Explore Live Restaurant Demo
@@ -509,12 +527,12 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
         <div className="desktop-container" style={{ textAlign: 'center', maxWidth: '1080px' }}>
           <div style={{ display: 'inline-block', marginBottom: '14px' }}>
             <span className="stat-pill stat-pill-primary" style={{ fontSize: '13px', padding: '6px 16px' }}>
-              🌟 7-Day All-Access Free Trial
+              ⚡ ₹79 Starter Trial Offer
             </span>
           </div>
           <h2 className="serif" style={{ fontSize: '38px', marginBottom: '12px' }}>Simple, High-ROI Subscription Packs</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '40px', maxWidth: '640px', margin: '0 auto 40px' }}>
-            Try full access for 7 days risk-free. Enjoy exclusive first-month promotional rates across all packs.
+            Get started with our ₹79 Testing Pack trial offer or choose a high-growth tier. Enjoy exclusive promotional rates across all packs.
           </p>
 
           <div className="pricing-grid">
@@ -593,7 +611,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                     <li>✓ Standard Reputation Shield</li>
                   </ul>
                   <button className="btn btn-outline btn-block" onClick={onStartOnboarding}>
-                    Start Free Trial →
+                    Start ₹79 Trial Pack →
                   </button>
                 </div>
               );
@@ -679,7 +697,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                     <li>✓ Maximum Defense Reputation Shield</li>
                   </ul>
                   <button className="btn btn-primary btn-block" onClick={onStartOnboarding}>
-                    Start Free Trial →
+                    Get Growth Pack →
                   </button>
                 </div>
               );
@@ -761,11 +779,105 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                     <li>✓ Dedicated priority support & SLA</li>
                   </ul>
                   <button className="btn btn-outline btn-block" onClick={onStartOnboarding}>
-                    Start Free Trial →
+                    Get Scale / Pro Pack →
                   </button>
                 </div>
               );
             })()}
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* SECTION: FEATURED ARTICLES & GROWTH GUIDES               */}
+      {/* ======================================================== */}
+      <section style={{ padding: '72px 20px', background: '#faf8f5', borderTop: '1px solid var(--border-light)' }}>
+        <div className="desktop-container" style={{ maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', marginBottom: '12px' }}>
+            <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px' }}>
+              📰 Knowledge &amp; Field Studies
+            </span>
+          </div>
+          <h2 className="serif" style={{ fontSize: '36px', fontWeight: 700, marginBottom: '10px' }}>
+            Restaurant Growth &amp; Google SEO Guides
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '15px', maxWidth: '640px', margin: '0 auto 36px' }}>
+            Actionable playbooks written by hospitality leaders to optimize reviews, shield ratings, and build custom restaurant software.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', textAlign: 'left' }}>
+            {[
+              {
+                title: 'How to Collect 100+ Real 5-Star Google Reviews in 30 Days',
+                category: 'GROWTH & REPUTATION',
+                readTime: '4 min read',
+                excerpt: 'Step-by-step masterclass on leveraging table stands, customer peak happiness moments, and conversational AI review prompts.',
+                tag: 'Google Reviews',
+              },
+              {
+                title: 'Why Table QR Stands Outperform Post-Visit SMS by 4.8x',
+                category: 'CUSTOMER EXPERIENCE',
+                readTime: '5 min read',
+                excerpt: 'Data analysis across 50,000 customer sessions: why on-site table tent conversion blows away delayed WhatsApp or SMS requests.',
+                tag: 'Conversion Optimization',
+              },
+              {
+                title: 'Custom Software vs Generic POS: When to Build Bespoke Solutions',
+                category: 'CUSTOM SOFTWARE',
+                readTime: '6 min read',
+                excerpt: 'Why high-volume businesses and delivery fleets switch from rigid off-the-shelf software to bespoke dispatch and ERP architectures.',
+                tag: 'Custom ERP',
+              },
+            ].map((article, aIdx) => (
+              <div
+                key={aIdx}
+                className="card"
+                onClick={() => setLegalModal('blog')}
+                style={{
+                  padding: '24px',
+                  cursor: 'pointer',
+                  border: '1.5px solid var(--border-light)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  borderRadius: '12px',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--primary)')}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-light)')}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span className="badge badge-primary">{article.category}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{article.readTime}</span>
+                  </div>
+                  <h3 className="serif" style={{ fontSize: '18px', fontWeight: 600, margin: '6px 0 10px', color: '#0f172a' }}>
+                    {article.title}
+                  </h3>
+                  <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                    {article.excerpt}
+                  </p>
+                </div>
+                <div style={{ marginTop: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
+                  <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px' }}>
+                    #{article.tag}
+                  </span>
+                  <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '13px' }}>
+                    Read Guide →
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: '32px' }}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setLegalModal('blog')}
+              style={{ fontSize: '14px', padding: '10px 22px' }}
+            >
+              View All Articles &amp; Playbooks →
+            </button>
           </div>
         </div>
       </section>
@@ -806,8 +918,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 a: 'Zero downloads, zero friction! Diners do not need to install any app or register. The review flow launches instantly in their mobile browser (Chrome / Safari) using their standard phone camera.',
               },
               {
-                q: 'What happens after the 7-Day All-Access Free Trial?',
-                a: 'You receive full access to all features for 7 days. After 7 days, your account seamlessly continues with your selected monthly pack (Testing Pack: ₹79/mo, Growth Pack: ₹149/mo, or Scale Pack: ₹249/mo). You can cancel, pause, or switch packs anytime with 1 click in your Merchant Dashboard.',
+                q: 'What is included with the ₹79 Testing Pack Trial?',
+                a: 'The ₹79 introductory pack provides 30 full days of access, 100 AI review drafts, and 2 Smart Table QR Stands. You can switch, upgrade, or cancel packs anytime directly from your Merchant Dashboard with zero lock-in.',
               },
               {
                 q: 'Can I print branded acrylic table stands for my restaurant?',

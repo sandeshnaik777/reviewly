@@ -40,9 +40,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
     setLoadingBlogs(true);
     try {
       const res = await api.getPublicBlogs(query);
-      if (res.success && res.blogs) {
-        setBlogs(res.blogs);
-      }
+      const list = Array.isArray(res) ? res : (res?.blogs || res?.data || []);
+      setBlogs(list);
     } catch (e) {
       console.error('Failed to load public blogs', e);
     } finally {
@@ -273,9 +272,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                 </p>
               </div>
 
-              <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. 7-Day Free Trial Verification</h4>
+              <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>1. Testing Pack &amp; Starter Trial</h4>
               <p>
-                The nominal ₹2 payment is an automated Razorpay authorization and verification fee to prevent bot abuse and activate 7 days of full platform access. This nominal verification fee is non-refundable.
+                The ₹79 promotional starter trial provides 30-day access to KindlyReview services (including 100 AI review drafts and 2 Smart QR Stands). This initial introductory trial fee is processed via Razorpay.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>2. Cancelling Your Subscription Anytime</h4>

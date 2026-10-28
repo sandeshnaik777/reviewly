@@ -147,15 +147,15 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
   const handlePayTrial = async () => {
     try {
-      const trialPlan = plans.find((p) => p.slug === 'trial') || { id: 'c0000000-0000-0000-0000-000000000001' };
-      const order = await api.createOrder(businessId, trialPlan.id);
+      const trialPlan = plans.find((p) => p.slug === 'starter') || plans[0];
+      const order = await api.createOrder(businessId, trialPlan.id, { isTrial: true });
       if ((window as any).Razorpay) {
         const options = {
           key: order.keyId,
-          amount: order.amount, // 200 paisa
+          amount: order.amount, // 7900 paisa (₹79)
           currency: order.currency,
           name: 'KindlyReview Platform',
-          description: '7-Day Free Trial Pass (₹2 Activation)',
+          description: 'Testing Pack (₹79 Starter Trial)',
           order_id: order.orderId,
           prefill: {
             name: business?.name || 'Business Owner',
@@ -170,7 +170,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 paymentId: response.razorpay_payment_id,
                 signature: response.razorpay_signature,
               });
-              showNotification('🎉 7-Day Trial Pass Activated for ₹2!');
+              showNotification('🎉 Testing Pack Trial Activated for ₹79!');
               loadAllData();
             } catch (vErr: any) {
               alert(`Trial activation verification note: ${vErr.message}`);
@@ -1027,14 +1027,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               >
                 <div style={{ maxWidth: '740px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <span className="badge badge-warning">⚡ 7-Day All-Access Trial Ready</span>
-                    <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 600 }}>Nominal ₹2 Verification Fee</span>
+                    <span className="badge badge-warning">⚡ Testing Pack Trial Ready</span>
+                    <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 600 }}>Introductory ₹79 Starter Offer</span>
                   </div>
                   <h3 className="serif" style={{ fontSize: '20px', margin: '4px 0 6px', color: '#78350f' }}>
-                    Welcome to Your Dashboard! Activate 7-Day Access for ₹2
+                    Welcome to Your Dashboard! Activate Starter Trial for ₹79
                   </h3>
                   <p style={{ margin: 0, fontSize: '13.5px', color: '#92400e', lineHeight: 1.5 }}>
-                    Your restaurant environment and smart table stands are ready! Complete the nominal ₹2 verification via Razorpay to activate 7 days of full AI review generation and Google conversion tracking.
+                    Your restaurant environment and smart table stands are ready! Complete the introductory ₹79 payment via Razorpay to activate 30 days of full AI review generation and Google conversion tracking.
                   </p>
                 </div>
                 <button
@@ -1042,7 +1042,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   onClick={handlePayTrial}
                   style={{ fontSize: '14.5px', padding: '12px 24px', whiteSpace: 'nowrap' }}
                 >
-                  💳 Pay ₹2 & Activate Trial Now →
+                  💳 Pay ₹79 &amp; Activate Trial Now →
                 </button>
               </div>
             )}
@@ -3538,12 +3538,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     >
                       {usage?.subscription?.trialActivated ? '✓ Trial Pass Active' : 'Trial Action Needed'}
                     </span>
-                    <strong style={{ fontSize: '16px' }}>7-Day Free Trial Pass</strong>
+                    <strong style={{ fontSize: '16px' }}>Testing Pack (Starter Trial)</strong>
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
                     {usage?.subscription?.trialActivated
-                      ? `Your 7-day trial pass is active (₹2 paid). After 7 days, your account will renew on your chosen plan. You can switch plans below at any time.`
-                      : 'Complete your ₹2 nominal verification payment via Razorpay to activate 7-day unlimited access.'}
+                      ? `Your Testing Pack trial is active (₹79 paid). You have 100 AI reviews and 2 QR stands for 30 days. You can switch plans below at any time.`
+                      : 'Complete your ₹79 starter payment via Razorpay to activate 30-day testing access.'}
                   </div>
                 </div>
 
@@ -3553,7 +3553,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     style={{ fontSize: '14px', padding: '10px 20px', background: 'var(--primary)' }}
                     onClick={handlePayTrial}
                   >
-                    💳 Pay ₹2 & Activate Trial
+                    💳 Pay ₹79 &amp; Activate Trial
                   </button>
                 )}
               </div>

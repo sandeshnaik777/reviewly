@@ -60,10 +60,10 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
   {
     id: 'c0000000-0000-0000-0000-000000000001',
     slug: 'trial',
-    name: '7-Day Free Trial Pass',
-    priceInr: 2,
+    name: '7-Day Free Trial Pass (Deprecated)',
+    priceInr: 79,
     originalPriceInr: 149,
-    offerBadge: '₹2 Trial Activation Pass',
+    offerBadge: 'Deprecated',
     billingPeriod: 'month',
     reviewGenerationLimit: 50,
     qrCodeLimit: 1,
@@ -71,19 +71,19 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     customQuestionsEnabled: true,
     customBrandingEnabled: false,
     teamMembersLimit: 1,
-    features: ['7-day full access', '₹2 trial verification fee', '50 AI review generations', '1 Smart QR Stand', 'Standard analytics'],
-    isActive: true,
+    features: ['Legacy pass'],
+    isActive: false,
   },
   {
     id: 'c0000000-0000-0000-0000-000000000002',
     slug: 'starter',
-    name: 'Testing Pack',
+    name: 'Testing Pack (Starter Trial)',
     priceInr: 79,
     priceInr3Months: 229,
     priceInr6Months: 429,
     priceInr1Year: 790, // 2 Months Free (10 × ₹79)
     originalPriceInr: 149,
-    offerBadge: '₹79 First Month Offer (Reg. ₹149)',
+    offerBadge: '⚡ ₹79 Starter Trial (Reg. ₹149)',
     billingPeriod: 'month',
     reviewGenerationLimit: 100,
     qrCodeLimit: 2,
@@ -91,7 +91,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     customQuestionsEnabled: true,
     customBrandingEnabled: false,
     teamMembersLimit: 1,
-    features: ['100 AI review generations/mo', 'First month offer: ₹79 (Reg. ₹149)', '2 Smart QR Stands', 'Category question builder', 'Scan & copy analytics', 'Email support'],
+    features: ['100 AI review generations/mo', 'Special trial offer: ₹79 (Reg. ₹149)', '2 Smart QR Stands', 'Category question builder', 'Scan & copy analytics', 'Fast email & WhatsApp support'],
     isActive: true,
   },
   {
@@ -103,7 +103,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr6Months: 799,
     priceInr1Year: 1490, // 2 Months Free (10 × ₹149)
     originalPriceInr: 249,
-    offerBadge: '₹149 First Month Offer (Reg. ₹249)',
+    offerBadge: '⭐ Most Popular · ₹149 (Reg. ₹249)',
     billingPeriod: 'month',
     reviewGenerationLimit: 500,
     qrCodeLimit: 5,
@@ -123,7 +123,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr6Months: 1349,
     priceInr1Year: 2490, // 2 Months Free (10 × ₹249)
     originalPriceInr: 399,
-    offerBadge: '₹249 First Month Offer (Reg. ₹399)',
+    offerBadge: '🚀 Scale & Multi-Outlet · ₹249 (Reg. ₹399)',
     billingPeriod: 'month',
     reviewGenerationLimit: 1000,
     qrCodeLimit: 15,
@@ -728,6 +728,9 @@ class DatabaseService {
   }
 
   async findPlanBySlug(slug: string): Promise<SubscriptionPlan | undefined> {
+    if (slug === 'trial') {
+      return this.data.subscriptionPlans.find((p) => p.slug === 'starter') || this.data.subscriptionPlans.find((p) => p.slug === 'trial');
+    }
     return this.data.subscriptionPlans.find((p) => p.slug === slug);
   }
 

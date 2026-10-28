@@ -549,19 +549,20 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         }
       }
 
-      const trialPlanId = trialPlan?.id || 'c0000000-0000-0000-0000-000000000001';
+      const starterPlan = plans.find((p) => p.slug === 'starter') || plans[0];
+      const trialPlanId = starterPlan?.id || 'c0000000-0000-0000-0000-000000000002';
 
-      // 2. Create Razorpay Order
-      const order = await api.createOrder(targetBiz.id, trialPlanId);
+      // 2. Create Razorpay Order for Testing Pack Trial (₹79)
+      const order = await api.createOrder(targetBiz.id, trialPlanId, { isTrial: true });
 
       // 3. Open Razorpay Checkout Modal
       if ((window as any).Razorpay) {
         const options = {
           key: order.keyId,
-          amount: order.amount, // 200 paisa (₹2)
+          amount: order.amount, // 7900 paisa (₹79)
           currency: order.currency || 'INR',
           name: 'KindlyReview Platform',
-          description: '7-Day Free Trial Pass (₹2 Activation)',
+          description: 'Testing Pack (₹79 Starter Trial)',
           order_id: order.orderId,
           prefill: {
             name: formData.ownerName,
@@ -1738,7 +1739,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   Choose How You Want to Start
                 </h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '14px', maxWidth: '560px', margin: '6px auto 0' }}>
-                  Start with a <strong>7-Day Free Trial for ₹2</strong> or <strong>pay directly</strong> to activate your full plan immediately with zero trial restrictions.
+                  Start with the <strong>Testing Pack Trial for ₹79</strong> (100 reviews, 2 QR stands) or <strong>pay directly</strong> to activate your full plan immediately.
                 </p>
               </div>
 
@@ -1766,15 +1767,15 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
-                      Option A
+                      Option A · Trial Pack
                     </span>
-                    <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹2</span>
+                    <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹79</span>
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)', marginBottom: '3px' }}>
-                    7-Day Free Trial
+                    Testing Pack (Trial)
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    ₹2 verification · 7-day all access
+                    ₹79 starter trial · 100 reviews · 2 QRs
                   </div>
                 </div>
 
@@ -1792,7 +1793,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
-                      Option B · Direct
+                      Option B · Direct Plan
                     </span>
                     <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹{directPrice}</span>
                   </div>
@@ -1825,7 +1826,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 </div>
               )}
 
-              {/* OPTION A: 7-DAY FREE TRIAL CARD */}
+              {/* OPTION A: TESTING PACK TRIAL CARD */}
               {paymentChoice === 'trial' ? (
                 <div
                   className="card"
@@ -1851,10 +1852,10 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '15px' }}>7-Day Free Trial Pass</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Full platform access + 50 reviews</div>
+                      <div style={{ fontWeight: 700, fontSize: '15px' }}>Testing Pack (Starter Trial)</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Full access + 100 reviews + 2 Smart QR Stands</div>
                     </div>
-                    <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '24px' }}>₹2</div>
+                    <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '24px' }}>₹79</div>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', fontSize: '13px' }}>
@@ -1967,9 +1968,9 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                           <span className="spinner"></span> Opening Checkout...
                         </>
                       ) : paymentFailed ? (
-                        '🔄 Retry ₹2 Payment via Razorpay'
+                        '🔄 Retry ₹79 Payment via Razorpay'
                       ) : (
-                        '💳 Pay ₹2 & Activate 7-Day Trial'
+                        '💳 Pay ₹79 & Start Testing Pack Trial'
                       )}
                     </button>
                   ) : (

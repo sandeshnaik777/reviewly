@@ -351,7 +351,7 @@ adminRouter.get('/blogs', async (req: AuthenticatedRequest, res: Response, next:
   try {
     const { search } = req.query as { search?: string };
     const blogs = await db.listBlogPosts(search, false);
-    res.json({ success: true, data: blogs });
+    res.json({ success: true, data: blogs, blogs });
   } catch (err) {
     next(err);
   }

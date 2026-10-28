@@ -42,9 +42,9 @@ paymentRouter.post(
         throw new AppError('Invalid or inactive subscription plan', 400, 'INVALID_PLAN');
       }
 
-      const isTrial = Boolean(req.body.isTrial || plan.slug === 'trial');
+      const isTrial = Boolean(req.body.isTrial || plan.slug === 'trial' || plan.slug === 'starter');
       const durationMonths = Number(req.body.durationMonths) || 1;
-      let amountInr = 2;
+      let amountInr = 79;
 
       if (!isTrial) {
         amountInr = plan.priceInr;
@@ -201,7 +201,7 @@ paymentRouter.get('/history', authenticate, requireTenant, async (req: Authentic
           durationMonths: p.durationMonths || 1,
           status: p.status,
           provider: p.provider,
-          paymentType: p.paymentType || (p.amountInr === 2 ? 'trial_verification' : 'direct_subscription'),
+          paymentType: p.paymentType || (p.amountInr === 79 || p.amountInr === 2 ? 'trial_verification' : 'direct_subscription'),
           autoRenew: p.autoRenew,
           planName: plan?.name || (p.amountInr === 2 ? '7-Day Free Trial Pass' : 'Growth Pack'),
           planSlug: plan?.slug,

@@ -1093,6 +1093,53 @@ test('15. Subscription Choice, Direct Activation & Monthly Recurring Billing Eng
     assert.equal(recRecord?.paymentType, 'recurring_monthly');
     assert.equal(recRecord?.status, 'captured');
   });
+
+  await t.test('Creates Testing Pack trial starter order with ₹79 trial amount and trial_verification paymentType', async () => {
+    const starterPlan = plans.find((p) => p.slug === 'starter') || plans[0];
+    const trialOrder = await paymentService.createOrder({
+      businessId: 'biz_trial_79_test',
+      planId: starterPlan.id,
+      isTrial: true,
+      autoRenew: true,
+      durationMonths: 1,
+    });
+
+    assert.ok(trialOrder.orderId);
+    assert.equal(trialOrder.amountInr, 79);
+    assert.equal(trialOrder.currency, 'INR');
+
+    const record = await db.findPaymentByOrderId(trialOrder.orderId);
+    assert.ok(record);
+    assert.equal(record.paymentType, 'trial_verification');
+    assert.equal(record.amountInr, 79);
+  });
+
+  await t.test('Captures Testing Pack trial payment, activates 30-day active trial subscription with lastTransactionId', async () => {
+    const starterPlan = plans.find((p) => p.slug === 'starter') || plans[0];
+    const trialOrder = await paymentService.createOrder({
+      businessId: 'biz_trial_79_test',
+      planId: starterPlan.id,
+      isTrial: true,
+      autoRenew: true,
+      durationMonths: 1,
+    });
+
+    const testTxnId = 'pay_trial_79_tx_12345';
+    await paymentService.processPaymentSuccess(trialOrder.orderId, testTxnId);
+
+    const sub = await paymentService.getSubscription('biz_trial_79_test');
+    assert.ok(sub);
+    assert.equal(sub.status, 'ACTIVE');
+    assert.equal(sub.trialActivated, true);
+    assert.equal(sub.lastTransactionId, testTxnId);
+    assert.ok(sub.nextBillingDate);
+
+    // Verify stored payment record has transactionId and captured status
+    const record = await db.findPaymentByOrderId(trialOrder.orderId);
+    assert.equal(record?.status, 'captured');
+    assert.equal(record?.transactionId, testTxnId);
+    assert.equal(record?.amountInr, 79);
+  });
 });
 
 

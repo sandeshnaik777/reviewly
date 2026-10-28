@@ -168,7 +168,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
         api.getAuditLogs(),
         api.getAdminNotifications().catch(() => []),
         api.getAdminInquiries().catch(() => []),
-        api.getAdminBlogs().catch(() => ({ success: true, blogs: [] })),
+        api.getAdminBlogs().catch(() => []),
         api.getAdminApiKeys().catch(() => []),
       ]);
       setStats(sRes);
@@ -177,7 +177,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
       setLogs(lRes);
       setNotifications(nRes || []);
       setInquiries(iRes || []);
-      setBlogs(blRes?.blogs || []);
+      setBlogs(Array.isArray(blRes) ? blRes : (blRes?.blogs || blRes?.data || []));
       setApiKeys(kRes || []);
     } catch (e: any) {
       console.error('Failed to load admin data:', e);
@@ -283,9 +283,8 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
     setLoadingBlogs(true);
     try {
       const res = await api.getAdminBlogs(query);
-      if (res.success && res.blogs) {
-        setBlogs(res.blogs);
-      }
+      const list = Array.isArray(res) ? res : (res?.blogs || res?.data || []);
+      setBlogs(list);
     } catch (err: any) {
       showNotification(`Failed to search blogs: ${err.message}`);
     } finally {
@@ -1285,7 +1284,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                     style={{ height: '42px', fontSize: '13px', background: 'var(--surface-container)' }}
                   >
                     <option value="ALL">All Plans</option>
-                    <option value="trial">7-Day Free Trial (₹2)</option>
+                    <option value="starter">Testing Pack (₹79 Trial)</option>
                     <option value="starter">Testing Pack (₹79)</option>
                     <option value="growth">Growth Pack (₹149)</option>
                     <option value="pro">Scale Pack (₹249)</option>
@@ -3174,7 +3173,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         setNewBizForm({ ...newBizForm, planSlug: slug, customReviewLimit: defaultLimit });
                       }}
                     >
-                      <option value="trial">7-Day Free Trial Pass (₹2)</option>
+                      <option value="starter">Testing Pack (₹79 Trial)</option>
                       <option value="starter">Testing Pack (₹79/mo, Reg. ₹149)</option>
                       <option value="growth">Growth Pack (₹149/mo, Reg. ₹249)</option>
                       <option value="pro">Scale / Pro Pack (₹249/mo, Reg. ₹399)</option>

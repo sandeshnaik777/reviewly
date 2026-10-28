@@ -158,7 +158,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
               }}
               style={{ fontWeight: 600 }}
             >
-              Start 7-Day Free Trial
+              Start Testing Pack (₹79 Trial)
             </a>
           </div>
 

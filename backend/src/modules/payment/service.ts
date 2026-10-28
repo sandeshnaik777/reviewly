@@ -52,8 +52,8 @@ export class RazorpayPaymentService implements PaymentService {
     let finalAmount = amountInr;
     let paymentType: 'trial_verification' | 'direct_subscription' | 'recurring_monthly' = 'direct_subscription';
 
-    if (isTrial || finalAmount === 2) {
-      finalAmount = 2;
+    if (isTrial || finalAmount === 79 || finalAmount === 2) {
+      finalAmount = 79;
       paymentType = 'trial_verification';
     } else if (finalAmount === undefined || isNaN(finalAmount)) {
       const plan = await db.findPlanById(planId);
@@ -187,19 +187,17 @@ export class RazorpayPaymentService implements PaymentService {
     const currentSub = await db.getBusinessSubscription(payment.businessId);
     const now = new Date();
     const plan = payment.planId ? await db.findPlanById(payment.planId) : undefined;
-    const isTrial = payment.paymentType === 'trial_verification' || plan?.slug === 'trial' || payment.amountInr === 2;
+    const isTrial = payment.paymentType === 'trial_verification' || plan?.slug === 'trial' || plan?.slug === 'starter';
     const durMonths = payment.durationMonths || 1;
     let periodDays = 30;
-    if (isTrial) {
-      periodDays = 7;
-    } else if (durMonths >= 12) {
+    if (durMonths >= 12) {
       periodDays = 365;
     } else if (durMonths >= 6) {
       periodDays = 180;
     } else if (durMonths >= 3) {
       periodDays = 90;
     } else {
-      periodDays = 30;
+      periodDays = 30; // 30-Day Testing Pack starter period
     }
     const periodEnd = new Date(now.getTime() + periodDays * 24 * 60 * 60 * 1000);
 
@@ -207,9 +205,9 @@ export class RazorpayPaymentService implements PaymentService {
     const newSub: Subscription = {
       id: currentSub?.id || crypto.randomUUID(),
       businessId: payment.businessId,
-      planId: payment.planId || currentSub?.planId || 'c0000000-0000-0000-0000-000000000001',
-      status: isTrial ? 'TRIAL' : 'ACTIVE',
-      trialActivated: isTrial,
+      planId: payment.planId || currentSub?.planId || 'c0000000-0000-0000-0000-000000000002',
+      status: 'ACTIVE',
+      trialActivated: true,
       autoRenew,
       billingCycle: durMonths === 12 ? 'yearly' : durMonths === 6 ? 'semi_annual' : durMonths === 3 ? 'quarterly' : 'monthly',
       recurringMandateId: `mandate_${paymentId}`,
