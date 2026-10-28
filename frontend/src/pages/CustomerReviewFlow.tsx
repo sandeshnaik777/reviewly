@@ -592,7 +592,8 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                     'Attentive Staff',
                     'Clean Clinic',
                   ]
-                : [
+                : cat === 'FOOD & HOSPITALITY'
+                ? [
                     'Signature Dishes',
                     'Chef Specials',
                     'Woodfired Pizza',
@@ -601,6 +602,16 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                     'Fresh Dessert',
                     'Tasting Platter',
                     'Warm Hospitality',
+                  ]
+                : [
+                    'Quality Service',
+                    'Helpful Team',
+                    'Fair Pricing',
+                    'Clean Atmosphere',
+                    'Prompt Turnaround',
+                    'Professional Care',
+                    'Highly Recommended',
+                    'Great Hospitality',
                   ];
 
               const suggestions = Array.from(new Set([...targetKeywords, ...rawSuggestions]));
@@ -611,7 +622,9 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 ? 'Services or Maintenance Performed'
                 : isHealth
                 ? 'Treatments or Care Received'
-                : 'Dishes or Beverages Enjoyed';
+                : cat === 'FOOD & HOSPITALITY'
+                ? 'Dishes or Beverages Enjoyed'
+                : 'Products, Offerings or Services Highlighted';
 
               const sectionSubtitle = isRetail
                 ? 'Tap items to mention them in your review, or type any specific component:'
@@ -619,7 +632,9 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 ? 'Tap services to mention them in your review, or type any specific work:'
                 : isHealth
                 ? 'Tap treatments to mention them in your review, or type any care received:'
-                : 'Tap items to mention them in your review, or type your favorites:';
+                : cat === 'FOOD & HOSPITALITY'
+                ? 'Tap dishes to mention them in your review, or type your favorites:'
+                : 'Tap items to mention them in your review, or type your highlights:';
 
               return (
                 <div className="card" style={{ marginTop: '14px', padding: '16px' }}>

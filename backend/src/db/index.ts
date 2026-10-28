@@ -31,6 +31,7 @@ import {
   ApiKeyServiceType,
 } from '../types/index.js';
 import { getDefaultQuestionsForCategory } from '../modules/business/categories.js';
+import { DEFAULT_BLOGS } from './blogs.js';
 
 interface DatabaseSchema {
   users: User[];
@@ -133,87 +134,6 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     teamMembersLimit: 10,
     features: ['1,000 AI review generations/mo', 'First month offer: ₹249 (Reg. ₹399)', '15 Smart QR Stands', 'Advanced anti-abuse guards', 'Multi-staff RBAC', 'Aura reputation shield', 'Dedicated SLA'],
     isActive: true,
-  },
-];
-
-const DEFAULT_BLOGS: BlogPost[] = [
-  {
-    id: 'blog-1',
-    title: 'How to Collect 100+ Real 5-Star Google Reviews in 30 Days',
-    slug: 'how-to-get-100-google-reviews-in-30-days',
-    excerpt: 'Step-by-step masterclass on leveraging table stands, customer peak happiness moments, and conversational AI review prompts.',
-    content: `# The Blueprint to 100+ Authentic 5-Star Google Reviews
-
-Local search traffic is the single highest-ROI customer acquisition channel for physical businesses. Over 84% of consumers trust online reviews as much as personal recommendations.
-
-## 1. The Friction Problem
-Most happy customers NEVER leave reviews. Why? Because opening Google Maps, searching your business, and thinking about what to write takes 3+ minutes.
-
-## 2. The 15-Second Solution
-By placing smart QR table stands directly at the table or billing desk, customers scan when their satisfaction is at its peak. Our AI engine prompts them with friendly questions ("What dish did you love?", "How was the speed?") and formats a human, authentic review draft in seconds.
-
-## 3. The Power of Private Interception
-If an experience fell short, our Reputation Shield routes the feedback directly to manager SMS/email for private resolution, protecting your Google public rating.`,
-    category: 'GROWTH & REPUTATION',
-    author: 'Platform Editorial Team',
-    readTime: '4 min read',
-    tags: ['Google Reviews', 'SEO', 'Customer Experience', 'Local Pack'],
-    isPublished: true,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'blog-2',
-    title: 'Why Table QR Stands Outperform Post-Visit SMS by 4.8x',
-    slug: 'why-qr-stands-outperform-sms-review-requests',
-    excerpt: 'Data analysis across 50,000 customer sessions: why on-site table tent conversion blows away delayed WhatsApp or SMS requests.',
-    content: `# The Psychology of Immediate Review Generation
-
-Delayed SMS and WhatsApp review requests suffer from catastrophic drop-off rates (less than 3% click-through). Here is why on-premise table engagement delivers 28% to 52% conversion rates.
-
-## 1. Cognitive Presence vs Distraction
-When a customer is finishing their meal or paying their bill, your service is top-of-mind. 24 hours later, they are at work or running errands and dismiss marketing texts.
-
-## 2. Zero Spam Perception
-Customers appreciate clean, self-service QR stands. They hate unsolicited automated texts that feel intrusive.
-
-## 3. Tactile Acrylic Stands
-Premium acrylic stands with a clear call-to-action ("Share your experience in 10 seconds") command attention on tables and reception desks.`,
-    category: 'CUSTOMER EXPERIENCE',
-    author: 'Growth Engineering',
-    readTime: '5 min read',
-    tags: ['QR Codes', 'Conversion Optimization', 'Retail', 'Hospitality'],
-    isPublished: true,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'blog-3',
-    title: 'Custom Software vs Generic POS: When to Build Bespoke Solutions',
-    slug: 'custom-software-vs-generic-pos',
-    excerpt: 'Why high-volume businesses and delivery fleets switch from rigid off-the-shelf software to bespoke dispatch and ERP architectures.',
-    content: `# Custom Software vs Rigid Generic Software
-
-Off-the-shelf tools charge high monthly subscriptions while locking your operational data into closed ecosystems.
-
-## 1. Delivery Fleet & Dispatch Optimization
-If you manage in-house delivery riders, generic aggregators charge 25-30% commissions. Custom dispatch software with real-time GPS tracking and route optimization saves hundreds of thousands of rupees monthly.
-
-## 2. Multi-Branch Warehousing & Billing
-Custom ERPs built to your exact workflow eliminate manual spreadsheet reconciliation and automate supplier ledgers in real-time.
-
-## 3. You Tell Us What You Need, We Build It
-Our engineering team builds custom web portals, mobile rider apps, and integrated billing systems tailored specifically to your business model.`,
-    category: 'CUSTOM SOFTWARE',
-    author: 'Chief Systems Architect',
-    readTime: '6 min read',
-    tags: ['Custom Software', 'Fleet Dispatch', 'ERP', 'Billing'],
-    isPublished: true,
-    publishedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
   },
 ];
 
@@ -407,7 +327,7 @@ class DatabaseService {
         if (!parsed.customSoftwareInquiries) {
           parsed.customSoftwareInquiries = [];
         }
-        if (!parsed.blogPosts || parsed.blogPosts.length === 0) {
+        if (!parsed.blogPosts || parsed.blogPosts.length < DEFAULT_BLOGS.length) {
           parsed.blogPosts = DEFAULT_BLOGS;
         }
         if (!parsed.apiKeys) {
@@ -534,8 +454,8 @@ class DatabaseService {
       });
     }
 
-    // Seed default blogs if missing or empty
-    if (!this.data.blogPosts || this.data.blogPosts.length === 0) {
+    // Seed default blogs if missing or outdated
+    if (!this.data.blogPosts || this.data.blogPosts.length < DEFAULT_BLOGS.length) {
       this.data.blogPosts = DEFAULT_BLOGS;
     }
 

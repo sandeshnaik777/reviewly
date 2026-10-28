@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 
-export type LegalModalType = 'terms' | 'privacy' | 'refund' | 'help' | 'blog' | null;
+export type LegalModalType = 'terms' | 'privacy' | 'refund' | 'help' | 'blog' | 'enterprise' | null;
 
 interface Props {
   type: LegalModalType;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'terms' | 'privacy' | 'refund' | 'help' | 'blog'>(type || 'terms');
+  const [activeTab, setActiveTab] = useState<'terms' | 'privacy' | 'refund' | 'help' | 'blog' | 'enterprise'>(type || 'terms');
   const [blogs, setBlogs] = useState<any[]>([]);
   const [blogSearch, setBlogSearch] = useState('');
   const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
@@ -23,6 +23,19 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
     message: '',
   });
   const [supportSubmitted, setSupportSubmitted] = useState(false);
+
+  // Custom Enterprise & Bespoke Software Form State
+  const [enterpriseForm, setEnterpriseForm] = useState({
+    name: '',
+    businessName: '',
+    contactPhone: '',
+    email: '',
+    serviceType: 'Bespoke Software & Multi-Branch Architecture',
+    locations: '1 - 5 Locations',
+    requirements: '',
+  });
+  const [submittingEnterprise, setSubmittingEnterprise] = useState(false);
+  const [enterpriseSubmitted, setEnterpriseSubmitted] = useState(false);
 
   useEffect(() => {
     if (type) {
@@ -55,6 +68,23 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
   };
 
   if (!type) return null;
+
+  const handleEnterpriseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!enterpriseForm.contactPhone || enterpriseForm.contactPhone.trim().length < 6) {
+      alert('Please enter a valid contact phone number so our systems architect can call you.');
+      return;
+    }
+    try {
+      setSubmittingEnterprise(true);
+      await api.submitPublicSoftwareInquiry(enterpriseForm);
+      setEnterpriseSubmitted(true);
+    } catch (err: any) {
+      alert(err.message || 'Failed to submit enterprise consultation request.');
+    } finally {
+      setSubmittingEnterprise(false);
+    }
+  };
 
   const handleSupportSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,11 +175,12 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
           }}
         >
           {[
+            { id: 'enterprise', label: 'Custom Enterprise / Software', icon: '🏢' },
+            { id: 'blog', label: 'Articles & Growth Guides', icon: '📰' },
+            { id: 'help', label: 'Help & Merchant Support', icon: '💬' },
             { id: 'terms', label: 'Terms of Service', icon: '📜' },
             { id: 'privacy', label: 'Privacy Policy', icon: '🔒' },
             { id: 'refund', label: 'Refund & Cancellation', icon: '💳' },
-            { id: 'blog', label: 'Articles & Growth Guides', icon: '📰' },
-            { id: 'help', label: 'Help & Merchant Support', icon: '💬' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -179,6 +210,218 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
         {/* Modal Scrollable Content Body */}
         <div style={{ padding: '28px 32px', overflowY: 'auto', flex: 1, fontSize: '13.5px', lineHeight: 1.68, color: '#334155' }}>
+          {/* TAB 0: CUSTOM ENTERPRISE & BESPOKE SOFTWARE */}
+          {activeTab === 'enterprise' && (
+            <div>
+              {enterpriseSubmitted ? (
+                <div style={{ padding: '36px 20px', textAlign: 'center', background: '#f0fdf4', borderRadius: '12px', border: '1.5px solid #86efac' }}>
+                  <div style={{ fontSize: '42px', marginBottom: '12px' }}>🎉</div>
+                  <h3 className="serif" style={{ fontSize: '24px', fontWeight: 700, color: '#166534', margin: '0 0 8px' }}>
+                    Consultation Request Successfully Received!
+                  </h3>
+                  <p style={{ fontSize: '14.5px', color: '#15803d', maxWidth: '580px', margin: '0 auto 20px', lineHeight: 1.6 }}>
+                    Thank you, <strong>{enterpriseForm.name || 'Partner'}</strong>! We have logged your request for <strong>{enterpriseForm.businessName}</strong>. Our Enterprise Solutions Architect will review your scope and call you at <strong>{enterpriseForm.contactPhone}</strong> within 2 business hours.
+                  </p>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setEnterpriseSubmitted(false)}
+                      style={{ padding: '8px 18px', fontSize: '13px' }}
+                    >
+                      Submit Another Scope
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={onClose}
+                      style={{ padding: '8px 22px', fontSize: '13px' }}
+                    >
+                      Close Window
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ marginBottom: '22px' }}>
+                    <span className="badge badge-warning" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>
+                      🏢 Enterprise &amp; Custom Systems
+                    </span>
+                    <h2 className="serif" style={{ fontSize: '26px', fontWeight: 700, margin: '8px 0 6px', color: '#0f172a' }}>
+                      Custom Enterprise &amp; Bespoke Software Solutions
+                    </h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0, lineHeight: 1.5 }}>
+                      Have 5 to 100+ branches, need custom POS / Tally integration, or want an in-house delivery dispatch fleet? Tell us your requirements and our solutions engineering team will engineer a custom proposal.
+                    </p>
+                  </div>
+
+                  {/* 4 Capability Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+                    <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🏬</div>
+                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>Multi-Branch Command</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Centralized headquarters dashboard across all locations with regional manager access.
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>⚡</div>
+                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>POS &amp; ERP Integration</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Seamless synchronization with Tally, SAP, Marg, Busy, Zoho, or proprietary billing APIs.
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🛵</div>
+                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>Delivery Fleet Logistics</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        In-house rider dispatch, live map tracking, and zero commission markups.
+                      </div>
+                    </div>
+                    <div style={{ background: 'var(--surface-container)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '6px' }}>🏷️</div>
+                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>Branded Hardware Stands</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Custom laser-engraved acrylic, brass, or wooden NFC stands matching brand aesthetics.
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Consultation Request Form */}
+                  <form onSubmit={handleEnterpriseSubmit} style={{ background: '#ffffff', border: '1.5px solid var(--border-light)', borderRadius: '12px', padding: '24px' }}>
+                    <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 16px', color: '#0f172a' }}>
+                      Request Consultation &amp; Custom Project Quote
+                    </h3>
+
+                    {/* Service Preset Chips */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label className="form-label" style={{ fontSize: '12.5px', fontWeight: 600, marginBottom: '6px' }}>
+                        Select Primary System Scope:
+                      </label>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {[
+                          'Multi-Branch Franchise Architecture',
+                          'Custom POS / ERP Integration (Tally / SAP)',
+                          'In-House Delivery Fleet & Dispatch Logistics',
+                          'Custom Laser-Engraved NFC Hardware Stands',
+                          'Dedicated Enterprise SLA & On-Premise Setup',
+                        ].map((preset) => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => setEnterpriseForm({ ...enterpriseForm, serviceType: preset })}
+                            style={{
+                              background: enterpriseForm.serviceType === preset ? '#d97706' : 'var(--surface-container)',
+                              color: enterpriseForm.serviceType === preset ? '#ffffff' : 'var(--text)',
+                              border: enterpriseForm.serviceType === preset ? '1px solid #d97706' : '1px solid var(--border)',
+                              borderRadius: '16px',
+                              padding: '5px 12px',
+                              fontSize: '11.5px',
+                              cursor: 'pointer',
+                              fontWeight: enterpriseForm.serviceType === preset ? 700 : 500,
+                              transition: 'all 0.15s ease',
+                            }}
+                          >
+                            {enterpriseForm.serviceType === preset ? '✓ ' : '+ '}
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                      <div>
+                        <label className="form-label" style={{ fontSize: '12px', fontWeight: 600 }}>Your Name &amp; Role</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="e.g. Rahul Sharma (Operations Director)"
+                          value={enterpriseForm.name}
+                          onChange={(e) => setEnterpriseForm({ ...enterpriseForm, name: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="form-label" style={{ fontSize: '12px', fontWeight: 600 }}>Business / Brand Name *</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="e.g. Apex Diagnostic & Retail Labs"
+                          value={enterpriseForm.businessName}
+                          onChange={(e) => setEnterpriseForm({ ...enterpriseForm, businessName: e.target.value })}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+                      <div>
+                        <label className="form-label" style={{ fontSize: '12px', fontWeight: 600 }}>Contact Phone Number (WhatsApp Enabled) *</label>
+                        <input
+                          type="tel"
+                          className="form-input"
+                          placeholder="e.g. 9876543210"
+                          value={enterpriseForm.contactPhone}
+                          onChange={(e) => setEnterpriseForm({ ...enterpriseForm, contactPhone: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="form-label" style={{ fontSize: '12px', fontWeight: 600 }}>Corporate Email</label>
+                        <input
+                          type="email"
+                          className="form-input"
+                          placeholder="e.g. rahul@apexretail.in"
+                          value={enterpriseForm.email}
+                          onChange={(e) => setEnterpriseForm({ ...enterpriseForm, email: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '14px' }}>
+                      <label className="form-label" style={{ fontSize: '12px', fontWeight: 600 }}>Scale / Number of Locations</label>
+                      <select
+                        className="form-input"
+                        value={enterpriseForm.locations}
+                        onChange={(e) => setEnterpriseForm({ ...enterpriseForm, locations: e.target.value })}
+                        style={{ padding: '9px 12px' }}
+                      >
+                        <option value="1 - 5 Locations">1 - 5 Outlets / Counters</option>
+                        <option value="6 - 20 Locations">6 - 20 Outlets (Regional Chain)</option>
+                        <option value="21 - 50 Locations">21 - 50 Outlets (Multi-City)</option>
+                        <option value="50+ Locations">50+ Outlets (National Franchise Network)</option>
+                      </select>
+                    </div>
+
+                    <div style={{ marginBottom: '18px' }}>
+                      <label className="form-label" style={{ fontSize: '12px', fontWeight: 600 }}>Specific Requirements &amp; Workflow Details</label>
+                      <textarea
+                        className="form-input"
+                        rows={3}
+                        placeholder="Tell us what you want to achieve: e.g. need to sync 15 billing desks with Tally, want to track 20 delivery riders live, require custom wooden QR stands, want unified reporting for investors..."
+                        value={enterpriseForm.requirements}
+                        onChange={(e) => setEnterpriseForm({ ...enterpriseForm, requirements: e.target.value })}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                      <button type="button" className="btn btn-secondary" onClick={onClose}>
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={submittingEnterprise}
+                        style={{ background: '#d97706', borderColor: '#d97706', color: '#ffffff', fontWeight: 700, padding: '10px 22px' }}
+                      >
+                        {submittingEnterprise ? 'Transmitting Request...' : 'Submit Enterprise Consultation Request →'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* TAB 1: TERMS OF SERVICE */}
           {activeTab === 'terms' && (
             <div>

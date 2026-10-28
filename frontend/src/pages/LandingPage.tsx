@@ -687,13 +687,13 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                     </div>
                   )}
 
-                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>For active dine-in restaurants & bars</p>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>For active retail stores, clinics, salons &amp; businesses</p>
                   <ul style={{ listStyle: 'none', fontSize: '13.5px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
                     <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviews}</li>
-                    <li>✓ 5 Smart QR Stands (tables/deck)</li>
-                    <li>✓ Full custom question builder</li>
-                    <li>✓ Aura Live Telemetry & Floor Heatmap</li>
-                    <li>✓ Kitchen Diagnostics & Server Leaderboard</li>
+                    <li>✓ 5 Smart QR Stands (counters/desks/tables)</li>
+                    <li>✓ Full custom question &amp; keyword builder</li>
+                    <li>✓ Aura Live Telemetry &amp; Growth Heatmap</li>
+                    <li>✓ Service Diagnostics &amp; Staff Leaderboard</li>
                     <li>✓ Maximum Defense Reputation Shield</li>
                   </ul>
                   <button className="btn btn-primary btn-block" onClick={onStartOnboarding}>
@@ -769,14 +769,14 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                     </div>
                   )}
 
-                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>For busy dining spaces & multi-hall venues</p>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>For high-volume stores, multi-counter spaces &amp; growing branches</p>
                   <ul style={{ listStyle: 'none', fontSize: '13.5px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
                     <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviews}</li>
                     <li>✓ 15 Smart QR Stands</li>
                     <li>✓ Custom printable acrylic tent studio</li>
-                    <li>✓ Multi-staff RBAC & Manager alerts</li>
+                    <li>✓ Multi-staff RBAC &amp; Manager alerts</li>
                     <li>✓ Anti-abuse spam prevention engine</li>
-                    <li>✓ Dedicated priority support & SLA</li>
+                    <li>✓ Dedicated priority support &amp; SLA</li>
                   </ul>
                   <button className="btn btn-outline btn-block" onClick={onStartOnboarding}>
                     Get Scale / Pro Pack →
@@ -784,6 +784,48 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 </div>
               );
             })()}
+
+            {/* Custom Enterprise & Bespoke Software Pack */}
+            <div className="card" style={{ padding: '32px 24px', textAlign: 'left', display: 'flex', flexDirection: 'column', border: '1.5px solid #d97706', background: 'linear-gradient(180deg, #ffffff 0%, #fffdfa 100%)', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-13px', left: '20px' }}>
+                <span className="badge badge-warning" style={{ padding: '4px 14px', fontSize: '11px', background: '#d97706', color: '#ffffff', fontWeight: 700 }}>
+                  🏢 Enterprise &amp; Custom
+                </span>
+              </div>
+
+              <div style={{ marginBottom: '8px' }}>
+                <div style={{ fontWeight: 700, fontSize: '18px', color: '#0f172a' }}>Custom / Bespoke Software</div>
+                <div style={{ fontSize: '12px', color: '#d97706', fontWeight: 600, marginTop: '2px' }}>
+                  Multi-Branch &amp; Custom Systems
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '14px 0 6px' }}>
+                <span style={{ fontSize: '32px', fontWeight: 800, color: '#d97706' }}>Custom Quote</span>
+                <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-muted)' }}>Tailored Project Scope</span>
+              </div>
+
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                For multi-branch chains, franchise networks, clinics, and businesses requiring custom POS/ERP integration or delivery fleet software.
+              </p>
+
+              <ul style={{ listStyle: 'none', fontSize: '13.5px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '28px', flex: 1 }}>
+                <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ Unlimited Smart QR Stands across all locations</li>
+                <li>✓ Multi-branch centralized command dashboard</li>
+                <li>✓ Bespoke POS &amp; ERP sync (Tally, SAP, Marg, Zoho)</li>
+                <li>✓ In-house delivery fleet &amp; real-time dispatch</li>
+                <li>✓ Custom laser-engraved NFC &amp; wooden stands</li>
+                <li>✓ Dedicated Solutions Engineer &amp; 24/7 SLA</li>
+              </ul>
+
+              <button
+                className="btn btn-secondary btn-block"
+                onClick={() => setLegalModal('enterprise')}
+                style={{ background: '#d97706', borderColor: '#d97706', color: '#ffffff', fontWeight: 700 }}
+              >
+                Contact Sales / Request Custom Quote →
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -808,25 +850,46 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', textAlign: 'left' }}>
             {[
               {
-                title: 'How to Collect 100+ Real 5-Star Google Reviews in 30 Days',
-                category: 'GROWTH & REPUTATION',
-                readTime: '4 min read',
-                excerpt: 'Step-by-step masterclass on leveraging table stands, customer peak happiness moments, and conversational AI review prompts.',
-                tag: 'Google Reviews',
+                title: 'The Definitive 2026 Guide to Dominating Google Maps Local 3-Pack Rankings',
+                category: 'LOCAL SEO MASTERY',
+                readTime: '15 min read',
+                excerpt: 'How review velocity, keyword density in reviews, recency, and proximity interact to propel retail shops, clinics, and service businesses to Rank #1 on Google Maps.',
+                tag: 'Google Maps 3-Pack',
               },
               {
-                title: 'Why Table QR Stands Outperform Post-Visit SMS by 4.8x',
-                category: 'CUSTOMER EXPERIENCE',
-                readTime: '5 min read',
-                excerpt: 'Data analysis across 50,000 customer sessions: why on-site table tent conversion blows away delayed WhatsApp or SMS requests.',
-                tag: 'Conversion Optimization',
+                title: 'Physical Smart NFC & QR Stands vs. SMS/WhatsApp Blasts: Why Tap-to-Review Converts at 48%',
+                category: 'CONVERSION OPTIMIZATION',
+                readTime: '13 min read',
+                excerpt: 'Analysis across 120,000 customer sessions: why physical on-premise review capture delivers 16x higher conversion than post-visit messages.',
+                tag: 'QR Stands & NFC',
               },
               {
-                title: 'Custom Software vs Generic POS: When to Build Bespoke Solutions',
+                title: 'The Complete Legal & Algorithmic Defense Guide: Protecting Against 1-Star Fake Reviews',
+                category: 'REPUTATION DEFENSE',
+                readTime: '16 min read',
+                excerpt: 'Navigating FTC regulations and Google policies while implementing proactive Reputation Shields that resolve customer complaints privately.',
+                tag: 'Negative Review Defense',
+              },
+              {
+                title: 'Keyword Injection & Semantic Search: How Specific Customer Mentions Drive Foot Traffic',
+                category: 'SEARCH ALGORITHMS',
+                readTime: '12 min read',
+                excerpt: 'How guiding customer reviews to mention high-margin inventory (RAM, SSD, Painless Care) quadruples discovery on Google Maps.',
+                tag: 'Keyword SEO',
+              },
+              {
+                title: 'Why Retail Stores, Clinics, Salons & Gyms Are Replacing Generic Aggregators with Bespoke Software',
                 category: 'CUSTOM SOFTWARE',
-                readTime: '6 min read',
-                excerpt: 'Why high-volume businesses and delivery fleets switch from rigid off-the-shelf software to bespoke dispatch and ERP architectures.',
-                tag: 'Custom ERP',
+                readTime: '14 min read',
+                excerpt: 'The hidden costs of off-the-shelf tools: why growing businesses switch to tailored POS integrations and custom delivery fleet systems.',
+                tag: 'Bespoke ERP & POS',
+              },
+              {
+                title: 'Enterprise Multi-Location Review Architecture: Scaling Brand Reputation Across 50+ Branches',
+                category: 'ENTERPRISE SCALING',
+                readTime: '17 min read',
+                excerpt: 'Managing multi-tier RBAC, regional manager escalation pipelines, and centralized Google 3-Pack tracking across national chains.',
+                tag: 'Enterprise Architecture',
               },
             ].map((article, aIdx) => (
               <div
@@ -896,34 +959,34 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             Frequently Asked Questions
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '15px', maxWidth: '620px', margin: '0 auto 36px' }}>
-            Everything you need to know about QR table tents, Google Maps review generation, and our Reputation Shield.
+            Everything you need to know about smart QR counter stands, Google Maps review generation, and our Reputation Shield.
           </p>
 
           <div className="faq-grid">
             {[
               {
-                q: 'How does AI-assisted review drafting work for diners?',
-                a: 'When a diner scans the QR stand on their table, they rate their experience across customized criteria (such as food taste, service, or ambience) in 30 seconds. Our server-side AI immediately synthesizes their genuine ratings into an authentic, mouth-watering draft. Diners tap "Copy & Post to Google Maps", opening your listing’s native review form with the text pre-copied ready to paste.',
+                q: 'How does AI-assisted review drafting work for customers?',
+                a: 'When a customer scans the QR stand at your billing counter, desk, or table, they rate their experience across customized criteria in 30 seconds. Our server-side AI immediately synthesizes their genuine ratings into an authentic, personalized draft in natural everyday English. Customers tap "Copy & Post to Google Maps", opening your listing’s native review form with the text pre-copied ready to paste.',
               },
               {
                 q: 'Does KindlyReview comply with Google Business Profile & Maps policies?',
-                a: 'Yes, 100%. KindlyReview does NOT use bots or proxy IP networks (which get banned by Google algorithms). Real in-person dining customers scan the stand from their own smartphones and post voluntarily using their personal, verified Google accounts, ensuring high authority and permanent indexation.',
+                a: 'Yes, 100%. KindlyReview does NOT use bots or proxy IP networks (which get banned by Google algorithms). Real in-person customers scan the stand from their own smartphones and post voluntarily using their personal, verified Google accounts, ensuring high authority and permanent indexation.',
               },
               {
                 q: 'What is the Reputation Shield and how does it prevent 1-star reviews?',
-                a: 'If a customer experiences an issue (like a slow dessert or minor order delay) and rates their experience 1 to 3 stars, KindlyReview intercepts the feedback privately. Rather than directing them to Google Maps, it routes their complaint directly to your manager WhatsApp and dashboard. This allows your team to resolve the issue at the dining table before it hurts your public score.',
+                a: 'If a customer experiences an issue and rates their experience 1 to 3 stars, KindlyReview intercepts the feedback privately. Rather than directing them to Google Maps, it routes their complaint directly to your manager WhatsApp and dashboard. This allows your team to resolve the issue privately on the spot before it hurts your public score.',
               },
               {
                 q: 'Do customers need to download an app or register an account?',
-                a: 'Zero downloads, zero friction! Diners do not need to install any app or register. The review flow launches instantly in their mobile browser (Chrome / Safari) using their standard phone camera.',
+                a: 'Zero downloads, zero friction! Customers do not need to install any app or register. The review flow launches instantly in their mobile browser (Chrome / Safari) using their standard phone camera.',
               },
               {
                 q: 'What is included with the ₹79 Testing Pack Trial?',
-                a: 'The ₹79 introductory pack provides 30 full days of access, 100 AI review drafts, and 2 Smart Table QR Stands. You can switch, upgrade, or cancel packs anytime directly from your Merchant Dashboard with zero lock-in.',
+                a: 'The ₹79 introductory pack provides 30 full days of access, 100 AI review drafts, and 2 Smart Counter / Table QR Stands. You can switch, upgrade, or cancel packs anytime directly from your Merchant Dashboard with zero lock-in.',
               },
               {
-                q: 'Can I print branded acrylic table stands for my restaurant?',
-                a: 'Yes! KindlyReview includes a built-in Printable Acrylic Tent Studio. You can customize table numbers, brand accent colors, custom welcome greetings, and optional guest Wi-Fi details, and print high-resolution 4"×6" table tent inserts immediately.',
+                q: 'Can I print branded acrylic counter stands for my business?',
+                a: 'Yes! KindlyReview includes a built-in Printable Acrylic Stand Studio. You can customize location/counter tags, brand accent colors, custom welcome greetings, and print high-resolution 4"×6" counter stand inserts immediately, or order custom laser-engraved stands.',
               },
             ].map((faq, idx) => {
               const isOpen = expandedFaq === idx;

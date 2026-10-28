@@ -83,6 +83,19 @@ export const api = {
   getBusinessNotifications: (businessId: string) => apiRequest(`/business/${businessId}/notifications`),
   submitSoftwareInquiry: (businessId: string, data: { serviceType: string; requirements?: string; contactPhone: string }) =>
     apiRequest(`/business/${businessId}/custom-software-inquiry`, { method: 'POST', body: JSON.stringify(data) }),
+  submitPublicSoftwareInquiry: (data: {
+    name?: string;
+    businessName: string;
+    email?: string;
+    contactPhone: string;
+    serviceType: string;
+    locations?: string;
+    requirements?: string;
+  }) =>
+    apiRequest('/business/public/custom-software-inquiry', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
 
   // QR Codes

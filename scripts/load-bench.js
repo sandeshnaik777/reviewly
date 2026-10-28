@@ -106,13 +106,15 @@ function analyzeStageResults(data) {
 async function runBenchmark() {
   console.log(`Starting Production Benchmark against: ${TARGET_HOST}`);
 
-  // Test across endpoints
+  // Test across increasing concurrency tiers
   const stages = [
-    { name: '10 Users Concurrency (Warmup & Baseline)', endpoint: `${TARGET_HOST}/api/plans`, total: 50, conc: 10 },
-    { name: '50 Concurrent Users (Normal Production Load)', endpoint: `${TARGET_HOST}/api/plans`, total: 150, conc: 50 },
-    { name: '100 Concurrent Users (Peak Traffic Surge)', endpoint: `${TARGET_HOST}/api/plans`, total: 300, conc: 100 },
-    { name: '200 Concurrent Users (High Density Burst)', endpoint: `${TARGET_HOST}/api/plans`, total: 400, conc: 200 },
-    { name: '50 Concurrent Users (Content Rich - Blogs API)', endpoint: `${TARGET_HOST}/api/blogs`, total: 100, conc: 50 },
+    { name: '10 Users Concurrency (Baseline Setup)', endpoint: `${TARGET_HOST}/api/plans`, total: 100, conc: 10 },
+    { name: '50 Concurrent Users (Standard Production Traffic)', endpoint: `${TARGET_HOST}/api/plans`, total: 250, conc: 50 },
+    { name: '100 Concurrent Users (Peak Local Foot Traffic Surge)', endpoint: `${TARGET_HOST}/api/plans`, total: 500, conc: 100 },
+    { name: '250 Concurrent Users (High-Volume Multi-Store Concurrency)', endpoint: `${TARGET_HOST}/api/plans`, total: 750, conc: 250 },
+    { name: '500 Concurrent Users (High Density Enterprise Stress)', endpoint: `${TARGET_HOST}/api/plans`, total: 1000, conc: 500 },
+    { name: '1000 Concurrent Users (Extreme Surge Stress Test)', endpoint: `${TARGET_HOST}/api/plans`, total: 1500, conc: 1000 },
+    { name: '100 Concurrent Users (Content Rich Pillar Blogs API)', endpoint: `${TARGET_HOST}/api/blogs`, total: 300, conc: 100 },
   ];
 
   const summary = [];

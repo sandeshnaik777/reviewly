@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { Router, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { db } from '../../db/index.js';
 import { authenticate, AuthenticatedRequest } from '../../middleware/auth.js';
@@ -402,6 +402,42 @@ businessRouter.post(
         success: true,
         data: inquiry,
         message: 'Your inquiry has been received! Our solutions engineering team will contact you shortly.',
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Public: Submit Custom Enterprise & Bespoke Software Inquiry (No auth required)
+businessRouter.post(
+  '/public/custom-software-inquiry',
+  validateBody(
+    z.object({
+      name: z.string().optional(),
+      businessName: z.string().min(2, 'Business or brand name is required'),
+      email: z.string().email().optional(),
+      contactPhone: z.string().min(6, 'Valid contact phone number is required'),
+      serviceType: z.string().min(2, 'Service type is required'),
+      locations: z.string().optional(),
+      requirements: z.string().optional(),
+    })
+  ),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const inquiry = await db.createSoftwareInquiry({
+        businessId: 'PUBLIC_LEAD',
+        businessName: req.body.businessName,
+        ownerEmail: req.body.email || 'lead@kindlyreview.in',
+        serviceType: req.body.serviceType,
+        contactPhone: req.body.contactPhone,
+        requirements: `[Lead Name: ${req.body.name || 'N/A'}] [Locations: ${req.body.locations || '1'}] ${req.body.requirements || ''}`,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: inquiry,
+        message: 'Your custom software consultation request has been received! Our solutions engineering team will reach out within 2 hours.',
       });
     } catch (err) {
       next(err);

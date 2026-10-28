@@ -469,12 +469,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     if (leverId === 'dish_boost') {
       if (settings) {
         const existing = settings.thingsToHighlight || [];
-        const dynamicAdditions = business?.subcategory ? [`Best ${business.subcategory}`, 'Signature Dishes', 'Top Hospitality'] : ['Signature Dishes', 'Top Hospitality'];
+        const dynamicAdditions = business?.subcategory ? [`Best ${business.subcategory}`, 'Quality Service', 'Top Hospitality'] : ['Quality Service', 'Top Hospitality'];
         const updated = Array.from(new Set([...existing, ...dynamicAdditions]));
         const newSettings = { ...settings, thingsToHighlight: updated, reviewTone: 'enthusiastic' };
         setSettings(newSettings);
         await api.saveSettings(businessId, newSettings);
-        showNotification('⚡ Aura Applied: Signature dishes & hospitality injected into Tonight’s AI Prompt!');
+        showNotification('⚡ Aura Applied: Top offerings & hospitality injected into AI Prompt!');
       }
     } else if (leverId === 'waiter_bonus') {
       showNotification('🏆 Recognition Logged: Team member recognition updated in Manager Log!');
@@ -1564,8 +1564,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                   <div style={{ padding: '12px 14px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Delivery Commission Saved</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>28% Swiggy/Zomato commission saved on dine-in diners</div>
+                      <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Direct Walk-In Commission Saved</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Aggregator commissions saved on direct walk-in customers</div>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--primary)' }}>
                       +₹{financial.aggregatorCommissionsSavedInr.toLocaleString()}
@@ -1575,7 +1575,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div style={{ padding: '12px 14px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Shield Recovered Revenue</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied diners intercepted and recovered</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied customers intercepted and recovered privately</div>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: '15px', color: '#16a34a' }}>
                       +₹{financial.shieldRecoveredRevenueInr.toLocaleString()}
@@ -1785,7 +1785,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     </span>
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
-                    Diners navigating directly to venue
+                    Customers navigating directly to storefront
                   </div>
                 </div>
 
@@ -1916,7 +1916,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             </div>
 
-            {/* 2-COLUMN SECTION: DINING SHIFTS & TOPIC MENTIONS */}
+            {/* 2-COLUMN SECTION: PEAK HOURS & TOPIC MENTIONS */}
             <div
               className="grid-mobile-single"
               style={{
@@ -1926,23 +1926,23 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 marginBottom: '24px',
               }}
             >
-              {/* Hourly / Dining Shift Heatmap */}
+              {/* Hourly / Peak Shift Heatmap */}
               <div className="card" style={{ padding: '26px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <h4 style={{ fontSize: '17px', fontWeight: 600 }}>
-                    Dining Rush & Shift Telemetry
+                    Customer Peak Hours &amp; Activity Telemetry
                   </h4>
-                  <span className="stat-pill stat-pill-neutral">{reviews.length > 0 ? 'Shift Telemetry Active' : 'Awaiting Scans'}</span>
+                  <span className="stat-pill stat-pill-neutral">{reviews.length > 0 ? 'Telemetry Active' : 'Awaiting Scans'}</span>
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px' }}>
-                  Customer activity, review submission velocity, and table turn rates.
+                  Customer activity, review submission velocity, and visit patterns.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
                     <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>
                       <div style={{ fontSize: '18px', marginBottom: '4px' }}>⏰</div>
-                      <div style={{ fontWeight: 600, fontSize: '13px' }}>Shift Telemetry Standby</div>
+                      <div style={{ fontWeight: 600, fontSize: '13px' }}>Activity Telemetry Standby</div>
                       <div style={{ fontSize: '11.5px' }}>Hourly distribution begins tracking with your first customer scan.</div>
                     </div>
                   ) : (
@@ -1971,10 +1971,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </div>
               </div>
 
-              {/* Topic & Dish Sentiment Intelligence */}
+              {/* Topic & Offering Sentiment Intelligence */}
               <div className="card" style={{ padding: '26px' }}>
                 <h4 style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>
-                  Customer Praise & Mention Intelligence
+                  Customer Praise &amp; Mention Intelligence
                 </h4>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
                   Real customer themes frequently mentioned in generated reviews.
@@ -1985,7 +1985,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
                       <div style={{ fontSize: '20px', marginBottom: '6px' }}>💬</div>
                       <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Topic Intelligence Initializing</div>
-                      <div style={{ fontSize: '12px' }}>Customer praise themes and dish mentions will appear here once diners submit reviews.</div>
+                      <div style={{ fontSize: '12px' }}>Customer praise themes and product/service mentions will appear here once customers submit reviews.</div>
                     </div>
                   ) : (
                     analytics.sentimentTopics.map((t: any, i: number) => (
@@ -2124,7 +2124,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       {roi.googleLocalPackRank || 'Awaiting Initial Reviews'}
                     </div>
                     <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
-                      {reviews.length} Reviews · {analytics?.avgRating ? `${analytics.avgRating} ★` : '0.0 ★'} Rating
+                      {reviews.length} Review{reviews.length === 1 ? '' : 's'} · {analytics?.avgRating ? `${analytics.avgRating} ★` : '0.0 ★'} Rating
                     </div>
                   </div>
 
@@ -2133,7 +2133,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       Weekly Review Velocity
                     </div>
                     <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                      {roi.reviewsVelocityPerWeek ?? 0} reviews/wk
+                      {roi.reviewsVelocityPerWeek ?? 0} review{roi.reviewsVelocityPerWeek === 1 ? '' : 's'}/wk
                     </div>
                     <div style={{ fontSize: '11px', color: '#4ade80' }}>
                       {reviews.length > 0 ? '▲ Active Review Acceleration' : 'Initial Baseline Setup'}
@@ -2330,7 +2330,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Main Dining, Patio, Counter"
+                    placeholder="e.g. Counter 1, Billing Desk, Reception, Table 1"
                     value={newQRLocation}
                     onChange={(e) => setNewQRLocation(e.target.value)}
                   />
@@ -2347,7 +2347,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div style={{ fontSize: '42px', marginBottom: '12px' }}>🎯</div>
                 <h4 style={{ margin: '0 0 6px', fontSize: '18px' }}>No QR Stands Generated Yet</h4>
                 <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                  Create your first table stand or counter QR to start collecting 5-star Google reviews.
+                  Create your first counter stand or table QR to start collecting 5-star Google reviews.
                 </p>
                 <button className="btn btn-primary" onClick={() => setShowQRModal(true)}>
                   + Generate First Stand
@@ -2382,7 +2382,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               {qr.name}
                             </h4>
                             <span className="badge badge-neutral" style={{ fontSize: '11px' }}>
-                              📍 {qr.locationTag || 'Dining Area'}
+                              📍 {qr.locationTag || 'Front Counter'}
                             </span>
                           </div>
                           <span className="stat-pill stat-pill-success" style={{ fontSize: '11px' }}>
@@ -2725,7 +2725,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div>
                     <div style={{ fontSize: '15px', fontWeight: 600 }}>Keywords & Vocabulary</div>
                     <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Highlight your signature dishes and avoid unwanted words.
+                      Highlight your key offerings, features and avoid unwanted words.
                     </div>
                   </div>
 
@@ -2992,7 +2992,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <span className="badge badge-neutral" style={{ fontSize: '10px' }}>Optional</span>
                     </div>
                     <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Reward diners &amp; customers with an interactive digital scratch card right after they submit or copy their Google review.
+                      Reward customers with an interactive digital scratch card right after they submit or copy their Google review.
                     </div>
                   </div>
 
@@ -3233,7 +3233,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       ...questions,
                       {
                         questionKey: newKey,
-                        label: 'Dining Experience',
+                        label: 'Overall Experience',
                         scaleType: '1-5_STARS',
                         displayOrder: questions.length,
                         isRequired: true,
@@ -3486,7 +3486,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         </div>
                       )}
 
-                      {/* Shield Recovery Action for Unhappy Diners */}
+                      {/* Shield Recovery Action for Unhappy Customers */}
                       {isShielded && (
                         <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                           <span style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600 }}>
@@ -4141,6 +4141,74 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 );
               })}
+
+              {/* 4th Plan: Custom Enterprise & Bespoke Software */}
+              <div
+                className="card"
+                style={{
+                  padding: '24px 20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  border: '1.5px solid #d97706',
+                  background: 'linear-gradient(180deg, #ffffff 0%, #fffdf8 100%)',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-11px',
+                    left: '20px',
+                    background: '#d97706',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '3px 12px',
+                    borderRadius: '12px',
+                  }}
+                >
+                  BESPOKE SYSTEMS
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '18px' }}>Custom / Bespoke Software</div>
+                    <div style={{ fontSize: '12px', color: '#d97706', fontWeight: 600, marginTop: '2px' }}>
+                      Enterprise &amp; Multi-Branch
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', margin: '8px 0 14px' }}>
+                  <span style={{ fontSize: '28px', fontWeight: 800, color: '#d97706' }}>
+                    Custom Quote
+                  </span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    Tailored to your scope
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                  For multi-branch chains, franchise networks, clinics, and businesses requiring custom POS/ERP integration or delivery dispatch.
+                </p>
+
+                <ul style={{ listStyle: 'none', fontSize: '12.5px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                  <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ Unlimited Smart QR Stands across all locations</li>
+                  <li>✓ Multi-Branch Centralized Command Center</li>
+                  <li>✓ Bespoke POS &amp; ERP sync (Tally, SAP, Marg, Zoho)</li>
+                  <li>✓ In-House Delivery Fleet &amp; Dispatch Logistics</li>
+                  <li>✓ Custom Laser-Engraved NFC Hardware Stands</li>
+                  <li>✓ Dedicated Solutions Engineer &amp; 24/7 Hotline SLA</li>
+                </ul>
+
+                <button
+                  className="btn btn-secondary btn-block"
+                  style={{ marginTop: '18px', fontSize: '13.5px', padding: '10px', background: '#d97706', borderColor: '#d97706', color: '#ffffff', fontWeight: 700 }}
+                  onClick={() => setShowInquiryModal(true)}
+                >
+                  Request Custom Quote →
+                </button>
+              </div>
             </div>
 
             {/* TRANSACTION ID & PAYMENT AUDIT LEDGER */}
@@ -4425,7 +4493,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Dining Floor, Rooftop, Cocktail Bar"
+                    placeholder="e.g. Billing Counter, Service Desk, Consultation Room, Front Lobby"
                     value={newQRLocation}
                     onChange={(e) => setNewQRLocation(e.target.value)}
                     required

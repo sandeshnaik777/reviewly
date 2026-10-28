@@ -1302,7 +1302,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               <textarea
                 className="form-textarea"
                 rows={3}
-                placeholder="Tell customers what makes your culinary experience unique (specialty dishes, atmosphere, fresh ingredients)..."
+                placeholder="Tell customers what makes your business unique (key offerings, specialty products, atmosphere, quality service)..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
@@ -1841,7 +1841,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>
-                        {formData.businessName || 'Your Restaurant'}
+                        {formData.businessName || 'Your Business'}
                       </div>
                       <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
                         {formData.ownerName} · {formData.subcategory} ({formData.city || 'India'})
@@ -1889,7 +1889,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>
-                        {formData.businessName || 'Your Restaurant'}
+                        {formData.businessName || 'Your Business'}
                       </div>
                       <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
                         Direct Plan Activation · {selectedPlan?.name}
