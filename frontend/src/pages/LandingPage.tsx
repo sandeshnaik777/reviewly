@@ -1159,7 +1159,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </ul>
 
             <div style={{ marginTop: '16px', fontSize: '12px', color: '#64748b' }}>
-              Support Email: <a href="mailto:support@kindlyreview.in" style={{ color: '#38bdf8' }}>support@kindlyreview.in</a>
+              Support Email: <a href="mailto:support@kindlyrate.com" style={{ color: '#38bdf8' }}>support@kindlyrate.com</a>
               <br />
               Helpline: <a href="tel:+918047192200" style={{ color: '#38bdf8' }}>+91 80 4719 2200</a>
             </div>

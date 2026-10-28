@@ -497,7 +497,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>4. Grievance Officer</h4>
               <p>
-                In compliance with the Digital Personal Data Protection Act, you may contact our designated Grievance Officer at: <strong>grievance@kindlyreview.in</strong>, KindlyReview Operations, Indiranagar, Bengaluru.
+                In compliance with the Digital Personal Data Protection Act, you may contact our designated Grievance Officer at: <strong>grievance@kindlyrate.com</strong>, KindlyRate Operations, Indiranagar, Bengaluru.
               </p>
             </div>
           )}
@@ -527,7 +527,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>3. Refund Eligibility &amp; Dispute Windows</h4>
               <p>
-                If an accidental duplicate charge or technical billing anomaly occurs, notify our finance desk within 7 days at <strong>billing@kindlyreview.in</strong>. Once verified, refunds are initiated immediately and reflected in your original payment method (UPI / Bank / Card) within <strong>5 to 7 business days</strong> as per banking network guidelines.
+                If an accidental duplicate charge or technical billing anomaly occurs, notify our finance desk within 7 days at <strong>billing@kindlyrate.com</strong>. Once verified, refunds are initiated immediately and reflected in your original payment method (UPI / Bank / Card) within <strong>5 to 7 business days</strong> as per banking network guidelines.
               </p>
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>4. Hardware / Acrylic Stands</h4>
@@ -559,8 +559,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   <div style={{ fontSize: '20px', marginBottom: '4px' }}>✉️</div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>Email Support</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Avg response &lt; 2 hrs</div>
-                  <a href="mailto:support@kindlyreview.in" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
-                    support@kindlyreview.in
+                  <a href="mailto:support@kindlyrate.com" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
+                    support@kindlyrate.com
                   </a>
                 </div>
 

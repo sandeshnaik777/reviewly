@@ -428,7 +428,7 @@ businessRouter.post(
       const inquiry = await db.createSoftwareInquiry({
         businessId: 'PUBLIC_LEAD',
         businessName: req.body.businessName,
-        ownerEmail: req.body.email || 'lead@kindlyreview.in',
+        ownerEmail: req.body.email || 'lead@kindlyrate.com',
         serviceType: req.body.serviceType,
         contactPhone: req.body.contactPhone,
         requirements: `[Lead Name: ${req.body.name || 'N/A'}] [Locations: ${req.body.locations || '1'}] ${req.body.requirements || ''}`,

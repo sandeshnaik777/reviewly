@@ -1,6 +1,6 @@
 # ====================================================================
-# Robots.txt — KindlyReview Multi-Tenant Business Review Platform
-# https://kindlyreview.in/
+# Robots.txt — KindlyRate Multi-Tenant Business Review Platform
+# https://kindlyrate.com/
 # ====================================================================
 
 User-agent: *
@@ -16,4 +16,4 @@ Disallow: /onboarding/checkout
 Crawl-delay: 1
 
 # XML Sitemaps
-Sitemap: https://kindlyreview.in/sitemap.xml
+Sitemap: https://kindlyrate.com/sitemap.xml

@@ -394,3 +394,4 @@ KindlyReview partners with corporate chains to deliver a complete turnkey soluti
 Contact our Enterprise Solutions team today to request a custom multi-location proposal and ROI projection tailored to your branch network.`,
   },
 ];
+

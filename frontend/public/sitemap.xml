@@ -6,7 +6,7 @@
   
   <!-- Homepage & Core Funnel -->
   <url>
-    <loc>https://kindlyreview.in/</loc>
+    <loc>https://kindlyrate.com/</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Features & Telemetry -->
   <url>
-    <loc>https://kindlyreview.in/#features</loc>
+    <loc>https://kindlyrate.com/#features</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- Subscription Packs & Promotional Pricing -->
   <url>
-    <loc>https://kindlyreview.in/#pricing</loc>
+    <loc>https://kindlyrate.com/#pricing</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -30,7 +30,7 @@
 
   <!-- Verified Testimonials & ROI Case Studies -->
   <url>
-    <loc>https://kindlyreview.in/#testimonials</loc>
+    <loc>https://kindlyrate.com/#testimonials</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -38,7 +38,7 @@
 
   <!-- Frequently Asked Questions (FAQ) -->
   <url>
-    <loc>https://kindlyreview.in/#faq</loc>
+    <loc>https://kindlyrate.com/#faq</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -46,7 +46,7 @@
 
   <!-- Articles & Guides Hub -->
   <url>
-    <loc>https://kindlyreview.in/blog</loc>
+    <loc>https://kindlyrate.com/blog</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -54,42 +54,42 @@
 
   <!-- High-Value SEO In-Depth Pillar Articles -->
   <url>
-    <loc>https://kindlyreview.in/blog/how-to-dominate-google-maps-local-3-pack-rankings-2026</loc>
+    <loc>https://kindlyrate.com/blog/how-to-dominate-google-maps-local-3-pack-rankings-2026</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://kindlyreview.in/blog/smart-nfc-qr-stands-vs-sms-whatsapp-review-requests</loc>
+    <loc>https://kindlyrate.com/blog/smart-nfc-qr-stands-vs-sms-whatsapp-review-requests</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://kindlyreview.in/blog/shielding-business-from-unfair-1-star-fake-reviews-legally</loc>
+    <loc>https://kindlyrate.com/blog/shielding-business-from-unfair-1-star-fake-reviews-legally</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://kindlyreview.in/blog/keyword-injection-and-semantic-search-in-customer-reviews</loc>
+    <loc>https://kindlyrate.com/blog/keyword-injection-and-semantic-search-in-customer-reviews</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://kindlyreview.in/blog/why-businesses-are-replacing-generic-aggregators-with-bespoke-software</loc>
+    <loc>https://kindlyrate.com/blog/why-businesses-are-replacing-generic-aggregators-with-bespoke-software</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
-    <loc>https://kindlyreview.in/blog/enterprise-multi-location-review-architecture</loc>
+    <loc>https://kindlyrate.com/blog/enterprise-multi-location-review-architecture</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
@@ -97,7 +97,7 @@
 
   <!-- Help Center & Merchant Support -->
   <url>
-    <loc>https://kindlyreview.in/help</loc>
+    <loc>https://kindlyrate.com/help</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -105,7 +105,7 @@
 
   <!-- Legal: Terms of Service -->
   <url>
-    <loc>https://kindlyreview.in/terms</loc>
+    <loc>https://kindlyrate.com/terms</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -113,7 +113,7 @@
 
   <!-- Legal: Privacy Policy -->
   <url>
-    <loc>https://kindlyreview.in/privacy</loc>
+    <loc>https://kindlyrate.com/privacy</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -121,7 +121,7 @@
 
   <!-- Legal: Cancellation & Refund Policy -->
   <url>
-    <loc>https://kindlyreview.in/refund</loc>
+    <loc>https://kindlyrate.com/refund</loc>
     <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
