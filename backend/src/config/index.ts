@@ -73,6 +73,6 @@ export const config = {
     customerReviewWindowMs: 60 * 1000,
     customerReviewMaxPerIp: 10,
     globalApiWindowMs: 60 * 1000,
-    globalApiMaxPerIp: 120,
+    globalApiMaxPerIp: Number(process.env.GLOBAL_API_MAX_PER_IP || 2000),
   },
 };
