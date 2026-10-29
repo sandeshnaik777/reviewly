@@ -760,23 +760,28 @@ class DatabaseService {
       else if (e.eventType === 'GOOGLE_MAPS_CLICK') agg.clicks++;
     }
 
+    const isDemoBiz = businessId === 'demo-merchant' || businessId === 'b0000000-0000-0000-0000-000000000001';
+
     return rawQrs.map((qr, idx) => {
       const agg = qrEventsMap.get(qr.id);
       const eventScans = agg?.scans || 0;
-      const scanCount = Math.max(qr.scanCount || 0, eventScans, idx === 0 ? 32 : idx === 1 ? 21 : 16);
+      const scanCount = isDemoBiz
+        ? Math.max(qr.scanCount || 0, eventScans, idx === 0 ? 32 : idx === 1 ? 21 : 16)
+        : Math.max(qr.scanCount || 0, eventScans);
 
       const eventReviews = agg?.reviews || 0;
-      const reviewsGenerated = Math.max(
-        eventReviews,
-        Math.round(scanCount * (idx === 0 ? 0.65 : idx === 1 ? 0.57 : 0.50))
-      );
+      const reviewsGenerated = isDemoBiz
+        ? Math.max(eventReviews, Math.round(scanCount * (idx === 0 ? 0.65 : idx === 1 ? 0.57 : 0.50)))
+        : (eventReviews || qr.reviewsGenerated || 0);
 
       const eventGoogle = agg?.clicks || 0;
-      const googleClicks = Math.max(eventGoogle, Math.round(reviewsGenerated * 0.78));
+      const googleClicks = isDemoBiz
+        ? Math.max(eventGoogle, Math.round(reviewsGenerated * 0.78))
+        : (eventGoogle || qr.googleClicks || 0);
 
       const conversionRate = scanCount > 0 ? Math.round((reviewsGenerated / scanCount) * 100) : 0;
-      const avgRating = idx === 0 ? 4.9 : idx === 1 ? 5.0 : 4.8;
-      const lastScan = idx === 0 ? '4m ago' : idx === 1 ? '18m ago' : '1h ago';
+      const avgRating = isDemoBiz ? (idx === 0 ? 4.9 : idx === 1 ? 5.0 : 4.8) : (qr.avgRating || 0.0);
+      const lastScan = isDemoBiz ? (idx === 0 ? '4m ago' : idx === 1 ? '18m ago' : '1h ago') : (qr.lastScan || (scanCount > 0 ? 'Recently' : 'No scans yet'));
 
       return {
         ...qr,

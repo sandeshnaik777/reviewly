@@ -176,7 +176,89 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const [mapsSetupDismissed, setMapsSetupDismissed] = useState(() => {
     try { return sessionStorage.getItem('kindlyrate_dismiss_maps_setup') === 'true'; } catch { return false; }
   });
-  const [overviewMobileSubtab, setOverviewMobileSubtab] = useState<'kpis' | 'keywords' | 'charts' | 'reviews'>('kpis');
+  const [overviewMobileSubtab, setOverviewMobileSubtab] = useState<'kpis' | 'questions' | 'keywords' | 'charts'>('kpis');
+  const [newOverviewQuestion, setNewOverviewQuestion] = useState('');
+
+  // Festive Limited-Time Offer Countdown Timer (Approx 2h 47m live countdown)
+  const [offerTimeLeft, setOfferTimeLeft] = useState<{ hours: string; minutes: string; seconds: string }>({
+    hours: '02',
+    minutes: '47',
+    seconds: '19',
+  });
+
+  useEffect(() => {
+    let expiry = 0;
+    try {
+      const stored = localStorage.getItem('kindlyrate_festive_offer_expiry');
+      if (stored) {
+        expiry = parseInt(stored, 10);
+      }
+    } catch {}
+
+    const now = Date.now();
+    if (!expiry || expiry <= now) {
+      expiry = now + (2 * 3600 + 47 * 60 + 19) * 1000;
+      try {
+        localStorage.setItem('kindlyrate_festive_offer_expiry', String(expiry));
+      } catch {}
+    }
+
+    const updateTimer = () => {
+      const diff = Math.max(0, expiry - Date.now());
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      setOfferTimeLeft({
+        hours: String(h).padStart(2, '0'),
+        minutes: String(m).padStart(2, '0'),
+        seconds: String(s).padStart(2, '0'),
+      });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleQuickAddQuestion = async (labelToAdd?: string) => {
+    const text = (labelToAdd || newOverviewQuestion).trim();
+    if (!text) return;
+
+    const newKey = `q_${Date.now()}`;
+    const newQ = {
+      questionKey: newKey,
+      label: text,
+      scaleType: '1-5_STARS',
+      displayOrder: questions.length,
+      isRequired: true,
+      isActive: true,
+    };
+
+    const updated = [...questions, newQ];
+    setQuestions(updated);
+    setNewOverviewQuestion('');
+
+    try {
+      const saved = await api.saveQuestions(businessId, updated);
+      setQuestions(saved);
+      showNotification(`✓ Rating question "${text}" is live on your QR stands!`);
+    } catch (err: any) {
+      console.error('Failed to auto-save question:', err);
+      showNotification(`Added "${text}"`);
+    }
+  };
+
+  const handleQuickRemoveQuestion = async (idxToRemove: number) => {
+    const updated = questions.filter((_, i) => i !== idxToRemove);
+    setQuestions(updated);
+    try {
+      const saved = await api.saveQuestions(businessId, updated);
+      setQuestions(saved);
+      showNotification('Rating question removed.');
+    } catch (err: any) {
+      console.error('Failed to auto-save question remove:', err);
+    }
+  };
 
   const handleDismissEmailBanner = () => {
     setEmailBannerDismissed(true);
@@ -1204,13 +1286,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         </div>
       )}
 
-      {/* Persistent Subscription Paywall Warning Banner */}
+      {/* Festive Countdown Bar (Top of Screen) */}
       {!loading && !isPaidActive && (
         <div
+          className={`dashboard-paywall-banner ${activeTab === 'overview' ? 'hide-mobile' : ''}`}
           style={{
-            background: 'linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%)',
+            background: 'linear-gradient(90deg, #fffbeb 0%, #fef3c7 50%, #fff7ed 100%)',
             borderBottom: '2px solid #f59e0b',
-            padding: '10px 18px',
+            padding: '9px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -1219,54 +1302,45 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             boxShadow: '0 2px 8px rgba(245, 158, 11, 0.12)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-            <span style={{ fontSize: '20px', flexShrink: 0 }}>🔒</span>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <strong style={{ color: '#78350f', fontSize: '13px' }}>
-                  Free Preview Mode
-                </strong>
-                <span
-                  style={{
-                    background: '#f59e0b',
-                    color: '#ffffff',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    padding: '1px 6px',
-                    borderRadius: '8px',
-                  }}
-                >
-                  Unpaid
-                </span>
-              </div>
-              <div className="hide-mobile" style={{ color: '#92400e', fontSize: '12px', marginTop: '1px' }}>
-                Live customer review submissions and physical QR counter stands require an active plan.
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '18px', flexShrink: 0 }}>🪔</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span style={{ background: '#dc2626', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                <span className="telemetry-pulse" style={{ background: '#ffffff', width: '5px', height: '5px' }} />
+                <span>DIWALI FLASH SALE 🎈</span>
+              </span>
+              <strong style={{ color: '#78350f', fontSize: '13px' }}>
+                Launch Pass: <span style={{ textDecoration: 'line-through', color: '#b91c1c', fontWeight: 600, marginRight: '3px' }}>₹499</span>
+                <span style={{ color: '#ea580c', fontWeight: 800 }}>₹79</span>
+              </strong>
+              <span style={{ color: '#78350f', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, background: '#fef08a', padding: '2px 7px', borderRadius: '6px', border: '1px solid #fde047' }}>
+                ⏳ {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
+              </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={handlePayTrial}
               className="btn btn-primary btn-sm"
               style={{
-                fontSize: '12.5px',
-                padding: '7px 16px',
-                background: '#d97706',
-                borderColor: '#b45309',
+                fontSize: '12px',
+                padding: '6px 14px',
+                background: '#ea580c',
+                borderColor: '#c2410c',
                 fontWeight: 800,
-                boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)',
+                boxShadow: '0 2px 6px rgba(234, 88, 12, 0.3)',
                 whiteSpace: 'nowrap',
               }}
             >
-              ⚡ Activate Testing Pack (₹79) →
+              🎉 Claim ₹79 Now →
             </button>
             <button
               onClick={() => setActiveTab('subscription')}
-              className="btn btn-secondary btn-sm hide-mobile"
-              style={{ fontSize: '12px', padding: '7px 12px' }}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '11.5px', padding: '6px 10px', whiteSpace: 'nowrap' }}
             >
-              View All Plans
+              Choose Plan
             </button>
           </div>
         </div>
@@ -1399,7 +1473,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             )}
 
-            {/* Mobile Segmented Sub-Nav Pills (Visible only on phone screens) */}
+            {/* Mobile Segmented Sub-Nav Pills (Visible on phone screens) */}
             <div className="show-mobile-only mobile-segment-tabs">
               <button
                 type="button"
@@ -1410,10 +1484,17 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </button>
               <button
                 type="button"
+                className={`mobile-segment-tab ${overviewMobileSubtab === 'questions' ? 'active' : ''}`}
+                onClick={() => setOverviewMobileSubtab('questions')}
+              >
+                ⭐ Questions ({questions.length})
+              </button>
+              <button
+                type="button"
                 className={`mobile-segment-tab ${overviewMobileSubtab === 'keywords' ? 'active' : ''}`}
                 onClick={() => setOverviewMobileSubtab('keywords')}
               >
-                🎯 SEO Keywords
+                🎯 SEO
               </button>
               <button
                 type="button"
@@ -1424,59 +1505,144 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </button>
             </div>
 
-            {/* Unpaid / Trial Hero Banner (Desktop only - mobile uses sleek top banner) */}
+            {/* Grand Festive Launch Offer Hero Card (Shown when unpaid / free preview) */}
             {!isPaidActive && (
               <div
-                className="card hide-mobile"
+                className="card dashboard-card-responsive"
                 style={{
-                  background: 'linear-gradient(135deg, #fffcf8 0%, #fef3c7 100%)',
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 45%, #fffbeb 100%)',
                   border: '2px solid #f59e0b',
-                  padding: '24px 28px',
+                  padding: '24px 26px',
                   marginBottom: '24px',
-                  borderRadius: '14px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '16px',
-                  boxShadow: '0 6px 18px rgba(245, 158, 11, 0.14)',
+                  borderRadius: '16px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 30px rgba(245, 158, 11, 0.18)',
                 }}
               >
-                <div style={{ maxWidth: '780px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span className="badge badge-warning" style={{ fontSize: '11px', fontWeight: 700 }}>Action Required</span>
-                    <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 700 }}>Exclusive Introductory Offer: ₹79</span>
-                  </div>
-                  <h3 className="serif" style={{ fontSize: '22px', margin: '4px 0 6px', color: '#78350f', fontWeight: 700 }}>
-                    Activate Your Plan to Accept Real Customer Reviews
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '13.5px', color: '#92400e', lineHeight: 1.55 }}>
-                    Your business profile and smart counter QR stands are pre-configured. Complete payment via Razorpay to enable live customer review drafting on Google Maps, instant negative feedback shielding, and reputation tracking.
-                  </p>
+                {/* Floating Festive Balloons & Sparkles Background Accent */}
+                <div style={{ position: 'absolute', top: '-10px', right: '16px', fontSize: '38px', opacity: 0.85, pointerEvents: 'none', userSelect: 'none' }}>
+                  🎈🪔✨
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <button
-                    className="btn btn-primary btn-lg"
-                    onClick={handlePayTrial}
-                    style={{ fontSize: '14.5px', padding: '12px 24px', whiteSpace: 'nowrap', fontWeight: 700 }}
-                  >
-                    Pay ₹79 &amp; Activate Plan Now →
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('subscription')}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#92400e',
-                      fontSize: '12px',
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Or explore 1-Year UPI Autopay (2 Months Free)
-                  </button>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', position: 'relative', zIndex: 1 }}>
+                  <div style={{ maxWidth: '720px' }}>
+                    {/* Urgency Badge + Timer */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                      <span
+                        style={{
+                          background: 'linear-gradient(90deg, #dc2626 0%, #ea580c 100%)',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          padding: '3px 10px',
+                          borderRadius: '20px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          letterSpacing: '0.4px',
+                          boxShadow: '0 2px 6px rgba(220, 38, 38, 0.3)',
+                        }}
+                      >
+                        <span className="telemetry-pulse" style={{ background: '#ffffff', width: '5px', height: '5px' }} />
+                        <span>🪔 DIWALI &amp; GRAND LAUNCH FLASH SALE 🎈</span>
+                      </span>
+
+                      {/* Live Ticking Countdown Timer */}
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          background: '#78350f',
+                          color: '#fef3c7',
+                          padding: '3px 10px',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontWeight: 800,
+                          fontFamily: 'monospace',
+                          boxShadow: '0 2px 6px rgba(120, 53, 15, 0.25)',
+                        }}
+                        title="Special launch price expires when timer hits 0"
+                      >
+                        <span style={{ fontSize: '13px' }}>⏳</span>
+                        <span>OFFER ENDS IN:</span>
+                        <span style={{ color: '#fef08a', background: 'rgba(0,0,0,0.25)', padding: '1px 5px', borderRadius: '4px' }}>
+                          {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Headline with Strikethrough Price */}
+                    <h3 className="serif" style={{ fontSize: '24px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
+                      Unlock Customer Reviews for Just <span style={{ textDecoration: 'line-through', color: '#b91c1c', fontSize: '20px', fontWeight: 600, marginRight: '4px' }}>₹499</span>
+                      <span style={{ color: '#ea580c', fontSize: '28px' }}>₹79</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#15803d', background: '#dcfce7', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px', verticalAlign: 'middle' }}>
+                        SAVE 84% TODAY
+                      </span>
+                    </h3>
+
+                    <p style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#92400e', lineHeight: 1.55 }}>
+                      🎉 Exclusive welcome celebration offer for your store! Complete the one-time ₹79 payment to activate live Gemini review generation, physical QR stand dispatch, and negative feedback defense. <em>Price reverts to ₹499/mo once the countdown timer expires.</em>
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: '12px', color: '#78350f', fontWeight: 600 }}>
+                      <span>✓ 100 5-Star Reviews Quota</span>
+                      <span>✓ 2 Smart Acrylic QR Stands</span>
+                      <span>✓ 100% Reputation Shield</span>
+                      <span>✓ Direct WhatsApp/Call Support</span>
+                    </div>
+                  </div>
+
+                  {/* Choice Buttons for User */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '220px', width: '100%', maxWidth: '280px' }}>
+                    <button
+                      className="btn btn-primary btn-lg"
+                      onClick={handlePayTrial}
+                      style={{
+                        fontSize: '14.5px',
+                        padding: '12px 18px',
+                        background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
+                        borderColor: '#9a3412',
+                        whiteSpace: 'nowrap',
+                        fontWeight: 800,
+                        boxShadow: '0 4px 14px rgba(194, 65, 12, 0.35)',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        width: '100%',
+                      }}
+                    >
+                      <Sparkles size={16} color="#ffffff" />
+                      <span>Claim ₹79 Festive Offer →</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('subscription')}
+                      style={{
+                        background: '#ffffff',
+                        border: '1.5px solid #d97706',
+                        color: '#92400e',
+                        padding: '9px 14px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                        width: '100%',
+                      }}
+                    >
+                      Or Choose Growth / Yearly Pack (2 Mos Free) →
+                    </button>
+
+                    <div style={{ textAlign: 'center', fontSize: '11px', color: '#b45309', fontWeight: 500 }}>
+                      ⚡ Instant activation via Razorpay / UPI
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -1600,7 +1766,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             </div>
 
-            {/* Mobile Quick Action Hub (Only visible on mobile screens) */}
+            {/* Mobile Quick Action Hub (Visible on mobile screens) */}
             <div className="show-mobile-only" style={{ marginBottom: '18px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 {qrs[0] && (
@@ -1617,6 +1783,15 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 )}
                 <button
                   type="button"
+                  onClick={() => setOverviewMobileSubtab('questions')}
+                  className="btn btn-secondary"
+                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px solid #fed7aa', background: '#fffaf5' }}
+                >
+                  <span>⭐</span>
+                  <span>Questions ({questions.length})</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setActiveTab('qrs')}
                   className="btn btn-secondary"
                   style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
@@ -1626,22 +1801,191 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </button>
                 <button
                   type="button"
-                  onClick={() => setOverviewMobileSubtab('keywords')}
+                  onClick={handlePayTrial}
                   className="btn btn-secondary"
-                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#ea580c', border: '1.5px solid #fdba74' }}
                 >
-                  <Target size={14} color="#15803d" />
-                  <span>Keywords</span>
+                  <span>🪔</span>
+                  <span>Festive Offer ₹79</span>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ⭐ CUSTOMER 5-STAR RATING CRITERIA & QUESTIONS CARD */}
+          <div className={overviewMobileSubtab !== 'kpis' && overviewMobileSubtab !== 'questions' ? 'hide-mobile' : ''}>
+            <div
+              className="card dashboard-card-responsive"
+              style={{
+                background: '#ffffff',
+                border: '1.5px solid #fed7aa',
+                borderRadius: '16px',
+                padding: '24px 26px',
+                marginBottom: '24px',
+                boxShadow: '0 4px 16px rgba(234, 88, 12, 0.05)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', border: '1px solid #fdba74', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                      ⭐
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                        Customer Rating Questions (Live on QR Stands)
+                      </h4>
+                      <span className="badge badge-success" style={{ fontSize: '10.5px', marginTop: '2px' }}>
+                        ● {questions.length} Active Rating Criteria
+                      </span>
+                    </div>
+                  </div>
+                  <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
+                    Customers rate these criteria when scanning your counter QR stands. Gemini AI uses their ratings to generate authentic 5-star Google reviews.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('ai_settings')}
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: '12px', padding: '6px 12px' }}
+                  >
+                    ⚙️ Advanced Tone &amp; AI Engine →
+                  </button>
+                </div>
+              </div>
+
+              {/* 1-Tap Category Presets (Food, Retail, Services, Health) */}
+              <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                  💡 Tap to add common rating criteria for your store:
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {[
+                    'Food Taste & Quality',
+                    'Speed of Service',
+                    'Staff Hospitality & Care',
+                    'Ambiance & Cleanliness',
+                    'Value for Money & Pricing',
+                    'Genuine Products & Authenticity',
+                    'Staff Technical Advice',
+                    'Diagnostic & Repair Speed',
+                  ].map((presetLabel) => {
+                    const isAlreadyAdded = questions.some((q) => q.label.toLowerCase() === presetLabel.toLowerCase());
+                    return (
+                      <button
+                        key={presetLabel}
+                        type="button"
+                        onClick={() => !isAlreadyAdded && handleQuickAddQuestion(presetLabel)}
+                        disabled={isAlreadyAdded}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          cursor: isAlreadyAdded ? 'default' : 'pointer',
+                          background: isAlreadyAdded ? '#e2e8f0' : '#ffffff',
+                          color: isAlreadyAdded ? '#64748b' : 'var(--primary)',
+                          border: isAlreadyAdded ? '1px solid #cbd5e1' : '1.5px solid var(--primary)',
+                          transition: 'all 0.15s ease',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <span>{isAlreadyAdded ? '✓ Added' : '+ Add'}</span>
+                        <span>{presetLabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Quick Inline Custom Question Input */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleQuickAddQuestion();
+                }}
+                style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}
+              >
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Type any custom question (e.g. Doctor Consultation, Delivery Speed, Room View)..."
+                  value={newOverviewQuestion}
+                  onChange={(e) => setNewOverviewQuestion(e.target.value)}
+                  style={{ flex: 1, minWidth: '220px', fontSize: '13.5px', background: '#ffffff', border: '1.5px solid #cbd5e1' }}
+                />
                 <button
-                  type="button"
-                  onClick={() => setOverviewMobileSubtab('charts')}
-                  className="btn btn-secondary"
-                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  type="submit"
+                  disabled={!newOverviewQuestion.trim()}
+                  className="btn btn-primary"
+                  style={{ padding: '0 20px', height: '46px', whiteSpace: 'nowrap', fontWeight: 700 }}
                 >
-                  <TrendingUpIcon size={14} color="#2563eb" />
-                  <span>Analytics</span>
+                  + Add Question
                 </button>
+              </form>
+
+              {/* Active Questions List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {questions.map((q, idx) => (
+                  <div
+                    key={q.questionKey || idx}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      gap: '10px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
+                      <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#fed7aa', color: '#9a3412', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800, flexShrink: 0 }}>
+                        {idx + 1}
+                      </span>
+                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {q.label}
+                      </span>
+                      <span style={{ color: '#f59e0b', fontSize: '12px', letterSpacing: '1px' }} className="hide-mobile">
+                        ★★★★★
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                      <span className="badge badge-neutral" style={{ fontSize: '10.5px' }}>
+                        1–5 Stars
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickRemoveQuestion(idx)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#ef4444',
+                          cursor: 'pointer',
+                          padding: '4px 6px',
+                          fontSize: '13px',
+                          fontWeight: 700,
+                        }}
+                        title="Delete question"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {questions.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '20px', color: '#64748b', fontSize: '13px' }}>
+                    No rating criteria added yet. Add questions above or tap presets to customize what guests rate.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -2778,7 +3122,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span className="stat-pill stat-pill-primary" style={{ fontSize: '11.5px', padding: '6px 12px' }}>
-                    Top Performer: {qrs[0]?.name || 'Table 1'} ({qrs[0]?.conversionRate || 65}% conv.)
+                    {qrs.some((q) => (q.scanCount || 0) > 0) ? `Top Performer: ${qrs[0]?.name || 'Table 1'} (${qrs[0]?.conversionRate || 0}% conv.)` : 'Telemetry Active · Ready for Customer Scans'}
                   </span>
                 </div>
               </div>
@@ -2790,7 +3134,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Total QR Scans
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>
-                    {qrs.reduce((sum: number, q: any) => sum + (q.scanCount || 0), 0) || (qrs.length * 28)}
+                    {qrs.reduce((sum: number, q: any) => sum + (q.scanCount || 0), 0)}
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#16a34a', marginTop: '4px', fontWeight: 600 }}>
                     ▲ Across {qrs.length} physical stands
@@ -2802,7 +3146,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Reviews Generated
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--primary)', marginTop: '4px' }}>
-                    {qrs.reduce((sum: number, q: any) => sum + (q.reviewsGenerated || Math.round((q.scanCount || 28) * 0.58)), 0)}
+                    {qrs.reduce((sum: number, q: any) => sum + (q.reviewsGenerated || 0), 0)}
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
                     Authentic review drafts completed
@@ -2814,7 +3158,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Overall Conversion Rate
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: 800, color: '#16a34a', marginTop: '4px' }}>
-                    {Math.round((qrs.reduce((sum: number, q: any) => sum + (q.reviewsGenerated || Math.round((q.scanCount || 28) * 0.58)), 0) / Math.max(1, qrs.reduce((sum: number, q: any) => sum + (q.scanCount || 28), 0))) * 100) || 62}%
+                    {(() => { const totalScans = qrs.reduce((sum: number, q: any) => sum + (q.scanCount || 0), 0); const totalReviews = qrs.reduce((sum: number, q: any) => sum + (q.reviewsGenerated || 0), 0); return totalScans > 0 ? Math.round((totalReviews / totalScans) * 100) : 0; })()}%
                   </div>
                   <div style={{ fontSize: '11.5px', color: '#15803d', marginTop: '4px', fontWeight: 600 }}>
                     ⭐ Industry High (Avg is 18%)
@@ -2826,7 +3170,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Google Maps Clicks
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: 800, color: '#2563eb', marginTop: '4px' }}>
-                    {qrs.reduce((sum: number, q: any) => sum + (q.googleClicks || Math.round((q.reviewsGenerated || Math.round((q.scanCount || 28) * 0.58)) * 0.78)), 0)}
+                    {qrs.reduce((sum: number, q: any) => sum + (q.googleClicks || 0), 0)}
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
                     Direct 1-tap Google Maps submissions
@@ -2991,46 +3335,48 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               </span>
                             </div>
                             <span
-                              className={`stat-pill ${(qr.conversionRate || 60) >= 55 ? 'stat-pill-success' : 'stat-pill-primary'}`}
+                              className={`stat-pill ${(qr.scanCount && qr.scanCount > 0) ? ((qr.conversionRate || 0) >= 55 ? 'stat-pill-success' : 'stat-pill-primary') : 'stat-pill-primary'}`}
                               style={{ fontSize: '10.5px', padding: '2px 8px', fontWeight: 600 }}
                             >
-                              {(qr.conversionRate || 60) >= 60 ? 'Top Converting' : 'Steady Traffic'}
+                              {(qr.scanCount && qr.scanCount > 0)
+                                ? ((qr.conversionRate || 0) >= 60 ? 'Top Converting' : 'Steady Traffic')
+                                : 'New Stand · Ready'}
                             </span>
                           </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', textAlign: 'center' }}>
                             <div style={{ background: '#ffffff', borderRadius: '8px', padding: '8px 4px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                               <div style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
-                                {qr.scanCount || 28}
+                                {qr.scanCount || 0}
                               </div>
                               <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px' }}>Scans</div>
                             </div>
 
                             <div style={{ background: '#ffffff', borderRadius: '8px', padding: '8px 4px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                               <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--primary)' }}>
-                                {qr.reviewsGenerated || Math.round((qr.scanCount || 28) * 0.6)}
+                                {qr.reviewsGenerated || 0}
                               </div>
                               <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px' }}>Reviews</div>
                             </div>
 
                             <div style={{ background: '#ffffff', borderRadius: '8px', padding: '8px 4px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                               <div style={{ fontSize: '16px', fontWeight: 800, color: '#16a34a' }}>
-                                {qr.conversionRate || Math.round(((qr.reviewsGenerated || Math.round((qr.scanCount || 28) * 0.6)) / Math.max(1, qr.scanCount || 28)) * 100)}%
+                                {(qr.scanCount && qr.scanCount > 0) ? `${qr.conversionRate || 0}%` : '0%'}
                               </div>
                               <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px' }}>Conv.</div>
                             </div>
 
                             <div style={{ background: '#ffffff', borderRadius: '8px', padding: '8px 4px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                               <div style={{ fontSize: '16px', fontWeight: 800, color: '#2563eb' }}>
-                                {qr.googleClicks || Math.round((qr.reviewsGenerated || Math.round((qr.scanCount || 28) * 0.6)) * 0.78)}
+                                {qr.googleClicks || 0}
                               </div>
                               <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '2px' }}>Google ↗</div>
                             </div>
                           </div>
 
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #e2e8f0', fontSize: '11px', color: '#64748b' }}>
-                            <span>Rating Avg: <strong style={{ color: '#0f172a' }}>{qr.avgRating || '4.9'} ★</strong></span>
-                            <span>Last Scan: <strong style={{ color: '#0f172a' }}>{qr.lastScan || '4m ago'}</strong></span>
+                            <span>Rating Avg: <strong style={{ color: '#0f172a' }}>{qr.avgRating && qr.avgRating > 0 ? `${qr.avgRating} ★` : '—'}</strong></span>
+                            <span>Last Scan: <strong style={{ color: '#0f172a' }}>{qr.lastScan && qr.lastScan !== '4m ago' ? qr.lastScan : ((qr.scanCount || 0) > 0 ? 'Recently' : 'No scans yet')}</strong></span>
                           </div>
                         </div>
                       </div>
@@ -4472,48 +4818,131 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         {/* ======================================================== */}
         {activeTab === 'subscription' && (
           <div>
-            {/* Trial Status or Activation Banner */}
-            {usage?.subscription?.status === 'TRIAL' && (
+            {/* Grand Festive Launch Offer Hero Card in Subscription Tab */}
+            {!usage?.subscription?.trialActivated ? (
               <div
                 style={{
-                  background: usage?.subscription?.trialActivated ? 'rgba(34, 197, 94, 0.08)' : 'rgba(245, 158, 11, 0.1)',
-                  border: `1.5px solid ${usage?.subscription?.trialActivated ? 'var(--success)' : '#f59e0b'}`,
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '18px 22px',
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 45%, #fffbeb 100%)',
+                  border: '2px solid #f59e0b',
+                  borderRadius: '16px',
+                  padding: '24px 26px',
                   marginBottom: '24px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 30px rgba(245, 158, 11, 0.16)',
+                }}
+              >
+                {/* Floating Festive Balloons & Sparkles Background Accent */}
+                <div style={{ position: 'absolute', top: '-10px', right: '16px', fontSize: '38px', opacity: 0.85, pointerEvents: 'none', userSelect: 'none' }}>
+                  🎈🪔✨
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', position: 'relative', zIndex: 1 }}>
+                  <div style={{ maxWidth: '680px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                      <span
+                        style={{
+                          background: 'linear-gradient(90deg, #dc2626 0%, #ea580c 100%)',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          padding: '3px 10px',
+                          borderRadius: '20px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          letterSpacing: '0.4px',
+                          boxShadow: '0 2px 6px rgba(220, 38, 38, 0.3)',
+                        }}
+                      >
+                        <span className="telemetry-pulse" style={{ background: '#ffffff', width: '5px', height: '5px' }} />
+                        <span>🪔 DIWALI &amp; GRAND LAUNCH FLASH SALE 🎈</span>
+                      </span>
+
+                      {/* Live Ticking Countdown Timer */}
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          background: '#78350f',
+                          color: '#fef3c7',
+                          padding: '3px 10px',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontWeight: 800,
+                          fontFamily: 'monospace',
+                          boxShadow: '0 2px 6px rgba(120, 53, 15, 0.25)',
+                        }}
+                      >
+                        <span>⏳ ENDS IN:</span>
+                        <span style={{ color: '#fef08a', background: 'rgba(0,0,0,0.25)', padding: '1px 5px', borderRadius: '4px' }}>
+                          {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
+                        </span>
+                      </div>
+                    </div>
+
+                    <h3 className="serif" style={{ fontSize: '24px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
+                      Choose Any Active Pack or Claim the <span style={{ textDecoration: 'line-through', color: '#b91c1c', fontSize: '20px', marginRight: '4px' }}>₹499</span>
+                      <span style={{ color: '#ea580c', fontSize: '28px' }}>₹79</span> Launch Pass
+                    </h3>
+
+                    <p style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#92400e', lineHeight: 1.55 }}>
+                      You have complete flexibility: start with our 30-day Testing Pass for ₹79, or select a Growth / Pro plan below (with 2 months free on yearly billing). <em>Festive launch rates revert to regular prices once the timer expires.</em>
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: '12px', color: '#78350f', fontWeight: 600 }}>
+                      <span>✓ Instant Razorpay/UPI Setup</span>
+                      <span>✓ 2 Counter QR Stands Dispatched</span>
+                      <span>✓ 100 5-Star Reviews Guaranteed</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '220px' }}>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handlePayTrial}
+                      style={{
+                        fontSize: '14px',
+                        padding: '12px 20px',
+                        background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
+                        borderColor: '#9a3412',
+                        fontWeight: 800,
+                        boxShadow: '0 4px 14px rgba(194, 65, 12, 0.35)',
+                        borderRadius: '10px',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      🎉 Claim ₹79 Festive Offer →
+                    </button>
+                    <div style={{ textAlign: 'center', fontSize: '11.5px', color: '#b45309', fontWeight: 600 }}>
+                      Or select from all subscription tiers below ↓
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: 'rgba(34, 197, 94, 0.08)',
+                  border: '1.5px solid var(--success)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '14px 20px',
+                  marginBottom: '20px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '14px',
+                  gap: '12px',
                 }}
               >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span
-                      className={`stat-pill ${usage?.subscription?.trialActivated ? 'stat-pill-success' : 'stat-pill-primary'}`}
-                      style={{ fontSize: '11.5px' }}
-                    >
-                      {usage?.subscription?.trialActivated ? '✓ Trial Pass Active' : 'Trial Action Needed'}
-                    </span>
-                    <strong style={{ fontSize: '16px' }}>Testing Pack (Starter Trial)</strong>
-                  </div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                    {usage?.subscription?.trialActivated
-                      ? `Your Testing Pack trial is active (₹79 paid). You have 100 AI reviews and 2 QR stands for 30 days. You can switch plans below at any time.`
-                      : 'Complete your ₹79 starter payment via Razorpay to activate 30-day testing access.'}
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="stat-pill stat-pill-success" style={{ fontSize: '11.5px' }}>✓ Active Pass</span>
+                  <strong style={{ fontSize: '15px' }}>30-Day Testing Pack Active</strong>
+                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                    (100 AI reviews &amp; 2 QR stands active. Switch or upgrade below at any time.)
+                  </span>
                 </div>
-
-                {!usage?.subscription?.trialActivated && (
-                  <button
-                    className="btn btn-primary"
-                    style={{ fontSize: '14px', padding: '10px 20px', background: 'var(--primary)' }}
-                    onClick={handlePayTrial}
-                  >
-                    Pay ₹79 &amp; Activate Trial
-                  </button>
-                )}
               </div>
             )}
 
@@ -5326,7 +5755,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             style={!isPaidActive ? { color: '#b45309', fontWeight: 700 } : undefined}
           >
             <Zap size={18} color={!isPaidActive ? '#d97706' : 'currentColor'} />
-            <span>{!isPaidActive ? '₹79 Pack' : 'Plans'}</span>
+            <span>{!isPaidActive ? '🪔 ₹79 Offer' : 'Plans'}</span>
           </button>
           <button
             type="button"
