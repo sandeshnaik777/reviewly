@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
-import { MapPin } from 'lucide-react';
+import { MapPin, Check } from 'lucide-react';
 import {
   KindlyRateLogo,
   GoogleLogo,
@@ -72,6 +72,14 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const ratingLabels: Record<number, { text: string; color: string; bg: string }> = {
+    5: { text: '⭐⭐⭐⭐⭐ Outstanding', color: '#b45309', bg: '#fef3c7' },
+    4: { text: '⭐⭐⭐⭐ Great', color: '#15803d', bg: '#dcfce7' },
+    3: { text: '⭐⭐⭐ Good', color: '#0369a1', bg: '#e0f2fe' },
+    2: { text: '⭐⭐ Fair', color: '#d97706', bg: '#fef3c7' },
+    1: { text: '⭐ Needs Attention', color: '#dc2626', bg: '#fee2e2' },
   };
 
   const handleRatingChange = (key: string, val: number) => {
@@ -210,20 +218,21 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
       {/* Business Header Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #fef8f5 0%, #f7eeea 100%)',
-          padding: '28px 20px 22px',
-          borderBottom: '1px solid var(--border-light)',
+          background: 'linear-gradient(180deg, #fffcfb 0%, #faf6f2 100%)',
+          padding: '24px 20px 20px',
+          borderBottom: '1px solid #ede8e3',
           textAlign: 'center',
         }}
       >
-        <span className="badge badge-primary" style={{ marginBottom: '8px' }}>
-          {business.subcategory}
-        </span>
-        <h1 className="serif" style={{ fontSize: '26px', lineHeight: 1.25, marginBottom: '6px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#ecfdf5', color: '#15803d', border: '1px solid #bbf7d0', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, marginBottom: '8px' }}>
+          <Check size={12} strokeWidth={3} />
+          <span>Verified Google Business</span>
+        </div>
+        <h1 className="serif" style={{ fontSize: '24px', fontWeight: 700, lineHeight: 1.25, marginBottom: '6px', color: '#0f172a' }}>
           {business.name}
         </h1>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-          <MapPin size={13} /> {business.city} · Verified Google Business
+        <p style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', margin: 0 }}>
+          <MapPin size={13} color="var(--primary)" /> {business.city || 'Local Area'} · {business.subcategory}
         </p>
       </div>
 
@@ -438,21 +447,25 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
         {/* ======================================================== */}
         {reviewMode === 'ai' && !generatedReview && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div>
-                <h2 className="serif" style={{ fontSize: '20px', fontWeight: 600 }}>Rate Your Experience</h2>
-                <p style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Tap stars for each aspect</p>
+                <h2 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                  Rate Your Experience
+                </h2>
+                <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0' }}>
+                  Tap stars for each aspect
+                </p>
               </div>
               <button
                 type="button"
                 onClick={handleOpenGoogleDirect}
                 style={{
-                  background: '#f8fafc',
+                  background: '#ffffff',
                   border: '1px solid #cbd5e1',
                   color: '#334155',
-                  fontSize: '12px',
+                  fontSize: '11.5px',
                   fontWeight: 600,
-                  padding: '6px 12px',
+                  padding: '5px 12px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -462,43 +475,62 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 }}
                 title="Open Google Maps directly without AI assistance"
               >
-                <GoogleLogo size={14} />
+                <GoogleLogo size={13} />
                 <span>Write Direct ↗</span>
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Quick 1-Tap 5-Star Banner */}
               <div
+                onClick={() => {
+                  const allFives: Record<string, number> = {};
+                  questions.forEach((q: any) => { allFives[q.questionKey] = 5; });
+                  setRatings(allFives);
+                }}
                 style={{
-                  background: 'linear-gradient(135deg, #fff9f5 0%, #fef3eb 100%)',
-                  border: '1.5px solid #fed7aa',
+                  background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                  border: '1.5px solid #fcd34d',
                   borderRadius: '12px',
-                  padding: '14px 16px',
+                  padding: '12px 16px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  boxShadow: '0 2px 8px rgba(154, 64, 24, 0.06)',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.1)',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                <div>
-                  <div style={{ fontSize: '14.5px', fontWeight: 700, color: '#9a4018', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>⭐</span>
-                    <span>Quick 5-Star All (1-Tap)</span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#78716c', marginTop: '2px' }}>
-                    Loved everything? Set all aspects to 5★ instantly
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '18px' }}>⭐</span>
+                  <div>
+                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#92400e' }}>
+                      Loved everything?
+                    </div>
+                    <div style={{ fontSize: '11.5px', color: '#b45309' }}>
+                      Tap to set all aspects to 5★ instantly
+                    </div>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const allFives: Record<string, number> = {};
                     questions.forEach((q: any) => { allFives[q.questionKey] = 5; });
                     setRatings(allFives);
                   }}
-                  className="btn btn-primary btn-sm"
-                  style={{ fontSize: '12.5px', padding: '8px 14px', whiteSpace: 'nowrap', borderRadius: '8px', fontWeight: 600 }}
+                  style={{
+                    background: '#d97706',
+                    color: '#ffffff',
+                    border: 'none',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
                   Rate All 5★
                 </button>
@@ -506,28 +538,38 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
 
               {questions.map((q: any) => {
                 const currentRating = ratings[q.questionKey] || 5;
+                const labelInfo = ratingLabels[currentRating] || ratingLabels[5];
+
                 return (
                   <div
                     key={q.questionKey}
                     className="card"
                     style={{
-                      padding: '18px 16px',
+                      padding: '16px 18px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '12px',
+                      gap: '10px',
                       borderRadius: '14px',
-                      border: '1px solid var(--border)',
+                      border: '1px solid #e2e8f0',
+                      background: '#ffffff',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 700, fontSize: '16px', color: 'var(--text)' }}>{q.label}</span>
-                        <span style={{ fontSize: '11px', color: '#78716c', background: '#f5f5f4', padding: '2px 8px', borderRadius: '10px', fontWeight: 500 }}>
-                          Optional
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>
-                        {currentRating} / 5
+                      <span style={{ fontWeight: 700, fontSize: '15px', color: '#0f172a' }}>
+                        {q.label}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          color: labelInfo.color,
+                          background: labelInfo.bg,
+                          padding: '3px 8px',
+                          borderRadius: '10px',
+                        }}
+                      >
+                        {labelInfo.text}
                       </span>
                     </div>
 
@@ -541,8 +583,8 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                           aria-label={`Rate ${star} stars`}
                           style={{
                             padding: '8px',
-                            minWidth: '48px',
-                            minHeight: '48px',
+                            minWidth: '46px',
+                            minHeight: '46px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -553,7 +595,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                             transition: 'all 0.15s ease',
                           }}
                         >
-                          <StarIcon size={34} filled={star <= currentRating} />
+                          <StarIcon size={32} filled={star <= currentRating} />
                         </button>
                       ))}
                     </div>
@@ -789,148 +831,50 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               );
             })()}
 
-            {/* Optional Customer Fine-Tuning (Format & Length) in Smooth Accordion */}
-            <details
+            {/* Optional Customer Note */}
+            <div
+              className="card"
               style={{
                 marginTop: '14px',
+                padding: '16px',
+                borderRadius: '14px',
+                border: '1px solid #e2e8f0',
                 background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
-                borderRadius: '12px',
-                padding: '12px 16px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
               }}
             >
-              <summary
-                style={{
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: '#334155',
-                  userSelect: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <span>⚙️ Optional: Review Format &amp; Length</span>
-                <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, background: '#fef2ee', padding: '2px 8px', borderRadius: '10px' }}>
-                  {reviewLength === 'short' ? 'Short' : reviewLength === 'detailed' ? 'Detailed' : 'Standard'} · {reviewFormat.replace('_', ' ')}
-                </span>
-              </summary>
-
-              <div style={{ paddingTop: '14px', borderTop: '1px solid #e2e8f0', marginTop: '12px' }}>
-                <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
-                  Review Format &amp; Layout
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '14px' }}>
-                  {[
-                    { id: 'narrative', label: 'Story Narrative', desc: 'Flowing natural experience' },
-                    { id: 'bullet_highlights', label: 'Key Highlights', desc: 'Bulleted top takeaways' },
-                    { id: 'casual_conversational', label: 'Conversational', desc: 'Short, friendly & direct' },
-                    { id: 'professional_critique', label: 'Articulate Critique', desc: 'Balanced & articulate' },
-                  ].map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setReviewFormat(item.id as any)}
-                      style={{
-                        padding: '10px 8px',
-                        borderRadius: '8px',
-                        textAlign: 'left',
-                        border: reviewFormat === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
-                        background: reviewFormat === item.id ? '#fef2ee' : 'var(--surface)',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, fontSize: '12px', color: reviewFormat === item.id ? 'var(--primary)' : 'var(--text)' }}>
-                        {item.label}
-                      </div>
-                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {item.desc}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
-                  Review Length
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px' }}>
-                  {[
-                    { id: 'short', label: 'Crisp & Quick', desc: '1–2 lines' },
-                    { id: 'medium', label: 'Balanced', desc: '3–4 lines' },
-                    { id: 'detailed', label: 'Detailed Story', desc: '9–10 lines' },
-                  ].map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setReviewLength(item.id as any)}
-                      style={{
-                        padding: '10px 6px',
-                        borderRadius: '8px',
-                        textAlign: 'center',
-                        border: reviewLength === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
-                        background: reviewLength === item.id ? '#fef2ee' : 'var(--surface)',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, fontSize: '12px', color: reviewLength === item.id ? 'var(--primary)' : 'var(--text)' }}>
-                        {item.label}
-                      </div>
-                      <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {item.desc}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </details>
-
-            {/* Optional Customer Note */}
-            <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
-              <label className="form-label" style={{ marginBottom: '6px' }}>
-                Any other compliment or favorite memory? <span style={{ fontWeight: 400 }}>(Optional)</span>
+              <label style={{ display: 'block', fontSize: '13.5px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
+                Special shoutout or compliment? <span style={{ fontWeight: 400, color: '#94a3b8' }}>(Optional)</span>
               </label>
               <textarea
                 className="form-textarea"
-                rows={3}
-                placeholder="e.g. Loved the attentive service, quick table seating, warm hospitality..."
+                rows={2}
+                placeholder="e.g. Loved the friendly staff, quick service, loved the food..."
                 value={customerComment}
                 onChange={(e) => setCustomerComment(e.target.value)}
                 maxLength={500}
+                style={{ borderRadius: '10px', fontSize: '13.5px', padding: '10px 12px' }}
               />
             </div>
 
-            <div
-              style={{
-                marginTop: '18px',
-                textAlign: 'center',
-                background: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                borderRadius: '12px',
-                padding: '12px 14px',
-              }}
-            >
-              <div style={{ fontSize: '12.5px', color: '#475569', marginBottom: '6px' }}>
-                Prefer writing in your own words without AI suggestions?
-              </div>
+            <div style={{ marginTop: '16px', textAlign: 'center' }}>
               <button
                 type="button"
                 onClick={handleOpenGoogleDirect}
-                className="btn btn-secondary btn-sm"
                 style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#64748b',
                   fontSize: '12.5px',
-                  padding: '6px 14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  background: '#ffffff',
+                  gap: '5px',
                 }}
               >
-                <GoogleLogo size={14} />
-                <span>Open Google Maps Directly ↗</span>
+                <GoogleLogo size={13} />
+                <span>Prefer writing in your own words? Open Google Maps directly ↗</span>
               </button>
             </div>
 
@@ -1035,52 +979,54 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
         {reviewMode === 'ai' && generatedReview && (
           <div>
             <div style={{ textAlign: 'center', marginBottom: '18px' }}>
-              <span className="stat-pill stat-pill-success" style={{ marginBottom: '8px' }}>
-                Review Generated
-              </span>
-              <h2 className="serif" style={{ fontSize: '22px', lineHeight: 1.25 }}>
-                Your Custom Review is Ready
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', color: '#15803d', border: '1px solid #bbf7d0', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, marginBottom: '8px' }}>
+                <Check size={13} strokeWidth={3} />
+                <span>Review Ready</span>
+              </div>
+              <h2 className="serif" style={{ fontSize: '22px', fontWeight: 700, margin: '2px 0 4px', color: '#0f172a' }}>
+                Your Review is Ready!
               </h2>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                Review or personalize the text below before copying.
+              <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+                Personalize any words below or post directly to Google Maps
               </p>
             </div>
 
-            <div className="card" style={{ padding: '16px', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary)' }}>
-                  {reviewLength === 'detailed' ? 'Detailed Experience Story' : 'Personalized Review Draft'}
-                </span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  {editedText.split('\n').filter(Boolean).length} lines · {editedText.length} characters
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1.5px solid #fed7aa',
+                borderRadius: '16px',
+                padding: '16px',
+                marginBottom: '16px',
+                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.07)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '14px' }}>⭐⭐⭐⭐⭐</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#c2410c' }}>5-Star Experience</span>
+                </div>
+                <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 500 }}>
+                  Tap text to edit
                 </span>
               </div>
               <textarea
                 className="form-textarea"
-                rows={reviewLength === 'detailed' ? 9 : 5}
-                style={{ fontSize: '16px', lineHeight: 1.65, minHeight: '140px', padding: '14px' }}
+                rows={reviewLength === 'detailed' ? 8 : 5}
+                style={{
+                  fontSize: '15.5px',
+                  lineHeight: 1.65,
+                  minHeight: '130px',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  color: '#1e293b',
+                  background: '#fffdfa',
+                  fontFamily: 'inherit',
+                }}
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
               />
-            </div>
-
-            {/* 1-Tap Posting Helper */}
-            <div
-              style={{
-                background: '#f0fdf4',
-                border: '1.5px solid #86efac',
-                borderRadius: '12px',
-                padding: '12px 16px',
-                marginBottom: '16px',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#166534', marginBottom: '3px' }}>
-                ⭐ 1-Tap Google Maps Posting
-              </div>
-              <div style={{ fontSize: '12.5px', color: '#15803d', lineHeight: 1.4 }}>
-                Tap the button below. Your review is copied automatically, and Google Maps will open ready to paste!
-              </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -1090,40 +1036,61 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 style={{
                   fontSize: '16px',
                   fontWeight: 800,
-                  padding: '16px 20px',
+                  padding: '15px 20px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '10px',
                   boxShadow: '0 4px 16px rgba(154, 64, 24, 0.35)',
-                  borderRadius: '12px',
+                  borderRadius: '14px',
+                  width: '100%',
                 }}
               >
                 <GoogleLogo size={22} />
-                <span>{copied ? '✓ Copied! Opening Google Maps...' : '📋 Copy & Post on Google Maps ↗'}</span>
+                <span>{copied ? '✓ Copied! Opening Google Maps...' : '📋 Copy & Open Google Maps ↗'}</span>
               </button>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ textAlign: 'center', fontSize: '12px', color: '#64748b' }}>
+                ✨ Copies automatically &amp; opens Google Maps so you just tap <b>Paste</b>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
                 <button
-                  className="btn btn-secondary"
+                  type="button"
                   onClick={handleCopyReview}
                   style={{
                     flex: 1,
-                    fontSize: '12.5px',
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#334155',
+                    fontSize: '12px',
+                    fontWeight: 600,
                     padding: '9px 12px',
+                    borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
+                    cursor: 'pointer',
                   }}
                 >
                   <ClipboardCopyIcon size={14} />
-                  <span>{copied ? '✓ Text Copied' : 'Copy Text Only'}</span>
+                  <span>{copied ? '✓ Copied' : 'Copy Text'}</span>
                 </button>
 
                 <button
-                  className="btn btn-secondary"
-                  style={{ flex: 1, fontSize: '12.5px', padding: '9px 12px' }}
+                  type="button"
+                  style={{
+                    flex: 1,
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    color: '#475569',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    padding: '9px 12px',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                  }}
                   onClick={() => setGeneratedReview(null)}
                 >
                   ← Adjust Ratings
@@ -1293,25 +1260,34 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
 
       {/* Sticky Bottom Button for AI Rating Step */}
       {reviewMode === 'ai' && !generatedReview && (
-        <div className="sticky-bottom-bar">
+        <div className="sticky-bottom-bar" style={{ textAlign: 'center', padding: '12px 16px 14px' }}>
           <button
             className="btn btn-primary btn-lg btn-block"
             onClick={handleGenerateReview}
             disabled={submitting}
-            style={{ fontSize: '15.5px' }}
+            style={{
+              fontSize: '16px',
+              fontWeight: 700,
+              padding: '15px 20px',
+              borderRadius: '14px',
+              boxShadow: '0 4px 14px rgba(154, 64, 24, 0.35)',
+            }}
           >
             {submitting ? (
               <>
                 <span className="spinner"></span>
-                <span>Crafting Your Review Draft...</span>
+                <span>Writing Your Review Draft...</span>
               </>
             ) : (
               <>
                 <SparklesIcon size={18} color="white" />
-                <span>Generate Review Draft</span>
+                <span>Generate My Review Draft ✨</span>
               </>
             )}
           </button>
+          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
+            ⚡ Ready in 5 seconds · Zero signup needed
+          </div>
         </div>
       )}
     </div>
