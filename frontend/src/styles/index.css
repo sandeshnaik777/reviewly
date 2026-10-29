@@ -1048,6 +1048,347 @@ a {
   }
 }
 
+/* ======================================================== */
+/* MODERN SAAS LEFT SIDEBAR LAYOUT (Google Ads / Stripe Style) */
+/* ======================================================== */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #faf8f5;
+  color: var(--text);
+  position: relative;
+}
+
+/* Left Sidebar (Desktop) */
+.dashboard-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-sidebar-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dashboard-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.dashboard-brand-title {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.dashboard-biz-card {
+  background: var(--surface-container);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-biz-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.dashboard-biz-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-biz-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-biz-meta {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sidebar Navigation Items */
+.dashboard-sidebar-nav {
+  flex: 1;
+  padding: 14px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dashboard-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.dashboard-nav-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.dashboard-nav-item.active {
+  background: #fef2ee;
+  color: #9a4018;
+  font-weight: 700;
+}
+
+.dashboard-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3.5px;
+  background: #9a4018;
+  border-radius: 0 4px 4px 0;
+}
+
+.dashboard-nav-item-content {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-nav-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.dashboard-nav-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.dashboard-nav-item.active .dashboard-nav-pill {
+  background: #fed7aa;
+  color: #9a4018;
+}
+
+/* Sidebar Footer */
+.dashboard-sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #ffffff;
+}
+
+.dashboard-helpline-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Right Main Content Area */
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Slim Topbar */
+.dashboard-topbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.dashboard-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dashboard-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.dashboard-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dashboard-content-body {
+  flex: 1;
+  padding: 24px 32px 60px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Mobile Responsive Drawer & Bottom Nav */
+@media (max-width: 1023px) {
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 1050;
+    transform: translateX(-100%);
+    box-shadow: 0 0 30px rgba(0,0,0,0.25);
+  }
+
+  .dashboard-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .dashboard-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1040;
+  }
+
+  .dashboard-topbar {
+    padding: 10px 16px;
+  }
+
+  .dashboard-content-body {
+    padding: 16px 14px 80px;
+  }
+
+  /* Sticky Mobile Bottom Navigation */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #ffffff;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 900;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 10.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 12px;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-bottom-nav-item.active {
+    color: #9a4018;
+    font-weight: 700;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-sidebar-overlay {
+    display: none !important;
+  }
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+}
+
 
 
 

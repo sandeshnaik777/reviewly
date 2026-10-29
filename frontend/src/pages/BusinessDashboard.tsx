@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import {
+  KindlyRateLogo,
   KindlyRateIcon,
   GoogleLogo,
   WhatsAppLogo,
@@ -34,6 +35,11 @@ import {
 } from '../components/Logos.js';
 import { EmailVerificationModal } from '../components/EmailVerificationModal.js';
 import {
+  Menu,
+  X,
+  ChevronRight,
+  LogOut,
+  ExternalLink,
   Bell,
   Phone,
   Mail,
@@ -66,6 +72,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const [activeTab, setActiveTab] = useState<
     'overview' | 'qrs' | 'ai_settings' | 'history' | 'profile' | 'subscription'
   >('overview');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -637,8 +644,49 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     rankingMessage: `Real-time Google Maps telemetry active for ${business?.city || 'your area'}. As customers scan your QR code and post 5-star reviews, your live search rank and local 3-pack visibility will dynamically climb.`,
   };
 
+  const navTabs = [
+    {
+      id: 'overview' as const,
+      label: 'Mission Control',
+      icon: <ChartBarIcon size={18} />,
+      badge: null,
+    },
+    {
+      id: 'qrs' as const,
+      label: 'QR Stands & Generator',
+      icon: <MobileIcon size={18} />,
+      badge: qrs.length,
+    },
+    {
+      id: 'history' as const,
+      label: 'Reviews & Interceptions',
+      icon: <ClipboardCopyIcon size={18} />,
+      badge: reviews.length,
+    },
+    {
+      id: 'ai_settings' as const,
+      label: 'Review Engine & AI',
+      icon: <SettingsIcon size={18} />,
+      badge: null,
+    },
+    {
+      id: 'profile' as const,
+      label: 'Business Profile',
+      icon: <StorefrontIcon size={18} />,
+      badge: null,
+    },
+    {
+      id: 'subscription' as const,
+      label: 'Subscription & Plans',
+      icon: <ShieldCheckIcon size={18} />,
+      badge: isPaidActive ? 'PRO' : 'TRIAL',
+    },
+  ];
+
+  const currentTabMeta = navTabs.find((t) => t.id === activeTab) || navTabs[0];
+
   return (
-    <div className="app-container" style={{ background: '#faf8f5', minHeight: '100vh' }}>
+    <div className="dashboard-layout">
       {/* Toast Notification */}
       {toast && (
         <div
@@ -665,155 +713,344 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         </div>
       )}
 
-      {/* Top Header - Spacious for Laptop and Phone */}
-      <header
-        className="header-responsive"
-        style={{
-          background: 'var(--surface)',
-          borderBottom: '1px solid var(--border-light)',
-          padding: '18px 36px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <KindlyRateIcon size={28} />
-            <h2 className="serif" style={{ fontSize: '24px', fontWeight: 600, letterSpacing: '-0.01em', margin: 0 }}>
-              {business.name}
-            </h2>
-            <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <span className="telemetry-pulse" />
-              <span>LIVE MISSION CONTROL</span>
-            </span>
+      {/* Mobile Sidebar Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="dashboard-sidebar-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Left Sidebar Navigation (Google Ads / Stripe Style) */}
+      <aside className={`dashboard-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="dashboard-sidebar-header">
+          <div className="dashboard-brand-row">
+            <div className="dashboard-brand-logo">
+              <KindlyRateLogo size={26} />
+              <span className="dashboard-brand-title">KindlyRate</span>
+            </div>
+            <button
+              type="button"
+              className="show-mobile-only"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                padding: '4px',
+              }}
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
           </div>
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            <MapPin size={13} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '3px' }} /> {business.city || 'Local Area'} · {business.subcategory} ·{' '}
-            <strong style={{ color: 'var(--primary)' }}>{roi.googleLocalPackRank}</strong> ·{' '}
-            <span style={{ color: 'var(--success)', fontWeight: 600 }}>{roi.reputationProtectionScore} Shield Defense Active</span>
+
+          {/* Business Info Card */}
+          <div className="dashboard-biz-card">
+            <div className="dashboard-biz-avatar">
+              {business.name ? business.name.charAt(0).toUpperCase() : 'K'}
+            </div>
+            <div className="dashboard-biz-info">
+              <div className="dashboard-biz-name" title={business.name}>
+                {business.name}
+              </div>
+              <div className="dashboard-biz-meta">
+                {business.city || 'Local Area'} · {business.subcategory}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          {/* Announcements & Notifications Bell */}
-          <button
-            onClick={() => setShowNotifDrawer(true)}
-            style={{
-              position: 'relative',
-              background: systemNotifications.length > 0 ? 'rgba(124, 58, 237, 0.08)' : 'var(--surface-container)',
-              color: systemNotifications.length > 0 ? '#7c3aed' : 'var(--text)',
-              border: systemNotifications.length > 0 ? '1px solid rgba(124, 58, 237, 0.3)' : '1px solid var(--border)',
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-            title="System Announcements & Notifications"
-          >
-            <Bell size={16} />
-            <span className="hide-mobile">Alerts</span>
-            {systemNotifications.length > 0 && (
-              <span
-                style={{
-                  background: '#dc2626',
-                  color: '#ffffff',
-                  fontSize: '10.5px',
-                  fontWeight: 800,
-                  padding: '1px 6px',
-                  borderRadius: '10px',
+        {/* Sidebar Nav Links */}
+        <nav className="dashboard-sidebar-nav">
+          <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '6px 14px' }}>
+            Main Menu
+          </div>
+          {navTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                className={`dashboard-nav-item ${isActive ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setMobileMenuOpen(false);
                 }}
               >
-                {systemNotifications.length}
-              </span>
+                <div className="dashboard-nav-item-content">
+                  <span className="dashboard-nav-item-icon">
+                    {tab.icon}
+                  </span>
+                  <span>{tab.label}</span>
+                </div>
+                {tab.badge !== null && (
+                  <span className="dashboard-nav-pill">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+
+          <div style={{ margin: '14px 0 6px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 14px 6px' }}>
+              Quick Links
+            </div>
+
+            {qrs[0] && (
+              <a
+                href={`/r/${qrs[0].slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="dashboard-nav-item"
+                style={{ textDecoration: 'none' }}
+              >
+                <div className="dashboard-nav-item-content">
+                  <span className="dashboard-nav-item-icon">
+                    <SparklesIcon size={16} />
+                  </span>
+                  <span>Test Review Flow</span>
+                </div>
+                <ExternalLink size={13} color="var(--text-subtle)" />
+              </a>
             )}
-          </button>
 
-          {/* Help & Contact Button */}
-          <button
-            onClick={() => setShowHelpModal(true)}
-            style={{
-              background: '#f8fafc',
-              color: '#1e293b',
-              border: '1px solid #cbd5e1',
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-            title="Get Help or Contact Support Anytime"
-          >
-            <Phone size={15} />
-            <span className="hide-mobile">Help &amp; Contact</span>
-            <span className="show-mobile-only">Help</span>
-          </button>
-
-          {/* Upgrade Plan Quick Button */}
-          <button
-            onClick={() => setActiveTab('subscription')}
-            style={{
-              background: 'var(--primary)',
-              color: '#ffffff',
-              border: 'none',
-              padding: '8px 13px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 2px 4px rgba(0, 56, 59, 0.2)',
-            }}
-            title="Upgrade your monthly review limits or subscription pack"
-          >
-            <TrendingUpIcon size={14} color="#ffffff" />
-            <span className="hide-mobile">Upgrade Plan ↗</span>
-            <span className="show-mobile-only">Upgrade</span>
-          </button>
-
-          <a
-            href={business.googleReviewUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-secondary hide-mobile"
-            style={{ fontSize: '13px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <GoogleLogo size={16} />
-            <span>Maps ↗</span>
-          </a>
-
-          {qrs[0] && (
             <a
-              href={`/r/${qrs[0].slug}`}
+              href={business.googleReviewUrl}
               target="_blank"
               rel="noreferrer"
-              className="btn btn-primary"
-              style={{ fontSize: '13px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+              className="dashboard-nav-item"
+              style={{ textDecoration: 'none' }}
             >
-              <SparklesIcon size={14} color="white" />
-              <span className="hide-mobile">Test Flow</span>
-              <span className="show-mobile-only">Test</span>
+              <div className="dashboard-nav-item-content">
+                <span className="dashboard-nav-item-icon">
+                  <GoogleLogo size={16} />
+                </span>
+                <span>Google Maps Profile</span>
+              </div>
+              <ExternalLink size={13} color="var(--text-subtle)" />
             </a>
-          )}
+          </div>
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="dashboard-sidebar-footer">
+          <div className="dashboard-helpline-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: 'var(--text)', marginBottom: '4px' }}>
+              <Phone size={13} color="var(--primary)" />
+              <span>Helpline &amp; Support</span>
+            </div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '11.5px', marginBottom: '8px' }}>
+              +91 81238 24899 (Mon–Sat)
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowHelpModal(true)}
+              style={{
+                width: '100%',
+                background: '#ffffff',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '6px 10px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--text)',
+                cursor: 'pointer',
+              }}
+            >
+              Get Instant Assistance
+            </button>
+          </div>
 
           <button
-            className="btn btn-outline"
-            style={{ fontSize: '13px', padding: '8px 12px' }}
+            type="button"
             onClick={onLogout}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '9px 14px',
+              background: '#f8fafc',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-muted)',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'all 0.15s ease',
+            }}
           >
-            Sign Out
+            <LogOut size={15} />
+            <span>Sign Out</span>
           </button>
         </div>
-      </header>
+      </aside>
+
+      {/* Right Main Area */}
+      <div className="dashboard-main">
+        {/* Slim Topbar Header */}
+        <header className="dashboard-topbar">
+          <div className="dashboard-topbar-left">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text)',
+                padding: '6px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              className="show-mobile-only"
+              aria-label="Open menu"
+            >
+              <Menu size={22} />
+            </button>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h1 className="dashboard-page-title">
+                  {currentTabMeta.label}
+                </h1>
+                <span className="stat-pill stat-pill-success hide-mobile" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span className="telemetry-pulse" />
+                  <span>LIVE SHIELD ACTIVE</span>
+                </span>
+              </div>
+              <div className="hide-mobile" style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                {business.name} · {business.city || 'Local Area'} · <strong style={{ color: 'var(--primary)' }}>{roi.googleLocalPackRank}</strong> ·{' '}
+                <span style={{ color: 'var(--success)', fontWeight: 600 }}>{roi.reputationProtectionScore} Defense Active</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="dashboard-topbar-actions">
+            {/* Announcements & Notifications Bell */}
+            <button
+              type="button"
+              onClick={() => setShowNotifDrawer(true)}
+              style={{
+                position: 'relative',
+                background: systemNotifications.length > 0 ? 'rgba(124, 58, 237, 0.08)' : 'var(--surface-container)',
+                color: systemNotifications.length > 0 ? '#7c3aed' : 'var(--text)',
+                border: systemNotifications.length > 0 ? '1px solid rgba(124, 58, 237, 0.3)' : '1px solid var(--border)',
+                padding: '7px 12px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+              title="System Announcements & Notifications"
+            >
+              <Bell size={15} />
+              <span className="hide-mobile">Alerts</span>
+              {systemNotifications.length > 0 && (
+                <span
+                  style={{
+                    background: '#dc2626',
+                    color: '#ffffff',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '1px 5px',
+                    borderRadius: '10px',
+                  }}
+                >
+                  {systemNotifications.length}
+                </span>
+              )}
+            </button>
+
+            {/* Help & Contact Button */}
+            <button
+              type="button"
+              onClick={() => setShowHelpModal(true)}
+              style={{
+                background: '#f8fafc',
+                color: '#1e293b',
+                border: '1px solid #cbd5e1',
+                padding: '7px 12px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+              title="Get Help or Contact Support Anytime"
+            >
+              <Phone size={14} />
+              <span className="hide-mobile">Help</span>
+            </button>
+
+            {/* Upgrade / Plan Status Button */}
+            {!isPaidActive ? (
+              <button
+                type="button"
+                onClick={handlePayTrial}
+                style={{
+                  background: 'var(--primary)',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '7px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 4px rgba(154, 64, 24, 0.25)',
+                }}
+                title="Activate Testing Pack"
+              >
+                <Zap size={14} color="#ffffff" />
+                <span>Activate Pack (₹79)</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setActiveTab('subscription')}
+                style={{
+                  background: 'var(--primary)',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '7px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 4px rgba(154, 64, 24, 0.2)',
+                }}
+                title="Manage Subscription"
+              >
+                <TrendingUpIcon size={14} color="#ffffff" />
+                <span className="hide-mobile">Manage Plan</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="btn btn-outline hide-mobile"
+              style={{ fontSize: '12.5px', padding: '7px 12px' }}
+              onClick={onLogout}
+            >
+              Sign Out
+            </button>
+          </div>
+        </header>
 
       {/* System Announcement Top Notification Bar */}
       {systemNotifications.length > 0 && (
@@ -987,61 +1224,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         </div>
       )}
 
-      {/* Main Content Area - Generous 1380px Width for Laptop Clarity */}
-      <div className="desktop-container" style={{ maxWidth: '1380px' }}>
-        {/* ======================================================== */}
-        {/* SEGMENTED NAVIGATION CONTROL (HIGH DENSITY HUD TABS)     */}
-        {/* ======================================================== */}
-        <div className="segmented-nav">
-          <button
-            className={`segmented-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <ChartBarIcon size={15} />
-            <span>Mission Control</span>
-          </button>
-          <button
-            className={`segmented-nav-item ${activeTab === 'qrs' ? 'active' : ''}`}
-            onClick={() => setActiveTab('qrs')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <MobileIcon size={15} />
-            <span>QR Stands &amp; Generator ({qrs.length})</span>
-          </button>
-          <button
-            className={`segmented-nav-item ${activeTab === 'ai_settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ai_settings')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <SettingsIcon size={15} />
-            <span>Review Engine &amp; Rewards</span>
-          </button>
-          <button
-            className={`segmented-nav-item ${activeTab === 'history' ? 'active' : ''}`}
-            onClick={() => setActiveTab('history')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <ClipboardCopyIcon size={15} />
-            <span>Reviews &amp; Interceptions ({reviews.length})</span>
-          </button>
-          <button
-            className={`segmented-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <StorefrontIcon size={15} />
-            <span>Business Profile</span>
-          </button>
-          <button
-            className={`segmented-nav-item ${activeTab === 'subscription' ? 'active' : ''}`}
-            onClick={() => setActiveTab('subscription')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <ShieldCheckIcon size={15} />
-            <span>Subscription &amp; Plans</span>
-          </button>
-        </div>
+        {/* Main Content Body Area */}
+        <main className="dashboard-content-body">
 
         {/* ======================================================== */}
         {/* TAB 1: MISSION CONTROL OVERVIEW                          */}
@@ -4953,6 +5137,45 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           </div>
         </div>
 
+        </main>
+
+        {/* Sticky Mobile Bottom Navigation Bar */}
+        <nav className="mobile-bottom-nav">
+          <button
+            type="button"
+            className={`mobile-bottom-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            <BarChart3 size={19} />
+            <span>Overview</span>
+          </button>
+          <button
+            type="button"
+            className={`mobile-bottom-nav-item ${activeTab === 'qrs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('qrs')}
+          >
+            <QrCode size={19} />
+            <span>QR Stands</span>
+          </button>
+          <button
+            type="button"
+            className={`mobile-bottom-nav-item ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            <MessageSquare size={19} />
+            <span>Reviews</span>
+          </button>
+          <button
+            type="button"
+            className="mobile-bottom-nav-item"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu size={19} />
+            <span>More</span>
+          </button>
+        </nav>
+      </div>
+
         {/* Create QR Modal */}
         {showQRModal && (
           <div
@@ -5338,7 +5561,6 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             loadAllData();
           }}
         />
-      </div>
     </div>
   );
 };
