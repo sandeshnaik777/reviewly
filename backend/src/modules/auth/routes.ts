@@ -436,8 +436,12 @@ function getGoogleRedirectUri(req: Request): string {
   if (config.google.callbackUrl) {
     return config.google.callbackUrl;
   }
-  const proto = (req.headers['x-forwarded-proto'] as string) || (req.secure ? 'https' : 'http');
   const host = (req.headers['x-forwarded-host'] as string) || req.headers.host || 'localhost:4000';
+  const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+  let proto = (req.headers['x-forwarded-proto'] as string) || (req.secure ? 'https' : 'http');
+  if (!isLocal) {
+    proto = 'https';
+  }
   return `${proto}://${host}/api/auth/google/callback`;
 }
 
