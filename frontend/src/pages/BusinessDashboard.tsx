@@ -120,7 +120,6 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
   // Settings Tags State
   const [newHighlightTag, setNewHighlightTag] = useState('');
-  const [newAvoidTag, setNewAvoidTag] = useState('');
   const [newTargetKeyword, setNewTargetKeyword] = useState('');
 
   // Create QR Modal State
@@ -3201,212 +3200,118 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                {/* 3. AI REVIEW VOICE & PERSONA (TONE OF VOICE) */}
+                {/* 3. AI REVIEW VOICE & PERSONA (SIMPLIFIED) */}
                 <div
                   style={{
                     background: '#ffffff',
                     border: '1.5px solid #e2e8f0',
                     borderRadius: '16px',
-                    padding: '26px 28px',
+                    padding: '24px 26px',
                     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
                   }}
                 >
-                  <div style={{ marginBottom: '18px' }}>
+                  <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <SparklesIcon size={20} color="var(--primary)" />
-                      <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                        3. AI Review Writing Voice &amp; Customer Persona
+                      <SparklesIcon size={18} color="var(--primary)" />
+                      <h4 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        3. AI Review Writing Voice &amp; Tone
                       </h4>
                     </div>
-                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
-                      Select the writing persona Gemini uses when generating review options for customers on their phones.
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748b' }}>
+                      Choose the writing style Gemini uses when generating reviews for customers on their phones.
                     </p>
                   </div>
 
-                  {/* 5 Tone Cards Grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+                  {/* Compact Tone Selector */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '18px' }}>
                     {[
-                      {
-                        id: 'enthusiastic',
-                        title: 'Enthusiastic & High Praise',
-                        emoji: '⚡',
-                        desc: 'Energetic, thrilled, top-tier praise',
-                        sample: '"Hands down the best place! Super fast, honest staff, and genuine quality. 10/10 recommend!"',
-                      },
-                      {
-                        id: 'warm',
-                        title: 'Warm & Hospitable',
-                        emoji: '🤝',
-                        desc: 'Welcoming, friendly, personal touch',
-                        sample: '"Such a lovely experience. The team treated me with genuine care and took time to explain everything."',
-                      },
-                      {
-                        id: 'professional',
-                        title: 'Polished & Professional',
-                        emoji: '👔',
-                        desc: 'Refined, articulate, balanced critique',
-                        sample: '"Highly professional standards, accurate diagnostics, transparent pricing, and timely completion."',
-                      },
-                      {
-                        id: 'casual',
-                        title: 'Casual & Relaxed',
-                        emoji: '💬',
-                        desc: 'Everyday conversational, authentic tone',
-                        sample: '"Really smooth visit. Got exactly what I needed without any hassle. Definitely coming back."',
-                      },
-                      {
-                        id: 'concise',
-                        title: 'Concise & Punchy',
-                        emoji: '🎯',
-                        desc: 'Direct, 1–2 sentence quick reviews',
-                        sample: '"Outstanding service and great pricing. Friendly team and quick turnaround!"',
-                      },
+                      { id: 'enthusiastic', label: 'Enthusiastic', emoji: '⚡', desc: 'Energetic & high praise' },
+                      { id: 'warm', label: 'Warm & Friendly', emoji: '🤝', desc: 'Welcoming & personal' },
+                      { id: 'professional', label: 'Professional', emoji: '👔', desc: 'Polished & articulate' },
+                      { id: 'casual', label: 'Casual & Relaxed', emoji: '💬', desc: 'Everyday & authentic' },
+                      { id: 'concise', label: 'Concise & Punchy', emoji: '🎯', desc: 'Short 1–2 sentences' },
                     ].map((t) => {
                       const isSelected = settings.reviewTone === t.id;
-
                       return (
-                        <div
+                        <button
                           key={t.id}
+                          type="button"
                           onClick={() => setSettings({ ...settings, reviewTone: t.id })}
                           style={{
-                            padding: '16px',
-                            borderRadius: '12px',
-                            border: isSelected ? '2px solid var(--primary)' : '1.5px solid #cbd5e1',
-                            background: isSelected ? '#f0fdf4' : '#ffffff',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '10px 16px',
+                            borderRadius: '10px',
+                            border: isSelected ? '2px solid var(--primary)' : '1.5px solid #e2e8f0',
+                            background: isSelected ? '#fef2ee' : '#f8fafc',
+                            color: isSelected ? 'var(--primary)' : '#1e293b',
+                            fontWeight: isSelected ? 700 : 500,
+                            fontSize: '13px',
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            boxShadow: isSelected ? '0 4px 12px rgba(0, 56, 59, 0.1)' : '0 1px 3px rgba(0,0,0,0.02)',
                           }}
                         >
-                          <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ fontSize: '18px' }}>{t.emoji}</span>
-                                <strong style={{ fontSize: '14px', color: isSelected ? 'var(--primary)' : '#0f172a' }}>
-                                  {t.title}
-                                </strong>
-                              </div>
-                              <span
-                                style={{
-                                  width: '16px',
-                                  height: '16px',
-                                  borderRadius: '50%',
-                                  border: isSelected ? '5px solid var(--primary)' : '1.5px solid #94a3b8',
-                                  background: 'white',
-                                  flexShrink: 0,
-                                }}
-                              />
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px' }}>
-                              {t.desc}
-                            </div>
-                          </div>
-
-                          <div
-                            style={{
-                              fontSize: '11.5px',
-                              color: '#334155',
-                              fontStyle: 'italic',
-                              background: isSelected ? 'rgba(0, 56, 59, 0.05)' : '#f8fafc',
-                              padding: '8px 10px',
-                              borderRadius: '8px',
-                              border: '1px solid rgba(0,0,0,0.04)',
-                              lineHeight: 1.45,
-                            }}
-                          >
-                            {t.sample}
-                          </div>
-                        </div>
+                          <span style={{ fontSize: '16px' }}>{t.emoji}</span>
+                          <span style={{ fontWeight: 600 }}>{t.label}</span>
+                          <span style={{ fontSize: '11px', color: isSelected ? 'var(--primary)' : '#64748b', opacity: 0.85 }}>
+                            · {t.desc}
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
 
-                  {/* Format & Length Sub-Controls */}
+                  {/* Compact Settings Row: Length + Instant Google Maps Forwarding */}
                   <div
                     style={{
                       background: '#f8fafc',
                       border: '1.5px solid #e2e8f0',
-                      borderRadius: '12px',
-                      padding: '18px 20px',
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                      gap: '18px',
+                      borderRadius: '10px',
+                      padding: '14px 18px',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '20px',
                       alignItems: 'center',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <div>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
-                        Review Format &amp; Layout
-                      </label>
-                      <select
-                        className="form-select"
-                        value={settings.reviewFormat || 'narrative'}
-                        onChange={(e) => setSettings({ ...settings, reviewFormat: e.target.value })}
-                        style={{ width: '100%', fontSize: '13px', padding: '9px 12px', borderRadius: '8px' }}
-                      >
-                        <option value="narrative">Story Narrative (Flowing detailed experience)</option>
-                        <option value="bullet_highlights">Key Highlights &amp; Bullet Points</option>
-                        <option value="casual_conversational">Casual &amp; Conversational (Everyday punchy)</option>
-                        <option value="professional_critique">Professional Critique (Articulate evaluation)</option>
-                      </select>
-                      <span style={{ fontSize: '11.5px', color: '#64748b', display: 'block', marginTop: '4px' }}>
-                        Story format generates the highest Google engagement.
-                      </span>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
-                        Review Length
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                      <label style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
+                        Review Length:
                       </label>
                       <select
                         className="form-select"
                         value={settings.reviewLength || 'medium'}
                         onChange={(e) => setSettings({ ...settings, reviewLength: e.target.value })}
-                        style={{ width: '100%', fontSize: '13px', padding: '9px 12px', borderRadius: '8px' }}
+                        style={{ fontSize: '13px', padding: '7px 12px', borderRadius: '8px', minWidth: '220px' }}
                       >
-                        <option value="short">Short (1–2 sentences · Quickest to post)</option>
+                        <option value="short">Short (1–2 sentences · Fast)</option>
                         <option value="medium">Balanced (3–4 sentences · Recommended for SEO)</option>
-                        <option value="detailed">Detailed Story (9–10 lines · Maximum 3-pack lift)</option>
+                        <option value="detailed">Detailed (In-depth story)</option>
                       </select>
-                      <span style={{ fontSize: '11.5px', color: '#64748b', display: 'block', marginTop: '4px' }}>
-                        Detailed reviews carry 2.4x more ranking weight on Google Maps.
-                      </span>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
-                        Instant Google Forwarding
-                      </label>
-                      <label
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          cursor: 'pointer',
-                          background: '#ffffff',
-                          padding: '10px 14px',
-                          borderRadius: '8px',
-                          border: '1px solid #cbd5e1',
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          id="autoForwardCheck"
-                          checked={settings.autoRedirectGoogle || false}
-                          onChange={(e) => setSettings({ ...settings, autoRedirectGoogle: e.target.checked })}
-                          style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
-                        />
-                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b' }}>
-                          Open Google Maps upon review copy
-                        </span>
-                      </label>
-                      <span style={{ fontSize: '11.5px', color: '#64748b', display: 'block', marginTop: '4px' }}>
-                        Automatically launches review dialog after customer copies text.
-                      </span>
-                    </div>
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#1e293b',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        id="autoForwardCheck"
+                        checked={settings.autoRedirectGoogle || false}
+                        onChange={(e) => setSettings({ ...settings, autoRedirectGoogle: e.target.checked })}
+                        style={{ width: '17px', height: '17px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                      />
+                      <span>Automatically open Google Maps upon review copy</span>
+                    </label>
                   </div>
                 </div>
 
@@ -3637,171 +3542,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                {/* 5. FORBIDDEN WORDS (AI STRICTLY AVOIDS) */}
-                <div
-                  style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '16px',
-                    padding: '26px 28px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
-                  }}
-                >
-                  <div style={{ marginBottom: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '18px' }}>🚫</span>
-                      <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                        5. Forbidden Negative Words (AI Never Uses)
-                      </h4>
-                    </div>
-                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
-                      Gemini will strictly never use these negative or unflattering words when generating customer reviews.
-                    </p>
-                  </div>
-
-                  {/* Active Words to Avoid */}
-                  <div style={{ marginBottom: '14px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.04em' }}>
-                      Active Forbidden Words ({(settings.wordsToAvoid || []).length}):
-                    </div>
-                    {(settings.wordsToAvoid || []).length === 0 ? (
-                      <div style={{ fontSize: '13px', color: '#64748b', fontStyle: 'italic', marginBottom: '8px' }}>
-                        No forbidden words added. Click suggestions below or type custom negative terms.
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {(settings.wordsToAvoid || []).map((tag: string, idx: number) => (
-                          <span
-                            key={idx}
-                            style={{
-                              background: '#fee2e2',
-                              border: '1.5px solid #fca5a5',
-                              color: '#991b1b',
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              padding: '6px 14px',
-                              borderRadius: '20px',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                            }}
-                          >
-                            <span>✕ {tag}</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const updated = settings.wordsToAvoid.filter((_: any, i: number) => i !== idx);
-                                setSettings({ ...settings, wordsToAvoid: updated });
-                              }}
-                              title="Remove forbidden word"
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#991b1b',
-                                cursor: 'pointer',
-                                padding: '0 2px',
-                                fontWeight: 800,
-                                fontSize: '14px',
-                                lineHeight: 1,
-                              }}
-                            >
-                              ✕
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Quick Select Avoid Pills */}
-                  <div style={{ marginBottom: '14px', background: '#f8fafc', padding: '14px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
-                      Click to quickly forbid common negative terms:
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      {[
-                        'Slow Service',
-                        'Overpriced',
-                        'Cheap Quality',
-                        'Noisy',
-                        'Long Delay',
-                        'Rude Staff',
-                        'Poor Support',
-                        'Dirty',
-                      ].map((item) => {
-                        const isAdded = (settings.wordsToAvoid || []).includes(item);
-
-                        return (
-                          <button
-                            key={item}
-                            type="button"
-                            onClick={() => {
-                              if (!isAdded) {
-                                setSettings({
-                                  ...settings,
-                                  wordsToAvoid: [...(settings.wordsToAvoid || []), item],
-                                });
-                              }
-                            }}
-                            style={{
-                              background: isAdded ? '#fee2e2' : '#ffffff',
-                              border: isAdded ? '1.5px solid #ef4444' : '1px solid #cbd5e1',
-                              color: isAdded ? '#991b1b' : '#1e293b',
-                              fontWeight: isAdded ? 700 : 500,
-                              padding: '5px 12px',
-                              borderRadius: '16px',
-                              fontSize: '12px',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {isAdded ? '✓ ' : '+ '}
-                            {item}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Custom Word Input */}
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', maxWidth: '680px' }}>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Type custom word to avoid (e.g. cheap, broken, rude, overpriced)..."
-                      value={newAvoidTag}
-                      onChange={(e) => setNewAvoidTag(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && newAvoidTag.trim()) {
-                          e.preventDefault();
-                          setSettings({
-                            ...settings,
-                            wordsToAvoid: [...(settings.wordsToAvoid || []), newAvoidTag.trim()],
-                          });
-                          setNewAvoidTag('');
-                        }
-                      }}
-                      style={{ flex: 1, padding: '10px 14px', fontSize: '13.5px' }}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      style={{ padding: '10px 20px', fontSize: '13.5px', fontWeight: 600, whiteSpace: 'nowrap' }}
-                      onClick={() => {
-                        if (newAvoidTag.trim()) {
-                          setSettings({
-                            ...settings,
-                            wordsToAvoid: [...(settings.wordsToAvoid || []), newAvoidTag.trim()],
-                          });
-                          setNewAvoidTag('');
-                        }
-                      }}
-                    >
-                      + Forbid Word
-                    </button>
-                  </div>
-                </div>
-
-                {/* 6. CUSTOMER SCRATCH CARD REWARDS (OPTIONAL) */}
+                {/* 5. CUSTOMER SCRATCH CARD REWARDS (OPTIONAL) */}
                 <div
                   style={{
                     background: '#ffffff',
@@ -3816,7 +3557,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <GiftIcon size={20} color="var(--primary)" />
                         <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                          6. Post-Review Scratch Card &amp; Customer Rewards (Optional)
+                          5. Post-Review Scratch Card &amp; Customer Rewards (Optional)
                         </h4>
                         <span className="badge badge-neutral" style={{ fontSize: '11px' }}>Optional</span>
                       </div>
