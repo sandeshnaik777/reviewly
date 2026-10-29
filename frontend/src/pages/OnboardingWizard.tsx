@@ -6,6 +6,7 @@ import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
 import { PhoneInput } from '../components/PhoneInput.js';
 import { validatePhoneNumber } from '../utils/phoneValidator.js';
 import { ForgotPasswordModal } from '../components/ForgotPasswordModal.js';
+import { loadRazorpay } from '../utils/razorpay.js';
 import {
   Key,
   Mail,
@@ -42,8 +43,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   // Plan duration selections (1, 3, 6, 12 months)
   const [onboardingPlanDurations, setOnboardingPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({});
 
-  // Payment Choice: 7-Day Free Trial (₹2) vs Direct Plan Payment
-  const [paymentChoice, setPaymentChoice] = useState<'trial' | 'direct'>('trial');
+  // Payment Choice: Autopay Direct Subscription (Forced First Option) vs Starter Trial
+  const [paymentChoice, setPaymentChoice] = useState<'direct' | 'trial'>('direct');
   const [autoRenewDirect, setAutoRenewDirect] = useState<boolean>(true);
 
   // Auth & Account state
@@ -568,69 +569,75 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
       const starterPlan = plans.find((p) => p.slug === 'starter') || plans[0];
       const trialPlanId = starterPlan?.id || 'c0000000-0000-0000-0000-000000000002';
 
-      // 2. Create Razorpay Order for Testing Pack Trial (₹79)
-      const order = await api.createOrder(targetBiz.id, trialPlanId, { isTrial: true });
+      // 2. Create Razorpay Order and ensure Razorpay SDK is loaded
+      const [order, isLoaded] = await Promise.all([
+        api.createOrder(targetBiz.id, trialPlanId, { isTrial: true }),
+        loadRazorpay(),
+      ]);
+
+      if (!isLoaded || !(window as any).Razorpay) {
+        throw new Error('Razorpay checkout script failed to load. Please check your connection and retry.');
+      }
 
       // 3. Open Razorpay Checkout Modal (Supports UPI Autopay Mandates & Direct Orders)
-      if ((window as any).Razorpay) {
-        const isSub = Boolean(order.subscriptionId || order.isSubscription);
-        const options: any = {
-          key: order.keyId,
-          currency: order.currency || 'INR',
-          name: 'KindlyRate Platform',
-          description: isSub
-            ? 'Testing Pack (₹79 Starter Trial · Monthly UPI Autopay)'
-            : 'Testing Pack (₹79 Starter Trial)',
-          prefill: {
-            name: formData.ownerName,
-            email: formData.email,
-            contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
+      const isSub = Boolean(order.subscriptionId || order.isSubscription);
+      const options: any = {
+        key: order.keyId,
+        currency: order.currency || 'INR',
+        name: 'KindlyRate Platform',
+        description: isSub
+          ? 'Testing Pack (₹79 Starter Trial · Monthly UPI Autopay)'
+          : 'Testing Pack (₹79 Starter Trial)',
+        prefill: {
+          name: formData.ownerName,
+          email: formData.email,
+          contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
+        },
+        theme: {
+          color: '#00383B',
+        },
+        handler: async (resp: any) => {
+          try {
+            setLoading(true);
+            await api.verifyPayment(targetBiz.id, {
+              orderId: resp.razorpay_subscription_id || resp.razorpay_order_id,
+              paymentId: resp.razorpay_payment_id,
+              signature: resp.razorpay_signature,
+              subscriptionId: resp.razorpay_subscription_id,
+            });
+            setStep(8); // Step 8: Welcome - ONLY after successful payment verification!
+          } catch (vErr: any) {
+            setError(`Trial payment verification note: ${vErr.message || 'Verification failed'}`);
+            setPaymentFailed(true);
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPaymentFailed(true);
+            setPaymentNote(
+              'Payment attempt was dismissed. You can retry with any UPI Autopay, Google Pay, PhonePe, or Card option below, or continue to your dashboard.'
+            );
           },
-          theme: {
-            color: '#00383B',
-          },
-          handler: async (resp: any) => {
-            try {
-              await api.verifyPayment(targetBiz.id, {
-                orderId: resp.razorpay_subscription_id || resp.razorpay_order_id,
-                paymentId: resp.razorpay_payment_id,
-                signature: resp.razorpay_signature,
-                subscriptionId: resp.razorpay_subscription_id,
-              });
-            } catch (vErr) {
-              console.warn('Trial signature verified with fallback:', vErr);
-            }
-            setStep(8); // Step 8: Welcome
-          },
-          modal: {
-            ondismiss: () => {
-              setPaymentFailed(true);
-              setPaymentNote(
-                'Payment attempt was dismissed. You can retry with any UPI Autopay, Google Pay, PhonePe, or Card option below, or continue to your dashboard.'
-              );
-            },
-          },
-        };
+        },
+      };
 
-        if (isSub) {
-          options.subscription_id = order.subscriptionId || order.orderId;
-        } else {
-          options.order_id = order.orderId;
-          options.amount = order.amount;
-        }
-
-        const rzp = new (window as any).Razorpay(options);
-        rzp.on('payment.failed', (fResp: any) => {
-          setPaymentFailed(true);
-          setPaymentNote(
-            `Payment note: ${fResp.error?.description || 'Payment was unsuccessful'}. You can retry anytime with UPI / Card.`
-          );
-        });
-        rzp.open();
+      if (isSub) {
+        options.subscription_id = order.subscriptionId || order.orderId;
       } else {
-        // Fallback if Razorpay SDK not reachable
-        setStep(8);
+        options.order_id = order.orderId;
+        options.amount = order.amount;
       }
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', (fResp: any) => {
+        setPaymentFailed(true);
+        setPaymentNote(
+          `Payment note: ${fResp.error?.description || 'Payment was unsuccessful'}. You can retry anytime with UPI / Card.`
+        );
+      });
+      rzp.open();
     } catch (err: any) {
       setError(err.message || 'Payment initiation failed. You can retry below.');
       setPaymentFailed(true);
@@ -708,73 +715,80 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         plans.find((p) => p.slug === formData.planSlug) ||
         plans.find((p) => p.slug === 'growth') ||
         plans[0];
-      const dur = onboardingPlanDurations[selectedPlan.id] || 1;
+      const dur = onboardingPlanDurations[selectedPlan.id] || 12;
 
-      // Create Razorpay Order for Direct Subscription
-      const order = await api.createOrder(targetBiz.id, selectedPlan.id, {
-        durationMonths: dur,
-        isTrial: false,
-        autoRenew: autoRenewDirect,
-      });
+      // Create Razorpay Order for Direct Subscription and ensure Razorpay SDK is loaded
+      const [order, isLoaded] = await Promise.all([
+        api.createOrder(targetBiz.id, selectedPlan.id, {
+          durationMonths: dur,
+          isTrial: false,
+          autoRenew: autoRenewDirect,
+        }),
+        loadRazorpay(),
+      ]);
 
-      if ((window as any).Razorpay) {
-        const isSub = Boolean(order.subscriptionId || order.isSubscription);
-        const options: any = {
-          key: order.keyId,
-          currency: order.currency || 'INR',
-          name: 'KindlyRate Platform',
-          description: isSub
-            ? `${selectedPlan.name} · Monthly UPI Autopay`
-            : `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''})`,
-          prefill: {
-            name: formData.ownerName,
-            email: formData.email,
-            contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
-          },
-          theme: {
-            color: '#00383B',
-          },
-          handler: async (resp: any) => {
-            try {
-              await api.verifyPayment(targetBiz.id, {
-                orderId: resp.razorpay_subscription_id || resp.razorpay_order_id,
-                paymentId: resp.razorpay_payment_id,
-                signature: resp.razorpay_signature,
-                subscriptionId: resp.razorpay_subscription_id,
-              });
-            } catch (vErr) {
-              console.warn('Direct payment signature verified with fallback:', vErr);
-            }
-            setStep(8);
-          },
-          modal: {
-            ondismiss: () => {
-              setPaymentFailed(true);
-              setPaymentNote(
-                'Payment attempt was dismissed. You can retry with any UPI Autopay, Google Pay, PhonePe, or Card option below, or continue to your dashboard.'
-              );
-            },
-          },
-        };
-
-        if (isSub) {
-          options.subscription_id = order.subscriptionId || order.orderId;
-        } else {
-          options.order_id = order.orderId;
-          options.amount = order.amount;
-        }
-
-        const rzp = new (window as any).Razorpay(options);
-        rzp.on('payment.failed', (fResp: any) => {
-          setPaymentFailed(true);
-          setPaymentNote(
-            `Payment note: ${fResp.error?.description || 'Payment was unsuccessful'}. You can retry anytime with UPI / Card.`
-          );
-        });
-        rzp.open();
-      } else {
-        setStep(8);
+      if (!isLoaded || !(window as any).Razorpay) {
+        throw new Error('Razorpay checkout script failed to load. Please check your connection and retry.');
       }
+
+      const isSub = Boolean(order.subscriptionId || order.isSubscription);
+      const options: any = {
+        key: order.keyId,
+        currency: order.currency || 'INR',
+        name: 'KindlyRate Platform',
+        description: isSub
+          ? `${selectedPlan.name} · ${dur === 12 ? '1-Year Autopay' : 'Monthly UPI Autopay'}`
+          : `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''})`,
+        prefill: {
+          name: formData.ownerName,
+          email: formData.email,
+          contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
+        },
+        theme: {
+          color: '#00383B',
+        },
+        handler: async (resp: any) => {
+          try {
+            setLoading(true);
+            await api.verifyPayment(targetBiz.id, {
+              orderId: resp.razorpay_subscription_id || resp.razorpay_order_id,
+              paymentId: resp.razorpay_payment_id,
+              signature: resp.razorpay_signature,
+              subscriptionId: resp.razorpay_subscription_id,
+            });
+            setStep(8); // Step 8: Welcome - ONLY after successful payment verification!
+          } catch (vErr: any) {
+            setError(`Payment verification note: ${vErr.message || 'Signature mismatch'}`);
+            setPaymentFailed(true);
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPaymentFailed(true);
+            setPaymentNote(
+              'Payment attempt was dismissed. You can retry with any UPI Autopay, Google Pay, PhonePe, or Card option below, or continue to your dashboard.'
+            );
+          },
+        },
+      };
+
+      if (isSub) {
+        options.subscription_id = order.subscriptionId || order.orderId;
+      } else {
+        options.order_id = order.orderId;
+        options.amount = order.amount;
+      }
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', (fResp: any) => {
+        setPaymentFailed(true);
+        setPaymentNote(
+          `Payment failed: ${fResp.error?.description || 'Payment was unsuccessful'}. You can retry anytime with UPI / Card.`
+        );
+      });
+      rzp.open();
     } catch (err: any) {
       setError(err.message || 'Payment initiation failed. You can retry below.');
       setPaymentFailed(true);
@@ -1611,7 +1625,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 .filter((p) => p.slug !== 'trial')
                 .map((p) => {
                   const isSelected = formData.planSlug === p.slug;
-                  const dur = onboardingPlanDurations[p.id] || 1;
+                  const dur = onboardingPlanDurations[p.id] || 12;
 
                   let activePrice = p.priceInr;
                   let origPrice = p.originalPriceInr || Math.round(p.priceInr * 1.5);
@@ -1764,17 +1778,20 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           </div>
         )}
 
-        {/* STEP 7: Payment Confirmation & Razorpay Activation (Trial or Direct Plan) */}
+        {/* STEP 7: Payment Confirmation & Razorpay Activation (Autopay Direct Plan or Trial) */}
         {step === 7 && (() => {
           const selectedPlan =
             plans.find((p) => p.slug === formData.planSlug) ||
             plans.find((p) => p.slug === 'growth') ||
             plans[0];
-          const dur = (selectedPlan && onboardingPlanDurations[selectedPlan.id]) || 1;
+          const dur = (selectedPlan && onboardingPlanDurations[selectedPlan.id]) || 12;
           let directPrice = selectedPlan ? selectedPlan.priceInr : 149;
-          let durLabel = '1 Month';
+          let durLabel = '12 Months (1 Year · 2 Mos Free!)';
           if (selectedPlan) {
-            if (dur === 3) {
+            if (dur === 1) {
+              directPrice = selectedPlan.priceInr;
+              durLabel = '1 Month';
+            } else if (dur === 3) {
               directPrice = selectedPlan.priceInr3Months || selectedPlan.priceInr * 3;
               durLabel = '3 Months (Quarterly)';
             } else if (dur === 6) {
@@ -1782,7 +1799,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               durLabel = '6 Months (Semi-Annual)';
             } else if (dur === 12) {
               directPrice = selectedPlan.priceInr1Year || selectedPlan.priceInr * 10;
-              durLabel = '1 Year (2 Mos Free!)';
+              durLabel = '1 Year (2 Mos Free Applied!)';
             }
           }
 
@@ -1793,23 +1810,52 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   Step 7: Plan Activation & Checkout
                 </span>
                 <h3 className="serif" style={{ fontSize: '26px', fontWeight: 600, marginTop: '6px' }}>
-                  Choose How You Want to Start
+                  Activate Your KindlyRate Plan
                 </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '14px', maxWidth: '560px', margin: '6px auto 0' }}>
-                  Start with the <strong>Testing Pack Trial for ₹79</strong> (100 reviews, 2 QR stands) or <strong>pay directly</strong> to activate your full plan immediately.
+                <p style={{ color: 'var(--text-muted)', fontSize: '14px', maxWidth: '580px', margin: '6px auto 0' }}>
+                  Choose <strong>UPI Autopay Subscription (Recommended)</strong> with 1-Year discount, or start with the <strong>Testing Pack Trial for ₹79</strong>.
                 </p>
               </div>
 
-              {/* DUAL PAYMENT ROUTE SELECTOR TABS */}
+              {/* DUAL PAYMENT ROUTE SELECTOR TABS (OPTION A: AUTOPAY FIRST) */}
               <div
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
                   gap: '12px',
-                  maxWidth: '540px',
+                  maxWidth: '560px',
                   margin: '0 auto 22px',
                 }}
               >
+                {/* OPTION A: AUTOPAY SUBSCRIPTION (FORCED FIRST OPTION) */}
+                <div
+                  onClick={() => setPaymentChoice('direct')}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    border: paymentChoice === 'direct' ? '2px solid var(--primary)' : '1px solid var(--border)',
+                    background: paymentChoice === 'direct' ? '#fffaf7' : 'var(--surface)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    boxShadow: paymentChoice === 'direct' ? '0 4px 14px rgba(154, 64, 24, 0.12)' : 'none',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Option A · UPI Autopay (Recommended)
+                    </span>
+                    <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary)' }}>₹{directPrice}</span>
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)', marginBottom: '3px' }}>
+                    {selectedPlan?.name || 'Growth Pack'} · Autopay
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    Instant activation · {durLabel}
+                  </div>
+                </div>
+
+                {/* OPTION B: TESTING PACK STARTER TRIAL */}
                 <div
                   onClick={() => setPaymentChoice('trial')}
                   style={{
@@ -1823,8 +1869,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
-                      Option A · Trial Pack
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                      Option B · Trial Pack
                     </span>
                     <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹79</span>
                   </div>
@@ -1833,32 +1879,6 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                     ₹79 starter trial · 100 reviews · 2 QRs
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setPaymentChoice('direct')}
-                  style={{
-                    padding: '14px 16px',
-                    borderRadius: '12px',
-                    border: paymentChoice === 'direct' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                    background: paymentChoice === 'direct' ? '#fffaf7' : 'var(--surface)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    boxShadow: paymentChoice === 'direct' ? '0 4px 14px rgba(154, 64, 24, 0.1)' : 'none',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase' }}>
-                      Option B · Direct Plan
-                    </span>
-                    <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹{directPrice}</span>
-                  </div>
-                  <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)', marginBottom: '3px' }}>
-                    Pay Directly (No Trial)
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    Instant full activation · {durLabel}
                   </div>
                 </div>
               </div>
@@ -1933,11 +1953,11 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </div>
                 </div>
               ) : (
-                /* OPTION B: DIRECT FULL PLAN CARD WITH AUTO-RENEW TOGGLE */
+                /* OPTION A: DIRECT FULL PLAN CARD WITH AUTOPAY & DURATION SELECTOR */
                 <div
                   className="card"
                   style={{
-                    maxWidth: '520px',
+                    maxWidth: '540px',
                     margin: '0 auto 24px',
                     padding: '24px',
                     border: '1.5px solid var(--primary)',
@@ -1950,27 +1970,68 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                         {formData.businessName || 'Your Business'}
                       </div>
                       <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-                        Direct Plan Activation · {selectedPlan?.name}
+                        UPI Autopay Activation · {selectedPlan?.name}
                       </div>
                     </div>
-                    <span className="badge badge-primary">Direct Pack</span>
+                    <span className="badge badge-primary">Recommended</span>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '16px' }}>{selectedPlan?.name}</div>
                       <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-                        Duration: {durLabel} · {selectedPlan?.reviewGenerationLimit} Reviews Quota
+                        Duration: {durLabel} · {selectedPlan?.reviewGenerationLimit} Monthly Reviews
                       </div>
                     </div>
                     <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '26px' }}>₹{directPrice}</div>
                   </div>
 
+                  {/* DURATION SWITCHER (DEFAULT 12M / 1 YEAR) */}
+                  <div style={{ marginTop: '14px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text)' }}>Plan Duration</span>
+                      <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 600 }}>1 Year includes 2 Months Free</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                      {[
+                        { m: 1 as const, lbl: '1 Month' },
+                        { m: 3 as const, lbl: '3 Months' },
+                        { m: 6 as const, lbl: '6 Months' },
+                        { m: 12 as const, lbl: '1 Year (2M Free)' },
+                      ].map((tab) => (
+                        <button
+                          key={tab.m}
+                          type="button"
+                          onClick={() => setOnboardingPlanDurations((prev) => ({ ...prev, [selectedPlan.id]: tab.m }))}
+                          style={{
+                            background: dur === tab.m ? 'var(--primary)' : 'var(--surface-container)',
+                            color: dur === tab.m ? '#ffffff' : 'var(--text)',
+                            border: dur === tab.m ? '1px solid var(--primary)' : '1px solid var(--border)',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                            fontWeight: dur === tab.m ? 700 : 500,
+                            padding: '8px 4px',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {tab.lbl}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {dur === 12 && (
+                    <div style={{ fontSize: '11.5px', color: '#166534', background: '#dcfce7', border: '1px solid #86efac', padding: '6px 10px', borderRadius: '6px', marginTop: '10px', fontWeight: 600 }}>
+                      ✓ 1-Year Pack: 2 Months Free Applied! Autopay renews annually.
+                    </div>
+                  )}
+
                   {/* RECURRING AUTO-RENEWAL TOGGLE / CHECKBOX */}
                   <div
                     style={{
-                      marginTop: '16px',
-                      padding: '14px',
+                      marginTop: '14px',
+                      padding: '12px 14px',
                       background: autoRenewDirect ? '#fef6ee' : 'var(--surface-container)',
                       border: autoRenewDirect ? '1.5px solid #fed7aa' : '1px solid var(--border)',
                       borderRadius: '10px',
@@ -1987,16 +2048,16 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                       style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
                     />
                     <label htmlFor="autoRenewDirect" style={{ cursor: 'pointer', flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)' }}>
-                        Enable Monthly Auto-Renewal
+                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text)' }}>
+                        Enable Recurring UPI Autopay
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.45, marginTop: '2px' }}>
-                        Automatically renews after each cycle so you never lose QR stands or telemetry. Every transaction ID is saved for your accounts. You can cancel or toggle off anytime inside your dashboard.
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', lineHeight: 1.45, marginTop: '2px' }}>
+                        Seamless recurring renewals via Google Pay, PhonePe, Paytm, or Cards. You can cancel or pause anytime from your dashboard.
                       </div>
                     </label>
                   </div>
 
-                  <div style={{ marginTop: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <div style={{ marginTop: '14px', background: 'var(--surface-container)', padding: '10px 12px', borderRadius: 'var(--radius-sm)', fontSize: '11.5px', color: 'var(--text-muted)' }}>
                     <Lock size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
                     Powered by Razorpay · UPI Autopay (Google Pay, PhonePe, Paytm), Cards · Instant activation
                   </div>
@@ -2005,22 +2066,29 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
               <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
                 <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-lg"
-                    onClick={handleOpenDashboardDirectly}
-                    disabled={loading}
-                    style={{ minWidth: '220px', fontSize: '15px', padding: '13px 22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    Open Dashboard First →
-                  </button>
-
-                  {paymentChoice === 'trial' ? (
+                  {paymentChoice === 'direct' ? (
+                    <button
+                      className="btn btn-primary btn-lg"
+                      onClick={handleDirectPayment}
+                      disabled={loading}
+                      style={{ minWidth: '280px', fontSize: '15px', padding: '13px 24px' }}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="spinner"></span> Opening UPI Autopay...
+                        </>
+                      ) : paymentFailed ? (
+                        `Retry ₹${directPrice} Payment`
+                      ) : (
+                        `Pay ₹${directPrice} & Activate UPI Autopay`
+                      )}
+                    </button>
+                  ) : (
                     <button
                       className="btn btn-primary btn-lg"
                       onClick={handleTrialPayment}
                       disabled={loading}
-                      style={{ minWidth: '260px', fontSize: '15px', padding: '13px 24px' }}
+                      style={{ minWidth: '280px', fontSize: '15px', padding: '13px 24px' }}
                     >
                       {loading ? (
                         <>
@@ -2032,24 +2100,17 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                         'Pay ₹79 & Start Testing Pack Trial'
                       )}
                     </button>
-                  ) : (
-                    <button
-                      className="btn btn-primary btn-lg"
-                      onClick={handleDirectPayment}
-                      disabled={loading}
-                      style={{ minWidth: '260px', fontSize: '15px', padding: '13px 24px' }}
-                    >
-                      {loading ? (
-                        <>
-                          <span className="spinner"></span> Opening Checkout...
-                        </>
-                      ) : paymentFailed ? (
-                        `Retry ₹${directPrice} Payment`
-                      ) : (
-                        `Pay ₹${directPrice} & Activate Plan Instantly`
-                      )}
-                    </button>
                   )}
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-lg"
+                    onClick={handleOpenDashboardDirectly}
+                    disabled={loading}
+                    style={{ minWidth: '220px', fontSize: '15px', padding: '13px 22px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    Open Dashboard First →
+                  </button>
                 </div>
 
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>

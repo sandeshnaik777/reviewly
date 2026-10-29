@@ -3977,7 +3977,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               {plans
                 .filter((p) => p.slug !== 'trial')
                 .map((p) => {
-                  const selectedDuration = planDurations[p.id] || 1; // 1 | 3 | 6 | 12
+                  const selectedDuration = planDurations[p.id] || 12; // Default 12 Months (1 Year with 2 Months Free)
 
                   let activePrice = p.priceInr;
                   let originalPrice = p.originalPriceInr || Math.round(p.priceInr * 1.5);

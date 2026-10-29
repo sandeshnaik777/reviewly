@@ -37,11 +37,18 @@ export interface PaymentService {
 }
 
 // Live Razorpay UPI Autopay Plans (Verified in Razorpay Live Dashboard)
-const RAZORPAY_PLAN_MAP: Record<string, string> = {
+const RAZORPAY_PLAN_MAP_MONTHLY: Record<string, string> = {
   starter: 'plan_TtcqSdkuxmyqoH', // ₹79/mo Testing Pack
   trial: 'plan_TtcqSdkuxmyqoH',
   growth: 'plan_Ttd2A0R5v2g4A9',  // ₹149/mo Growth Pack
   pro: 'plan_Ttd2AG8y0o19Vb',     // ₹249/mo Scale / Pro Pack
+};
+
+const RAZORPAY_PLAN_MAP_YEARLY: Record<string, string> = {
+  starter: 'plan_TtdVkbhz7I8Eob', // ₹790/yr Testing Pack (2 Mos Free)
+  trial: 'plan_TtdVkbhz7I8Eob',
+  growth: 'plan_TtdVky0x2dSqAV',  // ₹1,490/yr Growth Pack (2 Mos Free)
+  pro: 'plan_TtdVl8YjFaT0Te',     // ₹2,490/yr Scale / Pro Pack (2 Mos Free)
 };
 
 export class RazorpayPaymentService implements PaymentService {
@@ -90,13 +97,20 @@ export class RazorpayPaymentService implements PaymentService {
       try {
         const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
 
-        // Check if Autopay Subscription applies (monthly plans with autoRenew)
-        const planSlug = isTrial || finalAmount === 79 ? 'trial' : plan?.slug;
-        let rzpPlanId = planSlug ? RAZORPAY_PLAN_MAP[planSlug] : undefined;
+        // Check if Autopay Subscription applies (monthly or yearly plans with autoRenew)
+        const planSlug = isTrial || finalAmount === 79 ? 'trial' : (plan?.slug || 'growth');
+        let rzpPlanId: string | undefined = undefined;
 
-        // If monthly plan with autoRenew enabled, create live Razorpay Autopay Subscription
-        if (autoRenew && durationMonths === 1 && rzpPlanId) {
+        if (autoRenew && durationMonths === 12) {
+          rzpPlanId = RAZORPAY_PLAN_MAP_YEARLY[planSlug];
+        } else if (autoRenew && (durationMonths === 1 || !durationMonths)) {
+          rzpPlanId = RAZORPAY_PLAN_MAP_MONTHLY[planSlug];
+        }
+
+        // If plan with autoRenew enabled, create live Razorpay Autopay Subscription
+        if (rzpPlanId) {
           try {
+            const totalCount = durationMonths === 12 ? 10 : 60; // 10 years (yearly) or 5 years (monthly)
             const subRes = await fetch('https://api.razorpay.com/v1/subscriptions', {
               method: 'POST',
               headers: {
@@ -105,12 +119,13 @@ export class RazorpayPaymentService implements PaymentService {
               },
               body: JSON.stringify({
                 plan_id: rzpPlanId,
-                total_count: 60, // 5 years of automated monthly renewals
+                total_count: totalCount,
                 quantity: 1,
                 customer_notify: 1,
                 notes: {
                   businessId,
                   planId,
+                  durationMonths: String(durationMonths),
                   paymentType,
                   autoRenew: 'true',
                 },
