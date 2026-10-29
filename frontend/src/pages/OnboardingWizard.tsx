@@ -30,7 +30,13 @@ interface Props {
 }
 
 export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin, onNavigateHome }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('step') === '2') return 2;
+    }
+    return 1;
+  });
   const [categories, setCategories] = useState<any>({});
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1118,6 +1124,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 <div style={{ marginBottom: '18px' }}>
                   <GoogleAuthButton
                     label="Sign up / Continue with Google"
+                    flow="onboarding"
                     onSuccess={(res) => {
                       setFormData((prev) => ({
                         ...prev,

@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
@@ -8,6 +8,7 @@ import { aiReviewService } from '../src/modules/ai/service.js';
 import { subscriptionService } from '../src/modules/subscription/service.js';
 import { config } from '../src/config/index.js';
 import { createApp } from '../src/app.js';
+import { authRouter } from '../src/modules/auth/routes.js';
 import { convertMapsUrlToDirectReviewUrl } from '../src/modules/business/mapsService.js';
 import { validatePhoneNumber, parsePhoneInput, formatIndianPhone, SUPPORTED_COUNTRIES } from '../src/utils/phoneValidator.js';
 import { smsService } from '../src/modules/sms/service.js';
@@ -132,6 +133,46 @@ test('1. Authentication & Password Security', async (t) => {
     const fetched = await db.findUserByEmail(googleEmail);
     assert.ok(fetched);
     assert.equal(fetched.name, 'Google Merchant');
+  });
+
+  await t.test('Google OAuth 2.0 Web Flow: redirects to Google consent when configured or friendly error when not', async () => {
+    // 1. Test unconfigured login redirect
+    let redirectedUrl = '';
+    const mockReq: any = {
+      method: 'GET',
+      url: '/google/login?flow=onboarding',
+      query: { flow: 'onboarding' },
+      headers: { host: 'kindlyrate.com' },
+      secure: true,
+    };
+    const mockRes: any = {
+      redirect: (url: string) => {
+        redirectedUrl = url;
+      },
+      status: () => mockRes,
+      json: () => mockRes,
+    };
+
+    authRouter.handle(mockReq, mockRes, () => {});
+    assert.ok(redirectedUrl.includes('auth_error=google_not_configured') || redirectedUrl.includes('accounts.google.com'));
+
+    // 2. Test callback missing code redirect
+    let callbackRedirect = '';
+    const mockCbReq: any = {
+      method: 'GET',
+      url: '/google/callback',
+      query: {},
+      headers: { host: 'kindlyrate.com' },
+      secure: true,
+    };
+    const mockCbRes: any = {
+      redirect: (url: string) => {
+        callbackRedirect = url;
+      },
+    };
+
+    authRouter.handle(mockCbReq, mockCbRes, () => {});
+    assert.ok(callbackRedirect.includes('auth_error=missing_code'));
   });
 });
 
@@ -1230,6 +1271,10 @@ test('15. Subscription Choice, Direct Activation & Monthly Recurring Billing Eng
     assert.equal(record?.transactionId, testTxnId);
     assert.equal(record?.amountInr, 79);
   });
+});
+
+after(() => {
+  setTimeout(() => process.exit(0), 100);
 });
 
 

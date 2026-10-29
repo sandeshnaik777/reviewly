@@ -6,6 +6,7 @@ interface GoogleAuthButtonProps {
   onError?: (error: string) => void;
   label?: string;
   disabled?: boolean;
+  flow?: 'login' | 'onboarding';
 }
 
 export const GoogleGIcon: React.FC<{ size?: number; className?: string }> = ({ size = 18, className = '' }) => (
@@ -41,6 +42,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   onError,
   label = 'Continue with Google',
   disabled = false,
+  flow = 'login',
 }) => {
   const [loading, setLoading] = useState(false);
   const hiddenBtnRef = useRef<HTMLDivElement>(null);
@@ -91,39 +93,19 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       try {
         (window as any).google.accounts.id.prompt((notification: any) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('[GoogleAuth] One Tap prompt skipped, using popup...');
+            console.log('[GoogleAuth] One Tap prompt skipped, using full Google OAuth flow...');
+            window.location.href = `/api/auth/google/login?flow=${flow}`;
           }
         });
         return;
       } catch (promptErr) {
-        console.warn('[GoogleAuth] Prompt error:', promptErr);
+        console.warn('[GoogleAuth] Prompt error, falling back to OAuth redirect:', promptErr);
       }
     }
 
-    // 2. Fallback: Prompt user for their Google email or authenticate
-    const enteredEmail = window.prompt(
-      'Enter your Google account email to sign in instantly with Google:',
-      'owner@business.com'
-    );
-
-    if (!enteredEmail || !enteredEmail.includes('@')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const nameGuess = enteredEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-      const res = await api.googleAuth({
-        email: enteredEmail.trim(),
-        name: nameGuess,
-        googleId: `google_${Date.now()}`,
-      });
-      onSuccess(res);
-    } catch (err: any) {
-      onError?.(err.message || 'Google authentication failed');
-    } finally {
-      setLoading(false);
-    }
+    // 2. Direct browser navigation to Google OAuth 2.0 Web flow
+    // Initiates official accounts.google.com consent screen
+    window.location.href = `/api/auth/google/login?flow=${flow}`;
   };
 
   return (
@@ -173,3 +155,4 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
     </div>
   );
 };
+

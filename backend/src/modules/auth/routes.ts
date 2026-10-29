@@ -429,6 +429,178 @@ authRouter.post('/login', loginRateLimiter, validateBody(loginSchema), async (re
   }
 });
 
+/**
+ * Helper to build Google OAuth redirect URI
+ */
+function getGoogleRedirectUri(req: Request): string {
+  if (config.google.callbackUrl) {
+    return config.google.callbackUrl;
+  }
+  const proto = (req.headers['x-forwarded-proto'] as string) || (req.secure ? 'https' : 'http');
+  const host = (req.headers['x-forwarded-host'] as string) || req.headers.host || 'localhost:4000';
+  return `${proto}://${host}/api/auth/google/callback`;
+}
+
+/**
+ * GET /api/auth/google/login
+ * Redirects the user's browser to the Google OAuth 2.0 Consent Screen
+ */
+authRouter.get('/google/login', (req: Request, res: Response) => {
+  const clientId = config.google.clientId;
+  if (!clientId) {
+    return res.redirect('/?auth_error=google_not_configured');
+  }
+
+  const redirectUri = getGoogleRedirectUri(req);
+  const flow = (req.query.flow as string) || 'login';
+  const statePayload = {
+    flow,
+    nonce: crypto.randomBytes(16).toString('hex'),
+    createdAt: Date.now(),
+  };
+  const state = Buffer.from(JSON.stringify(statePayload)).toString('base64url');
+
+  const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  authUrl.searchParams.set('client_id', clientId);
+  authUrl.searchParams.set('redirect_uri', redirectUri);
+  authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('scope', 'openid email profile');
+  authUrl.searchParams.set('access_type', 'offline');
+  authUrl.searchParams.set('prompt', 'select_account');
+  authUrl.searchParams.set('state', state);
+
+  res.redirect(authUrl.toString());
+});
+
+/**
+ * GET /api/auth/google/callback
+ * Handles Google OAuth 2.0 authorization code exchange
+ */
+authRouter.get('/google/callback', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { code, state, error: googleError } = req.query;
+
+    let flow = 'login';
+    if (state && typeof state === 'string') {
+      try {
+        const decoded = JSON.parse(Buffer.from(state, 'base64url').toString('utf8'));
+        flow = decoded.flow || 'login';
+      } catch {}
+    }
+
+    if (googleError) {
+      console.warn('[GoogleOAuth] Google returned error:', googleError);
+      return res.redirect(`/?auth_error=${encodeURIComponent(String(googleError))}`);
+    }
+
+    if (!code || typeof code !== 'string') {
+      return res.redirect('/?auth_error=missing_code');
+    }
+
+    const clientId = config.google.clientId;
+    const clientSecret = config.google.clientSecret;
+    if (!clientId || !clientSecret) {
+      console.error('[GoogleOAuth] Missing clientId or clientSecret');
+      return res.redirect('/?auth_error=google_credentials_missing');
+    }
+
+    const redirectUri = getGoogleRedirectUri(req);
+
+    // Exchange authorization code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    if (!tokenRes.ok) {
+      const errBody = await tokenRes.text();
+      console.error('[GoogleOAuth] Token exchange failed:', errBody);
+      return res.redirect('/?auth_error=token_exchange_failed');
+    }
+
+    const tokenData = (await tokenRes.json()) as any;
+    const accessToken = tokenData.access_token;
+
+    // Fetch user profile from Google
+    const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!userinfoRes.ok) {
+      const errBody = await userinfoRes.text();
+      console.error('[GoogleOAuth] Userinfo fetch failed:', errBody);
+      return res.redirect('/?auth_error=userinfo_fetch_failed');
+    }
+
+    const profile = (await userinfoRes.json()) as any;
+    const email = profile.email?.toLowerCase().trim();
+    if (!email) {
+      return res.redirect('/?auth_error=email_not_provided');
+    }
+
+    const name = profile.name || email.split('@')[0];
+    const googleId = profile.sub;
+    const avatarUrl = profile.picture;
+
+    // Check or create user
+    let user = await db.findUserByEmail(email);
+
+    if (user) {
+      if (user.lockoutUntil && new Date(user.lockoutUntil) > new Date()) {
+        return res.redirect('/?auth_error=account_locked');
+      }
+      user = (await db.updateUser(user.id, {
+        emailVerified: true,
+        failedLoginAttempts: 0,
+        lockoutUntil: undefined,
+        googleId: googleId || user.googleId,
+        avatarUrl: avatarUrl || user.avatarUrl,
+      })) || user;
+    } else {
+      const randomPassword = crypto.randomBytes(24).toString('hex');
+      const passwordHash = bcrypt.hashSync(randomPassword, 10);
+      const userId = crypto.randomUUID();
+
+      user = await db.createUser({
+        id: userId,
+        email,
+        passwordHash,
+        name,
+        role: 'BUSINESS_OWNER',
+        isActive: true,
+        emailVerified: true,
+        failedLoginAttempts: 0,
+        googleId,
+        avatarUrl,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    const token = sendAuthToken(user, res, req);
+    const businesses = await db.findBusinessesByOwnerId(user.id);
+
+    // If merchant already has business and was logging in, send to dashboard
+    if (businesses.length > 0 && flow !== 'onboarding') {
+      return res.redirect(`/?token=${token}&google=success&flow=dashboard`);
+    }
+
+    // New merchant or onboarding flow: send directly to onboarding Step 2
+    return res.redirect(
+      `/?token=${token}&google=success&flow=onboarding&step=2&name=${encodeURIComponent(user.name)}&email=${encodeURIComponent(user.email)}`
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
 const googleAuthSchema = z.object({
   credential: z.string().optional(),
   email: z.string().email().optional(),

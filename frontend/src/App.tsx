@@ -37,9 +37,30 @@ export const App: React.FC = () => {
       return;
     }
 
+    // Handle Google OAuth callback redirect parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+    const authError = urlParams.get('auth_error');
+    const flowFromUrl = urlParams.get('flow');
+
+    if (tokenFromUrl) {
+      localStorage.setItem('kindlyrate_token', tokenFromUrl);
+      localStorage.setItem('kindlyreview_token', tokenFromUrl);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (authError) {
+      if (authError === 'google_not_configured') {
+        alert('Google OAuth Setup Required: Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to your environment variables.');
+      } else {
+        console.warn('[GoogleAuth] OAuth callback notice:', authError);
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Check existing authentication session only if a token exists in storage
     const hasToken = typeof localStorage !== 'undefined' && Boolean(
-      localStorage.getItem('kindlyrate_token') || localStorage.getItem('kindlyreview_token') || localStorage.getItem('reviewly_token')
+      tokenFromUrl || localStorage.getItem('kindlyrate_token') || localStorage.getItem('kindlyreview_token') || localStorage.getItem('reviewly_token')
     );
 
     if (!hasToken) {
@@ -54,9 +75,11 @@ export const App: React.FC = () => {
           setCurrentUser(res.user);
           if (res.user.role === 'PLATFORM_ADMIN') {
             setView('admin');
-          } else if (res.businesses && res.businesses.length > 0) {
+          } else if (res.businesses && res.businesses.length > 0 && flowFromUrl !== 'onboarding') {
             setCurrentBusiness(res.businesses[0]);
             setView('dashboard');
+          } else {
+            setView('onboarding');
           }
         }
       })

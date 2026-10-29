@@ -106,6 +106,7 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
           <div style={{ marginBottom: '18px' }}>
             <GoogleAuthButton
               label="Continue with Google"
+              flow="login"
               onSuccess={(res) => onLoginSuccess(res.user, res.businesses)}
               onError={(err) => setError(err)}
               disabled={loading}
