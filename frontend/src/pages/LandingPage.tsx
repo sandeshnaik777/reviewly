@@ -347,28 +347,6 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 Sign In Here
               </button>
             </div>
-
-            <span style={{ color: '#cbd5e1' }} className="hide-on-phone">|</span>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#d97706', fontWeight: 700 }}>● Live Demo?</span>
-              <button
-                type="button"
-                onClick={onNavigateLogin}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#d97706',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  padding: 0,
-                  textDecoration: 'underline',
-                  fontSize: '12.5px',
-                }}
-              >
-                1-Click Demo Login
-              </button>
-            </div>
           </div>
         </div>
 

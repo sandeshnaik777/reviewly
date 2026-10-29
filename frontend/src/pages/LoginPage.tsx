@@ -52,21 +52,6 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
     }
   };
 
-  const handleDemoLogin = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      setEmail('demo@kindlyrate.com');
-      setPassword('DemoRate2026!');
-      const res = await api.login({ email: 'demo@kindlyrate.com', password: 'DemoRate2026!' });
-      onLoginSuccess(res.user, res.businesses);
-    } catch (err: any) {
-      setError(err.message || 'Demo login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#faf8f5' }}>
       {/* Top Header with Back to Home Navigation */}
@@ -145,33 +130,6 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
             <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '6px' }}>
               Access your business analytics, customer reviews, and growth center.
             </p>
-          </div>
-
-          {/* 1-Click Instant Demo Login */}
-          <div style={{ marginBottom: '18px' }}>
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '11px 16px',
-                background: '#fef3c7',
-                border: '1.5px solid #f59e0b',
-                borderRadius: '10px',
-                color: '#92400e',
-                fontWeight: 700,
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                boxShadow: '0 2px 6px rgba(245, 158, 11, 0.15)',
-              }}
-            >
-              <span>⚡ 1-Click Demo Login (Priya Sharma Demo Store)</span>
-            </button>
           </div>
 
           {error && <div className="alert alert-error">{error}</div>}
