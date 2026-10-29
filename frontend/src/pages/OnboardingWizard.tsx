@@ -571,29 +571,31 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
       // 2. Create Razorpay Order for Testing Pack Trial (₹79)
       const order = await api.createOrder(targetBiz.id, trialPlanId, { isTrial: true });
 
-      // 3. Open Razorpay Checkout Modal
+      // 3. Open Razorpay Checkout Modal (Supports UPI Autopay Mandates & Direct Orders)
       if ((window as any).Razorpay) {
-        const options = {
+        const isSub = Boolean(order.subscriptionId || order.isSubscription);
+        const options: any = {
           key: order.keyId,
-          amount: order.amount, // 7900 paisa (₹79)
           currency: order.currency || 'INR',
           name: 'KindlyRate Platform',
-          description: 'Testing Pack (₹79 Starter Trial)',
-          order_id: order.orderId,
+          description: isSub
+            ? 'Testing Pack (₹79 Starter Trial · Monthly UPI Autopay)'
+            : 'Testing Pack (₹79 Starter Trial)',
           prefill: {
             name: formData.ownerName,
             email: formData.email,
             contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
           },
           theme: {
-            color: '#9a4018',
+            color: '#00383B',
           },
           handler: async (resp: any) => {
             try {
               await api.verifyPayment(targetBiz.id, {
-                orderId: resp.razorpay_order_id,
+                orderId: resp.razorpay_subscription_id || resp.razorpay_order_id,
                 paymentId: resp.razorpay_payment_id,
                 signature: resp.razorpay_signature,
+                subscriptionId: resp.razorpay_subscription_id,
               });
             } catch (vErr) {
               console.warn('Trial signature verified with fallback:', vErr);
@@ -604,11 +606,18 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             ondismiss: () => {
               setPaymentFailed(true);
               setPaymentNote(
-                'Payment attempt was dismissed. You can retry with any UPI, Card, or NetBanking option below, or continue to your dashboard.'
+                'Payment attempt was dismissed. You can retry with any UPI Autopay, Google Pay, PhonePe, or Card option below, or continue to your dashboard.'
               );
             },
           },
         };
+
+        if (isSub) {
+          options.subscription_id = order.subscriptionId || order.orderId;
+        } else {
+          options.order_id = order.orderId;
+          options.amount = order.amount;
+        }
 
         const rzp = new (window as any).Razorpay(options);
         rzp.on('payment.failed', (fResp: any) => {
@@ -709,27 +718,29 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
       });
 
       if ((window as any).Razorpay) {
-        const options = {
+        const isSub = Boolean(order.subscriptionId || order.isSubscription);
+        const options: any = {
           key: order.keyId,
-          amount: order.amount,
           currency: order.currency || 'INR',
           name: 'KindlyRate Platform',
-          description: `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''}) - Direct Activation`,
-          order_id: order.orderId,
+          description: isSub
+            ? `${selectedPlan.name} · Monthly UPI Autopay`
+            : `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''})`,
           prefill: {
             name: formData.ownerName,
             email: formData.email,
             contact: (formData.phone || '').replace(/[^0-9]/g, '').slice(-10),
           },
           theme: {
-            color: '#9a4018',
+            color: '#00383B',
           },
           handler: async (resp: any) => {
             try {
               await api.verifyPayment(targetBiz.id, {
-                orderId: resp.razorpay_order_id,
+                orderId: resp.razorpay_subscription_id || resp.razorpay_order_id,
                 paymentId: resp.razorpay_payment_id,
                 signature: resp.razorpay_signature,
+                subscriptionId: resp.razorpay_subscription_id,
               });
             } catch (vErr) {
               console.warn('Direct payment signature verified with fallback:', vErr);
@@ -740,11 +751,18 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             ondismiss: () => {
               setPaymentFailed(true);
               setPaymentNote(
-                'Payment attempt was dismissed. You can retry with any UPI, Card, or NetBanking option below, or continue to your dashboard.'
+                'Payment attempt was dismissed. You can retry with any UPI Autopay, Google Pay, PhonePe, or Card option below, or continue to your dashboard.'
               );
             },
           },
         };
+
+        if (isSub) {
+          options.subscription_id = order.subscriptionId || order.orderId;
+        } else {
+          options.order_id = order.orderId;
+          options.amount = order.amount;
+        }
 
         const rzp = new (window as any).Razorpay(options);
         rzp.on('payment.failed', (fResp: any) => {
@@ -1911,7 +1929,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
                   <div style={{ marginTop: '18px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <Lock size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-                    Powered by Razorpay · UPI, Google Pay, PhonePe, Cards, NetBanking · Instant activation
+                    Powered by Razorpay · UPI Autopay (Google Pay, PhonePe, Paytm), Cards · Instant activation
                   </div>
                 </div>
               ) : (
@@ -1980,7 +1998,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
                   <div style={{ marginTop: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: 'var(--radius-sm)', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <Lock size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />
-                    Powered by Razorpay · UPI, Google Pay, Cards, NetBanking · Instant activation
+                    Powered by Razorpay · UPI Autopay (Google Pay, PhonePe, Paytm), Cards · Instant activation
                   </div>
                 </div>
               )}

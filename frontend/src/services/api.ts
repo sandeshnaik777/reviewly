@@ -162,7 +162,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ mapsUrl }),
     }),
-  verifyPayment: (businessId: string, data: { orderId: string; paymentId: string; signature: string }) =>
+  verifyPayment: (businessId: string, data: { orderId: string; paymentId: string; signature: string; subscriptionId?: string }) =>
     apiRequest('/payment/verify', {
       method: 'POST',
       headers: { 'X-Business-ID': businessId },

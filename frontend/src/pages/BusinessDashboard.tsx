@@ -171,33 +171,43 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         loadRazorpay(),
       ]);
       if (isLoaded && (window as any).Razorpay) {
-        const options = {
+        const isSub = Boolean(order.subscriptionId || order.isSubscription);
+        const options: any = {
           key: order.keyId,
-          amount: order.amount, // 7900 paisa (₹79)
           currency: order.currency,
           name: 'KindlyRate Platform',
-          description: 'Testing Pack (₹79 Starter Trial)',
-          order_id: order.orderId,
+          description: isSub
+            ? 'Testing Pack (₹79 Starter Trial · Monthly UPI Autopay)'
+            : 'Testing Pack (₹79 Starter Trial)',
           prefill: {
             name: business?.name || 'Business Owner',
             email: business?.email || '',
             contact: (business?.phone || '').replace(/[^0-9]/g, '').slice(-10),
           },
-          theme: { color: '#9a4018' },
+          theme: { color: '#00383B' },
           handler: async (response: any) => {
             try {
               await api.verifyPayment(businessId, {
-                orderId: response.razorpay_order_id,
+                orderId: response.razorpay_subscription_id || response.razorpay_order_id,
                 paymentId: response.razorpay_payment_id,
                 signature: response.razorpay_signature,
+                subscriptionId: response.razorpay_subscription_id,
               });
-              showNotification('Testing Pack Trial Activated for ₹79!');
+              showNotification('Testing Pack Trial Activated for ₹79 via UPI Autopay!');
               loadAllData();
             } catch (vErr: any) {
               alert(`Trial activation verification note: ${vErr.message}`);
             }
           },
         };
+
+        if (isSub) {
+          options.subscription_id = order.subscriptionId || order.orderId;
+        } else {
+          options.order_id = order.orderId;
+          options.amount = order.amount;
+        }
+
         const rzp = new (window as any).Razorpay(options);
         rzp.open();
       } else {
@@ -4112,29 +4122,31 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               loadRazorpay(),
                             ]);
                             if (isLoaded && (window as any).Razorpay) {
-                            const options = {
+                            const isSub = Boolean(order.subscriptionId || order.isSubscription);
+                            const options: any = {
                               key: order.keyId,
-                              amount: order.amount,
                               currency: order.currency,
                               name: 'KindlyRate Platform',
-                              description: `Upgrade to ${p.name}`,
-                              order_id: order.orderId,
+                              description: isSub
+                                ? `Upgrade to ${p.name} · Monthly UPI Autopay`
+                                : `Upgrade to ${p.name}`,
                               prefill: {
                                 name: business?.name || 'Business Owner',
                                 email: business?.email || '',
                                 contact: (business?.phone || '').replace(/[^0-9]/g, '').slice(-10),
                               },
                               theme: {
-                                color: '#9a4018',
+                                color: '#00383B',
                               },
                               handler: async (response: any) => {
                                 try {
                                   await api.verifyPayment(businessId, {
-                                    orderId: response.razorpay_order_id,
+                                    orderId: response.razorpay_subscription_id || response.razorpay_order_id,
                                     paymentId: response.razorpay_payment_id,
                                     signature: response.razorpay_signature,
+                                    subscriptionId: response.razorpay_subscription_id,
                                   });
-                                  showNotification(`Payment Successful! Account upgraded to ${p.name}.`);
+                                  showNotification(`Payment Successful! Account upgraded to ${p.name} with UPI Autopay.`);
                                   loadAllData();
                                 } catch (vErr: any) {
                                   alert(`Payment verification failed: ${vErr.message}`);
@@ -4146,6 +4158,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                                 },
                               },
                             };
+                            if (isSub) {
+                              options.subscription_id = order.subscriptionId || order.orderId;
+                            } else {
+                              options.order_id = order.orderId;
+                              options.amount = order.amount;
+                            }
                             const rzp = new (window as any).Razorpay(options);
                             rzp.on('payment.failed', (resp: any) => {
                               alert(`Payment Failed: ${resp.error?.description || 'Transaction cancelled'}`);

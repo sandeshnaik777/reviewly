@@ -408,7 +408,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           </div>
         </div>
 
-        {/* Transformation Matrix: BEFORE VS AFTER KINDLYREVIEW */}
+        {/* Transformation Matrix: BEFORE VS AFTER KINDLYRATE */}
         <div className="desktop-container" style={{ maxWidth: '1280px', marginTop: '36px' }}>
           <div
             style={{

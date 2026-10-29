@@ -84,14 +84,15 @@ paymentRouter.post(
       orderId: z.string().min(1),
       paymentId: z.string().min(1),
       signature: z.string().min(1),
+      subscriptionId: z.string().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const { orderId, paymentId, signature } = req.body;
+      const { orderId, paymentId, signature, subscriptionId } = req.body;
 
       // In real production with live keys, signature is verified against Razorpay secret
-      let isSignatureValid = paymentService.verifyPaymentSignature(orderId, paymentId, signature);
+      let isSignatureValid = paymentService.verifyPaymentSignature(orderId, paymentId, signature, subscriptionId);
 
       if (!isSignatureValid && (signature.startsWith('simulated_') || signature === 'test_sig' || (paymentId.startsWith('pay_') && config.nodeEnv === 'development'))) {
         isSignatureValid = true;

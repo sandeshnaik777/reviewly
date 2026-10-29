@@ -16,6 +16,8 @@ export interface CreateOrderParams {
 
 export interface OrderResult {
   orderId: string;
+  subscriptionId?: string;
+  isSubscription?: boolean;
   amount: number;
   amountInr?: number;
   currency: string;
@@ -25,7 +27,7 @@ export interface OrderResult {
 export interface PaymentService {
   createOrder(params: CreateOrderParams): Promise<OrderResult>;
   verifyWebhookSignature(payload: string, signature: string): boolean;
-  verifyPaymentSignature(orderId: string, paymentId: string, signature: string): boolean;
+  verifyPaymentSignature(orderId: string, paymentId: string, signature: string, subscriptionId?: string): boolean;
   processPaymentSuccess(orderId: string, paymentId: string, providerRef?: string): Promise<PaymentRecord>;
   processWebhookEvent(rawBody: string, signature: string): Promise<{ handled: boolean; event: string }>;
   getSubscription(businessId: string): Promise<Subscription | undefined>;
@@ -33,6 +35,14 @@ export interface PaymentService {
   toggleAutoRenew(businessId: string, enabled: boolean): Promise<Subscription | undefined>;
   processRecurringBilling(): Promise<Array<{ subscriptionId: string; businessId: string; transactionId: string; amountInr: number }>>;
 }
+
+// Live Razorpay UPI Autopay Plans (Verified in Razorpay Live Dashboard)
+const RAZORPAY_PLAN_MAP: Record<string, string> = {
+  starter: 'plan_TtcqSdkuxmyqoH', // ₹79/mo Testing Pack
+  trial: 'plan_TtcqSdkuxmyqoH',
+  growth: 'plan_Ttd2A0R5v2g4A9',  // ₹149/mo Growth Pack
+  pro: 'plan_Ttd2AG8y0o19Vb',     // ₹249/mo Scale / Pro Pack
+};
 
 export class RazorpayPaymentService implements PaymentService {
   get keyId(): string {
@@ -48,15 +58,18 @@ export class RazorpayPaymentService implements PaymentService {
   async createOrder(params: CreateOrderParams): Promise<OrderResult> {
     const { businessId, planId, amountInr, currency = 'INR', durationMonths = 1, isTrial, autoRenew = true } = params;
     let orderId = `order_${crypto.randomBytes(12).toString('hex')}`;
+    let subscriptionId: string | undefined = undefined;
+    let isSubscription = false;
 
     let finalAmount = amountInr;
     let paymentType: 'trial_verification' | 'direct_subscription' | 'recurring_monthly' = 'direct_subscription';
+
+    const plan = await db.findPlanById(planId);
 
     if (isTrial || finalAmount === 79 || finalAmount === 2) {
       finalAmount = 79;
       paymentType = 'trial_verification';
     } else if (finalAmount === undefined || isNaN(finalAmount)) {
-      const plan = await db.findPlanById(planId);
       if (plan) {
         if (durationMonths === 3) {
           finalAmount = plan.priceInr3Months || (plan.priceInr * 3);
@@ -76,33 +89,80 @@ export class RazorpayPaymentService implements PaymentService {
     if (this.keyId && this.keySecret && this.keyId.startsWith('rzp_')) {
       try {
         const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
-        const res = await fetch('https://api.razorpay.com/v1/orders', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: finalAmount * 100, // paisa
-            currency,
-            receipt: `rcpt_${Date.now().toString(36)}_${businessId.slice(0, 6)}`,
-            notes: {
-              businessId,
-              planId,
-              paymentType,
-              autoRenew: String(autoRenew),
-            },
-          }),
-        });
 
-        if (res.ok) {
-          const rzpOrder = (await res.json()) as any;
-          if (rzpOrder?.id) {
-            orderId = rzpOrder.id;
+        // Check if Autopay Subscription applies (monthly plans with autoRenew)
+        const planSlug = isTrial || finalAmount === 79 ? 'trial' : plan?.slug;
+        let rzpPlanId = planSlug ? RAZORPAY_PLAN_MAP[planSlug] : undefined;
+
+        // If monthly plan with autoRenew enabled, create live Razorpay Autopay Subscription
+        if (autoRenew && durationMonths === 1 && rzpPlanId) {
+          try {
+            const subRes = await fetch('https://api.razorpay.com/v1/subscriptions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                plan_id: rzpPlanId,
+                total_count: 60, // 5 years of automated monthly renewals
+                quantity: 1,
+                customer_notify: 1,
+                notes: {
+                  businessId,
+                  planId,
+                  paymentType,
+                  autoRenew: 'true',
+                },
+              }),
+            });
+
+            if (subRes.ok) {
+              const rzpSub = (await subRes.json()) as any;
+              if (rzpSub?.id) {
+                subscriptionId = rzpSub.id;
+                orderId = rzpSub.id;
+                isSubscription = true;
+              }
+            } else {
+              const errText = await subRes.text();
+              console.warn('[RazorpayPaymentService] Subscription creation failed, falling back to standard order:', errText);
+            }
+          } catch (subErr) {
+            console.warn('[RazorpayPaymentService] Subscription API error, falling back to standard order:', subErr);
           }
-        } else {
-          const errText = await res.text();
-          console.warn('Razorpay API order error, falling back to simulated order:', errText);
+        }
+
+        // Fallback: If not subscription or subscription failed, create standard order
+        if (!isSubscription) {
+          const res = await fetch('https://api.razorpay.com/v1/orders', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Basic ${auth}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              amount: finalAmount * 100, // paisa
+              currency,
+              receipt: `rcpt_${Date.now().toString(36)}_${businessId.slice(0, 6)}`,
+              notes: {
+                businessId,
+                planId,
+                paymentType,
+                autoRenew: String(autoRenew),
+              },
+            }),
+          });
+
+          if (res.ok) {
+            const rzpOrder = (await res.json()) as any;
+            if (rzpOrder?.id) {
+              orderId = rzpOrder.id;
+            }
+          } else {
+            const errText = await res.text();
+            console.warn('Razorpay API order error, falling back to simulated order:', errText);
+          }
         }
       } catch (apiErr) {
         console.warn('Razorpay API network error, falling back to simulated order:', apiErr);
@@ -128,6 +188,8 @@ export class RazorpayPaymentService implements PaymentService {
 
     return {
       orderId,
+      subscriptionId,
+      isSubscription,
       amount: finalAmount * 100, // Razorpay uses paisa
       amountInr: finalAmount,
       currency,
@@ -135,12 +197,25 @@ export class RazorpayPaymentService implements PaymentService {
     };
   }
 
-  verifyPaymentSignature(orderId: string, paymentId: string, signature: string): boolean {
+  verifyPaymentSignature(orderIdOrSubId: string, paymentId: string, signature: string, subscriptionId?: string): boolean {
     try {
-      const expectedSignature = crypto
-        .createHmac('sha256', this.keySecret)
-        .update(`${orderId}|${paymentId}`)
-        .digest('hex');
+      const subId = subscriptionId || (orderIdOrSubId && orderIdOrSubId.startsWith('sub_') ? orderIdOrSubId : null);
+
+      let expectedSignature: string;
+      if (subId) {
+        // Razorpay Subscription / UPI Autopay signature verification
+        expectedSignature = crypto
+          .createHmac('sha256', this.keySecret)
+          .update(`${paymentId}|${subId}`)
+          .digest('hex');
+      } else {
+        // Standard Razorpay Order verification
+        expectedSignature = crypto
+          .createHmac('sha256', this.keySecret)
+          .update(`${orderIdOrSubId}|${paymentId}`)
+          .digest('hex');
+      }
+
       const bufA = Buffer.from(expectedSignature);
       const bufB = Buffer.from(signature);
       if (bufA.length !== bufB.length) return false;
@@ -350,7 +425,16 @@ export class RazorpayPaymentService implements PaymentService {
     const eventData = JSON.parse(rawBody);
     const eventType = eventData.event;
 
-    if (eventType === 'payment.captured' || eventType === 'order.paid') {
+    if (eventType === 'subscription.charged' || eventType === 'subscription.authenticated') {
+      const subEntity = eventData.payload?.subscription?.entity;
+      const paymentEntity = eventData.payload?.payment?.entity;
+      const subId = subEntity?.id;
+      const paymentId = paymentEntity?.id;
+
+      if (subId && paymentId) {
+        await this.processPaymentSuccess(subId, paymentId, 'Razorpay UPI Autopay Recurring Charge');
+      }
+    } else if (eventType === 'payment.captured' || eventType === 'order.paid') {
       const paymentEntity = eventData.payload?.payment?.entity;
       const orderId = paymentEntity?.order_id;
       const paymentId = paymentEntity?.id;
