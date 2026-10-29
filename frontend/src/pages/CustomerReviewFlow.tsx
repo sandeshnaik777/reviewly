@@ -26,8 +26,8 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any>(null);
 
-  // Review Flow Mode: 'choice' (first screen), 'ai' (rating criteria + AI generation), or 'direct'
-  const [reviewMode, setReviewMode] = useState<'choice' | 'ai'>('choice');
+  // Review Flow Mode: defaults directly to 'ai' rating criteria for 0-friction fast completion
+  const [reviewMode, setReviewMode] = useState<'choice' | 'ai'>('ai');
 
   // Form State
   const [ratings, setRatings] = useState<Record<string, number>>({});
@@ -444,10 +444,26 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 <p style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Tap stars for each aspect</p>
               </div>
               <button
-                onClick={() => setReviewMode('choice')}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '12.5px', cursor: 'pointer', textDecoration: 'underline' }}
+                type="button"
+                onClick={handleOpenGoogleDirect}
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #cbd5e1',
+                  color: '#334155',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                }}
+                title="Open Google Maps directly without AI assistance"
               >
-                ← Back
+                <GoogleLogo size={14} />
+                <span>Write Direct ↗</span>
               </button>
             </div>
 
@@ -887,15 +903,129 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               />
             </div>
 
-            <div style={{ marginTop: '14px', textAlign: 'center' }}>
+            <div
+              style={{
+                marginTop: '18px',
+                textAlign: 'center',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '12px 14px',
+              }}
+            >
+              <div style={{ fontSize: '12.5px', color: '#475569', marginBottom: '6px' }}>
+                Prefer writing in your own words without AI suggestions?
+              </div>
               <button
+                type="button"
                 onClick={handleOpenGoogleDirect}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '12.5px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                className="btn btn-secondary btn-sm"
+                style={{
+                  fontSize: '12.5px',
+                  padding: '6px 14px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: '#ffffff',
+                }}
               >
                 <GoogleLogo size={14} />
-                <span>Want to write directly instead? Open Google Maps ↗</span>
+                <span>Open Google Maps Directly ↗</span>
               </button>
             </div>
+
+            {/* OPTIONAL SOCIAL MEDIA CONNECTIONS (Shown if added by merchant) */}
+            {(Boolean(business?.instagramUrl?.trim()) || Boolean(business?.whatsappUrl?.trim()) || Boolean(business?.facebookUrl?.trim())) && (
+              <div
+                className="card"
+                style={{
+                  marginTop: '16px',
+                  padding: '14px 16px',
+                  background: '#ffffff',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>
+                    Connect With {business.name}
+                  </span>
+                  <span className="badge badge-primary" style={{ fontSize: '10px', padding: '1px 6px' }}>Official</span>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginTop: '10px' }}>
+                  {Boolean(business?.instagramUrl?.trim()) && (
+                    <button
+                      type="button"
+                      onClick={() => handleSocialClick('instagram', business.instagramUrl)}
+                      className="btn"
+                      style={{
+                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        padding: '8px 12px',
+                        borderRadius: '999px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <InstagramLogo size={15} />
+                      <span>Instagram</span>
+                    </button>
+                  )}
+                  {Boolean(business?.whatsappUrl?.trim()) && (
+                    <button
+                      type="button"
+                      onClick={() => handleSocialClick('whatsapp', business.whatsappUrl)}
+                      className="btn"
+                      style={{
+                        background: '#25D366',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        padding: '8px 12px',
+                        borderRadius: '999px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <WhatsAppLogo size={15} />
+                      <span>WhatsApp</span>
+                    </button>
+                  )}
+                  {Boolean(business?.facebookUrl?.trim()) && (
+                    <button
+                      type="button"
+                      onClick={() => handleSocialClick('facebook', business.facebookUrl)}
+                      className="btn"
+                      style={{
+                        background: '#1877F2',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        padding: '8px 12px',
+                        borderRadius: '999px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <FacebookLogo size={15} />
+                      <span>Facebook</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

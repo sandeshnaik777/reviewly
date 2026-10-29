@@ -740,7 +740,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               background: '#f8fafc',
               color: '#1e293b',
               border: '1px solid #cbd5e1',
-              padding: '8px 13px',
+              padding: '8px 12px',
               borderRadius: 'var(--radius-md)',
               fontSize: '13px',
               fontWeight: 600,
@@ -751,8 +751,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             }}
             title="Get Help or Contact Support Anytime"
           >
-            <Phone size={16} />
-            <span>Help & Contact</span>
+            <Phone size={15} />
+            <span className="hide-mobile">Help &amp; Contact</span>
+            <span className="show-mobile-only">Help</span>
           </button>
 
           {/* Upgrade Plan Quick Button */}
@@ -762,7 +763,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               background: 'var(--primary)',
               color: '#ffffff',
               border: 'none',
-              padding: '8px 14px',
+              padding: '8px 13px',
               borderRadius: 'var(--radius-md)',
               fontSize: '13px',
               fontWeight: 600,
@@ -775,7 +776,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             title="Upgrade your monthly review limits or subscription pack"
           >
             <TrendingUpIcon size={14} color="#ffffff" />
-            <span>Upgrade Plan ↗</span>
+            <span className="hide-mobile">Upgrade Plan ↗</span>
+            <span className="show-mobile-only">Upgrade</span>
           </button>
 
           <a
@@ -795,10 +797,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               target="_blank"
               rel="noreferrer"
               className="btn btn-primary"
-              style={{ fontSize: '13px', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ fontSize: '13px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <SparklesIcon size={14} color="white" />
-              <span>Test Flow</span>
+              <span className="hide-mobile">Test Flow</span>
+              <span className="show-mobile-only">Test</span>
             </a>
           )}
 

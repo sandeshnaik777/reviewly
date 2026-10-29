@@ -394,6 +394,20 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
     }
   };
 
+  const handlePasteOnboardingMapsLink = async () => {
+    try {
+      if (navigator?.clipboard?.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          setFormData((prev: any) => ({ ...prev, googleMapsShareUrl: text.trim() }));
+          setError(null);
+        }
+      }
+    } catch {
+      // Clipboard API might require user permission
+    }
+  };
+
   const handleNext = async () => {
     setError(null);
 
@@ -1584,6 +1598,36 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         {/* STEP 5: Google Review URL & Google Maps Share Link */}
         {step === 5 && (
           <div>
+            {/* Visual 3-Step Guide */}
+            <div
+              style={{
+                background: '#f8fafc',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '14px 16px',
+                marginBottom: '16px',
+              }}
+            >
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Lightbulb size={16} color="var(--primary)" />
+                <span>How to get your Google Maps Link (takes 10 seconds):</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', fontSize: '12px', color: '#475569' }}>
+                <div style={{ background: '#ffffff', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                  <strong style={{ color: '#0f172a', display: 'block', marginBottom: '2px' }}>1. Open Maps</strong>
+                  <span>Open Google Maps app or site on phone/laptop.</span>
+                </div>
+                <div style={{ background: '#ffffff', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                  <strong style={{ color: '#0f172a', display: 'block', marginBottom: '2px' }}>2. Search Business</strong>
+                  <span>Search <strong>{formData.businessName || 'Your Store'}</strong>.</span>
+                </div>
+                <div style={{ background: '#ffffff', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                  <strong style={{ color: '#0f172a', display: 'block', marginBottom: '2px' }}>3. Tap "Share"</strong>
+                  <span>Tap "Share" ➔ "Copy link" (e.g. <code>maps.app.goo.gl/...</code>) &amp; paste below!</span>
+                </div>
+              </div>
+            </div>
+
             {/* 1. Google Maps Share Link Converter */}
             <div className="card" style={{ padding: '20px', marginBottom: '20px', border: '1.5px dashed var(--primary)', background: '#fffcfb' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
@@ -1597,13 +1641,26 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               </div>
 
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <input
-                  className="form-input"
-                  style={{ flex: 1, minWidth: '240px' }}
-                  placeholder="https://maps.app.goo.gl/... or https://goo.gl/maps/..."
-                  value={formData.googleMapsShareUrl || ''}
-                  onChange={(e) => setFormData({ ...formData, googleMapsShareUrl: e.target.value })}
-                />
+                <div style={{ display: 'flex', flex: 1, minWidth: '240px', gap: '6px' }}>
+                  <input
+                    className="form-input"
+                    style={{ flex: 1 }}
+                    placeholder="https://maps.app.goo.gl/... or https://goo.gl/maps/..."
+                    value={formData.googleMapsShareUrl || ''}
+                    onChange={(e) => setFormData({ ...formData, googleMapsShareUrl: e.target.value })}
+                  />
+                  {typeof navigator !== 'undefined' && (
+                    <button
+                      type="button"
+                      onClick={handlePasteOnboardingMapsLink}
+                      className="btn btn-secondary"
+                      style={{ fontSize: '12px', padding: '0 12px', whiteSpace: 'nowrap' }}
+                      title="Paste URL directly from clipboard"
+                    >
+                      📋 Paste
+                    </button>
+                  )}
+                </div>
                 <button
                   type="button"
                   className="btn btn-primary"
@@ -1631,14 +1688,33 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     background: '#dcfce7',
                     border: '1px solid #86efac',
                     color: '#166534',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
                     fontSize: '12.5px',
                     marginTop: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '8px',
                     fontWeight: 600,
                   }}
                 >
-                  {mapsConvertSuccess}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={16} color="#166534" />
+                    <span>{mapsConvertSuccess}</span>
+                  </div>
+                  {formData.googleReviewUrl && (
+                    <a
+                      href={formData.googleReviewUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: '11.5px', padding: '4px 12px', textDecoration: 'none' }}
+                    >
+                      Test My Review Link ↗
+                    </a>
+                  )}
                 </div>
               )}
             </div>

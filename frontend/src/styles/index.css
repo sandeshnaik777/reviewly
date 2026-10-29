@@ -392,7 +392,17 @@ a {
 }
 
 /* Responsive Layout */
+.show-mobile-only {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  .show-mobile-only {
+    display: inline-block !important;
+  }
   .header-responsive {
     flex-direction: column !important;
     align-items: flex-start !important;
