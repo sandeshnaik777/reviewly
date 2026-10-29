@@ -194,6 +194,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     try { return sessionStorage.getItem('kindlyrate_dismiss_maps_setup') === 'true'; } catch { return false; }
   });
   const [overviewMobileSubtab, setOverviewMobileSubtab] = useState<'kpis' | 'questions' | 'keywords' | 'charts'>('kpis');
+  const [overviewSection, setOverviewSection] = useState<'activity' | 'setup' | 'seo' | 'roi'>('activity');
+  const [weeklyViewSubtab, setWeeklyViewSubtab] = useState<'chart' | 'tips'>('chart');
+  const [setupSubtab, setSetupSubtab] = useState<'questions' | 'keywords'>('questions');
+  const [seoSubtab, setSeoSubtab] = useState<'grid' | 'table'>('grid');
+  const [roiSubtab, setRoiSubtab] = useState<'financial' | 'competitors' | 'peakhours'>('financial');
+  const [autoRenewChoice, setAutoRenewChoice] = useState<boolean>(true);
   const [newOverviewQuestion, setNewOverviewQuestion] = useState('');
 
   // Festive Limited-Time Offer Countdown Timer (Approx 2h 47m live countdown)
@@ -1363,8 +1369,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 <span>DIWALI FLASH SALE 🎈</span>
               </span>
               <strong style={{ color: '#78350f', fontSize: '13px' }}>
-                Launch Pass: <span style={{ textDecoration: 'line-through', color: '#b91c1c', fontWeight: 600, marginRight: '3px' }}>₹499</span>
-                <span style={{ color: '#ea580c', fontWeight: 800 }}>₹79</span>
+                All Plans Discounted: Testing Pass <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹499</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹79</span> · Growth <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹249</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹149/mo</span>
               </strong>
               <span style={{ color: '#78350f', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, background: '#fef08a', padding: '2px 7px', borderRadius: '6px', border: '1px solid #fde047' }}>
                 ⏳ {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
@@ -1386,14 +1391,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 whiteSpace: 'nowrap',
               }}
             >
-              🎉 Claim ₹79 Now →
+              🎉 Claim ₹79 Pass →
             </button>
             <button
               onClick={() => setActiveTab('subscription')}
               className="btn btn-secondary btn-sm"
               style={{ fontSize: '11.5px', padding: '6px 10px', whiteSpace: 'nowrap' }}
             >
-              Choose Plan
+              All Plans (2 Mos Free) →
             </button>
           </div>
         </div>
@@ -1526,37 +1531,6 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               </div>
             )}
 
-            {/* Mobile Segmented Sub-Nav Pills (Visible on phone screens) */}
-            <div className="show-mobile-only mobile-segment-tabs">
-              <button
-                type="button"
-                className={`mobile-segment-tab ${overviewMobileSubtab === 'kpis' ? 'active' : ''}`}
-                onClick={() => setOverviewMobileSubtab('kpis')}
-              >
-                📊 Overview
-              </button>
-              <button
-                type="button"
-                className={`mobile-segment-tab ${overviewMobileSubtab === 'questions' ? 'active' : ''}`}
-                onClick={() => setOverviewMobileSubtab('questions')}
-              >
-                ⭐ Questions ({questions.length})
-              </button>
-              <button
-                type="button"
-                className={`mobile-segment-tab ${overviewMobileSubtab === 'keywords' ? 'active' : ''}`}
-                onClick={() => setOverviewMobileSubtab('keywords')}
-              >
-                🎯 SEO
-              </button>
-              <button
-                type="button"
-                className={`mobile-segment-tab ${overviewMobileSubtab === 'charts' ? 'active' : ''}`}
-                onClick={() => setOverviewMobileSubtab('charts')}
-              >
-                📈 Analytics
-              </button>
-            </div>
 
             {/* Grand Festive Launch Offer Hero Card (Shown when unpaid / free preview) */}
             {!isPaidActive && (
@@ -1627,23 +1601,45 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     </div>
 
                     {/* Headline with Strikethrough Price */}
-                    <h3 className="serif" style={{ fontSize: '24px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
-                      Unlock Customer Reviews for Just <span style={{ textDecoration: 'line-through', color: '#b91c1c', fontSize: '20px', fontWeight: 600, marginRight: '4px' }}>₹499</span>
-                      <span style={{ color: '#ea580c', fontSize: '28px' }}>₹79</span>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#15803d', background: '#dcfce7', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px', verticalAlign: 'middle' }}>
-                        SAVE 84% TODAY
-                      </span>
+                    <h3 className="serif" style={{ fontSize: '23px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
+                      Diwali Flash Sale Live Across All Plans · Save Up to 84% Today
                     </h3>
 
-                    <p style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#92400e', lineHeight: 1.55 }}>
-                      🎉 Exclusive welcome celebration offer for your store! Complete the one-time ₹79 payment to activate live Gemini review generation, physical QR stand dispatch, and negative feedback defense. <em>Price reverts to ₹499/mo once the countdown timer expires.</em>
+                    <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
+                      🎉 Special festive discounts active across all tiers! Choose our ₹79 Testing Pass or save with Growth &amp; Pro packs (plus 2 months free on yearly billing). Includes physical acrylic QR stands and live Google review automation.
                     </p>
 
-                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: '12px', color: '#78350f', fontWeight: 600 }}>
-                      <span>✓ 100 5-Star Reviews Quota</span>
-                      <span>✓ 2 Smart Acrylic QR Stands</span>
-                      <span>✓ 100% Reputation Shield</span>
-                      <span>✓ Direct WhatsApp/Call Support</span>
+                    {/* All Plans Comparison Cards */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '14px' }}>
+                      <div style={{ background: '#ffffff', border: '1.5px solid #fed7aa', borderRadius: '10px', padding: '10px 12px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Testing Pass</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
+                          <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹79</span>
+                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹499</span>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>84% OFF</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#78350f' }}>100 reviews · 2 QR Stands</div>
+                      </div>
+
+                      <div style={{ background: '#ffffff', border: '1.5px solid #fdba74', borderRadius: '10px', padding: '10px 12px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Growth Pack ⭐</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
+                          <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹149<span style={{ fontSize: '11px', fontWeight: 500 }}>/mo</span></span>
+                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹249</span>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>40% OFF</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#78350f' }}>500 reviews · 5 QR Stands</div>
+                      </div>
+
+                      <div style={{ background: '#ffffff', border: '1.5px solid #fed7aa', borderRadius: '10px', padding: '10px 12px' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Scale Pro Pack</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
+                          <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹249<span style={{ fontSize: '11px', fontWeight: 500 }}>/mo</span></span>
+                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹399</span>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>38% OFF</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#78350f' }}>1,000 reviews · 15 QR Stands</div>
+                      </div>
                     </div>
                   </div>
 
@@ -1700,8 +1696,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               </div>
             )}
 
-            {/* Overview Section Wrapper: Top 4 KPIs & Mobile Quick Actions */}
-            <div className={overviewMobileSubtab !== 'kpis' ? 'hide-mobile' : ''}>
+            {/* Overview Top 4 KPIs & Mobile Quick Actions */}
+            <div>
               {/* Top 4 KPI Metrics Row */}
               <div
                 className="dashboard-kpi-grid"
@@ -1836,7 +1832,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 )}
                 <button
                   type="button"
-                  onClick={() => setOverviewMobileSubtab('questions')}
+                  onClick={() => setOverviewSection('setup')}
                   className="btn btn-secondary"
                   style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px solid #fed7aa', background: '#fffaf5' }}
                 >
@@ -1865,50 +1861,102 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             </div>
           </div>
 
-          {/* ⭐ CUSTOMER 5-STAR RATING CRITERIA & QUESTIONS CARD */}
-          <div className={overviewMobileSubtab !== 'kpis' && overviewMobileSubtab !== 'questions' ? 'hide-mobile' : ''}>
-            <div
-              className="card dashboard-card-responsive"
-              style={{
-                background: '#ffffff',
-                border: '1.5px solid #fed7aa',
-                borderRadius: '16px',
-                padding: '24px 26px',
-                marginBottom: '24px',
-                boxShadow: '0 4px 16px rgba(234, 88, 12, 0.05)',
-              }}
+          {/* Universal Overview Segmented Navigation (Desktop & Mobile) */}
+          <div className="overview-segment-tabs">
+            <button
+              type="button"
+              className={`overview-segment-tab ${overviewSection === 'activity' ? 'active' : ''}`}
+              onClick={() => setOverviewSection('activity')}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', border: '1px solid #fdba74', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                      ⭐
-                    </div>
+              📊 Weekly Activity
+            </button>
+            <button
+              type="button"
+              className={`overview-segment-tab ${overviewSection === 'setup' ? 'active' : ''}`}
+              onClick={() => setOverviewSection('setup')}
+            >
+              ⭐ Questions &amp; Keywords ({questions.length})
+            </button>
+            <button
+              type="button"
+              className={`overview-segment-tab ${overviewSection === 'seo' ? 'active' : ''}`}
+              onClick={() => setOverviewSection('seo')}
+            >
+              📍 Maps &amp; GeoGrid
+            </button>
+            <button
+              type="button"
+              className={`overview-segment-tab ${overviewSection === 'roi' ? 'active' : ''}`}
+              onClick={() => setOverviewSection('roi')}
+            >
+              💰 ROI &amp; Competitors
+            </button>
+          </div>
+
+          {/* ⭐ SECTION 2: CUSTOMER 5-STAR RATING CRITERIA & QUESTIONS */}
+          {overviewSection === 'setup' && (
+            <div>
+              {/* Feature Sub-Navigation */}
+              <div className="overview-sub-tabs">
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${setupSubtab === 'questions' ? 'active' : ''}`}
+                  onClick={() => setSetupSubtab('questions')}
+                >
+                  ⭐ Rating Questions ({questions.length})
+                </button>
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${setupSubtab === 'keywords' ? 'active' : ''}`}
+                  onClick={() => setSetupSubtab('keywords')}
+                >
+                  🎯 Target Keywords ({((settings?.targetKeywords || settings?.thingsToHighlight) || []).length})
+                </button>
+              </div>
+
+              {setupSubtab === 'questions' && (
+                <div
+                  className="card dashboard-card-responsive"
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #fed7aa',
+                    borderRadius: '16px',
+                    padding: '24px 26px',
+                    marginBottom: '24px',
+                    boxShadow: '0 4px 16px rgba(234, 88, 12, 0.05)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                     <div>
-                      <h4 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                        Customer Rating Questions (Live on QR Stands)
-                      </h4>
-                      <span className="badge badge-success" style={{ fontSize: '10.5px', marginTop: '2px' }}>
-                        ● {questions.length} Active Rating Criteria
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', border: '1px solid #fdba74', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                          ⭐
+                        </div>
+                        <div>
+                          <h4 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+                            Customer Rating Questions
+                          </h4>
+                          <span className="badge badge-success" style={{ fontSize: '10.5px', marginTop: '2px' }}>
+                            ● {questions.length} Active Criteria
+                          </span>
+                        </div>
+                      </div>
+                      <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
+                        Criteria customers rate on your counter QR stands. Gemini generates reviews from these ratings.
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('ai_settings')}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '12px', padding: '6px 12px' }}
+                      >
+                        ⚙️ Advanced AI Tone →
+                      </button>
                     </div>
                   </div>
-                  <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
-                    Customers rate these criteria when scanning your counter QR stands. Gemini AI uses their ratings to generate authentic 5-star Google reviews.
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('ai_settings')}
-                    className="btn btn-secondary btn-sm"
-                    style={{ fontSize: '12px', padding: '6px 12px' }}
-                  >
-                    ⚙️ Advanced Tone &amp; AI Engine →
-                  </button>
-                </div>
-              </div>
 
               {/* 1-Tap Category Presets (Food, Retail, Services, Health) */}
               <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
@@ -2041,10 +2089,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 )}
               </div>
             </div>
-          </div>
+            )}
 
-          {/* TARGET KEYWORDS & MENTION SUGGESTIONS ENGINE */}
-          <div className={overviewMobileSubtab !== 'keywords' ? 'hide-mobile' : ''}>
+            {/* TARGET KEYWORDS & MENTION SUGGESTIONS ENGINE */}
+            {setupSubtab === 'keywords' && (
             <div
               className="card dashboard-card-responsive"
               style={{
@@ -2261,17 +2309,39 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </button>
               </div>
             </div>
+            )}
           </div>
+          )}
 
-          {/* DEEP ANALYTICS & CONVERSION CHARTS */}
-          <div className={overviewMobileSubtab !== 'charts' ? 'hide-mobile' : ''}>
-            {/* 1. WEEKLY REVIEW ACTIVITY (SIMPLIFIED & CLEAN) */}
-            <div className="card dashboard-card-responsive" style={{ padding: '24px 26px', marginBottom: '24px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+          {/* 📊 SECTION 1: WEEKLY REVIEW ACTIVITY & 3 GROWTH ACTIONS */}
+          {overviewSection === 'activity' && (
+            <div>
+              {/* Feature Sub-Navigation */}
+              <div className="overview-sub-tabs">
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${weeklyViewSubtab === 'chart' ? 'active' : ''}`}
+                  onClick={() => setWeeklyViewSubtab('chart')}
+                >
+                  📊 7-Day Review Chart
+                </button>
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${weeklyViewSubtab === 'tips' ? 'active' : ''}`}
+                  onClick={() => setWeeklyViewSubtab('tips')}
+                >
+                  💡 3 Growth Tips
+                </button>
+              </div>
+
+              {/* 1. WEEKLY REVIEW ACTIVITY (SIMPLIFIED & CLEAN) */}
+              {weeklyViewSubtab === 'chart' && (
+                <div className="card dashboard-card-responsive" style={{ padding: '24px 26px', marginBottom: '24px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                      Weekly Review Activity (Last 7 Days)
+                      Weekly Reviews (Last 7 Days)
                     </h3>
                     <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700 }}>
                       <TrendingUpIcon size={13} color="#15803d" />
@@ -2279,7 +2349,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     </span>
                   </div>
                   <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
-                    Customer reviews collected and posted to Google Maps over the past week.
+                    Customer reviews collected vs posted to Google Maps.
                   </p>
                 </div>
 
@@ -2417,8 +2487,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </div>
               </div>
             </div>
+            )}
 
             {/* 2. 3 QUICK WAYS TO GET MORE REVIEWS (SIMPLIFIED & CLEAN LIGHT CARD) */}
+            {weeklyViewSubtab === 'tips' && (
             <div
               className="card dashboard-card-responsive"
               style={{
@@ -2440,7 +2512,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                       3 Ways to Grow Your Google Reviews
                     </h3>
                     <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '2px' }}>
-                      Simple actions to increase your customer review volume and Google Maps ranking.
+                      Recommended actions based on your store's live rating data.
                     </div>
                   </div>
                 </div>
@@ -2476,8 +2548,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     className="btn btn-secondary btn-sm"
                     style={{ fontSize: '12px', fontWeight: 700, alignSelf: 'flex-start', border: '1.5px solid #cbd5e1' }}
                     onClick={() => {
-                      setActiveTab('ai_settings');
-                      showNotification('Opening Settings to configure target keywords');
+                      setOverviewSection('setup');
+                      setSetupSubtab('keywords');
+                      showNotification('Switched to Target Keywords');
                     }}
                   >
                     Add Keywords →
@@ -2558,22 +2631,44 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </div>
               </div>
             </div>
+            )}
+          </div>
+          )}
 
-            {/* 2-COLUMN SECTION: FINANCIAL VALUE & COMPETITOR SEARCH RADAR */}
-            <div
-              className="grid-mobile-single"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.1fr 1fr',
-                gap: '24px',
-                marginBottom: '24px',
-              }}
-            >
-              {/* Financial Telemetry & Aggregator Savings */}
-              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+          {/* 💰 SECTION 4: ROI, COMPETITORS & PEAK ACTIVITY */}
+          {overviewSection === 'roi' && (
+            <div>
+              {/* Feature Sub-Navigation */}
+              <div className="overview-sub-tabs">
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${roiSubtab === 'financial' ? 'active' : ''}`}
+                  onClick={() => setRoiSubtab('financial')}
+                >
+                  💰 Revenue Impact &amp; Savings
+                </button>
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${roiSubtab === 'competitors' ? 'active' : ''}`}
+                  onClick={() => setRoiSubtab('competitors')}
+                >
+                  🎯 Competitor Radar
+                </button>
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${roiSubtab === 'peakhours' ? 'active' : ''}`}
+                  onClick={() => setRoiSubtab('peakhours')}
+                >
+                  ⏰ Peak Hours &amp; Praise Themes
+                </button>
+              </div>
+
+              {/* Sub-Feature 1: Financial Telemetry & Aggregator Savings */}
+              {roiSubtab === 'financial' && (
+              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                   <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                    Financial Telemetry &amp; Aggregator Savings
+                    Revenue Impact &amp; Aggregator Savings
                   </h4>
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700 }}>
                     Net: +₹{(financial?.totalMonthlyImpactInr ?? 0).toLocaleString()}/mo
@@ -2620,9 +2715,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   </div>
                 </div>
               </div>
+              )}
 
-              {/* Competitor Radar & Suburb Share of Search */}
-              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+              {/* Sub-Feature 2: Competitor Radar */}
+              {roiSubtab === 'competitors' && (
+              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                   <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                     Local Search Dominance &amp; Competitor Radar
@@ -2679,29 +2776,153 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   )}
                 </div>
               </div>
+              )}
+
+              {/* Sub-Feature 3: Hourly Peak Hours & Customer Praise Themes */}
+              {roiSubtab === 'peakhours' && (
+              <div
+                className="grid-mobile-single"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1.2fr 1fr',
+                  gap: '24px',
+                  marginBottom: '24px',
+                }}
+              >
+                {/* Hourly / Peak Shift Heatmap */}
+                <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      Customer Peak Hours &amp; Activity Telemetry
+                    </h4>
+                    <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 700 }}>
+                      {reviews.length > 0 ? '● Telemetry Active' : 'Awaiting Scans'}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
+                    Customer activity, review submission velocity, and visit patterns.
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
+                      <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ fontSize: '20px', marginBottom: '4px' }}>⏰</div>
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Activity Telemetry Standby</div>
+                        <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Hourly distribution begins tracking with your first customer scan.</div>
+                      </div>
+                    ) : (
+                      analytics.hourlyDistribution.map((shift: any, idx: number) => (
+                        <div key={idx} style={{ padding: '12px 14px', background: shift.isPeak ? '#fef3ee' : '#f8fafc', borderRadius: '10px', border: shift.isPeak ? '1.5px solid #fed7aa' : '1px solid #e2e8f0' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <div style={{ fontWeight: 700, fontSize: '14px', color: shift.isPeak ? 'var(--primary)' : '#0f172a' }}>
+                              {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 6px', marginLeft: '6px' }}>Peak Shift</span>}
+                            </div>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
+                              {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: '#64748b', fontWeight: 500 }}>{shift.turnRate}</span>
+                            </div>
+                          </div>
+                          <div style={{ height: '7px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                width: `${shift.percentage}%`,
+                                background: shift.isPeak ? 'var(--primary)' : '#22c55e',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Topic & Offering Sentiment Intelligence */}
+                <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      Customer Praise &amp; Mention Themes
+                    </h4>
+                    <span className="stat-pill stat-pill-success" style={{ fontSize: '11px', fontWeight: 700 }}>AI Intelligence</span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', marginTop: '2px' }}>
+                    Real customer themes frequently mentioned in generated reviews.
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {(!analytics?.sentimentTopics || analytics.sentimentTopics.length === 0) ? (
+                      <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ marginBottom: '6px' }}><MessageSquare size={20} color="var(--primary)" /></div>
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Topic Intelligence Initializing</div>
+                        <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Customer praise themes and service mentions appear here once customers submit reviews.</div>
+                      </div>
+                    ) : (
+                      analytics.sentimentTopics.map((t: any, i: number) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                          <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.score >= 85 ? '#22c55e' : '#eab308', display: 'inline-block' }} />
+                            <span>{t.topic}</span>
+                          </div>
+                          <div style={{ display: 'center', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '12px', color: '#64748b' }}>{t.count} mentions</span>
+                            <span style={{ fontSize: '12.5px', fontWeight: 800, color: t.score >= 85 ? '#15803d' : '#d97706' }}>
+                              {t.score}%
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+              )}
             </div>
+          )}
 
-            {/* 3x3 GEO-GRID RANK TRACKER HEATMAP */}
-            <GeoGridHeatmap
-              geoGrid={analytics?.geoGrid}
-              businessName={business?.name || 'Your Business'}
-              city={business?.city || 'Local Area'}
-              onRefresh={handleRefreshMapsRankings}
-              isRefreshing={isRefreshingMaps}
-            />
+          {/* 📍 SECTION 3: MAPS & GEOGRID RANKING TRACKER */}
+          {overviewSection === 'seo' && (
+            <div>
+              {/* Feature Sub-Navigation */}
+              <div className="overview-sub-tabs">
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${seoSubtab === 'grid' ? 'active' : ''}`}
+                  onClick={() => setSeoSubtab('grid')}
+                >
+                  🗺️ 3x3 Geo-Grid Rank Heatmap
+                </button>
+                <button
+                  type="button"
+                  className={`overview-sub-tab ${seoSubtab === 'table' ? 'active' : ''}`}
+                  onClick={() => setSeoSubtab('table')}
+                >
+                  📋 Keyword Search Rankings ({keywordRankings.length})
+                </button>
+              </div>
 
-            {/* GOOGLE MAPS KEYWORD RANKINGS & LOCAL 3-PACK TRACKER */}
-            <div
-              className="card"
-              style={{
-                background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
-                borderRadius: '16px',
-                padding: '28px',
-                marginBottom: '24px',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.04)',
-              }}
-            >
+              {/* Sub-Feature 1: 3x3 GeoGrid Heatmap */}
+              {seoSubtab === 'grid' && (
+                <GeoGridHeatmap
+                  geoGrid={analytics?.geoGrid}
+                  businessName={business?.name || 'Your Business'}
+                  city={business?.city || 'Local Area'}
+                  onRefresh={handleRefreshMapsRankings}
+                  isRefreshing={isRefreshingMaps}
+                />
+              )}
+
+              {/* Sub-Feature 2: Google Maps Keyword Rankings Tracker */}
+              {seoSubtab === 'table' && (
+                <div
+                  className="card"
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '28px',
+                    marginBottom: '24px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.04)',
+                  }}
+                >
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -2947,103 +3168,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </table>
               </div>
             </div>
+            )}
 
-            {/* 2-COLUMN SECTION: PEAK HOURS & TOPIC MENTIONS */}
-            <div
-              className="grid-mobile-single"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.2fr 1fr',
-                gap: '24px',
-                marginBottom: '24px',
-              }}
-            >
-              {/* Hourly / Peak Shift Heatmap */}
-              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                    Customer Peak Hours &amp; Activity Telemetry
-                  </h4>
-                  <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 700 }}>
-                    {reviews.length > 0 ? '● Telemetry Active' : 'Awaiting Scans'}
-                  </span>
-                </div>
-                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
-                  Customer activity, review submission velocity, and visit patterns.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '20px', marginBottom: '4px' }}>⏰</div>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Activity Telemetry Standby</div>
-                      <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Hourly distribution begins tracking with your first customer scan.</div>
-                    </div>
-                  ) : (
-                    analytics.hourlyDistribution.map((shift: any, idx: number) => (
-                      <div key={idx} style={{ padding: '12px 14px', background: shift.isPeak ? '#fef3ee' : '#f8fafc', borderRadius: '10px', border: shift.isPeak ? '1.5px solid #fed7aa' : '1px solid #e2e8f0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                          <div style={{ fontWeight: 700, fontSize: '14px', color: shift.isPeak ? 'var(--primary)' : '#0f172a' }}>
-                            {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 6px', marginLeft: '6px' }}>Peak Shift</span>}
-                          </div>
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
-                            {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: '#64748b', fontWeight: 500 }}>{shift.turnRate}</span>
-                          </div>
-                        </div>
-                        <div style={{ height: '7px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
-                          <div
-                            style={{
-                              height: '100%',
-                              width: `${shift.percentage}%`,
-                              background: shift.isPeak ? 'var(--primary)' : '#22c55e',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Topic & Offering Sentiment Intelligence */}
-              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                    Customer Praise &amp; Mention Themes
-                  </h4>
-                  <span className="stat-pill stat-pill-success" style={{ fontSize: '11px', fontWeight: 700 }}>AI Intelligence</span>
-                </div>
-                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', marginTop: '2px' }}>
-                  Real customer themes frequently mentioned in generated reviews.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {(!analytics?.sentimentTopics || analytics.sentimentTopics.length === 0) ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ marginBottom: '6px' }}><MessageSquare size={20} color="var(--primary)" /></div>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Topic Intelligence Initializing</div>
-                      <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Customer praise themes and service mentions appear here once customers submit reviews.</div>
-                    </div>
-                  ) : (
-                    analytics.sentimentTopics.map((t: any, i: number) => (
-                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.score >= 85 ? '#22c55e' : '#eab308', display: 'inline-block' }} />
-                          <span>{t.topic}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '12px', color: '#64748b' }}>{t.count} mentions</span>
-                          <span style={{ fontSize: '12.5px', fontWeight: 800, color: t.score >= 85 ? '#15803d' : '#d97706' }}>
-                            {t.score}%
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
             </div>
-            </div>
+          )}
           </div>
         )}
 
@@ -5035,8 +5163,45 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{ fontSize: '18px', fontWeight: 600 }}>Upgrade or Switch Subscription Pack</h4>
               <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                Special introductory promotional pricing applies for your first month. Cancel or switch anytime.
+                🪔 Diwali flash sale active across all tiers! Cancel or switch anytime.
               </p>
+            </div>
+
+            {/* Recurring Autopay Preference Card */}
+            <div
+              style={{
+                background: autoRenewChoice ? '#f0fdf4' : '#f8fafc',
+                border: autoRenewChoice ? '1.5px solid #86efac' : '1px solid #cbd5e1',
+                borderRadius: '12px',
+                padding: '14px 18px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <input
+                  type="checkbox"
+                  id="dashboardAutoRenewPref"
+                  checked={autoRenewChoice}
+                  onChange={(e) => setAutoRenewChoice(e.target.checked)}
+                  style={{ width: '18px', height: '18px', accentColor: '#16a34a', cursor: 'pointer' }}
+                />
+                <label htmlFor="dashboardAutoRenewPref" style={{ cursor: 'pointer' }}>
+                  <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>
+                    UPI &amp; Card Autopay: {autoRenewChoice ? 'Active (Default & Recommended)' : 'Off (One-time payment)'}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>
+                    Seamless recurring renewals via Google Pay, PhonePe, Paytm, or Cards. Cancel anytime with 1 click.
+                  </div>
+                </label>
+              </div>
+              <span className={`badge ${autoRenewChoice ? 'badge-success' : 'badge-neutral'}`} style={{ fontSize: '11px', fontWeight: 700 }}>
+                {autoRenewChoice ? '✓ Autopay Enabled' : 'One-Time Payment'}
+              </span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
@@ -5133,6 +5298,27 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                       ) : null}
 
                       {/* Header with Title and Month Duration Selector */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span
+                          style={{
+                            background: 'linear-gradient(90deg, #dc2626 0%, #ea580c 100%)',
+                            color: '#ffffff',
+                            fontSize: '10.5px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 6px rgba(220, 38, 38, 0.25)',
+                          }}
+                        >
+                          🪔 DIWALI FLASH SALE
+                        </span>
+                        {autoRenewChoice && (
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: '#166534', background: '#dcfce7', padding: '2px 7px', borderRadius: '8px' }}>
+                            ✓ Autopay Enabled
+                          </span>
+                        )}
+                      </div>
+
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '18px' }}>{p.name}</div>
@@ -5223,7 +5409,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                           try {
                             setInitiatingPlanId(p.id);
                             const [order, isLoaded] = await Promise.all([
-                              api.createOrder(businessId, p.id, selectedDuration),
+                              api.createOrder(businessId, p.id, { durationMonths: selectedDuration, autoRenew: autoRenewChoice }),
                               loadRazorpay(),
                             ]);
                             if (isLoaded && (window as any).Razorpay) {
@@ -5241,7 +5427,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                                         ? '3-Month Autopay'
                                         : 'Monthly UPI Autopay'
                                   }`
-                                  : `Upgrade to ${p.name} (${selectedDuration} Months)`,
+                                  : `Upgrade to ${p.name} (${selectedDuration} Months · ${autoRenewChoice ? 'UPI Autopay' : 'One-Time'})`,
                                 prefill: {
                                   name: business?.name || currentUser?.name || 'Business Owner',
                                   email: business?.email || currentUser?.email || '',

@@ -2270,7 +2270,7 @@ export const OnboardingWizard: React.FC<Props> = ({
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Option A · UPI Autopay (Recommended)
+                      Option A · 🪔 Diwali Autopay (Recommended)
                     </span>
                     <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary)' }}>₹{directPrice}</span>
                   </div>
@@ -2297,15 +2297,15 @@ export const OnboardingWizard: React.FC<Props> = ({
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                      Option B · Trial Pack
+                      Option B · 🪔 Festive Pass
                     </span>
                     <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--primary)' }}>₹79</span>
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text)', marginBottom: '3px' }}>
-                    Testing Pack (Trial)
+                    Testing Pack (Diwali Offer)
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    ₹79 starter trial · 100 reviews · 2 QRs
+                    ₹79 starter pass · 100 reviews · 2 QRs
                   </div>
                 </div>
               </div>
@@ -2405,8 +2405,11 @@ export const OnboardingWizard: React.FC<Props> = ({
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: '1px solid var(--border-light)' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '16px' }}>{selectedPlan?.name}</div>
-                      <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ fontWeight: 700, fontSize: '16px' }}>{selectedPlan?.name}</div>
+                        <span className="badge badge-warning" style={{ fontSize: '10px' }}>🪔 Diwali Offer</span>
+                      </div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                         Duration: {durLabel} · {selectedPlan?.reviewGenerationLimit} Monthly Reviews
                       </div>
                     </div>

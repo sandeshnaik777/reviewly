@@ -86,7 +86,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr6Months: 429,
     priceInr1Year: 790, // 2 Months Free (10 × ₹79)
     originalPriceInr: 149,
-    offerBadge: '⚡ ₹79 Starter Trial (Reg. ₹149)',
+    offerBadge: '🪔 Diwali Offer · ₹79 (Reg. ₹149)',
     billingPeriod: 'month',
     reviewGenerationLimit: 100,
     qrCodeLimit: 2,
@@ -106,7 +106,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr6Months: 799,
     priceInr1Year: 1490, // 2 Months Free (10 × ₹149)
     originalPriceInr: 249,
-    offerBadge: '⭐ Most Popular · ₹149 (Reg. ₹249)',
+    offerBadge: '🪔 Diwali Offer · ₹149 (Reg. ₹249)',
     billingPeriod: 'month',
     reviewGenerationLimit: 500,
     qrCodeLimit: 5,
@@ -126,7 +126,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr6Months: 1349,
     priceInr1Year: 2490, // 2 Months Free (10 × ₹249)
     originalPriceInr: 399,
-    offerBadge: 'Scale & Multi-Outlet · ₹249 (Reg. ₹399)',
+    offerBadge: '🪔 Diwali Offer · ₹249 (Reg. ₹399)',
     billingPeriod: 'month',
     reviewGenerationLimit: 1000,
     qrCodeLimit: 15,
