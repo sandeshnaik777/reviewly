@@ -239,11 +239,12 @@ Respond with ONLY valid JSON (no markdown, no backticks):
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(8000),
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2500,
           responseMimeType: 'application/json',
         },
       }),
@@ -259,7 +260,8 @@ Respond with ONLY valid JSON (no markdown, no backticks):
       throw new Error('No content returned from AI');
     }
 
-    const parsed = JSON.parse(text);
+    const cleanedText = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+    const parsed = JSON.parse(cleanedText);
     const centerRank = parsed.keywordRankings?.[0]?.rank || 5;
     const geoGrid = this.generateGeoGrid(business, reviewCount, centerRank);
 

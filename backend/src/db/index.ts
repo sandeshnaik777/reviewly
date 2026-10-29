@@ -880,6 +880,9 @@ class DatabaseService {
 
   async createQRCode(qr: QRCodeItem): Promise<QRCodeItem> {
     this.data.qrCodes.push(qr);
+    const list = this.qrsByBusinessId.get(qr.businessId) || [];
+    list.push(qr);
+    this.qrsByBusinessId.set(qr.businessId, list);
     await this.persist();
     return qr;
   }
@@ -888,6 +891,11 @@ class DatabaseService {
     const idx = this.data.qrCodes.findIndex((q) => q.id === id && q.businessId === businessId);
     if (idx === -1) return undefined;
     this.data.qrCodes[idx] = { ...this.data.qrCodes[idx], ...updates, updatedAt: new Date().toISOString() };
+    const list = this.qrsByBusinessId.get(businessId);
+    if (list) {
+      const qIdx = list.findIndex((q) => q.id === id);
+      if (qIdx !== -1) list[qIdx] = this.data.qrCodes[idx];
+    }
     await this.persist();
     return this.data.qrCodes[idx];
   }
@@ -1150,9 +1158,9 @@ class DatabaseService {
 
   async getBusinessAnalytics(businessId: string): Promise<any> {
     const business = this.businessesById.get(businessId) || this.data.businesses.find((b) => b.id === businessId);
-    const events = this.eventsByBusinessId.get(businessId) || this.data.analyticsEvents.filter((e) => e.businessId === businessId);
-    const reviews = this.reviewsByBusinessId.get(businessId) || this.data.generatedReviews.filter((r) => r.businessId === businessId);
-    const qrs = this.qrsByBusinessId.get(businessId) || this.data.qrCodes.filter((q) => q.businessId === businessId);
+    const events = this.eventsByBusinessId.get(businessId) || [];
+    const reviews = this.reviewsByBusinessId.get(businessId) || [];
+    const qrs = this.qrsByBusinessId.get(businessId) || [];
     const todayStr = new Date().toDateString();
 
     // ========================================================

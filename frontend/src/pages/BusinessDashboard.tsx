@@ -2245,7 +2245,16 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
               {/* Simplified Bar Chart */}
               <div style={{ height: '190px', display: 'flex', alignItems: 'flex-end', gap: '12px', paddingBottom: '28px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
-                {dailyTrends.map((d: any, idx: number) => {
+                {((dailyTrends && dailyTrends.length > 0)
+                  ? dailyTrends
+                  : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => ({
+                      day,
+                      date: 'Today',
+                      totalReviews: 0,
+                      googleClicks: 0,
+                      critical: 0,
+                    }))
+                ).map((d: any, idx: number) => {
                   const hasReviews = (d.totalReviews || 0) > 0;
                   const barHeightPct = hasReviews
                     ? Math.max(16, Math.min(100, Math.round((d.totalReviews / maxDayReviews) * 100)))
