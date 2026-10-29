@@ -7,17 +7,25 @@ import { AdminDashboard } from './pages/AdminDashboard.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { LandingPage } from './pages/LandingPage.js';
 import { BlogPage } from './pages/BlogPage.js';
+import { ThankYouPage } from './pages/ThankYouPage.js';
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentBusiness, setCurrentBusiness] = useState<any>(null);
-  const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog'>('landing');
+  const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog' | 'thank-you'>('landing');
   const [customerSlug, setCustomerSlug] = useState<string>('');
   const [blogSlug, setBlogSlug] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const path = window.location.pathname;
+
+    // Check if customer is on post-payment Thank You page (Google Ads conversion target)
+    if (path === '/thank-you' || path === '/success' || path === '/order-confirmed') {
+      setView('thank-you');
+      setLoading(false);
+      return;
+    }
 
     // Check if customer is scanning QR code (/r/:slug)
     const match = path.match(/^\/r\/([^/]+)/);
@@ -128,6 +136,28 @@ export const App: React.FC = () => {
   // Customer QR View (Zero account needed)
   if (view === 'customer' && customerSlug) {
     return <CustomerReviewFlow slug={customerSlug} />;
+  }
+
+  // Thank You / Order Confirmation View (For Google Ads & Meta Pixel Conversion Tracking)
+  if (view === 'thank-you') {
+    return (
+      <ThankYouPage
+        businessName={currentBusiness?.name}
+        onNavigateDashboard={() => {
+          if (currentBusiness) {
+            setView('dashboard');
+            window.history.pushState({}, '', '/');
+          } else {
+            setView('login');
+            window.history.pushState({}, '', '/');
+          }
+        }}
+        onNavigateHome={() => {
+          setView('landing');
+          window.history.pushState({}, '', '/');
+        }}
+      />
+    );
   }
 
   // Platform Admin View

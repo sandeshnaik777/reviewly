@@ -639,6 +639,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               signature: resp.razorpay_signature,
               subscriptionId: resp.razorpay_subscription_id,
             });
+            window.history.pushState({}, '', '/thank-you');
             setStep(8); // Step 8: Welcome - ONLY after successful payment verification!
           } catch (vErr: any) {
             setError(`Trial payment verification note: ${vErr.message || 'Verification failed'}`);
@@ -808,6 +809,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
               signature: resp.razorpay_signature,
               subscriptionId: resp.razorpay_subscription_id,
             });
+            window.history.pushState({}, '', '/thank-you');
             setStep(8); // Step 8: Welcome - ONLY after successful payment verification!
           } catch (vErr: any) {
             setError(`Payment verification note: ${vErr.message || 'Signature mismatch'}`);

@@ -30,6 +30,8 @@ Disallow: /api/
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /onboarding/checkout
+Disallow: /thank-you
+Disallow: /success
 Crawl-delay: 1
 
 # --------------------------------------------------------------------
@@ -88,6 +90,8 @@ Disallow: /api/
 Disallow: /admin
 Disallow: /admin/*
 Disallow: /onboarding/checkout
+Disallow: /thank-you
+Disallow: /success
 Crawl-delay: 1
 
 # --------------------------------------------------------------------
