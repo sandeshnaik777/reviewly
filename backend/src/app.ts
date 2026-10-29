@@ -86,6 +86,12 @@ export function createApp(): Express {
     });
   });
 
+  // Client Runtime Error Telemetry
+  app.post('/api/telemetry/client-error', (req, res) => {
+    console.error('🚨 [CLIENT RUNTIME ERROR CAUGHT BY ERRORBOUNDARY]:\n', JSON.stringify(req.body, null, 2));
+    res.json({ success: true });
+  });
+
   // 5. SEO & AI Crawler Endpoints (robots.txt, sitemap.xml, llms.txt)
   app.get('/robots.txt', (_req, res) => {
     const robotsPath = path.join(staticPath, 'robots.txt');

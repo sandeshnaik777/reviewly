@@ -24,6 +24,18 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('[KindlyRate ErrorBoundary caught exception]:', error, errorInfo);
+    try {
+      fetch('/api/telemetry/client-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: error?.message || String(error),
+          stack: error?.stack,
+          componentStack: errorInfo?.componentStack,
+          url: typeof window !== 'undefined' ? window.location.href : '',
+        }),
+      }).catch(() => {});
+    } catch {}
     this.setState({ error, errorInfo });
   }
 
@@ -177,6 +189,33 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
             </div>
 
+            {this.state.error && (
+              <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+                <div
+                  style={{
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    fontSize: '12px',
+                    color: '#991b1b',
+                    fontFamily: 'monospace',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  <strong>Diagnostic Error:</strong> {this.state.error.message || String(this.state.error)}
+                  {this.state.error.stack && (
+                    <details style={{ marginTop: '8px', fontSize: '11px', color: '#7f1d1d' }}>
+                      <summary style={{ cursor: 'pointer', fontWeight: 600 }}>Show Stack Trace</summary>
+                      <pre style={{ marginTop: '6px', whiteSpace: 'pre-wrap', maxHeight: '140px', overflowY: 'auto' }}>
+                        {this.state.error.stack}
+                      </pre>
+                    </details>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div
               style={{
                 paddingTop: '18px',
@@ -202,3 +241,4 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+

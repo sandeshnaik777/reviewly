@@ -93,7 +93,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
   >('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [loading, setLoading] = useState(!initialBusiness);
+  const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [showEmailVerifyModal, setShowEmailVerifyModal] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -752,7 +752,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     }
   };
 
-  if (loading && !business) {
+  if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
         <div style={{ position: 'relative', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -771,7 +771,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     );
   }
 
-  if (!business && !loading) {
+  if (!business) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
         <div style={{ textAlign: 'center', maxWidth: '420px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
