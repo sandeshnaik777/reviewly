@@ -5,23 +5,23 @@
   --primary-light: #fef2ee;
   --on-primary: #ffffff;
 
-  --background: #fff8f5;
+  --background: #f8fafc;
   --surface: #ffffff;
-  --surface-container: #f4ece8;
-  --surface-container-high: #eee7e3;
-  --surface-container-highest: #e9e1dd;
+  --surface-container: #f1f5f9;
+  --surface-container-high: #e2e8f0;
+  --surface-container-highest: #cbd5e1;
 
-  --text: #1e1b19;
-  --text-muted: #6b554e;
-  --text-subtle: #8a736c;
-  --border: #e0d8d5;
-  --border-light: #ede5e1;
+  --text: #0f172a;
+  --text-muted: #334155;
+  --text-subtle: #64748b;
+  --border: #cbd5e1;
+  --border-light: #e2e8f0;
 
   --star-active: #d97706;
-  --star-empty: #d1c7c2;
+  --star-empty: #cbd5e1;
   --success: #15803d;
   --success-bg: #ecfdf5;
-  --error: #ba1a1a;
+  --error: #b91c1c;
   --error-bg: #fef2f2;
   --warning: #b45309;
   --warning-bg: #fffbeb;
@@ -34,9 +34,9 @@
   --radius-lg: 16px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(30, 27, 25, 0.05);
-  --shadow-md: 0 4px 12px rgba(30, 27, 25, 0.08);
-  --shadow-lg: 0 10px 25px rgba(30, 27, 25, 0.1);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
 }
 
 * {
@@ -148,10 +148,10 @@ a {
 /* Cards */
 .card {
   background: var(--surface);
-  border: 1px solid var(--border-light);
+  border: 1.5px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 /* Badges */
@@ -162,7 +162,7 @@ a {
   padding: 4px 10px;
   border-radius: var(--radius-full);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -181,30 +181,31 @@ a {
 
 /* Form Controls */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 .form-label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
   margin-bottom: 6px;
 }
 .form-input, .form-select, .form-textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
   font-size: 14px;
+  font-weight: 500;
   color: var(--text);
   background: var(--surface);
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(154, 64, 24, 0.1);
+  box-shadow: 0 0 0 3px rgba(154, 64, 24, 0.15);
 }
 
 /* Rating Stars */
@@ -284,9 +285,10 @@ a {
 /* Segmented Navigation Control (Apple / Linear style) */
 .segmented-nav {
   display: flex;
-  gap: 4px;
-  background: var(--surface-container);
-  padding: 5px;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  padding: 6px;
   border-radius: var(--radius-lg);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -300,12 +302,12 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-size: 13.5px;
-  font-weight: 500;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: #475569;
   background: transparent;
-  border: none;
+  border: 1.5px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
   white-space: nowrap;
@@ -313,14 +315,15 @@ a {
   user-select: none;
 }
 .segmented-nav-item:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.4);
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.7);
 }
 .segmented-nav-item.active {
-  color: var(--text);
-  font-weight: 600;
-  background: var(--surface);
-  box-shadow: 0 1px 4px rgba(30, 27, 25, 0.08);
+  color: #0f172a;
+  font-weight: 700;
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
 /* Executive Dark Concierge Card */
