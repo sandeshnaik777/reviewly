@@ -761,7 +761,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             }}
             title="Upgrade your monthly review limits or subscription pack"
           >
-            <TrendingUp size={14} color="#ffffff" />
+            <TrendingUpIcon size={14} color="#ffffff" />
             <span>Upgrade Plan ↗</span>
           </button>
 
@@ -807,20 +807,20 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               systemNotifications[0].type === 'ALERT'
                 ? '#fef2f2'
                 : systemNotifications[0].type === 'WARNING'
-                ? '#fffbeb'
-                : '#f0fdf4',
+                  ? '#fffbeb'
+                  : '#f0fdf4',
             borderBottom:
               systemNotifications[0].type === 'ALERT'
                 ? '1px solid #fecaca'
                 : systemNotifications[0].type === 'WARNING'
-                ? '1px solid #fde68a'
-                : '1px solid #bbf7d0',
+                  ? '1px solid #fde68a'
+                  : '1px solid #bbf7d0',
             color:
               systemNotifications[0].type === 'ALERT'
                 ? '#991b1b'
                 : systemNotifications[0].type === 'WARNING'
-                ? '#92400e'
-                : '#166534',
+                  ? '#92400e'
+                  : '#166534',
             padding: '10px 24px',
             display: 'flex',
             alignItems: 'center',
@@ -835,8 +835,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               {systemNotifications[0].type === 'ALERT'
                 ? 'ALERT'
                 : systemNotifications[0].type === 'WARNING'
-                ? 'NOTICE'
-                : 'UPDATE'}
+                  ? 'NOTICE'
+                  : 'UPDATE'}
             </span>
             <strong>{systemNotifications[0].title}:</strong>
             <span>{systemNotifications[0].message}</span>
@@ -1264,19 +1264,19 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                 const suggestions = isRetailOrTech
                   ? [
-                      '16GB RAM',
-                      'SSD Upgrade',
-                      'Custom Gaming PC',
-                      'Genuine Warranty',
-                      'Quick Diagnostics',
-                      'Fair Pricing',
-                      'Clean Setup',
-                      'Helpful Staff',
-                      'Official Parts',
-                      'Fast Turnaround',
-                    ]
+                    '16GB RAM',
+                    'SSD Upgrade',
+                    'Custom Gaming PC',
+                    'Genuine Warranty',
+                    'Quick Diagnostics',
+                    'Fair Pricing',
+                    'Clean Setup',
+                    'Helpful Staff',
+                    'Official Parts',
+                    'Fast Turnaround',
+                  ]
                   : isServices
-                  ? [
+                    ? [
                       'Quick Diagnostics',
                       'Honest Mechanic',
                       'Original Spare Parts',
@@ -1286,25 +1286,25 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       'Punctual Service',
                       'Reliable Quality',
                     ]
-                  : isHealth
-                  ? [
-                      'Painless Treatment',
-                      'Friendly Doctor',
-                      'Clean Clinic',
-                      'Accurate Diagnostics',
-                      'Short Waiting Time',
-                      'Caring Staff',
-                      'Modern Equipment',
-                    ]
-                  : [
-                      'Quick Service',
-                      'Fresh Quality',
-                      'Honest Team',
-                      'Fair Price',
-                      'Clean Space',
-                      'Great Hospitality',
-                      'Highly Recommended',
-                    ];
+                    : isHealth
+                      ? [
+                        'Painless Treatment',
+                        'Friendly Doctor',
+                        'Clean Clinic',
+                        'Accurate Diagnostics',
+                        'Short Waiting Time',
+                        'Caring Staff',
+                        'Modern Equipment',
+                      ]
+                      : [
+                        'Quick Service',
+                        'Fresh Quality',
+                        'Honest Team',
+                        'Fair Price',
+                        'Clean Space',
+                        'Great Hospitality',
+                        'Highly Recommended',
+                      ];
 
                 return (
                   <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -2589,7 +2589,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           </div>
         )}
 
-{/* ======================================================== */}
+        {/* ======================================================== */}
         {/* TAB 4: AI REVIEW TONE & REPUTATION SHIELD                */}
         {/* ======================================================== */}
         {activeTab === 'ai_settings' && (
@@ -2810,19 +2810,19 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                             const items = isRetail
                               ? [
-                                  '16GB RAM',
-                                  'SSD Upgrade',
-                                  'Genuine Components',
-                                  'Expert Consultation',
-                                  'Custom PC Builds',
-                                  'Quick Diagnostics',
-                                  'Competitive Pricing',
-                                  'Official Warranty',
-                                  'Clean Setup',
-                                  'Friendly Support',
-                                ]
+                                '16GB RAM',
+                                'SSD Upgrade',
+                                'Genuine Components',
+                                'Expert Consultation',
+                                'Custom PC Builds',
+                                'Quick Diagnostics',
+                                'Competitive Pricing',
+                                'Official Warranty',
+                                'Clean Setup',
+                                'Friendly Support',
+                              ]
                               : isServices
-                              ? [
+                                ? [
                                   'Expert Diagnostics',
                                   'Fast Turnaround',
                                   'Genuine Spare Parts',
@@ -2831,24 +2831,24 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                                   'Honest Technicians',
                                   'Reliable Service',
                                 ]
-                              : isHealth
-                              ? [
-                                  'Painless Treatment',
-                                  'Courteous Doctor',
-                                  'Immaculate Hygiene',
-                                  'Attentive Staff',
-                                  'Modern Equipment',
-                                  'Personalized Care',
-                                ]
-                              : [
-                                  'Signature Recipes',
-                                  'Craft Beverages',
-                                  'Prompt Service',
-                                  'Warm Hospitality',
-                                  'Generous Portions',
-                                  'Cozy Ambience',
-                                  'Fresh Ingredients',
-                                ];
+                                : isHealth
+                                  ? [
+                                    'Painless Treatment',
+                                    'Courteous Doctor',
+                                    'Immaculate Hygiene',
+                                    'Attentive Staff',
+                                    'Modern Equipment',
+                                    'Personalized Care',
+                                  ]
+                                  : [
+                                    'Signature Recipes',
+                                    'Craft Beverages',
+                                    'Prompt Service',
+                                    'Warm Hospitality',
+                                    'Generous Portions',
+                                    'Cozy Ambience',
+                                    'Fresh Ingredients',
+                                  ];
 
                             return items.map((item) => (
                               <button
@@ -3306,35 +3306,35 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                     const presets = isRetail
                       ? [
-                          { label: 'Product Authenticity & Genuine Quality', key: 'product_authenticity' },
-                          { label: 'Staff Technical Advice & Knowledge', key: 'tech_advice' },
-                          { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
-                          { label: 'Store Experience & Product Selection', key: 'store_selection' },
-                          { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
-                        ]
+                        { label: 'Product Authenticity & Genuine Quality', key: 'product_authenticity' },
+                        { label: 'Staff Technical Advice & Knowledge', key: 'tech_advice' },
+                        { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
+                        { label: 'Store Experience & Product Selection', key: 'store_selection' },
+                        { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
+                      ]
                       : isServices
-                      ? [
+                        ? [
                           { label: 'Repair & Diagnostic Quality', key: 'diagnostic_quality' },
                           { label: 'Turnaround Speed & Punctuality', key: 'turnaround_speed' },
                           { label: 'Transparent Pricing & Estimates', key: 'transparent_pricing' },
                           { label: 'Technician Professionalism', key: 'technician_prof' },
                           { label: 'Overall Service Reliability', key: 'service_reliability' },
                         ]
-                      : isHealth
-                      ? [
-                          { label: 'Treatment Quality & Results', key: 'treatment_quality' },
-                          { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
-                          { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
-                          { label: 'Appointment Punctuality', key: 'appointment_time' },
-                          { label: 'Value for Care & Consultation', key: 'care_value' },
-                        ]
-                      : [
-                          { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
-                          { label: 'Speed of Service', key: 'service_speed' },
-                          { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
-                          { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
-                          { label: 'Value for Price', key: 'value_money' },
-                        ];
+                        : isHealth
+                          ? [
+                            { label: 'Treatment Quality & Results', key: 'treatment_quality' },
+                            { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
+                            { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
+                            { label: 'Appointment Punctuality', key: 'appointment_time' },
+                            { label: 'Value for Care & Consultation', key: 'care_value' },
+                          ]
+                          : [
+                            { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
+                            { label: 'Speed of Service', key: 'service_speed' },
+                            { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
+                            { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
+                            { label: 'Value for Price', key: 'value_money' },
+                          ];
 
                     return presets.map((preset) => (
                       <button
@@ -4126,74 +4126,73 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               loadRazorpay(),
                             ]);
                             if (isLoaded && (window as any).Razorpay) {
-                            const isSub = Boolean(order.subscriptionId || order.isSubscription);
-                            const options: any = {
-                              key: order.keyId,
-                              currency: order.currency,
-                              name: 'KindlyRate Platform',
-                              description: isSub
-                                ? `Upgrade to ${p.name} · ${
-                                    selectedDuration === 12
-                                      ? '1-Year Autopay (2 Mos Free)'
-                                      : selectedDuration === 6
+                              const isSub = Boolean(order.subscriptionId || order.isSubscription);
+                              const options: any = {
+                                key: order.keyId,
+                                currency: order.currency,
+                                name: 'KindlyRate Platform',
+                                description: isSub
+                                  ? `Upgrade to ${p.name} · ${selectedDuration === 12
+                                    ? '1-Year Autopay (2 Mos Free)'
+                                    : selectedDuration === 6
                                       ? '6-Month Autopay'
                                       : selectedDuration === 3
-                                      ? '3-Month Autopay'
-                                      : 'Monthly UPI Autopay'
+                                        ? '3-Month Autopay'
+                                        : 'Monthly UPI Autopay'
                                   }`
-                                : `Upgrade to ${p.name} (${selectedDuration} Months)`,
-                              prefill: {
-                                name: business?.name || 'Business Owner',
-                                email: business?.email || '',
-                                contact: (business?.phone || '').replace(/[^0-9]/g, '').slice(-10),
-                              },
-                              theme: {
-                                color: '#00383B',
-                              },
-                              handler: async (response: any) => {
-                                try {
-                                  await api.verifyPayment(businessId, {
-                                    orderId: response.razorpay_subscription_id || response.razorpay_order_id,
-                                    paymentId: response.razorpay_payment_id,
-                                    signature: response.razorpay_signature,
-                                    subscriptionId: response.razorpay_subscription_id,
-                                  });
-                                  showNotification(`Payment Successful! Account upgraded to ${p.name} with UPI Autopay.`);
-                                  loadAllData();
-                                } catch (vErr: any) {
-                                  alert(`Payment verification failed: ${vErr.message}`);
-                                }
-                              },
-                              modal: {
-                                ondismiss: () => {
-                                  console.log('Razorpay modal closed');
+                                  : `Upgrade to ${p.name} (${selectedDuration} Months)`,
+                                prefill: {
+                                  name: business?.name || 'Business Owner',
+                                  email: business?.email || '',
+                                  contact: (business?.phone || '').replace(/[^0-9]/g, '').slice(-10),
                                 },
-                              },
-                            };
-                            if (isSub) {
-                              options.subscription_id = order.subscriptionId || order.orderId;
+                                theme: {
+                                  color: '#00383B',
+                                },
+                                handler: async (response: any) => {
+                                  try {
+                                    await api.verifyPayment(businessId, {
+                                      orderId: response.razorpay_subscription_id || response.razorpay_order_id,
+                                      paymentId: response.razorpay_payment_id,
+                                      signature: response.razorpay_signature,
+                                      subscriptionId: response.razorpay_subscription_id,
+                                    });
+                                    showNotification(`Payment Successful! Account upgraded to ${p.name} with UPI Autopay.`);
+                                    loadAllData();
+                                  } catch (vErr: any) {
+                                    alert(`Payment verification failed: ${vErr.message}`);
+                                  }
+                                },
+                                modal: {
+                                  ondismiss: () => {
+                                    console.log('Razorpay modal closed');
+                                  },
+                                },
+                              };
+                              if (isSub) {
+                                options.subscription_id = order.subscriptionId || order.orderId;
+                              } else {
+                                options.order_id = order.orderId;
+                                options.amount = order.amount;
+                              }
+                              const rzp = new (window as any).Razorpay(options);
+                              rzp.on('payment.failed', (resp: any) => {
+                                alert(`Payment Failed: ${resp.error?.description || 'Transaction cancelled'}`);
+                              });
+                              rzp.open();
                             } else {
-                              options.order_id = order.orderId;
-                              options.amount = order.amount;
+                              alert(`Razorpay checkout script loading. Created Order: ${order.orderId}. Please try again in a moment.`);
                             }
-                            const rzp = new (window as any).Razorpay(options);
-                            rzp.on('payment.failed', (resp: any) => {
-                              alert(`Payment Failed: ${resp.error?.description || 'Transaction cancelled'}`);
-                            });
-                            rzp.open();
-                          } else {
-                            alert(`Razorpay checkout script loading. Created Order: ${order.orderId}. Please try again in a moment.`);
+                          } catch (err: any) {
+                            alert(err.message || 'Failed to initialize payment');
                           }
-                        } catch (err: any) {
-                          alert(err.message || 'Failed to initialize payment');
-                        }
-                      }}
-                    >
-                      Select {p.name} (₹{p.priceInr})
-                    </button>
-                  </div>
-                );
-              })}
+                        }}
+                      >
+                        Select {p.name} (₹{p.priceInr})
+                      </button>
+                    </div>
+                  );
+                })}
 
               {/* 4th Plan: Custom Enterprise & Bespoke Software */}
               <div
