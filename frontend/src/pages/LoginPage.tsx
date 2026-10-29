@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { LegalModals } from '../components/LegalModals.js';
 import { KindlyRateBrand } from '../components/Logos.js';
 import { ForgotPasswordModal } from '../components/ForgotPasswordModal.js';
+import { GoogleAuthButton } from '../components/GoogleAuthButton.js';
 
 interface Props {
   onLoginSuccess: (user: any, businesses: any[]) => void;
@@ -100,6 +101,24 @@ export const LoginPage: React.FC<Props> = ({ onLoginSuccess, onNavigateRegister,
           </div>
 
           {error && <div className="alert alert-error">{error}</div>}
+
+          {/* Continue with Google One-Click Authentication */}
+          <div style={{ marginBottom: '18px' }}>
+            <GoogleAuthButton
+              label="Continue with Google"
+              onSuccess={(res) => onLoginSuccess(res.user, res.businesses)}
+              onError={(err) => setError(err)}
+              disabled={loading}
+            />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', gap: '12px' }}>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px' }}>
+              or continue with email
+            </span>
+            <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">

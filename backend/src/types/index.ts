@@ -25,6 +25,8 @@ export interface User {
   emailVerified: boolean;
   phone?: string;
   phoneVerified?: boolean;
+  googleId?: string;
+  avatarUrl?: string;
   failedLoginAttempts: number;
   lockoutUntil?: string;
   createdAt: string;

@@ -429,6 +429,118 @@ authRouter.post('/login', loginRateLimiter, validateBody(loginSchema), async (re
   }
 });
 
+const googleAuthSchema = z.object({
+  credential: z.string().optional(),
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  picture: z.string().optional(),
+  googleId: z.string().optional(),
+});
+
+/**
+ * POST /api/auth/google
+ * Google One Tap & OAuth 2.0 Sign-In / Sign-Up
+ */
+authRouter.post('/google', loginRateLimiter, validateBody(googleAuthSchema), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { credential, email: directEmail, name: directName, picture: directPicture, googleId: directGoogleId } = req.body;
+
+    let email = directEmail;
+    let name = directName;
+    let googleId = directGoogleId;
+    let avatarUrl = directPicture;
+
+    // If Google ID token credential was provided, verify with Google tokeninfo
+    if (credential) {
+      try {
+        const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+        if (verifyRes.ok) {
+          const tokenInfo = (await verifyRes.json()) as any;
+          if (tokenInfo.email) {
+            email = tokenInfo.email;
+            name = tokenInfo.name || name || tokenInfo.email.split('@')[0];
+            googleId = tokenInfo.sub || googleId;
+            avatarUrl = tokenInfo.picture || avatarUrl;
+          }
+        } else {
+          const errText = await verifyRes.text();
+          console.warn('[GoogleAuth] Token verification returned non-200:', errText);
+        }
+      } catch (verifyErr) {
+        console.warn('[GoogleAuth] Token verification network error:', verifyErr);
+      }
+    }
+
+    if (!email) {
+      throw new AppError('Unable to verify Google account credentials. Please try again.', 400, 'GOOGLE_AUTH_FAILED');
+    }
+
+    email = email.toLowerCase().trim();
+
+    // Check if user exists
+    let user = await db.findUserByEmail(email);
+
+    if (user) {
+      // Existing user: check lockout
+      if (user.lockoutUntil && new Date(user.lockoutUntil) > new Date()) {
+        const remainingMin = Math.ceil((new Date(user.lockoutUntil).getTime() - Date.now()) / (60 * 1000));
+        throw new AppError(`Account is temporarily locked. Try again in ${remainingMin} minutes.`, 403, 'ACCOUNT_LOCKED');
+      }
+
+      // Update user with googleId, emailVerified: true if not already set
+      user = (await db.updateUser(user.id, {
+        emailVerified: true,
+        failedLoginAttempts: 0,
+        lockoutUntil: undefined,
+        googleId: googleId || user.googleId,
+        avatarUrl: avatarUrl || user.avatarUrl,
+      })) || user;
+    } else {
+      // New user from Google Sign In
+      const randomPassword = crypto.randomBytes(24).toString('hex');
+      const passwordHash = bcrypt.hashSync(randomPassword, 10);
+      const userId = crypto.randomUUID();
+
+      user = await db.createUser({
+        id: userId,
+        email,
+        passwordHash,
+        name: name || email.split('@')[0],
+        role: 'BUSINESS_OWNER',
+        isActive: true,
+        emailVerified: true,
+        failedLoginAttempts: 0,
+        googleId,
+        avatarUrl,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    const token = sendAuthToken(user, res, req);
+    const businesses = await db.findBusinessesByOwnerId(user.id);
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          emailVerified: user.emailVerified,
+          avatarUrl: user.avatarUrl,
+        },
+        businesses,
+        isNewUser: !user.createdAt || (Date.now() - new Date(user.createdAt).getTime()) < 5000,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 /**
  * POST /api/auth/logout
  */

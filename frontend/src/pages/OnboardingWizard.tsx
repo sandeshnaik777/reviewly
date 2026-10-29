@@ -6,6 +6,7 @@ import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
 import { PhoneInput } from '../components/PhoneInput.js';
 import { validatePhoneNumber } from '../utils/phoneValidator.js';
 import { ForgotPasswordModal } from '../components/ForgotPasswordModal.js';
+import { GoogleAuthButton } from '../components/GoogleAuthButton.js';
 import { loadRazorpay } from '../utils/razorpay.js';
 import {
   Key,
@@ -1112,7 +1113,38 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
             )}
 
             {!isAccountCreated && !showOtpVerification && (
-              <form onSubmit={handleAccountSubmit}>
+              <>
+                {/* 1-Click Google Sign Up */}
+                <div style={{ marginBottom: '18px' }}>
+                  <GoogleAuthButton
+                    label="Sign up / Continue with Google"
+                    onSuccess={(res) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        ownerName: res.user.name || prev.ownerName,
+                        email: res.user.email || prev.email,
+                      }));
+                      setIsAccountCreated(true);
+                      setIsEmailVerified(true);
+                      if (res.businesses && res.businesses.length > 0) {
+                        setCreatedBusiness(res.businesses[0]);
+                      }
+                      setStep(2);
+                    }}
+                    onError={(err) => setError(err)}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', margin: '18px 0', gap: '12px' }}>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+                  <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.5px' }}>
+                    or create with email & password
+                  </span>
+                  <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+                </div>
+
+                <form onSubmit={handleAccountSubmit}>
                 <div className="form-grid-responsive">
                   <div className="form-group">
                     <label className="form-label">Full Name (Owner / Manager) *</label>
@@ -1233,7 +1265,8 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </div>
                 </div>
               </form>
-            )}
+            </>
+          )}
           </div>
         )}
 

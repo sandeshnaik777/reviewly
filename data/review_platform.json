@@ -3,26 +3,26 @@
     {
       "id": "user-admin-kindlyrate-001",
       "email": "admin@kindlyrate.com",
-      "passwordHash": "$2b$10$pNZsEay1EHXxIbJtW/ooDO2yRkCJusJnLjhdZ0s8D9M1Zx7yiPqgW",
+      "passwordHash": "$2b$10$LuUR5wpM8iB9ni0WCOA/WOiHxeXR0hHZqmnSnk5DbJi0jMaMQRU8m",
       "name": "Platform Administrator",
       "role": "PLATFORM_ADMIN",
       "isActive": true,
       "emailVerified": true,
       "failedLoginAttempts": 0,
       "createdAt": "2026-10-01T00:00:00.000Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     },
     {
       "id": "user-demo-kindlyrate-002",
       "email": "demo@kindlyrate.com",
-      "passwordHash": "$2b$10$gODa7sbSjYqvd7JCfno/vO72Hl.YiHzteuNxEj.oG0LwwHNkJ2AuS",
+      "passwordHash": "$2b$10$U/jQdF70beYQFyG.LSEX3ubnGhZLLsb0o/MWw8ladTOUa.fLSq0y.",
       "name": "Priya Sharma (Demo Merchant)",
       "role": "BUSINESS_OWNER",
       "isActive": true,
       "emailVerified": true,
       "failedLoginAttempts": 0,
       "createdAt": "2026-10-01T00:00:00.000Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     }
   ],
   "businesses": [
@@ -43,8 +43,8 @@
       "googleReviewUrl": "https://maps.google.com/?cid=12345678901234567890",
       "googleMapsShareUrl": "https://maps.app.goo.gl/kindlyrate-demo",
       "isActive": true,
-      "createdAt": "2026-10-17T07:46:11.968Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z",
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     }
   ],
   "businessMembers": [
@@ -56,7 +56,7 @@
       "permissions": [
         "ALL"
       ],
-      "createdAt": "2026-10-17T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z"
     }
   ],
   "businessQuestions": [
@@ -102,8 +102,8 @@
       "googleReviewUrl": "https://maps.google.com/?cid=12345678901234567890",
       "primaryColor": "#00383B",
       "welcomeMessage": "Thank you for visiting KindlyRate Demo Cafe! We value your honest feedback.",
-      "createdAt": "2026-10-17T07:46:11.968Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z",
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     }
   ],
   "qrCodes": [
@@ -115,10 +115,10 @@
       "type": "PHYSICAL_STAND",
       "location": "Front Billing Counter",
       "scanCount": 142,
-      "lastScannedAt": "2026-10-29T07:21:11.968Z",
+      "lastScannedAt": "2026-10-29T08:02:27.651Z",
       "isActive": true,
-      "createdAt": "2026-10-17T07:46:11.968Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z",
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     },
     {
       "id": "qr-demo-002",
@@ -128,10 +128,10 @@
       "type": "TABLE_TENT",
       "location": "Garden Seating Table 4",
       "scanCount": 88,
-      "lastScannedAt": "2026-10-29T06:11:11.968Z",
+      "lastScannedAt": "2026-10-29T06:52:27.651Z",
       "isActive": true,
-      "createdAt": "2026-10-17T07:46:11.968Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z",
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     }
   ],
   "subscriptionPlans": [
@@ -238,7 +238,7 @@
       "isActive": true
     },
     {
-      "id": "8ce2afa4-d857-41d9-8cad-35fd9e27c5c4",
+      "id": "cb04afe7-01bf-42c0-9e07-45b325517e5d",
       "slug": "starter",
       "name": "Starter Plan",
       "priceInr": 49,
@@ -259,16 +259,16 @@
       "businessId": "biz-demo-store-001",
       "planId": "c0000000-0000-0000-0000-000000000003",
       "status": "ACTIVE",
-      "currentPeriodStart": "2026-10-17T07:46:11.968Z",
-      "currentPeriodEnd": "2027-10-17T07:46:11.968Z",
+      "currentPeriodStart": "2026-10-17T08:27:27.651Z",
+      "currentPeriodEnd": "2027-10-17T08:27:27.651Z",
       "reviewLimitMonthly": 500,
       "reviewsGeneratedThisMonth": 48,
       "qrCodeLimit": 5,
       "qrCodesActive": 2,
       "autoRenew": true,
       "lastTransactionId": "pay_live_demo_growth_1yr",
-      "createdAt": "2026-10-17T07:46:11.968Z",
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z",
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     }
   ],
   "usageRecords": [
@@ -278,7 +278,7 @@
       "period": "2026-10",
       "reviewsGenerated": 48,
       "qrCodesActive": 2,
-      "updatedAt": "2026-10-29T07:46:11.968Z"
+      "updatedAt": "2026-10-29T08:27:27.651Z"
     }
   ],
   "payments": [
@@ -292,7 +292,7 @@
       "status": "CAPTURED",
       "paymentType": "direct_subscription",
       "providerRef": "sub_live_demo_mandate_1yr",
-      "createdAt": "2026-10-17T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z"
     }
   ],
   "reviewSessions": [
@@ -302,12 +302,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Rohan Kulkarni",
-      "customerPhone": "+919881869839",
+      "customerPhone": "+919855307599",
       "customerFeedback": "The almond croissants and cortado were sensational! Super calm ambience to work from.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-28T07:46:11.968Z",
-      "updatedAt": "2026-10-28T07:46:11.968Z"
+      "createdAt": "2026-10-28T08:27:27.651Z",
+      "updatedAt": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "session-demo-2",
@@ -315,12 +315,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 5,
       "customerName": "Sneha Patel",
-      "customerPhone": "+919812060132",
+      "customerPhone": "+919829739839",
       "customerFeedback": "Amazing specialty coffee roast. The barista recommended the pour-over which was exceptional.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-28T07:46:11.968Z",
-      "updatedAt": "2026-10-28T07:46:11.968Z"
+      "createdAt": "2026-10-28T08:27:27.651Z",
+      "updatedAt": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "session-demo-3",
@@ -328,12 +328,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Ananya Iyer",
-      "customerPhone": "+919816255149",
+      "customerPhone": "+919832531221",
       "customerFeedback": "Warm service, great aesthetic, and delightful pastries. Indiranagar favorite without doubt.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-27T07:46:11.968Z",
-      "updatedAt": "2026-10-27T07:46:11.968Z"
+      "createdAt": "2026-10-27T08:27:27.651Z",
+      "updatedAt": "2026-10-27T08:27:27.651Z"
     },
     {
       "id": "session-demo-4",
@@ -341,12 +341,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 2,
       "customerName": "Aditya Verma",
-      "customerPhone": "+919890297331",
+      "customerPhone": "+919861205853",
       "customerFeedback": "A bit too noisy during rush hour and took 20 mins for our iced latte.",
       "status": "SHIELDED_PRIVATE",
       "intercepted": true,
-      "createdAt": "2026-10-26T07:46:11.968Z",
-      "updatedAt": "2026-10-26T07:46:11.968Z"
+      "createdAt": "2026-10-26T08:27:27.651Z",
+      "updatedAt": "2026-10-26T08:27:27.651Z"
     },
     {
       "id": "session-demo-5",
@@ -354,12 +354,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Meera Rao",
-      "customerPhone": "+919829699123",
+      "customerPhone": "+919880109954",
       "customerFeedback": "Great vibe for meeting clients or casual weekend brunch. Will definitely be returning.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-25T07:46:11.968Z",
-      "updatedAt": "2026-10-25T07:46:11.968Z"
+      "createdAt": "2026-10-25T08:27:27.651Z",
+      "updatedAt": "2026-10-25T08:27:27.651Z"
     },
     {
       "id": "session-demo-6",
@@ -367,12 +367,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 5,
       "customerName": "Karthik Nambiar",
-      "customerPhone": "+919816328959",
+      "customerPhone": "+919880159559",
       "customerFeedback": "The almond croissants and cortado were sensational! Super calm ambience to work from.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-24T07:46:11.968Z",
-      "updatedAt": "2026-10-24T07:46:11.968Z"
+      "createdAt": "2026-10-24T08:27:27.651Z",
+      "updatedAt": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "session-demo-7",
@@ -380,12 +380,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Pooja Hegde",
-      "customerPhone": "+919831004696",
+      "customerPhone": "+919874679870",
       "customerFeedback": "Amazing specialty coffee roast. The barista recommended the pour-over which was exceptional.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-24T07:46:11.968Z",
-      "updatedAt": "2026-10-24T07:46:11.968Z"
+      "createdAt": "2026-10-24T08:27:27.651Z",
+      "updatedAt": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "session-demo-8",
@@ -393,12 +393,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 5,
       "customerName": "Nikhil Reddy",
-      "customerPhone": "+919898857601",
+      "customerPhone": "+919825438762",
       "customerFeedback": "Warm service, great aesthetic, and delightful pastries. Indiranagar favorite without doubt.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-23T07:46:11.968Z",
-      "updatedAt": "2026-10-23T07:46:11.968Z"
+      "createdAt": "2026-10-23T08:27:27.651Z",
+      "updatedAt": "2026-10-23T08:27:27.651Z"
     },
     {
       "id": "session-demo-9",
@@ -406,12 +406,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Shreya Banerjee",
-      "customerPhone": "+919878245943",
+      "customerPhone": "+919894989188",
       "customerFeedback": "Crisp clean tables, fast service and wonderful sourdough toast. Highly recommended!",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-22T07:46:11.968Z",
-      "updatedAt": "2026-10-22T07:46:11.968Z"
+      "createdAt": "2026-10-22T08:27:27.651Z",
+      "updatedAt": "2026-10-22T08:27:27.651Z"
     },
     {
       "id": "session-demo-10",
@@ -419,12 +419,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 3,
       "customerName": "Tanvi Deshmukh",
-      "customerPhone": "+919838307153",
+      "customerPhone": "+919840404572",
       "customerFeedback": "A bit too noisy during rush hour and took 20 mins for our iced latte.",
       "status": "SHIELDED_PRIVATE",
       "intercepted": true,
-      "createdAt": "2026-10-21T07:46:11.968Z",
-      "updatedAt": "2026-10-21T07:46:11.968Z"
+      "createdAt": "2026-10-21T08:27:27.651Z",
+      "updatedAt": "2026-10-21T08:27:27.651Z"
     },
     {
       "id": "session-demo-11",
@@ -432,12 +432,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Arjun Nair",
-      "customerPhone": "+919842867578",
+      "customerPhone": "+919863559262",
       "customerFeedback": "The almond croissants and cortado were sensational! Super calm ambience to work from.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-20T07:46:11.968Z",
-      "updatedAt": "2026-10-20T07:46:11.968Z"
+      "createdAt": "2026-10-20T08:27:27.651Z",
+      "updatedAt": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "session-demo-12",
@@ -445,12 +445,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 5,
       "customerName": "Divya Soni",
-      "customerPhone": "+919874799671",
+      "customerPhone": "+919882657120",
       "customerFeedback": "Amazing specialty coffee roast. The barista recommended the pour-over which was exceptional.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-20T07:46:11.968Z",
-      "updatedAt": "2026-10-20T07:46:11.968Z"
+      "createdAt": "2026-10-20T08:27:27.651Z",
+      "updatedAt": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "session-demo-13",
@@ -458,12 +458,12 @@
       "qrCodeId": "qr-demo-001",
       "overallRating": 5,
       "customerName": "Rahul Kapoor",
-      "customerPhone": "+919836342886",
+      "customerPhone": "+919825630530",
       "customerFeedback": "Warm service, great aesthetic, and delightful pastries. Indiranagar favorite without doubt.",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-19T07:46:11.968Z",
-      "updatedAt": "2026-10-19T07:46:11.968Z"
+      "createdAt": "2026-10-19T08:27:27.651Z",
+      "updatedAt": "2026-10-19T08:27:27.651Z"
     },
     {
       "id": "session-demo-14",
@@ -471,12 +471,12 @@
       "qrCodeId": "qr-demo-002",
       "overallRating": 5,
       "customerName": "Ritu Saxena",
-      "customerPhone": "+919868763733",
+      "customerPhone": "+919874689950",
       "customerFeedback": "Crisp clean tables, fast service and wonderful sourdough toast. Highly recommended!",
       "status": "POSTED_TO_GOOGLE",
       "intercepted": false,
-      "createdAt": "2026-10-18T07:46:11.968Z",
-      "updatedAt": "2026-10-18T07:46:11.968Z"
+      "createdAt": "2026-10-18T08:27:27.651Z",
+      "updatedAt": "2026-10-18T08:27:27.651Z"
     }
   ],
   "reviewRatings": [],
@@ -493,7 +493,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-28T07:46:11.968Z"
+      "createdAt": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "gen-review-2",
@@ -507,7 +507,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-28T07:46:11.968Z"
+      "createdAt": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "gen-review-3",
@@ -521,7 +521,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-27T07:46:11.968Z"
+      "createdAt": "2026-10-27T08:27:27.651Z"
     },
     {
       "id": "gen-review-5",
@@ -535,7 +535,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-25T07:46:11.968Z"
+      "createdAt": "2026-10-25T08:27:27.651Z"
     },
     {
       "id": "gen-review-6",
@@ -549,7 +549,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-24T07:46:11.968Z"
+      "createdAt": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "gen-review-7",
@@ -563,7 +563,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-24T07:46:11.968Z"
+      "createdAt": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "gen-review-8",
@@ -577,7 +577,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-23T07:46:11.968Z"
+      "createdAt": "2026-10-23T08:27:27.651Z"
     },
     {
       "id": "gen-review-9",
@@ -591,7 +591,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-22T07:46:11.968Z"
+      "createdAt": "2026-10-22T08:27:27.651Z"
     },
     {
       "id": "gen-review-11",
@@ -605,7 +605,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-20T07:46:11.968Z"
+      "createdAt": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "gen-review-12",
@@ -619,7 +619,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-20T07:46:11.968Z"
+      "createdAt": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "gen-review-13",
@@ -633,7 +633,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-19T07:46:11.968Z"
+      "createdAt": "2026-10-19T08:27:27.651Z"
     },
     {
       "id": "gen-review-14",
@@ -647,7 +647,7 @@
         "barista"
       ],
       "copiedToClipboard": true,
-      "createdAt": "2026-10-18T07:46:11.968Z"
+      "createdAt": "2026-10-18T08:27:27.651Z"
     }
   ],
   "analyticsEvents": [
@@ -656,196 +656,196 @@
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-28T07:46:11.968Z"
+      "timestamp": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "event-rating-1",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-28T07:46:11.968Z"
+      "timestamp": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "event-scan-2",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-28T07:46:11.968Z"
+      "timestamp": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "event-rating-2",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-28T07:46:11.968Z"
+      "timestamp": "2026-10-28T08:27:27.651Z"
     },
     {
       "id": "event-scan-3",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-27T07:46:11.968Z"
+      "timestamp": "2026-10-27T08:27:27.651Z"
     },
     {
       "id": "event-rating-3",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-27T07:46:11.968Z"
+      "timestamp": "2026-10-27T08:27:27.651Z"
     },
     {
       "id": "event-scan-4",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-26T07:46:11.968Z"
+      "timestamp": "2026-10-26T08:27:27.651Z"
     },
     {
       "id": "event-rating-4",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-26T07:46:11.968Z"
+      "timestamp": "2026-10-26T08:27:27.651Z"
     },
     {
       "id": "event-scan-5",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-25T07:46:11.968Z"
+      "timestamp": "2026-10-25T08:27:27.651Z"
     },
     {
       "id": "event-rating-5",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-25T07:46:11.968Z"
+      "timestamp": "2026-10-25T08:27:27.651Z"
     },
     {
       "id": "event-scan-6",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-24T07:46:11.968Z"
+      "timestamp": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "event-rating-6",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-24T07:46:11.968Z"
+      "timestamp": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "event-scan-7",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-24T07:46:11.968Z"
+      "timestamp": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "event-rating-7",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-24T07:46:11.968Z"
+      "timestamp": "2026-10-24T08:27:27.651Z"
     },
     {
       "id": "event-scan-8",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-23T07:46:11.968Z"
+      "timestamp": "2026-10-23T08:27:27.651Z"
     },
     {
       "id": "event-rating-8",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-23T07:46:11.968Z"
+      "timestamp": "2026-10-23T08:27:27.651Z"
     },
     {
       "id": "event-scan-9",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-22T07:46:11.968Z"
+      "timestamp": "2026-10-22T08:27:27.651Z"
     },
     {
       "id": "event-rating-9",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-22T07:46:11.968Z"
+      "timestamp": "2026-10-22T08:27:27.651Z"
     },
     {
       "id": "event-scan-10",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-21T07:46:11.968Z"
+      "timestamp": "2026-10-21T08:27:27.651Z"
     },
     {
       "id": "event-rating-10",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-21T07:46:11.968Z"
+      "timestamp": "2026-10-21T08:27:27.651Z"
     },
     {
       "id": "event-scan-11",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-20T07:46:11.968Z"
+      "timestamp": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "event-rating-11",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-20T07:46:11.968Z"
+      "timestamp": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "event-scan-12",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-20T07:46:11.968Z"
+      "timestamp": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "event-rating-12",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-20T07:46:11.968Z"
+      "timestamp": "2026-10-20T08:27:27.651Z"
     },
     {
       "id": "event-scan-13",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-19T07:46:11.968Z"
+      "timestamp": "2026-10-19T08:27:27.651Z"
     },
     {
       "id": "event-rating-13",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-001",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-19T07:46:11.968Z"
+      "timestamp": "2026-10-19T08:27:27.651Z"
     },
     {
       "id": "event-scan-14",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "QR_SCAN",
-      "timestamp": "2026-10-18T07:46:11.968Z"
+      "timestamp": "2026-10-18T08:27:27.651Z"
     },
     {
       "id": "event-rating-14",
       "businessId": "biz-demo-store-001",
       "qrCodeId": "qr-demo-002",
       "eventType": "RATING_SUBMITTED",
-      "timestamp": "2026-10-18T07:46:11.968Z"
+      "timestamp": "2026-10-18T08:27:27.651Z"
     }
   ],
   "auditLogs": [
@@ -854,7 +854,7 @@
       "action": "PLATFORM_INITIALIZATION",
       "actorId": "user-admin-kindlyrate-001",
       "details": "Platform initialized with single administrator and single sample business",
-      "timestamp": "2026-10-29T07:46:11.968Z"
+      "timestamp": "2026-10-29T08:27:27.651Z"
     }
   ],
   "emailVerifications": [],
@@ -865,7 +865,7 @@
       "title": "Welcome to KindlyRate",
       "message": "Your 1-Year Growth Pack is active. Smart QR stands are operational.",
       "read": false,
-      "createdAt": "2026-10-17T07:46:11.968Z"
+      "createdAt": "2026-10-17T08:27:27.651Z"
     }
   ],
   "customSoftwareInquiries": [],
@@ -1005,11 +1005,11 @@
       "keyValue": "SAMPLE_GEMINI_KEY_REPLACE_IN_PRODUCTION",
       "secondaryValue": "gemini-flash-lite-latest",
       "isActive": true,
-      "callCount": 86,
-      "errorCount": 45,
+      "callCount": 91,
+      "errorCount": 50,
       "createdAt": "2026-10-11T11:41:35.098Z",
       "updatedAt": "2026-10-11T11:41:35.098Z",
-      "lastUsedAt": "2026-10-29T07:45:44.003Z",
+      "lastUsedAt": "2026-10-29T08:27:11.177Z",
       "lastError": "HTTP 400: {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"API key not valid. Please pass a valid API key.\",\n    \"status\": \"INVALID_ARGUMENT\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"API_KEY_INVALID\",\n        \"domain\": \"googleapis.com\","
     }
   ],

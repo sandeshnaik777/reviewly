@@ -46,6 +46,8 @@ export const api = {
     apiRequest('/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
   register: (data: any) => apiRequest('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data: any) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
+  googleAuth: (data: { credential?: string; email?: string; name?: string; picture?: string; googleId?: string }) =>
+    apiRequest('/auth/google', { method: 'POST', body: JSON.stringify(data) }),
   logout: () => {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('kindlyrate_token');

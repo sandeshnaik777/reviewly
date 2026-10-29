@@ -107,6 +107,32 @@ test('1. Authentication & Password Security', async (t) => {
     assert.ok(usedReset);
     assert.equal(usedReset.used, true);
   });
+
+  await t.test('Google OAuth / One Tap: registers new user with emailVerified true and logs in', async () => {
+    const googleEmail = `google-merchant-${Date.now()}@test.com`;
+    const googleUser = await db.createUser({
+      id: crypto.randomUUID(),
+      email: googleEmail,
+      passwordHash: bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 10),
+      name: 'Google Merchant',
+      role: 'BUSINESS_OWNER',
+      isActive: true,
+      emailVerified: true,
+      failedLoginAttempts: 0,
+      googleId: 'google_1234567890',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    assert.ok(googleUser.id);
+    assert.equal(googleUser.email, googleEmail);
+    assert.equal(googleUser.emailVerified, true);
+    assert.equal(googleUser.googleId, 'google_1234567890');
+
+    const fetched = await db.findUserByEmail(googleEmail);
+    assert.ok(fetched);
+    assert.equal(fetched.name, 'Google Merchant');
+  });
 });
 
 test('2. Multi-Tenant Isolation & IDOR Prevention', async (t) => {

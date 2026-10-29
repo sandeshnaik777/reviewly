@@ -58,6 +58,10 @@ export const config = {
     from: process.env.EMAIL_FROM || 'KindlyRate <no-reply@kindlyrate.com>',
   },
 
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID || '',
+  },
+
   awsSms: {
     region: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'ap-south-1',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
