@@ -526,7 +526,7 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
 
               <h4 style={{ color: '#0f172a', marginTop: '16px', marginBottom: '6px' }}>4. Grievance Officer</h4>
               <p>
-                In compliance with the Digital Personal Data Protection Act, you may contact our designated Grievance Officer at: <strong>grievance@kindlyrate.com</strong>, KindlyRate Operations, Indiranagar, Bengaluru.
+                In compliance with the Digital Personal Data Protection Act, you may contact our designated Grievance Officer at: <strong>sandeshnaik525@gmail.com</strong>, KindlyRate Operations, Indiranagar, Bengaluru.
               </p>
             </div>
           )}
@@ -590,8 +590,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>Email Support</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Avg response &lt; 2 hrs</div>
-                  <a href="mailto:support@kindlyrate.com" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
-                    support@kindlyrate.com
+                  <a href="mailto:sandeshnaik525@gmail.com" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
+                    sandeshnaik525@gmail.com
                   </a>
                 </div>
 
@@ -601,8 +601,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>Helpline Phone</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Mon–Sat: 9 AM – 9 PM</div>
-                  <a href="tel:+918047192200" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
-                    +91 80 4719 2200
+                  <a href="tel:+918123824899" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', marginTop: '6px', display: 'inline-block' }}>
+                    +91 81238 24899
                   </a>
                 </div>
 
@@ -612,8 +612,8 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '14px' }}>WhatsApp Concierge</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Instant merchant chat</div>
-                  <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" style={{ fontSize: '13px', fontWeight: 600, color: '#16a34a', marginTop: '6px', display: 'inline-block' }}>
-                    +91 98765 43210
+                  <a href="https://wa.me/918123824899" target="_blank" rel="noreferrer" style={{ fontSize: '13px', fontWeight: 600, color: '#16a34a', marginTop: '6px', display: 'inline-block' }}>
+                    +91 81238 24899
                   </a>
                 </div>
               </div>

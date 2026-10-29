@@ -4905,13 +4905,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '13.5px', color: '#d6cec7' }}>
-              <div>Direct: <strong style={{ color: '#fcfaf7' }}>+91 98765 43210</strong></div>
-              <div>Email: <strong style={{ color: '#fcfaf7' }}>solutions@reviewplatform.local</strong></div>
+              <div>Direct: <strong style={{ color: '#fcfaf7' }}>+91 81238 24899</strong></div>
+              <div>Email: <strong style={{ color: '#fcfaf7' }}>sandeshnaik525@gmail.com</strong></div>
             </div>
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <a
-                href="tel:+919876543210"
+                href="tel:+918123824899"
                 style={{
                   color: '#fcfaf7',
                   border: '1px solid rgba(255,255,255,0.2)',
@@ -4928,7 +4928,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 Call Direct
               </a>
               <a
-                href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                href={`https://wa.me/918123824899?text=${encodeURIComponent(
                   `Hello! I manage "${business.name}" and would like details regarding custom software development (Delivery fleet / ERP / Billing / Custom Apps).`
                 )}`}
                 target="_blank"
@@ -5166,14 +5166,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               {/* Fast Direct Contacts */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '18px' }}>
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+918123824899"
                   className="btn btn-secondary"
                   style={{ fontSize: '12.5px', padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
                   <span>Call Hotline</span>
                 </a>
                 <a
-                  href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                  href={`https://wa.me/918123824899?text=${encodeURIComponent(
                     `Hello Support! I manage "${business.name}" and need assistance with my dashboard/reviews.`
                   )}`}
                   target="_blank"
