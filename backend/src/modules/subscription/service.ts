@@ -29,6 +29,16 @@ export class SubscriptionService {
       throw new AppError('Subscription is inactive.', 403, 'SUBSCRIPTION_INACTIVE');
     }
 
+    // Require paid active plan or confirmed trial activation
+    const isPaidActive = sub.status === 'ACTIVE' || (sub.status === 'TRIAL' && sub.trialActivated === true);
+    if (!isPaidActive) {
+      throw new AppError(
+        'Subscription required: Please activate an active plan to enable live AI review generation.',
+        402,
+        'SUBSCRIPTION_REQUIRED'
+      );
+    }
+
     const plan = await db.findPlanById(sub.planId);
     const limit = plan?.reviewGenerationLimit || 50;
     const periodMonth = this.getCurrentPeriodMonth();
@@ -58,10 +68,14 @@ export class SubscriptionService {
     const usage = await db.getUsageRecord(businessId, periodMonth);
     const limit = plan?.reviewGenerationLimit || 50;
     const percentUsed = Math.min(100, Math.round((usage.reviewsGeneratedCount / limit) * 100));
+    const isPaidActive = Boolean(
+      sub && (sub.status === 'ACTIVE' || (sub.status === 'TRIAL' && sub.trialActivated === true))
+    );
 
     return {
       subscription: sub,
       plan,
+      isPaidActive,
       periodMonth,
       reviewsUsed: usage.reviewsGeneratedCount,
       reviewLimit: limit,

@@ -153,6 +153,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   // Toast / Status Message
   const [toast, setToast] = useState<string | null>(null);
 
+  // Subscription verification state
+  const isPaidActive = Boolean(
+    (subscriptionData?.status === 'ACTIVE') ||
+    (subscriptionData?.status === 'TRIAL' && subscriptionData?.trialActivated === true) ||
+    (usage?.subscription?.status === 'ACTIVE') ||
+    (usage?.subscription?.status === 'TRIAL' && usage?.subscription?.trialActivated === true)
+  );
+
   useEffect(() => {
     loadAllData();
   }, [businessId]);
@@ -881,6 +889,88 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         </div>
       )}
 
+      {/* Persistent Subscription Paywall Warning Banner */}
+      {!loading && !isPaidActive && (
+        <div
+          style={{
+            background: 'linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%)',
+            borderBottom: '2px solid #f59e0b',
+            padding: '12px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px',
+            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.15)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: '#fef3c7',
+                border: '1.5px solid #f59e0b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '18px',
+                flexShrink: 0,
+              }}
+            >
+              🔒
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <strong style={{ color: '#78350f', fontSize: '14px' }}>
+                  Account in Free Preview Mode · Plan Activation Required
+                </strong>
+                <span
+                  style={{
+                    background: '#f59e0b',
+                    color: '#ffffff',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                  }}
+                >
+                  Unpaid
+                </span>
+              </div>
+              <div style={{ color: '#92400e', fontSize: '12.5px', marginTop: '2px' }}>
+                Live customer review submissions and physical QR counter stands require an active plan. Activate our ₹79 introductory pack or annual autopay to go live immediately.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <button
+              onClick={handlePayTrial}
+              className="btn btn-primary btn-sm"
+              style={{
+                fontSize: '13px',
+                padding: '8px 18px',
+                background: '#d97706',
+                borderColor: '#b45309',
+                fontWeight: 700,
+                boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)',
+              }}
+            >
+              ⚡ Activate Testing Pack (₹79) →
+            </button>
+            <button
+              onClick={() => setActiveTab('subscription')}
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '13px', padding: '8px 14px' }}
+            >
+              View All Plans
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area - Generous 1380px Width for Laptop Clarity */}
       <div className="desktop-container" style={{ maxWidth: '1380px' }}>
         {/* ======================================================== */}
@@ -942,43 +1032,60 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         {/* ======================================================== */}
         {activeTab === 'overview' && (
           <div>
-            {/* Trial Pass Activation Hero Banner */}
-            {usage?.subscription && !usage.subscription.trialActivated && (
+            {/* Unpaid / Trial Hero Banner */}
+            {!isPaidActive && (
               <div
                 className="card"
                 style={{
                   background: 'linear-gradient(135deg, #fffcf8 0%, #fef3c7 100%)',
                   border: '2px solid #f59e0b',
-                  padding: '22px 28px',
+                  padding: '24px 28px',
                   marginBottom: '24px',
-                  borderRadius: '12px',
+                  borderRadius: '14px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
                   gap: '16px',
-                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.12)',
+                  boxShadow: '0 6px 18px rgba(245, 158, 11, 0.14)',
                 }}
               >
-                <div style={{ maxWidth: '740px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <span className="badge badge-warning">Testing Pack Trial Ready</span>
-                    <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 600 }}>Introductory ₹79 Starter Offer</span>
+                <div style={{ maxWidth: '780px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span className="badge badge-warning" style={{ fontSize: '11px', fontWeight: 700 }}>Action Required</span>
+                    <span style={{ fontSize: '13px', color: '#92400e', fontWeight: 700 }}>Exclusive Introductory Offer: ₹79</span>
                   </div>
-                  <h3 className="serif" style={{ fontSize: '20px', margin: '4px 0 6px', color: '#78350f' }}>
-                    Welcome to Your Dashboard! Activate Starter Trial for ₹79
+                  <h3 className="serif" style={{ fontSize: '22px', margin: '4px 0 6px', color: '#78350f', fontWeight: 700 }}>
+                    Activate Your Plan to Accept Real Customer Reviews
                   </h3>
-                  <p style={{ margin: 0, fontSize: '13.5px', color: '#92400e', lineHeight: 1.5 }}>
-                    Your business environment and smart QR counter stands are ready! Complete the introductory ₹79 payment via Razorpay to activate 30 days of full AI review generation and Google conversion tracking.
+                  <p style={{ margin: 0, fontSize: '13.5px', color: '#92400e', lineHeight: 1.55 }}>
+                    Your business profile and smart counter QR stands are pre-configured. Complete payment via Razorpay to enable live customer review drafting on Google Maps, instant negative feedback shielding, and reputation tracking.
                   </p>
                 </div>
-                <button
-                  className="btn btn-primary btn-lg"
-                  onClick={handlePayTrial}
-                  style={{ fontSize: '14.5px', padding: '12px 24px', whiteSpace: 'nowrap' }}
-                >
-                  Pay ₹79 &amp; Activate Trial Now →
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={handlePayTrial}
+                    style={{ fontSize: '14.5px', padding: '12px 24px', whiteSpace: 'nowrap', fontWeight: 700 }}
+                  >
+                    Pay ₹79 &amp; Activate Plan Now →
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('subscription')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#92400e',
+                      fontSize: '12px',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Or explore 1-Year UPI Autopay (2 Months Free)
+                  </button>
+                </div>
               </div>
             )}
 
@@ -1445,128 +1552,161 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             </div>
 
-            {/* AURA AI RECOMMENDATIONS & INSIGHTS: WHAT CHANGES NEED TO MAKE */}
-            <div
-              className="card"
-              style={{
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
-                color: '#ffffff',
-                padding: '28px 30px',
-                borderRadius: '16px',
-                marginBottom: '24px',
-                boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <SparklesIcon size={20} color="#38bdf8" />
-                  </div>
-                  <div>
-                    <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
-                      Aura AI Insights: High-Impact Changes to Make
-                    </h3>
-                    <div style={{ fontSize: '12.5px', color: '#94a3b8' }}>
-                      Telemetry diagnostic: 4 recommendations to increase 5-star velocity and shield your rating
-                    </div>
-                  </div>
+            {/* ACTIONABLE AI GROWTH INSIGHTS (ACTIVATES WITH REAL REVIEW ACTIVITY) */}
+            {reviews.length < 3 ? (
+              <div
+                style={{
+                  background: '#f8fafc',
+                  border: '1.5px dashed #cbd5e1',
+                  borderRadius: '16px',
+                  padding: '32px 24px',
+                  marginBottom: '24px',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    background: '#e0f2fe',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 12px',
+                  }}
+                >
+                  <SparklesIcon size={24} color="#0284c7" />
                 </div>
-                <span className="stat-pill" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                  Aura Engine Active
-                </span>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <Tag size={16} color="var(--primary)" />
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Highlight Target Keywords in Reviews</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Customers often praise overall service without naming key offerings. Injecting target keywords (e.g. "16GB RAM, SSD Upgrade, Honest Service") makes Gemini generate rich reviews that rank 2.4x higher on Google Maps.
-                    </p>
-                  </div>
+                <h4 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 6px', color: '#0f172a' }}>
+                  AI Growth Insights Standby
+                </h4>
+                <p style={{ margin: '0 auto 18px', fontSize: '13.5px', color: '#64748b', maxWidth: '580px', lineHeight: 1.55 }}>
+                  Personalized keyword suggestions, customer sentiment themes, and Google Maps ranking optimization will generate automatically once your first 3 customer reviews are collected.
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  {qrs[0] && (
+                    <a
+                      href={`/r/${qrs[0].slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-primary btn-sm"
+                      style={{ fontSize: '13px', padding: '8px 18px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <SparklesIcon size={14} color="#ffffff" />
+                      <span>Test Customer Review Flow ↗</span>
+                    </a>
+                  )}
                   <button
-                    className="btn btn-sm"
-                    style={{ background: '#38bdf8', color: '#0f172a', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
-                    onClick={() => {
-                      setActiveTab('ai_settings');
-                      showNotification('Navigated to Review Settings to configure target keywords');
-                    }}
+                    onClick={() => setActiveTab('qrs')}
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: '13px', padding: '8px 16px' }}
                   >
-                    Manage Target Keywords →
-                  </button>
-                </div>
-
-                <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <ShieldCheckIcon size={16} />
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Enable Strict Shield for Peak Hours</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Peak customer rush hours can have occasional delays. Switching the Reputation Shield from Standard to Strict ensures 100% of 1 to 3-star customer feedback is routed to your private manager inbox before it can reach Google.
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-sm"
-                    style={{ background: shieldStrictness === 'strict' ? '#22c55e' : '#f59e0b', color: '#0f172a', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
-                    onClick={() => {
-                      setShieldStrictness(shieldStrictness === 'strict' ? 'standard' : 'strict');
-                      showNotification(shieldStrictness === 'strict' ? 'Reputation Shield returned to Standard' : 'Reputation Shield set to Strict (100% negative feedback intercepted)');
-                    }}
-                  >
-                    {shieldStrictness === 'strict' ? '✓ Strict Shield Active' : 'Activate Strict Shield'}
-                  </button>
-                </div>
-
-                <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <QrCode size={16} color="var(--primary)" />
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Position Stand at Billing Counter</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Telemetry shows QR stands at checkout convert 82% of customers paying by UPI or Card. Position a dedicated "Cashier / Counter Stand" to collect reviews while receipts or invoices are generated.
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-sm"
-                    style={{ background: '#a855f7', color: '#ffffff', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
-                    onClick={() => {
-                      setActiveTab('qrs');
-                      showNotification('Navigated to QR Stands Generator');
-                    }}
-                  >
-                    Generate Counter Stand →
-                  </button>
-                </div>
-
-                <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <SlidersHorizontal size={16} color="var(--primary)" />
-                      <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Set Review Prompting to Detailed (9–10 lines)</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Longer in-depth reviews (9–10 lines) receive 4x more Google engagement and boost local 3-pack rank. Aura recommends setting review length to "Detailed Story (9–10 lines)".
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-sm"
-                    style={{ background: 'rgba(255,255,255,0.15)', color: '#ffffff', fontWeight: 600, border: '1px solid rgba(255,255,255,0.25)', alignSelf: 'flex-start' }}
-                    onClick={() => {
-                      setActiveTab('ai_settings');
-                      showNotification('Opening Review Generation settings');
-                    }}
-                  >
-                    Check Tone Settings →
+                    View QR Counter Stands ({qrs.length}) →
                   </button>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div
+                className="card"
+                style={{
+                  background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+                  color: '#ffffff',
+                  padding: '28px 30px',
+                  borderRadius: '16px',
+                  marginBottom: '24px',
+                  boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <SparklesIcon size={20} color="#38bdf8" />
+                    </div>
+                    <div>
+                      <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
+                        Actionable Growth Insights
+                      </h3>
+                      <div style={{ fontSize: '12.5px', color: '#94a3b8' }}>
+                        Data-backed recommendations derived from your live customer ratings
+                      </div>
+                    </div>
+                  </div>
+                  <span className="stat-pill" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                    ● Active Intelligence
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                        <Tag size={16} color="#38bdf8" />
+                        <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Highlight Target Keywords</strong>
+                      </div>
+                      <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
+                        Injecting target keywords makes Gemini generate rich reviews that rank 2.4x higher on Google Maps local searches.
+                      </p>
+                    </div>
+                    <button
+                      className="btn btn-sm"
+                      style={{ background: '#38bdf8', color: '#0f172a', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
+                      onClick={() => {
+                        setActiveTab('ai_settings');
+                        showNotification('Opening Review Settings to configure target keywords');
+                      }}
+                    >
+                      Manage Target Keywords →
+                    </button>
+                  </div>
+
+                  <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                        <ShieldCheckIcon size={16} />
+                        <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Strict Reputation Shield</strong>
+                      </div>
+                      <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
+                        Ensure 100% of 1 to 3-star customer feedback is captured privately to your dashboard before it can ever be posted publicly to Google.
+                      </p>
+                    </div>
+                    <button
+                      className="btn btn-sm"
+                      style={{ background: shieldStrictness === 'strict' ? '#22c55e' : '#f59e0b', color: '#0f172a', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
+                      onClick={() => {
+                        setShieldStrictness(shieldStrictness === 'strict' ? 'standard' : 'strict');
+                        showNotification(shieldStrictness === 'strict' ? 'Reputation Shield returned to Standard' : 'Reputation Shield set to Strict (100% negative feedback intercepted)');
+                      }}
+                    >
+                      {shieldStrictness === 'strict' ? '✓ Strict Shield Active' : 'Activate Strict Shield'}
+                    </button>
+                  </div>
+
+                  <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                        <QrCode size={16} color="#38bdf8" />
+                        <strong style={{ fontSize: '14px', color: '#f1f5f9' }}>Billing Counter Stand Conversion</strong>
+                      </div>
+                      <p style={{ fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.5, margin: '0 0 14px' }}>
+                        QR stands placed directly at checkout counters achieve an 82% scan completion rate while customers pay by UPI or Card.
+                      </p>
+                    </div>
+                    <button
+                      className="btn btn-sm"
+                      style={{ background: '#a855f7', color: '#ffffff', fontWeight: 600, border: 'none', alignSelf: 'flex-start' }}
+                      onClick={() => {
+                        setActiveTab('qrs');
+                        showNotification('Navigated to QR Stands Generator');
+                      }}
+                    >
+                      Generate Counter Stand →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 2-COLUMN SECTION: FINANCIAL VALUE & COMPETITOR SEARCH RADAR */}
             <div
@@ -2046,192 +2186,45 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </div>
               </div>
             </div>
-
-            {/* ======================================================== */}
-            {/* AURA EXECUTIVE AI BRIEFING & LEVERS (BOTTOM OF OVERVIEW) */}
-            {/* ======================================================== */}
-            <div className="aura-card" style={{ marginTop: '28px', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span className="telemetry-pulse" />
-                  <strong style={{ fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <SparklesIcon size={16} color="#38bdf8" />
-                    <span>Executive Reputation &amp; Growth Insights</span>
-                  </strong>
-                  <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                    · Monitoring {qrs.length} Touchpoints &amp; Google Maps Visibility
-                  </span>
-                </div>
-                <div style={{ fontSize: '12.5px', color: '#4ade80', fontWeight: 600 }}>
-                  ● {aura.defenseShieldHealth}
-                </div>
-              </div>
-
-              <p style={{ fontSize: '13.5px', color: '#cbd5e1', marginBottom: '16px', lineHeight: 1.5 }}>
-                {aura.statusText}
-              </p>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px' }}>
-                {aura.recommendations.map((rec: any) => (
-                  <div
-                    key={rec.id}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.09)',
-                      borderRadius: '8px',
-                      padding: '14px 16px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      gap: '10px',
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {rec.id === 'dish_boost' && <SparklesIcon size={15} color="#f59e0b" />}
-                        {rec.id === 'waiter_bonus' && <TrophyIcon size={15} color="#38bdf8" />}
-                        {rec.id === 'google_pack_gap' && <TrendingUpIcon size={15} color="#4ade80" />}
-                        <span>{rec.title}</span>
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.45 }}>
-                        {rec.desc}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleExecuteAuraLever(rec.id)}
-                      style={{
-                        alignSelf: 'flex-start',
-                        background: 'rgba(56, 189, 248, 0.15)',
-                        border: '1px solid rgba(56, 189, 248, 0.4)',
-                        color: '#38bdf8',
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.25)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(56, 189, 248, 0.15)')}
-                    >
-                      <ZapIcon size={13} color="#38bdf8" />
-                      <span>{rec.actionText} →</span>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ======================================================== */}
-            {/* REAL-TIME PERFORMANCE & REPUTATION SUMMARY STRIP         */}
-            {/* ======================================================== */}
-            <div className="ironman-hud-strip" style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-                {/* HUD KPI Metrics */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap' }}>
-                  <div>
-                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                      Total Net Monthly Value
-                    </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
-                      +₹{(financial.totalMonthlyImpactInr ?? 0).toLocaleString()}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
-                      Walk-ins + Aggregator commission saved
-                    </div>
-                  </div>
-
-                  <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
-                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                      Reputation Defense Shield
-                    </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                      {roi.negativeReviewsShielded ?? 0} Intercepted
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#4ade80' }}>
-                      100% Negative Leaks Contained
-                    </div>
-                  </div>
-
-                  <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
-                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                      Google Local Pack Rank
-                    </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#fde047', marginTop: '2px' }}>
-                      {roi.googleLocalPackRank || 'Awaiting Initial Reviews'}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#cbd5e1' }}>
-                      {reviews.length} Review{reviews.length === 1 ? '' : 's'} · {analytics?.avgRating ? `${analytics.avgRating} ★` : '0.0 ★'} Rating
-                    </div>
-                  </div>
-
-                  <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', paddingLeft: '24px' }}>
-                    <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#94a3b8' }}>
-                      Weekly Review Velocity
-                    </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>
-                      {roi.reviewsVelocityPerWeek ?? 0} review{roi.reviewsVelocityPerWeek === 1 ? '' : 's'}/wk
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#4ade80' }}>
-                      {reviews.length > 0 ? '▲ Active Review Acceleration' : 'Initial Baseline Setup'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Action Buttons */}
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <button
-                    onClick={() => setActiveTab('qrs')}
-                    style={{
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      color: '#ffffff',
-                      padding: '9px 16px',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <span>QR Stands &amp; Generator</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('ai_settings')}
-                    style={{
-                      background: 'var(--primary)',
-                      border: 'none',
-                      color: '#ffffff',
-                      padding: '9px 16px',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <ShieldIcon size={14} color="#ffffff" />
-                    <span>Shield Settings</span>
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
-                {/* ======================================================== */}
+        {/* ======================================================== */}
         {/* TAB 2: QR STANDS & GENERATOR (CLEAN & INSTANT)          */}
         {/* ======================================================== */}
         {activeTab === 'qrs' && (
           <div>
+            {!isPaidActive && (
+              <div
+                style={{
+                  background: '#fffbeb',
+                  border: '1.5px solid #fde047',
+                  borderRadius: '12px',
+                  padding: '14px 20px',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '18px' }}>⚠️</span>
+                  <div style={{ fontSize: '13px', color: '#854d0e' }}>
+                    <strong>QR Stands in Sandbox Preview:</strong> Scans will function, but live Google review drafting requires an active subscription.
+                  </div>
+                </div>
+                <button
+                  onClick={handlePayTrial}
+                  className="btn btn-primary btn-sm"
+                  style={{ fontSize: '12.5px', padding: '6px 14px', background: '#d97706', borderColor: '#b45309' }}
+                >
+                  Activate for ₹79 →
+                </button>
+              </div>
+            )}
+
             {/* Top Bar with Actions */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
