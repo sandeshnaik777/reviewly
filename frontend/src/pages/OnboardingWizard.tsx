@@ -1126,7 +1126,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                     label="Sign up / Continue with Google"
                     flow="onboarding"
                     onSuccess={(res) => {
-                      setFormData((prev) => ({
+                      setFormData((prev: any) => ({
                         ...prev,
                         ownerName: res.user.name || prev.ownerName,
                         email: res.user.email || prev.email,

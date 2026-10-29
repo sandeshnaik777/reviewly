@@ -516,7 +516,6 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     } else if (leverId === 'waiter_bonus') {
       showNotification('Recognition Logged: Team member recognition updated in Manager Log!');
     } else if (leverId === 'google_pack_gap') {
-      setRushMode(true);
       showNotification('Local Pack Sprint Mode Activated: Accelerated 1-click Google conversion prompts engaged!');
     }
   };
@@ -744,7 +743,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
           {/* Upgrade Plan Quick Button */}
           <button
-            onClick={() => setActiveTab('billing')}
+            onClick={() => setActiveTab('subscription')}
             style={{
               background: 'var(--primary)',
               color: '#ffffff',
@@ -1127,7 +1126,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>AI Reviews Generated</div>
                   <button
-                    onClick={() => setActiveTab('billing')}
+                    onClick={() => setActiveTab('subscription')}
                     style={{
                       background: 'none',
                       border: 'none',
