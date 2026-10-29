@@ -57,6 +57,7 @@ import {
   Layers,
   Code2,
   Briefcase,
+  Sparkles,
 } from 'lucide-react';
 import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
 import { ScratchCard } from '../components/ScratchCard.js';
@@ -910,7 +911,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
         <div className="dashboard-sidebar-header">
           <div className="dashboard-brand-row">
             <div className="dashboard-brand-logo">
-              <KindlyRateLogo size={26} />
+              <KindlyRateIcon size={26} />
               <span className="dashboard-brand-title">KindlyRate</span>
             </div>
             <button
@@ -5720,8 +5721,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <textarea
                     className="form-textarea"
                     rows={4}
-                    value={inquiryForm.notes}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, notes: e.target.value })}
+                    value={inquiryForm.requirements}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, requirements: e.target.value })}
                     placeholder="Describe how your store operates today, how many branches or riders you have, and what features you want..."
                     style={{ padding: '12px 14px', fontSize: '13.5px', borderRadius: '10px' }}
                   />

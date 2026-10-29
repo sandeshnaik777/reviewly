@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { CheckCircle2, ArrowRight, ShieldCheck, QrCode, Phone, Sparkles } from 'lucide-react';
-import { KindlyRateLogo } from '../components/Logos.js';
+import { KindlyRateLogo, KindlyRateIcon } from '../components/Logos.js';
 
 interface ThankYouPageProps {
   businessName?: string;
@@ -41,7 +41,7 @@ export const ThankYouPage: React.FC<ThankYouPageProps> = ({
             onClick={onNavigateHome}
             style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
-            <KindlyRateLogo size={28} />
+            <KindlyRateIcon size={28} />
             <span className="serif" style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text)' }}>
               KindlyRate
             </span>
