@@ -28,50 +28,9 @@ export interface RateLimitOptions {
   keyGenerator?: (req: Request) => string;
 }
 
-export function rateLimiter(options: RateLimitOptions) {
-  const { windowMs, max, message = 'Too many requests. Please try again later.' } = options;
-
-  return (req: Request, res: Response, next: NextFunction) => {
-    const key = options.keyGenerator
-      ? options.keyGenerator(req)
-      : `${req.ip || 'anonymous'}:${req.baseUrl || req.path}`;
-
-    const now = Date.now();
-    const entry = memoryStore[key];
-
-    if (!entry || entry.resetTime < now) {
-      memoryStore[key] = {
-        count: 1,
-        resetTime: now + windowMs,
-      };
-      res.setHeader('X-RateLimit-Limit', max);
-      res.setHeader('X-RateLimit-Remaining', max - 1);
-      res.setHeader('X-RateLimit-Reset', Math.ceil((now + windowMs) / 1000));
-      return next();
-    }
-
-    if (entry.count >= max) {
-      try { db.recordRateLimitHit(); } catch {}
-      const retryAfterSeconds = Math.ceil((entry.resetTime - now) / 1000);
-      res.setHeader('Retry-After', retryAfterSeconds);
-      res.setHeader('X-RateLimit-Limit', max);
-      res.setHeader('X-RateLimit-Remaining', 0);
-      res.setHeader('X-RateLimit-Reset', Math.ceil(entry.resetTime / 1000));
-
-      const response: ApiResponse = {
-        success: false,
-        error: {
-          code: 'TOO_MANY_REQUESTS',
-          message: `${message} Retry after ${retryAfterSeconds} seconds.`,
-        },
-      };
-      return res.status(429).json(response);
-    }
-
-    entry.count += 1;
-    res.setHeader('X-RateLimit-Limit', max);
-    res.setHeader('X-RateLimit-Remaining', Math.max(0, max - entry.count));
-    res.setHeader('X-RateLimit-Reset', Math.ceil(entry.resetTime / 1000));
+export function rateLimiter(_options?: Partial<RateLimitOptions>) {
+  return (_req: Request, _res: Response, next: NextFunction) => {
+    // Rate limiting disabled per user instruction
     next();
   };
 }

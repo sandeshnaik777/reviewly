@@ -91,11 +91,20 @@ paymentRouter.post(
     try {
       const { orderId, paymentId, signature, subscriptionId } = req.body;
 
-      // In real production with live keys, signature is verified against Razorpay secret
+      // 1. Strict Tenant Isolation Check: Verify order belongs to caller tenant
+      const existingPayment = await db.findPaymentByOrderId(orderId);
+      if (existingPayment && existingPayment.businessId !== req.tenantId) {
+        throw new AppError('Unauthorized: Order belongs to a different business tenant.', 403, 'FORBIDDEN');
+      }
+
+      // 2. Strict HMAC-SHA256 Signature Verification
       let isSignatureValid = paymentService.verifyPaymentSignature(orderId, paymentId, signature, subscriptionId);
 
-      if (!isSignatureValid && (signature.startsWith('simulated_') || signature === 'test_sig' || (paymentId.startsWith('pay_') && config.nodeEnv === 'development'))) {
-        isSignatureValid = true;
+      // Only allow simulation bypass in local development
+      if (!isSignatureValid && config.nodeEnv === 'development') {
+        if (signature.startsWith('simulated_') || signature === 'test_sig') {
+          isSignatureValid = true;
+        }
       }
 
       if (!isSignatureValid) {

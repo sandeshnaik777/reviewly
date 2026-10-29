@@ -86,8 +86,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   const [togglingAutoRenew, setTogglingAutoRenew] = useState(false);
   const [copiedTxnId, setCopiedTxnId] = useState<string | null>(null);
 
-  // Reputation & Telemetry Controls
-  const [rushMode, setRushMode] = useState(false);
+  // Reputation & Shield Controls
   const [shieldStrictness, setShieldStrictness] = useState<'standard' | 'strict'>('standard');
   const [timeHorizon, setTimeHorizon] = useState<'7d' | '30d'>('7d');
   const [selectedDayIdx, setSelectedDayIdx] = useState<number | null>(null);
@@ -735,21 +734,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             <span>Help & Contact</span>
           </button>
 
-          {/* Turbo Rush Mode Toggle */}
+          {/* Upgrade Plan Quick Button */}
           <button
-            onClick={() => {
-              setRushMode(!rushMode);
-              showNotification(
-                !rushMode
-                  ? 'Turbo Rush Mode ON: Streamlined prompt brevity enabled for maximum dinner turnover!'
-                  : 'Standard Telemetry Mode restored.'
-              );
-            }}
+            onClick={() => setActiveTab('billing')}
             style={{
-              background: rushMode ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'var(--surface-container)',
-              color: rushMode ? '#ffffff' : 'var(--text)',
-              border: rushMode ? 'none' : '1px solid var(--border)',
-              padding: '8px 12px',
+              background: 'var(--primary)',
+              color: '#ffffff',
+              border: 'none',
+              padding: '8px 14px',
               borderRadius: 'var(--radius-md)',
               fontSize: '13px',
               fontWeight: 600,
@@ -757,10 +749,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              boxShadow: '0 2px 4px rgba(0, 56, 59, 0.2)',
             }}
+            title="Upgrade your monthly review limits or subscription pack"
           >
-            <ZapIcon size={14} color={rushMode ? '#ffffff' : '#f59e0b'} />
-            <span className="hide-mobile">{rushMode ? 'Rush: ON' : 'Turbo Rush'}</span>
+            <TrendingUp size={14} color="#ffffff" />
+            <span>Upgrade Plan ↗</span>
           </button>
 
           <a
@@ -1023,7 +1017,24 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
 
               <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>AI Reviews Generated</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>AI Reviews Generated</div>
+                  <button
+                    onClick={() => setActiveTab('billing')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--primary)',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                    title="View plans and upgrade monthly limit"
+                  >
+                    Upgrade →
+                  </button>
+                </div>
                 <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--primary)' }}>
                   {analytics?.generated ?? 0}
                 </div>
@@ -2116,7 +2127,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             </div>
 
             {/* ======================================================== */}
-            {/* IRON MAN MISSION CONTROL FLIGHT DECK (BOTTOM HUD STRIP)  */}
+            {/* REAL-TIME PERFORMANCE & REPUTATION SUMMARY STRIP         */}
             {/* ======================================================== */}
             <div className="ironman-hud-strip" style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
@@ -4109,7 +4120,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviewLimitDisplay}</li>
                         <li>✓ {p.qrCodeLimit} Smart QR Stands</li>
                         <li>✓ Conversion Funnel Tracking</li>
-                        <li>✓ Aura Telemetry &amp; Reputation Shield</li>
+                        <li>✓ Real-Time Analytics &amp; Reputation Shield</li>
                       </ul>
 
                       <button

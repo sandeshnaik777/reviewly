@@ -1807,7 +1807,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                         <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviewsDisplay}</li>
                         <li>✓ {p.qrCodeLimit} Smart QR Stands</li>
                         <li>✓ Full Funnel Conversion Tracking</li>
-                        <li>✓ Aura Telemetry & Reputation Shield</li>
+                        <li>✓ Real-Time Analytics & Reputation Shield</li>
                       </ul>
 
                       <div style={{ marginTop: '16px' }}>
