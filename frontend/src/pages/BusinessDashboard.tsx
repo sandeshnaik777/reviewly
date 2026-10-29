@@ -166,6 +166,31 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
   // Toast / Status Message
   const [toast, setToast] = useState<string | null>(null);
 
+  // Mobile & Banner UX states
+  const [emailBannerDismissed, setEmailBannerDismissed] = useState(() => {
+    try { return sessionStorage.getItem('kindlyrate_dismiss_email_banner') === 'true'; } catch { return false; }
+  });
+  const [systemNotifDismissed, setSystemNotifDismissed] = useState(() => {
+    try { return sessionStorage.getItem('kindlyrate_dismiss_sys_notif') === 'true'; } catch { return false; }
+  });
+  const [mapsSetupDismissed, setMapsSetupDismissed] = useState(() => {
+    try { return sessionStorage.getItem('kindlyrate_dismiss_maps_setup') === 'true'; } catch { return false; }
+  });
+  const [overviewMobileSubtab, setOverviewMobileSubtab] = useState<'kpis' | 'keywords' | 'charts' | 'reviews'>('kpis');
+
+  const handleDismissEmailBanner = () => {
+    setEmailBannerDismissed(true);
+    try { sessionStorage.setItem('kindlyrate_dismiss_email_banner', 'true'); } catch {}
+  };
+  const handleDismissSystemNotif = () => {
+    setSystemNotifDismissed(true);
+    try { sessionStorage.setItem('kindlyrate_dismiss_sys_notif', 'true'); } catch {}
+  };
+  const handleDismissMapsSetup = () => {
+    setMapsSetupDismissed(true);
+    try { sessionStorage.setItem('kindlyrate_dismiss_maps_setup', 'true'); } catch {}
+  };
+
   // Subscription verification state
   const isPaidActive = Boolean(
     (subscriptionData?.status === 'ACTIVE') ||
@@ -734,25 +759,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     <div className="dashboard-layout">
       {/* Toast Notification */}
       {toast && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '24px',
-            right: '24px',
-            background: '#18181b',
-            color: '#f8fafc',
-            padding: '12px 20px',
-            borderRadius: 'var(--radius-md)',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-            zIndex: 1200,
-            fontSize: '13.5px',
-            fontWeight: 500,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            border: '1px solid #3f3f46',
-          }}
-        >
+        <div className="app-toast">
           <span className="telemetry-pulse" />
           <span>{toast}</span>
         </div>
@@ -979,6 +986,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             {/* Announcements & Notifications Bell */}
             <button
               type="button"
+              className="hide-mobile"
               onClick={() => setShowNotifDrawer(true)}
               style={{
                 position: 'relative',
@@ -1017,6 +1025,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             {/* Help & Contact Button */}
             <button
               type="button"
+              className="hide-mobile"
               onClick={() => setShowHelpModal(true)}
               style={{
                 background: '#f8fafc',
@@ -1098,8 +1107,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         </header>
 
       {/* System Announcement Top Notification Bar */}
-      {systemNotifications.length > 0 && (
+      {systemNotifications.length > 0 && !systemNotifDismissed && (
         <div
+          className="mobile-slim-notice"
           style={{
             background:
               systemNotifications[0].type === 'ALERT'
@@ -1119,71 +1129,78 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 : systemNotifications[0].type === 'WARNING'
                   ? '#92400e'
                   : '#166534',
-            padding: '10px 24px',
+            padding: '8px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
-            flexWrap: 'wrap',
-            fontSize: '13px',
+            gap: '10px',
+            fontSize: '12.5px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>
-              {systemNotifications[0].type === 'ALERT'
-                ? 'ALERT'
-                : systemNotifications[0].type === 'WARNING'
-                  ? 'NOTICE'
-                  : 'UPDATE'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+            <span style={{ fontWeight: 800, fontSize: '10px', padding: '1px 6px', borderRadius: '4px', background: 'rgba(0,0,0,0.06)' }}>
+              {systemNotifications[0].type === 'ALERT' ? 'ALERT' : systemNotifications[0].type === 'WARNING' ? 'NOTICE' : 'UPDATE'}
             </span>
-            <strong>{systemNotifications[0].title}:</strong>
-            <span>{systemNotifications[0].message}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <strong>{systemNotifications[0].title}:</strong> {systemNotifications[0].message}
+            </span>
           </div>
-          <button
-            onClick={() => setShowNotifDrawer(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '12.5px',
-              color: 'inherit',
-            }}
-          >
-            View All ({systemNotifications.length}) →
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            <button
+              onClick={() => setShowNotifDrawer(true)}
+              style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', fontWeight: 700, fontSize: '12px', color: 'inherit' }}
+            >
+              View All ({systemNotifications.length}) →
+            </button>
+            <button
+              onClick={handleDismissSystemNotif}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '13px', padding: '0 4px' }}
+              title="Dismiss announcement"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 
       {/* Unverified Email Alert Banner */}
-      {currentUser && currentUser.emailVerified === false && (
+      {currentUser && currentUser.emailVerified === false && !emailBannerDismissed && (
         <div
+          className="mobile-slim-notice"
           style={{
             background: '#fffbeb',
-            borderBottom: '1.5px solid #fde047',
-            padding: '12px 24px',
+            borderBottom: '1px solid #fde047',
+            padding: '8px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            gap: '10px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+            fontSize: '12.5px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Mail size={16} />
-            <span style={{ fontSize: '13.5px', color: '#854d0e' }}>
-              <strong>Your email is unverified:</strong> Please confirm <strong>{currentUser.email}</strong> to activate staff review notifications and telemetry alerts.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+            <Mail size={14} style={{ flexShrink: 0, color: '#854d0e' }} />
+            <span style={{ color: '#854d0e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <strong>Email unverified:</strong> Confirm <strong>{currentUser.email}</strong> for review alerts
             </span>
           </div>
-          <button
-            onClick={() => setShowEmailVerifyModal(true)}
-            className="btn btn-primary btn-sm"
-            style={{ fontSize: '12.5px', padding: '6px 14px' }}
-          >
-            Verify Email (Enter 6-Digit Code) →
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <button
+              onClick={() => setShowEmailVerifyModal(true)}
+              className="btn btn-primary btn-sm"
+              style={{ fontSize: '11.5px', padding: '4px 10px', height: '28px', whiteSpace: 'nowrap' }}
+            >
+              Verify Code →
+            </button>
+            <button
+              onClick={handleDismissEmailBanner}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#854d0e', fontSize: '13px', padding: '0 4px' }}
+              title="Dismiss for now"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 
@@ -1193,75 +1210,61 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           style={{
             background: 'linear-gradient(90deg, #fffbeb 0%, #fef3c7 100%)',
             borderBottom: '2px solid #f59e0b',
-            padding: '12px 24px',
+            padding: '10px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '14px',
-            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.15)',
+            gap: '10px',
+            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.12)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: '#fef3c7',
-                border: '1.5px solid #f59e0b',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '18px',
-                flexShrink: 0,
-              }}
-            >
-              🔒
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <span style={{ fontSize: '20px', flexShrink: 0 }}>🔒</span>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <strong style={{ color: '#78350f', fontSize: '14px' }}>
-                  Account in Free Preview Mode · Plan Activation Required
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <strong style={{ color: '#78350f', fontSize: '13px' }}>
+                  Free Preview Mode
                 </strong>
                 <span
                   style={{
                     background: '#f59e0b',
                     color: '#ffffff',
-                    fontSize: '11px',
+                    fontSize: '10px',
                     fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: '10px',
+                    padding: '1px 6px',
+                    borderRadius: '8px',
                   }}
                 >
                   Unpaid
                 </span>
               </div>
-              <div style={{ color: '#92400e', fontSize: '12.5px', marginTop: '2px' }}>
-                Live customer review submissions and physical QR counter stands require an active plan. Activate our ₹79 introductory pack or annual autopay to go live immediately.
+              <div className="hide-mobile" style={{ color: '#92400e', fontSize: '12px', marginTop: '1px' }}>
+                Live customer review submissions and physical QR counter stands require an active plan.
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
               onClick={handlePayTrial}
               className="btn btn-primary btn-sm"
               style={{
-                fontSize: '13px',
-                padding: '8px 18px',
+                fontSize: '12.5px',
+                padding: '7px 16px',
                 background: '#d97706',
                 borderColor: '#b45309',
-                fontWeight: 700,
+                fontWeight: 800,
                 boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)',
+                whiteSpace: 'nowrap',
               }}
             >
               ⚡ Activate Testing Pack (₹79) →
             </button>
             <button
               onClick={() => setActiveTab('subscription')}
-              className="btn btn-secondary btn-sm"
-              style={{ fontSize: '13px', padding: '8px 14px' }}
+              className="btn btn-secondary btn-sm hide-mobile"
+              style={{ fontSize: '12px', padding: '7px 12px' }}
             >
               View All Plans
             </button>
@@ -1334,61 +1337,97 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             </div>
 
             {/* Quick Setup Checklist for Google Maps Link */}
-            {(!business?.googleReviewUrl || business.googleReviewUrl === 'https://maps.google.com') && !quickMapsSuccess && (
+            {(!business?.googleReviewUrl || business.googleReviewUrl === 'https://maps.google.com') && !quickMapsSuccess && !mapsSetupDismissed && (
               <div
+                className="dashboard-card-responsive"
                 style={{
                   background: 'linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)',
                   border: '2px solid #fed7aa',
                   borderRadius: '14px',
-                  padding: '20px 24px',
-                  marginBottom: '22px',
+                  padding: '16px 20px',
+                  marginBottom: '20px',
                   boxShadow: '0 4px 14px rgba(154, 64, 24, 0.06)',
+                  position: 'relative',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#ea580c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                    📍
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#ea580c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', flexShrink: 0 }}>
+                      📍
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#9a3412', margin: 0 }}>
+                        Step 1: Connect Your Google Maps Listing
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '12.5px', color: '#7c2d12' }}>
+                        Paste your Google Maps review link or share URL so reviews publish directly to your store:
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#9a3412', margin: 0 }}>
-                      Step 1: Connect Your Google Maps Listing
-                    </h3>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#7c2d12' }}>
-                      Your smart QR stand is live! Paste your Google Maps review link or share URL below so customer reviews publish directly to your store:
-                    </p>
-                  </div>
+                  <button
+                    onClick={handleDismissMapsSetup}
+                    style={{ background: 'none', border: 'none', color: '#9a3412', cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '2px 6px' }}
+                    title="Dismiss for now"
+                  >
+                    ✕ Later
+                  </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '14px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/... or https://search.google.com/...)"
+                    placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/...)"
                     value={quickMapsUrl}
                     onChange={(e) => setQuickMapsUrl(e.target.value)}
-                    style={{ flex: 1, minWidth: '280px', background: '#ffffff', border: '1.5px solid #fdba74' }}
+                    style={{ flex: 1, minWidth: '200px', background: '#ffffff', border: '1.5px solid #fdba74' }}
                   />
                   <button
                     type="button"
                     className="btn btn-primary"
                     disabled={quickSavingMaps || !quickMapsUrl.trim()}
                     onClick={handleQuickConnectMaps}
-                    style={{ whiteSpace: 'nowrap', padding: '0 20px', fontWeight: 700 }}
+                    style={{ whiteSpace: 'nowrap', padding: '0 18px', fontWeight: 700 }}
                   >
-                    {quickSavingMaps ? 'Connecting...' : 'Connect Google Maps Link →'}
+                    {quickSavingMaps ? 'Connecting...' : 'Connect Link →'}
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '12.5px', color: '#9a3412', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span>💡 <strong>Tip:</strong> Open Google Maps on phone or desktop, search your business name, tap "Share" ➔ "Copy link" and paste here!</span>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '12px', color: '#9a3412', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span>💡 <strong>Tip:</strong> Search your business on Google Maps, tap "Share" ➔ "Copy link" and paste here!</span>
                 </div>
               </div>
             )}
 
-            {/* Unpaid / Trial Hero Banner */}
+            {/* Mobile Segmented Sub-Nav Pills (Visible only on phone screens) */}
+            <div className="show-mobile-only mobile-segment-tabs">
+              <button
+                type="button"
+                className={`mobile-segment-tab ${overviewMobileSubtab === 'kpis' ? 'active' : ''}`}
+                onClick={() => setOverviewMobileSubtab('kpis')}
+              >
+                📊 Overview
+              </button>
+              <button
+                type="button"
+                className={`mobile-segment-tab ${overviewMobileSubtab === 'keywords' ? 'active' : ''}`}
+                onClick={() => setOverviewMobileSubtab('keywords')}
+              >
+                🎯 SEO Keywords
+              </button>
+              <button
+                type="button"
+                className={`mobile-segment-tab ${overviewMobileSubtab === 'charts' ? 'active' : ''}`}
+                onClick={() => setOverviewMobileSubtab('charts')}
+              >
+                📈 Analytics
+              </button>
+            </div>
+
+            {/* Unpaid / Trial Hero Banner (Desktop only - mobile uses sleek top banner) */}
             {!isPaidActive && (
               <div
-                className="card"
+                className="card hide-mobile"
                 style={{
                   background: 'linear-gradient(135deg, #fffcf8 0%, #fef3c7 100%)',
                   border: '2px solid #f59e0b',
@@ -1442,16 +1481,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             )}
 
-            {/* Top 4 KPI Metrics Row */}
-            <div
-              className="dashboard-kpi-grid"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-                gap: '16px',
-                marginBottom: '22px',
-              }}
-            >
+            {/* Overview Section Wrapper: Top 4 KPIs & Mobile Quick Actions */}
+            <div className={overviewMobileSubtab !== 'kpis' ? 'hide-mobile' : ''}>
+              {/* Top 4 KPI Metrics Row */}
+              <div
+                className="dashboard-kpi-grid"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
+                  gap: '16px',
+                  marginBottom: '20px',
+                }}
+              >
               <div
                 className="card dashboard-kpi-card"
                 style={{
@@ -1559,9 +1600,56 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
             </div>
 
-            {/* TARGET KEYWORDS & MENTION SUGGESTIONS ENGINE */}
+            {/* Mobile Quick Action Hub (Only visible on mobile screens) */}
+            <div className="show-mobile-only" style={{ marginBottom: '18px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                {qrs[0] && (
+                  <a
+                    href={`/r/${qrs[0].slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-primary"
+                    style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                  >
+                    <SparklesIcon size={14} color="#ffffff" />
+                    <span>Test Flow ↗</span>
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('qrs')}
+                  className="btn btn-secondary"
+                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  <QrCode size={14} />
+                  <span>Get Stand</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOverviewMobileSubtab('keywords')}
+                  className="btn btn-secondary"
+                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  <Target size={14} color="#15803d" />
+                  <span>Keywords</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOverviewMobileSubtab('charts')}
+                  className="btn btn-secondary"
+                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  <TrendingUpIcon size={14} color="#2563eb" />
+                  <span>Analytics</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* TARGET KEYWORDS & MENTION SUGGESTIONS ENGINE */}
+          <div className={overviewMobileSubtab !== 'keywords' ? 'hide-mobile' : ''}>
             <div
-              className="card"
+              className="card dashboard-card-responsive"
               style={{
                 background: '#ffffff',
                 border: '1.5px solid #e2e8f0',
@@ -1776,9 +1864,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </button>
               </div>
             </div>
+          </div>
 
+          {/* DEEP ANALYTICS & CONVERSION CHARTS */}
+          <div className={overviewMobileSubtab !== 'charts' ? 'hide-mobile' : ''}>
             {/* VISUAL GRAPH 1: WEEKLY CONVERSION TREND & VELOCITY */}
-            <div className="card" style={{ padding: '28px', marginBottom: '24px' }}>
+            <div className="card dashboard-card-responsive" style={{ padding: '28px', marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '20px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -2590,6 +2681,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </div>
               </div>
             </div>
+            </div>
           </div>
         )}
 
@@ -2692,7 +2784,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
 
               {/* 4 Summary Stat Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
+              <div className="dashboard-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
                 <div style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
                   <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
                     Total QR Scans
@@ -2744,14 +2836,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             </div>
 
             {/* Quick Generator Box */}
-            <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border-light)' }}>
+            <div className="card dashboard-card-responsive" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border-light)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                 <Zap size={18} />
                 <h4 style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>
                   Quick Stand Generator
                 </h4>
               </div>
-              <form onSubmit={handleCreateQR} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr)) auto', gap: '14px', alignItems: 'flex-end' }}>
+              <form onSubmit={handleCreateQR} className="form-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr)) auto', gap: '14px', alignItems: 'flex-end' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label" style={{ fontSize: '12px' }}>Stand / Location Name *</label>
                   <input
@@ -2773,7 +2865,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     onChange={(e) => setNewQRLocation(e.target.value)}
                   />
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ padding: '10px 22px', whiteSpace: 'nowrap', height: '42px' }}>
+                <button type="submit" className="btn btn-primary" style={{ padding: '10px 22px', whiteSpace: 'nowrap', height: '46px' }}>
                   Generate &amp; Add Stand
                 </button>
               </form>
@@ -2792,7 +2884,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                 {qrs.map((qr: any) => {
                   const targetCustomerUrl = `${window.location.origin}/r/${qr.slug}`;
                   const pngDownloadUrl = `/api/qrs/${qr.slug}/image?format=png`;
@@ -4593,8 +4685,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         </div>
                       ) : null}
 
-                      {/* Header with Title and Month Duration Selector in Right Upper Container */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                      {/* Header with Title and Month Duration Selector */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '18px' }}>{p.name}</div>
                           <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600, marginTop: '2px' }}>
@@ -4602,12 +4694,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                           </div>
                         </div>
 
-                        {/* In right upper of container: Select Months */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+                        {/* Select Months */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px', marginTop: '4px' }}>
                           <span style={{ fontSize: '9.5px', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.4px' }}>
                             Select Months
                           </span>
-                          <div style={{ display: 'inline-flex', background: 'var(--surface-container)', padding: '2px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                          <div style={{ display: 'inline-flex', flexWrap: 'wrap', background: 'var(--surface-container)', padding: '2px', borderRadius: '8px', border: '1px solid var(--border)', gap: '2px' }}>
                             {[
                               { m: 1 as const, lbl: '1M' },
                               { m: 3 as const, lbl: '3M' },
@@ -5216,7 +5308,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             className={`mobile-bottom-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
-            <BarChart3 size={19} />
+            <BarChart3 size={18} />
             <span>Overview</span>
           </button>
           <button
@@ -5224,15 +5316,24 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             className={`mobile-bottom-nav-item ${activeTab === 'qrs' ? 'active' : ''}`}
             onClick={() => setActiveTab('qrs')}
           >
-            <QrCode size={19} />
+            <QrCode size={18} />
             <span>QR Stands</span>
+          </button>
+          <button
+            type="button"
+            className={`mobile-bottom-nav-item ${activeTab === 'subscription' ? 'active' : ''}`}
+            onClick={() => setActiveTab('subscription')}
+            style={!isPaidActive ? { color: '#b45309', fontWeight: 700 } : undefined}
+          >
+            <Zap size={18} color={!isPaidActive ? '#d97706' : 'currentColor'} />
+            <span>{!isPaidActive ? '₹79 Pack' : 'Plans'}</span>
           </button>
           <button
             type="button"
             className={`mobile-bottom-nav-item ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            <MessageSquare size={19} />
+            <MessageSquare size={18} />
             <span>Reviews</span>
           </button>
           <button
@@ -5240,7 +5341,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             className="mobile-bottom-nav-item"
             onClick={() => setMobileMenuOpen(true)}
           >
-            <Menu size={19} />
+            <Menu size={18} />
             <span>More</span>
           </button>
         </nav>
@@ -5260,10 +5361,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1100,
-              padding: '20px',
+              padding: '12px',
             }}
           >
-            <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '28px' }}>
+            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '420px' }}>
               <h3 className="serif" style={{ fontSize: '19px', marginBottom: '14px' }}>
                 New Table QR Stand
               </h3>
@@ -5303,7 +5404,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           </div>
         )}
 
-        {/* Custom Software Inquiry Modal (Type freely instead of select) */}
+        {/* Custom Software Inquiry Modal */}
         {showInquiryModal && (
           <div
             style={{
@@ -5317,10 +5418,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1100,
-              padding: '20px',
+              padding: '12px',
             }}
           >
-            <div className="card" style={{ width: '100%', maxWidth: '480px', padding: '28px' }}>
+            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '480px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <h3 className="serif" style={{ fontSize: '19px', fontWeight: 600 }}>
                   Request Custom Software Development
@@ -5433,10 +5534,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1150,
-              padding: '20px',
+              padding: '12px',
             }}
           >
-            <div className="card" style={{ width: '100%', maxWidth: '480px', padding: '28px' }}>
+            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '480px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Phone size={20} />
@@ -5540,10 +5641,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1150,
-              padding: '20px',
+              padding: '12px',
             }}
           >
-            <div className="card" style={{ width: '100%', maxWidth: '520px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', padding: '24px' }}>
+            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '520px', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Bell size={20} />

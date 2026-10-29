@@ -661,7 +661,12 @@ a {
 
 @media (max-width: 520px) {
   .proof-strip-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .proof-strip-grid > div {
+    padding: 8px 10px !important;
+    font-size: 11.5px !important;
   }
 }
 
@@ -912,7 +917,7 @@ a {
   gap: 12px;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   /* Prevent horizontal screen jiggle/overflow on mobile */
   html, body {
     overflow-x: hidden;
@@ -957,9 +962,15 @@ a {
   }
 
   /* Ensure inputs have at least 16px font-size to prevent iOS Safari auto-zoom */
-  .form-input, .form-select, .form-textarea {
+  .form-input, .form-select {
     font-size: 16px !important;
     height: 46px !important;
+  }
+  .form-textarea {
+    font-size: 16px !important;
+    height: auto !important;
+    min-height: 85px !important;
+    line-height: 1.5 !important;
   }
 
   /* Full-width touch-friendly buttons on phone */
@@ -1046,6 +1057,127 @@ a {
     padding: 10px 16px max(10px, env(safe-area-inset-bottom));
     z-index: 50;
   }
+
+  /* Responsive card override to prevent crushed content */
+  .dashboard-card-responsive {
+    padding: 16px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Slim banner notices on mobile that never fill the entire viewport */
+  .mobile-slim-notice {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  /* Mobile bottom navigation spacing */
+  .dashboard-content-body {
+    padding: 12px 10px 85px !important;
+  }
+
+  /* Responsive modal dialogs */
+  .modal-responsive-card {
+    padding: 18px 14px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+  }
+
+  /* Smooth scrollable chart & table wrappers */
+  .mobile-scroll-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 6px !important;
+  }
+}
+
+/* Floating Toast Styling across Mobile & Desktop */
+.app-toast {
+  position: fixed;
+  z-index: 2000;
+  background: #18181b;
+  color: #f8fafc;
+  padding: 11px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #3f3f46;
+  pointer-events: none;
+  animation: toastFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 769px) {
+  .app-toast {
+    top: 24px;
+    right: 24px;
+    max-width: 440px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-toast {
+    bottom: 74px; /* Sits nicely above the 60px mobile bottom nav */
+    left: 14px;
+    right: 14px;
+    max-width: calc(100vw - 28px);
+    justify-content: center;
+    text-align: center;
+    font-size: 12.5px;
+    padding: 10px 14px;
+  }
+}
+
+/* Mobile Segmented Sub-Nav Pills */
+.mobile-segment-tabs {
+  display: flex;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-segment-tab {
+  flex: 1;
+  min-width: 90px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.mobile-segment-tab.active {
+  background: #ffffff;
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 /* ======================================================== */
@@ -1394,3 +1526,20 @@ a {
 
 
 
+
+/* Touch friendly form button and flex wrap helpers */
+.mobile-touch-target {
+  min-height: 44px;
+}
+
+@media (max-width: 768px) {
+  .btn {
+    min-height: 42px;
+  }
+  .executive-card {
+    padding: 20px 14px !important;
+  }
+  .pricing-grid .card {
+    padding: 22px 16px !important;
+  }
+}

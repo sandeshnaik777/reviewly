@@ -1412,7 +1412,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   </button>
                 </div>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <div className="table-responsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid var(--border)', textAlign: 'left', color: 'var(--text-muted)' }}>
                       <th style={{ padding: '12px 8px' }}>Business</th>
@@ -1562,7 +1562,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       );
                     })}
                   </tbody>
-                </table>
+                </table></div>
               )}
             </div>
 

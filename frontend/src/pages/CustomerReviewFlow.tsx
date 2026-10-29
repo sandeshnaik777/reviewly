@@ -573,7 +573,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                       </span>
                     </div>
 
-                    <div className="star-rating" style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', padding: '4px 0' }}>
+                    <div className="star-rating" style={{ display: 'flex', gap: '6px', justifyContent: 'space-between', padding: '4px 0', width: '100%' }}>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
@@ -582,20 +582,22 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                           onClick={() => handleRatingChange(q.questionKey, star)}
                           aria-label={`Rate ${star} stars`}
                           style={{
-                            padding: '8px',
-                            minWidth: '46px',
-                            minHeight: '46px',
+                            padding: '6px 2px',
+                            flex: '1 1 0',
+                            minWidth: '38px',
+                            maxWidth: '54px',
+                            height: '46px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRadius: '10px',
-                            background: star <= currentRating ? '#fff8f4' : 'transparent',
-                            border: star <= currentRating ? '1px solid #fed7aa' : '1px solid transparent',
+                            background: star <= currentRating ? '#fff8f4' : '#f8fafc',
+                            border: star <= currentRating ? '1.5px solid #fed7aa' : '1px solid #e2e8f0',
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
                           }}
                         >
-                          <StarIcon size={32} filled={star <= currentRating} />
+                          <StarIcon size={26} filled={star <= currentRating} />
                         </button>
                       ))}
                     </div>
