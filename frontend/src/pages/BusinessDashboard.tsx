@@ -54,6 +54,9 @@ import {
   BarChart3,
   CheckCircle2,
   Zap,
+  Layers,
+  Code2,
+  Briefcase,
 } from 'lucide-react';
 import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
 import { ScratchCard } from '../components/ScratchCard.js';
@@ -70,7 +73,7 @@ interface Props {
 
 export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => {
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'qrs' | 'ai_settings' | 'history' | 'profile' | 'subscription'
+    'overview' | 'qrs' | 'ai_settings' | 'history' | 'profile' | 'subscription' | 'custom_software'
   >('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -680,6 +683,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       icon: <ShieldCheckIcon size={18} />,
       badge: isPaidActive ? 'PRO' : 'TRIAL',
     },
+    {
+      id: 'custom_software' as const,
+      label: 'Custom Software & ERP',
+      icon: <Layers size={18} />,
+      badge: 'SOLUTIONS',
+    },
   ];
 
   const currentTabMeta = navTabs.find((t) => t.id === activeTab) || navTabs[0];
@@ -1231,6 +1240,62 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         {/* ======================================================== */}
         {activeTab === 'overview' && (
           <div>
+            {/* Mission Control Page Header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '14px',
+                marginBottom: '20px',
+                background: '#ffffff',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '14px',
+                padding: '18px 22px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                  <h2 className="serif" style={{ fontSize: '22px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    Mission Control
+                  </h2>
+                  <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d', fontWeight: 700 }}>
+                    ● Live Telemetry
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                  Real-time Google Maps performance, review conversion velocity, and customer sentiment for <strong style={{ color: '#0f172a' }}>{business?.name || 'your business'}</strong>
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={handleRefreshMapsRankings}
+                  disabled={isRefreshingMaps}
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <RefreshIcon size={14} />
+                  <span>{isRefreshingMaps ? 'Syncing...' : 'Sync Telemetry'}</span>
+                </button>
+                {qrs[0] && (
+                  <a
+                    href={`/r/${qrs[0].slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <SparklesIcon size={14} color="#ffffff" />
+                    <span>Open Review Flow ↗</span>
+                  </a>
+                )}
+              </div>
+            </div>
+
             {/* Unpaid / Trial Hero Banner */}
             {!isPaidActive && (
               <div
@@ -1293,69 +1358,114 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               className="dashboard-kpi-grid"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
                 gap: '16px',
-                marginBottom: '24px',
+                marginBottom: '22px',
               }}
             >
-              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Customer Satisfaction Index</div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
-                  <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800 }}>{analytics?.avgRating ? `${analytics.avgRating}` : '0.0'}</div>
-                  <div style={{ color: 'var(--star-active)', fontSize: '18px' }}>★★★★★</div>
+              <div
+                className="card dashboard-kpi-card"
+                style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '14px',
+                  padding: '20px 22px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                }}
+              >
+                <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  Customer Rating Index
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
-                  {reviews.length > 0 ? '● Verified rating active' : '● Awaiting initial ratings'}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '6px' }}>
+                  <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, color: '#0f172a' }}>
+                    {analytics?.avgRating ? `${analytics.avgRating}` : '5.0'}
+                  </div>
+                  <div style={{ color: '#f59e0b', fontSize: '18px', letterSpacing: '1px' }}>★★★★★</div>
+                </div>
+                <div style={{ fontSize: '12.5px', color: '#15803d', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
+                  <span>{reviews.length > 0 ? 'Verified rating active' : 'Awaiting initial ratings'}</span>
                 </div>
               </div>
 
-              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--text-muted)' }}>
+              <div
+                className="card dashboard-kpi-card"
+                style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '14px',
+                  padding: '20px 22px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   <GoogleLogo size={14} />
                   <span>Google Maps Driven</span>
                 </div>
-                <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--success)' }}>
+                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: '#15803d' }}>
                   {analytics?.googleClicks ?? 0}
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  {analytics?.funnel?.copiedToGoogle ?? 0}% conversion from scans
+                <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px' }}>
+                  <strong style={{ color: '#0f172a' }}>{analytics?.funnel?.copiedToGoogle ?? 0}%</strong> conversion from scans
                 </div>
               </div>
 
-              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
+              <div
+                className="card dashboard-kpi-card"
+                style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '14px',
+                  padding: '20px 22px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                }}
+              >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>AI Reviews Generated</div>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    AI Reviews Generated
+                  </div>
                   <button
                     onClick={() => setActiveTab('subscription')}
                     style={{
                       background: 'none',
                       border: 'none',
                       color: 'var(--primary)',
-                      fontSize: '12px',
-                      fontWeight: 600,
+                      fontSize: '11.5px',
+                      fontWeight: 700,
                       cursor: 'pointer',
                       padding: 0,
                     }}
                     title="View plans and upgrade monthly limit"
                   >
-                    Upgrade →
+                    Manage Limit →
                   </button>
                 </div>
-                <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px', color: 'var(--primary)' }}>
+                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: 'var(--primary)' }}>
                   {analytics?.generated ?? 0}
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  From {analytics?.ratings ?? 0} rating sessions
+                <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px' }}>
+                  From <strong style={{ color: '#0f172a' }}>{analytics?.ratings ?? 0}</strong> rating sessions
                 </div>
               </div>
 
-              <div className="card dashboard-kpi-card" style={{ padding: '22px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total QR Scans</div>
-                <div className="kpi-value" style={{ fontSize: '36px', fontWeight: 800, marginTop: '4px' }}>
+              <div
+                className="card dashboard-kpi-card"
+                style={{
+                  background: '#ffffff',
+                  border: '1.5px solid #e2e8f0',
+                  borderRadius: '14px',
+                  padding: '20px 22px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                }}
+              >
+                <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  Total QR Scans
+                </div>
+                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: '#0f172a' }}>
                   {analytics?.scans ?? 0}
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  Across {qrs.length} active QR stations
+                <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px' }}>
+                  Across <strong style={{ color: '#0f172a' }}>{qrs.length}</strong> active counter stations
                 </div>
               </div>
             </div>
@@ -1918,107 +2028,107 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               }}
             >
               {/* Financial Telemetry & Aggregator Savings */}
-              <div className="card" style={{ padding: '26px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h4 style={{ fontSize: '17px', fontWeight: 600 }}>
-                    Financial Telemetry & Aggregator Savings
+              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    Financial Telemetry &amp; Aggregator Savings
                   </h4>
-                  <span className="stat-pill stat-pill-success">
+                  <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700 }}>
                     Net: +₹{financial.totalMonthlyImpactInr.toLocaleString()}/mo
                   </span>
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px' }}>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
                   Quantified financial value delivered directly to your bottom line.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ padding: '12px 14px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Direct Walk-In Revenue Lift</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Guests discovering via Google Maps 5★ pack</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Direct Walk-In Revenue Lift</div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Guests discovering via Google Maps 5★ pack</div>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--success)' }}>
+                    <div style={{ fontWeight: 800, fontSize: '16px', color: '#15803d' }}>
                       +₹{financial.walkInRevenueInr.toLocaleString()}
                     </div>
                   </div>
 
-                  <div style={{ padding: '12px 14px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Direct Walk-In Commission Saved</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Aggregator commissions saved on direct walk-in customers</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Direct Walk-In Commission Saved</div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Aggregator commissions saved on direct walk-in customers</div>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--primary)' }}>
+                    <div style={{ fontWeight: 800, fontSize: '16px', color: 'var(--primary)' }}>
                       +₹{financial.aggregatorCommissionsSavedInr.toLocaleString()}
                     </div>
                   </div>
 
-                  <div style={{ padding: '12px 14px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Shield Recovered Revenue</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied customers intercepted and recovered privately</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Shield Recovered Revenue</div>
+                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied customers intercepted and recovered privately</div>
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: '15px', color: '#16a34a' }}>
+                    <div style={{ fontWeight: 800, fontSize: '16px', color: '#16a34a' }}>
                       +₹{financial.shieldRecoveredRevenueInr.toLocaleString()}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 4px', fontSize: '12.5px', color: 'var(--text-muted)' }}>
-                    <span>Customer Acquisition Cost: <strong style={{ color: 'var(--success)' }}>₹0</strong> (vs ₹450 Google Ads CPC)</span>
-                    <span>LTV Multiplier: <strong style={{ color: 'var(--text)' }}>{financial.customerLifetimeValueMultiplier}</strong></span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 4px', fontSize: '13px', color: '#64748b' }}>
+                    <span>Customer Acquisition Cost: <strong style={{ color: '#15803d' }}>₹0</strong> (vs ₹450 Google Ads CPC)</span>
+                    <span>LTV Multiplier: <strong style={{ color: '#0f172a' }}>{financial.customerLifetimeValueMultiplier}</strong></span>
                   </div>
                 </div>
               </div>
 
               {/* Competitor Radar & Suburb Share of Search */}
-              <div className="card" style={{ padding: '26px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h4 style={{ fontSize: '17px', fontWeight: 600 }}>
-                    Local Search Dominance & Competitor Radar
+              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    Local Search Dominance &amp; Competitor Radar
                   </h4>
-                  <span className="stat-pill stat-pill-primary">{roi.googleLocalPackRank || 'Radar Active'}</span>
+                  <span className="stat-pill stat-pill-primary" style={{ fontSize: '11px', fontWeight: 700 }}>{roi.googleLocalPackRank || 'Radar Active'}</span>
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', marginTop: '2px' }}>
                   Your Google Maps local 3-pack search share vs top 3 local rivals.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {competitors.length === 0 ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                       <div style={{ marginBottom: '6px' }}><Target size={20} color="var(--primary)" /></div>
-                      <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Competitor Radar Initializing</div>
-                      <div style={{ fontSize: '12px', marginTop: '4px' }}>Live competitor benchmarks will populate as reviews and Google Maps data are collected.</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Competitor Radar Initializing</div>
+                      <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Live competitor benchmarks will populate as reviews and Google Maps data are collected.</div>
                     </div>
                   ) : (
                     competitors.map((comp: any, idx: number) => (
                       <div
                         key={idx}
                         style={{
-                          padding: '10px 14px',
-                          background: comp.rank === 1 ? '#fef3ee' : 'var(--surface-container)',
-                          border: comp.rank === 1 ? '1px solid #fed7aa' : 'none',
-                          borderRadius: 'var(--radius-sm)',
+                          padding: '12px 14px',
+                          background: comp.rank === 1 ? '#fef3ee' : '#f8fafc',
+                          border: comp.rank === 1 ? '1.5px solid #fed7aa' : '1px solid #e2e8f0',
+                          borderRadius: '10px',
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <strong style={{ fontSize: '13px', width: '20px', color: comp.rank === 1 ? 'var(--primary)' : 'var(--text-muted)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <strong style={{ fontSize: '14px', width: '24px', color: comp.rank === 1 ? 'var(--primary)' : '#64748b' }}>
                             #{comp.rank}
                           </strong>
                           <div>
-                            <div style={{ fontWeight: 600, fontSize: '13.5px', color: comp.rank === 1 ? 'var(--primary)' : 'var(--text)' }}>
+                            <div style={{ fontWeight: 700, fontSize: '14px', color: comp.rank === 1 ? 'var(--primary)' : '#0f172a' }}>
                               {comp.name}
                             </div>
-                            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '1px' }}>
                               {comp.reviewsCount} reviews · {comp.shareOfSearch} search share
                             </div>
                           </div>
                         </div>
 
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontWeight: 700, fontSize: '13.5px' }}>{comp.rating} ★</div>
-                          <span className={`stat-pill ${comp.rank === 1 ? 'stat-pill-success' : 'stat-pill-neutral'}`} style={{ fontSize: '10.5px' }}>
+                          <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>{comp.rating} ★</div>
+                          <span className={`stat-pill ${comp.rank === 1 ? 'stat-pill-success' : 'stat-pill-neutral'}`} style={{ fontSize: '10.5px', fontWeight: 600 }}>
                             {comp.badge}
                           </span>
                         </div>
@@ -2307,36 +2417,38 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               }}
             >
               {/* Hourly / Peak Shift Heatmap */}
-              <div className="card" style={{ padding: '26px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h4 style={{ fontSize: '17px', fontWeight: 600 }}>
+              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                     Customer Peak Hours &amp; Activity Telemetry
                   </h4>
-                  <span className="stat-pill stat-pill-neutral">{reviews.length > 0 ? 'Telemetry Active' : 'Awaiting Scans'}</span>
+                  <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 700 }}>
+                    {reviews.length > 0 ? '● Telemetry Active' : 'Awaiting Scans'}
+                  </span>
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px' }}>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
                   Customer activity, review submission velocity, and visit patterns.
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
-                    <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      <div style={{ fontSize: '18px', marginBottom: '4px' }}>⏰</div>
-                      <div style={{ fontWeight: 600, fontSize: '13px' }}>Activity Telemetry Standby</div>
-                      <div style={{ fontSize: '11.5px' }}>Hourly distribution begins tracking with your first customer scan.</div>
+                    <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                      <div style={{ fontSize: '20px', marginBottom: '4px' }}>⏰</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Activity Telemetry Standby</div>
+                      <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Hourly distribution begins tracking with your first customer scan.</div>
                     </div>
                   ) : (
                     analytics.hourlyDistribution.map((shift: any, idx: number) => (
-                      <div key={idx} style={{ padding: '10px 14px', background: shift.isPeak ? '#fef3ee' : 'var(--surface-container)', borderRadius: 'var(--radius-sm)', border: shift.isPeak ? '1px solid #fed7aa' : 'none' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                          <div style={{ fontWeight: 600, fontSize: '13.5px', color: shift.isPeak ? 'var(--primary)' : 'var(--text)' }}>
-                            {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 5px', marginLeft: '4px' }}>Peak</span>}
+                      <div key={idx} style={{ padding: '12px 14px', background: shift.isPeak ? '#fef3ee' : '#f8fafc', borderRadius: '10px', border: shift.isPeak ? '1.5px solid #fed7aa' : '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <div style={{ fontWeight: 700, fontSize: '14px', color: shift.isPeak ? 'var(--primary)' : '#0f172a' }}>
+                            {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 6px', marginLeft: '6px' }}>Peak Shift</span>}
                           </div>
-                          <div style={{ fontSize: '13px', fontWeight: 700 }}>
-                            {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>{shift.turnRate}</span>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
+                            {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: '#64748b', fontWeight: 500 }}>{shift.turnRate}</span>
                           </div>
                         </div>
-                        <div style={{ height: '6px', background: 'rgba(0,0,0,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ height: '7px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
                           <div
                             style={{
                               height: '100%',
@@ -2352,30 +2464,34 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
 
               {/* Topic & Offering Sentiment Intelligence */}
-              <div className="card" style={{ padding: '26px' }}>
-                <h4 style={{ fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>
-                  Customer Praise &amp; Mention Intelligence
-                </h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    Customer Praise &amp; Mention Themes
+                  </h4>
+                  <span className="stat-pill stat-pill-success" style={{ fontSize: '11px', fontWeight: 700 }}>AI Intelligence</span>
+                </div>
+                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', marginTop: '2px' }}>
                   Real customer themes frequently mentioned in generated reviews.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(!analytics?.sentimentTopics || analytics.sentimentTopics.length === 0) ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                       <div style={{ marginBottom: '6px' }}><MessageSquare size={20} color="var(--primary)" /></div>
-                      <div style={{ fontWeight: 600, fontSize: '13.5px', color: 'var(--text)' }}>Topic Intelligence Initializing</div>
-                      <div style={{ fontSize: '12px' }}>Customer praise themes and product/service mentions will appear here once customers submit reviews.</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Topic Intelligence Initializing</div>
+                      <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Customer praise themes and service mentions appear here once customers submit reviews.</div>
                     </div>
                   ) : (
                     analytics.sentimentTopics.map((t: any, i: number) => (
-                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--surface-container)', borderRadius: 'var(--radius-sm)' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                          {t.score >= 85 ? <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', display: 'inline-block', marginRight: 4 }} /> : <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#eab308', display: 'inline-block', marginRight: 4 }} />} {t.topic}
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.score >= 85 ? '#22c55e' : '#eab308', display: 'inline-block' }} />
+                          <span>{t.topic}</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>{t.count} mentions</span>
-                          <span style={{ fontSize: '12px', fontWeight: 700, color: t.score >= 85 ? 'var(--success)' : 'var(--warning)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ fontSize: '12px', color: '#64748b' }}>{t.count} mentions</span>
+                          <span style={{ fontSize: '12.5px', fontWeight: 800, color: t.score >= 85 ? '#15803d' : '#d97706' }}>
                             {t.score}%
                           </span>
                         </div>
@@ -4761,122 +4877,246 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         )}
 
         {/* ======================================================== */}
-        {/* EXECUTIVE CONCIERGE: CUSTOM SOFTWARE & BUSINESS MANAGEMENT */}
+        {/* TAB 7: CUSTOM SOFTWARE & ENTERPRISE SOLUTIONS           */}
         {/* ======================================================== */}
-        <div className="executive-card" style={{ marginTop: '40px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px', marginBottom: '24px' }}>
-            <div>
-              <span className="stat-pill" style={{ background: 'rgba(217, 119, 6, 0.2)', color: '#fbbf24', marginBottom: '8px' }}>
-                Custom Software & Enterprise Solutions
-              </span>
-              <h3 className="serif" style={{ fontSize: '24px', fontWeight: 600, color: '#fcfaf7', marginTop: '6px' }}>
-                Need Custom Software, Fleet Delivery & Business Management Solutions?
-              </h3>
-              <p style={{ color: '#d6cec7', fontSize: '13.5px', maxWidth: '720px', marginTop: '6px', lineHeight: 1.6 }}>
-                Whatever your business needs, we engineer and build it. From Real-Time Delivery Fleet & Dispatch Management, Multi-Branch Enterprise ERPs, to Omnichannel Billing/POS and Bespoke Mobile Apps — you tell us what you need, and our engineering team builds it for you.
-              </p>
+        {activeTab === 'custom_software' && (
+          <div>
+            <div className="executive-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px', marginBottom: '24px' }}>
+                <div>
+                  <span className="stat-pill" style={{ background: 'rgba(217, 119, 6, 0.2)', color: '#fbbf24', marginBottom: '8px' }}>
+                    Custom Software &amp; Enterprise Solutions
+                  </span>
+                  <h2 className="serif" style={{ fontSize: '26px', fontWeight: 700, color: '#fcfaf7', marginTop: '6px', lineHeight: 1.25 }}>
+                    Need Custom Software, Fleet Delivery &amp; Business Management Solutions?
+                  </h2>
+                  <p style={{ color: '#d6cec7', fontSize: '14px', maxWidth: '720px', marginTop: '8px', lineHeight: 1.6 }}>
+                    Whatever your business needs, we engineer and build it. From Real-Time Delivery Fleet &amp; Dispatch Management, Multi-Branch Enterprise ERPs, to Omnichannel Billing/POS and Bespoke Mobile Apps — you tell us what you need, and our engineering team builds it for you.
+                  </p>
+                </div>
+
+                <button
+                  className="btn btn-primary"
+                  style={{ background: '#d97706', borderColor: '#d97706', color: '#1c1815', fontWeight: 700, fontSize: '14px', padding: '12px 22px', borderRadius: '10px' }}
+                  onClick={() => setShowInquiryModal(true)}
+                >
+                  Request Custom Software Consultation
+                </button>
+              </div>
+
+              {/* 4 Feature Columns */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <MapPin size={18} color="#fbbf24" />
+                    <div style={{ fontWeight: 700, fontSize: '15px', color: '#fcfaf7' }}>Delivery Fleet &amp; Dispatch</div>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#a89f91', lineHeight: 1.55 }}>
+                    Real-time rider GPS tracking, live customer ETA links, automated dispatch routing, and SMS/WhatsApp driver alerts.
+                  </div>
+                </div>
+
+                <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <StorefrontIcon size={18} />
+                    <div style={{ fontWeight: 700, fontSize: '15px', color: '#fcfaf7' }}>Enterprise ERP &amp; CRM</div>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#a89f91', lineHeight: 1.55 }}>
+                    Multi-branch inventory ledger, vendor procurement, customer CRM, staff payroll, and real-time financial reporting.
+                  </div>
+                </div>
+
+                <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Printer size={18} color="#fbbf24" />
+                    <div style={{ fontWeight: 700, fontSize: '15px', color: '#fcfaf7' }}>Omnichannel POS &amp; Billing</div>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#a89f91', lineHeight: 1.55 }}>
+                    Barcode scanning, thermal receipt printing, GST compliance, offline-sync billing, and multi-store warehouse transfers.
+                  </div>
+                </div>
+
+                <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <Code2 size={18} color="#fbbf24" />
+                    <div style={{ fontWeight: 700, fontSize: '15px', color: '#fcfaf7' }}>Bespoke Mobile Apps &amp; Automation</div>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#a89f91', lineHeight: 1.55 }}>
+                    You tell us what you need, we build it. Custom iOS/Android apps, third-party webhooks, and automated workflows.
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Bar with Real Logos */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '14px',
+                  paddingTop: '20px',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', fontSize: '14px', color: '#d6cec7' }}>
+                  <div>Direct Phone: <strong style={{ color: '#fcfaf7' }}>+91 81238 24899</strong></div>
+                  <div>Email: <strong style={{ color: '#fcfaf7' }}>sandeshnaik525@gmail.com</strong></div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <a
+                    href="tel:+918123824899"
+                    style={{
+                      color: '#fcfaf7',
+                      border: '1px solid rgba(255,255,255,0.25)',
+                      padding: '9px 18px',
+                      borderRadius: '8px',
+                      fontSize: '13.5px',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <Phone size={14} />
+                    <span>Call Direct</span>
+                  </a>
+                  <a
+                    href={`https://wa.me/918123824899?text=${encodeURIComponent(
+                      `Hello! I manage "${business.name}" and would like details regarding custom software development (Delivery fleet / ERP / Billing / Custom Apps).`
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      background: '#25D366',
+                      color: '#ffffff',
+                      padding: '9px 18px',
+                      borderRadius: '8px',
+                      fontSize: '13.5px',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
+                    }}
+                  >
+                    <WhatsAppLogo size={18} />
+                    <span>Chat on WhatsApp</span>
+                  </a>
+                </div>
+              </div>
             </div>
 
-            <button
-              className="btn btn-primary"
-              style={{ background: '#d97706', borderColor: '#d97706', color: '#1c1815', fontWeight: 700, fontSize: '13.5px', padding: '10px 20px' }}
-              onClick={() => setShowInquiryModal(true)}
+            {/* In-Page Quick Consultation Form Card */}
+            <div
+              className="card"
+              style={{
+                background: '#ffffff',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '28px 32px',
+                marginTop: '24px',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+              }}
             >
-              Request Custom Software Consultation
-            </button>
+              <div style={{ marginBottom: '18px' }}>
+                <span className="badge badge-primary" style={{ fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
+                  Schedule Free Engineering Consultation
+                </span>
+                <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: '4px 0 6px', color: '#0f172a' }}>
+                  Tell Us What You Want to Build for {business.name}
+                </h3>
+                <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
+                  Our senior software architects will analyze your business requirements, prepare a turnkey architectural plan, and provide an accurate cost and timeline estimate.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmitInquiry}>
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label className="form-label" style={{ fontWeight: 600, color: '#334155' }}>
+                    What type of custom system or application do you need?
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={inquiryForm.serviceType}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, serviceType: e.target.value })}
+                    placeholder="e.g. Real-time Delivery Fleet App, Multi-Outlet Retail ERP, Thermal Billing POS..."
+                    required
+                    style={{ padding: '12px 14px', fontSize: '14px', borderRadius: '10px' }}
+                  />
+
+                  {/* Preset Quick Chips */}
+                  <div style={{ marginTop: '10px' }}>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px', fontWeight: 600 }}>
+                      Quick Ideas (Click to auto-fill):
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {[
+                        'Delivery Fleet & Dispatch Tracking',
+                        'Multi-Store Inventory ERP & Ledger',
+                        'Omnichannel POS & Thermal Billing',
+                        'Bespoke Mobile App (iOS & Android)',
+                        'Automated WhatsApp Customer Bot',
+                        'Online Ordering & Payment System',
+                      ].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setInquiryForm({ ...inquiryForm, serviceType: preset })}
+                          style={{
+                            background: inquiryForm.serviceType === preset ? '#fef3c7' : '#f8fafc',
+                            border: inquiryForm.serviceType === preset ? '1.5px solid #d97706' : '1px solid #cbd5e1',
+                            color: inquiryForm.serviceType === preset ? '#92400e' : '#334155',
+                            borderRadius: '20px',
+                            padding: '5px 12px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            fontWeight: inquiryForm.serviceType === preset ? 700 : 500,
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label className="form-label" style={{ fontWeight: 600, color: '#334155' }}>
+                    Briefly describe your requirements or current bottlenecks
+                  </label>
+                  <textarea
+                    className="form-textarea"
+                    rows={4}
+                    value={inquiryForm.notes}
+                    onChange={(e) => setInquiryForm({ ...inquiryForm, notes: e.target.value })}
+                    placeholder="Describe how your store operates today, how many branches or riders you have, and what features you want..."
+                    style={{ padding: '12px 14px', fontSize: '13.5px', borderRadius: '10px' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ fontSize: '14.5px', fontWeight: 700, padding: '12px 28px', borderRadius: '10px' }}
+                  >
+                    Submit Consultation Request →
+                  </button>
+
+                  <div style={{ fontSize: '12.5px', color: '#64748b' }}>
+                    🔒 Confidential · Free Architecture Blueprint · Response within 4 hours
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
-
-          {/* 4 Feature Columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Delivery Fleet & Dispatch</div>
-              <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
-                Real-time rider GPS tracking, live customer ETA links, automated dispatch routing, and SMS/WhatsApp driver alerts.
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Enterprise ERP & CRM</div>
-              <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
-                Multi-branch inventory ledger, vendor procurement, customer CRM, staff payroll, and real-time financial reporting.
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Omnichannel POS & Billing</div>
-              <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
-                Barcode scanning, thermal receipt printing, GST compliance, offline-sync billing, and multi-store warehouse transfers.
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-              <div style={{ fontWeight: 600, fontSize: '14px', color: '#fcfaf7' }}>Bespoke Mobile Apps & Automation</div>
-              <div style={{ fontSize: '12.5px', color: '#a89f91', marginTop: '4px', lineHeight: 1.5 }}>
-                You tell us what you need, we build it. Custom iOS/Android apps, third-party webhooks, and automated workflows.
-              </div>
-            </div>
-          </div>
-
-          {/* Contact Bar with Real Logos */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '12px',
-              paddingTop: '16px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', fontSize: '13.5px', color: '#d6cec7' }}>
-              <div>Direct: <strong style={{ color: '#fcfaf7' }}>+91 81238 24899</strong></div>
-              <div>Email: <strong style={{ color: '#fcfaf7' }}>sandeshnaik525@gmail.com</strong></div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <a
-                href="tel:+918123824899"
-                style={{
-                  color: '#fcfaf7',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                Call Direct
-              </a>
-              <a
-                href={`https://wa.me/918123824899?text=${encodeURIComponent(
-                  `Hello! I manage "${business.name}" and would like details regarding custom software development (Delivery fleet / ERP / Billing / Custom Apps).`
-                )}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  background: '#25D366',
-                  color: '#ffffff',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                <WhatsAppLogo size={18} />
-                <span>Chat on WhatsApp</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        )}
 
         </main>
 
