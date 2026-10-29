@@ -156,6 +156,13 @@ class DatabaseService {
   private qrsByBusinessId = new Map<string, QRCodeItem[]>();
   private plansById = new Map<string, SubscriptionPlan>();
   private plansBySlug = new Map<string, SubscriptionPlan>();
+  private reviewsByBusinessId = new Map<string, GeneratedReview[]>();
+  private sessionsById = new Map<string, ReviewSession>();
+  private sessionsByToken = new Map<string, ReviewSession>();
+  private eventsByBusinessId = new Map<string, AnalyticsEvent[]>();
+
+  private debounceTimer: NodeJS.Timeout | null = null;
+  private pendingPersistResolvers: (() => void)[] = [];
 
   public rebuildIndexes(): void {
     this.usersById.clear();
@@ -194,6 +201,27 @@ class DatabaseService {
     for (const plan of this.data.subscriptionPlans || []) {
       this.plansById.set(plan.id, plan);
       this.plansBySlug.set(plan.slug, plan);
+    }
+
+    this.reviewsByBusinessId.clear();
+    for (const r of this.data.generatedReviews || []) {
+      const list = this.reviewsByBusinessId.get(r.businessId) || [];
+      list.push(r);
+      this.reviewsByBusinessId.set(r.businessId, list);
+    }
+
+    this.sessionsById.clear();
+    this.sessionsByToken.clear();
+    for (const s of this.data.reviewSessions || []) {
+      this.sessionsById.set(s.id, s);
+      if (s.sessionToken) this.sessionsByToken.set(s.sessionToken, s);
+    }
+
+    this.eventsByBusinessId.clear();
+    for (const e of this.data.analyticsEvents || []) {
+      const list = this.eventsByBusinessId.get(e.businessId) || [];
+      list.push(e);
+      this.eventsByBusinessId.set(e.businessId, list);
     }
   }
 
@@ -266,6 +294,14 @@ class DatabaseService {
             ip_address VARCHAR(64),
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
           );
+
+          -- High-concurrency B-Tree database indexes for sub-millisecond querying
+          CREATE INDEX IF NOT EXISTS idx_payment_records_biz ON payment_records(business_id);
+          CREATE INDEX IF NOT EXISTS idx_payment_records_status ON payment_records(status);
+          CREATE INDEX IF NOT EXISTS idx_payment_records_created ON payment_records(created_at DESC);
+          CREATE INDEX IF NOT EXISTS idx_audit_logs_biz ON system_audit_logs(business_id, created_at DESC);
+          CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON system_audit_logs(user_id);
+          CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON system_audit_logs(created_at DESC);
         `);
 
         const res = await client.query('SELECT data FROM kindlyreview_store WHERE id = $1', ['primary']);
@@ -412,6 +448,41 @@ class DatabaseService {
           ]
         : [],
     };
+  }
+
+  // High-throughput write-coalescing buffer: batches rapid telemetry updates within 300ms
+  public persistDebounced(delayMs: number = 300): Promise<void> {
+    return new Promise((resolve) => {
+      this.pendingPersistResolvers.push(resolve);
+      if (this.debounceTimer) {
+        return; // Timer already active, will flush shortly
+      }
+      this.debounceTimer = setTimeout(async () => {
+        this.debounceTimer = null;
+        const callbacks = [...this.pendingPersistResolvers];
+        this.pendingPersistResolvers = [];
+        try {
+          await this.persist();
+        } finally {
+          for (const cb of callbacks) cb();
+        }
+      }, delayMs);
+    });
+  }
+
+  // Instant emergency flush for process shutdown or immediate ACID consistency
+  public async flush(): Promise<void> {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    const callbacks = [...this.pendingPersistResolvers];
+    this.pendingPersistResolvers = [];
+    try {
+      await this.persist();
+    } finally {
+      for (const cb of callbacks) cb();
+    }
   }
 
   private async persist(): Promise<void> {
@@ -1016,21 +1087,26 @@ class DatabaseService {
   // --- Anonymous Customer Flow: Sessions, Ratings, Reviews ---
   async createReviewSession(session: ReviewSession): Promise<ReviewSession> {
     this.data.reviewSessions.push(session);
+    this.sessionsById.set(session.id, session);
+    if (session.sessionToken) this.sessionsByToken.set(session.sessionToken, session);
     await this.persist();
     return session;
   }
 
   async findReviewSessionByToken(token: string): Promise<ReviewSession | undefined> {
-    return this.data.reviewSessions.find((s) => s.sessionToken === token);
+    return this.sessionsByToken.get(token) || this.data.reviewSessions.find((s) => s.sessionToken === token);
   }
 
   async saveReviewRatings(ratings: { id: string; sessionId: string; businessId: string; questionKey: string; ratingValue: number; createdAt: string }[]): Promise<void> {
     this.data.reviewRatings.push(...ratings);
-    await this.persist();
+    await this.persistDebounced(250);
   }
 
   async saveGeneratedReview(review: GeneratedReview): Promise<GeneratedReview> {
     this.data.generatedReviews.push(review);
+    const list = this.reviewsByBusinessId.get(review.businessId) || [];
+    list.unshift(review);
+    this.reviewsByBusinessId.set(review.businessId, list);
     await this.persist();
     return review;
   }
@@ -1038,94 +1114,223 @@ class DatabaseService {
   async updateGeneratedReview(id: string, updates: Partial<GeneratedReview>): Promise<GeneratedReview | undefined> {
     const idx = this.data.generatedReviews.findIndex((r) => r.id === id);
     if (idx === -1) return undefined;
-    this.data.generatedReviews[idx] = { ...this.data.generatedReviews[idx], ...updates };
+    const updated = { ...this.data.generatedReviews[idx], ...updates };
+    this.data.generatedReviews[idx] = updated;
+
+    const list = this.reviewsByBusinessId.get(updated.businessId);
+    if (list) {
+      const bIdx = list.findIndex((r) => r.id === id);
+      if (bIdx !== -1) list[bIdx] = updated;
+    }
+
     await this.persist();
-    return this.data.generatedReviews[idx];
+    return updated;
   }
 
   async listBusinessReviews(businessId: string): Promise<GeneratedReview[]> {
-    return this.data.generatedReviews
+    const cached = this.reviewsByBusinessId.get(businessId);
+    if (cached) {
+      return cached;
+    }
+    const filtered = this.data.generatedReviews
       .filter((r) => r.businessId === businessId)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    this.reviewsByBusinessId.set(businessId, filtered);
+    return filtered;
   }
 
   // --- Analytics & Funnel Tracking ---
   async trackAnalyticsEvent(event: AnalyticsEvent): Promise<void> {
     this.data.analyticsEvents.push(event);
-    await this.persist();
+    const list = this.eventsByBusinessId.get(event.businessId) || [];
+    list.push(event);
+    this.eventsByBusinessId.set(event.businessId, list);
+    await this.persistDebounced(300);
   }
 
   async getBusinessAnalytics(businessId: string): Promise<any> {
-    const business = this.data.businesses.find((b) => b.id === businessId);
-    const events = this.data.analyticsEvents.filter((e) => e.businessId === businessId);
-    const scans = events.filter((e) => e.eventType === 'QR_SCAN').length;
-    const ratings = events.filter((e) => e.eventType === 'RATING_SUBMISSION').length;
-    const generated = events.filter((e) => e.eventType === 'REVIEW_GENERATED').length;
-    const copied = events.filter((e) => e.eventType === 'REVIEW_COPIED').length;
-    const googleClicks = events.filter((e) => e.eventType === 'GOOGLE_MAPS_CLICK').length;
-
-    const reviews = this.data.generatedReviews.filter((r) => r.businessId === businessId);
-    const positive = reviews.filter((r) => r.sentiment === 'positive').length;
-    const neutral = reviews.filter((r) => r.sentiment === 'neutral').length;
-    const constructive = reviews.filter((r) => r.sentiment === 'constructive_critical').length;
-
+    const business = this.businessesById.get(businessId) || this.data.businesses.find((b) => b.id === businessId);
+    const events = this.eventsByBusinessId.get(businessId) || this.data.analyticsEvents.filter((e) => e.businessId === businessId);
+    const reviews = this.reviewsByBusinessId.get(businessId) || this.data.generatedReviews.filter((r) => r.businessId === businessId);
+    const qrs = this.qrsByBusinessId.get(businessId) || this.data.qrCodes.filter((q) => q.businessId === businessId);
     const todayStr = new Date().toDateString();
-    const todayReviews = reviews.filter((r) => new Date(r.createdAt).toDateString() === todayStr).length;
-    const todayScans = events.filter((e) => e.eventType === 'QR_SCAN' && new Date(e.createdAt).toDateString() === todayStr).length;
 
-    // Calculate average score across all ratings in snapshots
+    // ========================================================
+    // SINGLE-PASS O(N) LINEAR ACCUMULATION FOR EVENTS
+    // ========================================================
+    let scans = 0;
+    let ratings = 0;
+    let generated = 0;
+    let copied = 0;
+    let googleClicks = 0;
+    let todayScans = 0;
+
+    const scansByQr = new Map<string, number>();
+    const scansByDate = new Map<string, number>();
+
+    const shiftBuckets = {
+      lunch: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+      afternoon: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+      dinner: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+      lateNight: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
+    };
+
+    for (let i = 0; i < events.length; i++) {
+      const e = events[i];
+      if (e.eventType === 'QR_SCAN') {
+        scans++;
+        if (e.createdAt) {
+          const ds = new Date(e.createdAt).toDateString();
+          if (ds === todayStr) todayScans++;
+          scansByDate.set(ds, (scansByDate.get(ds) || 0) + 1);
+
+          const hr = new Date(e.createdAt).getHours();
+          const bucket = hr >= 12 && hr < 15 ? 'lunch' : hr >= 15 && hr < 19 ? 'afternoon' : hr >= 19 && hr < 23 ? 'dinner' : 'lateNight';
+          shiftBuckets[bucket].scans++;
+        }
+        if (e.qrCodeId) {
+          scansByQr.set(e.qrCodeId, (scansByQr.get(e.qrCodeId) || 0) + 1);
+        }
+      } else if (e.eventType === 'RATING_SUBMISSION') {
+        ratings++;
+      } else if (e.eventType === 'REVIEW_GENERATED') {
+        generated++;
+      } else if (e.eventType === 'REVIEW_COPIED') {
+        copied++;
+      } else if (e.eventType === 'GOOGLE_MAPS_CLICK') {
+        googleClicks++;
+      }
+    }
+
+    // ========================================================
+    // SINGLE-PASS O(N) LINEAR ACCUMULATION FOR REVIEWS
+    // ========================================================
+    let positive = 0;
+    let neutral = 0;
+    let constructive = 0;
+    let todayReviews = 0;
     let totalScore = 0;
     let scoreCount = 0;
-    for (const r of reviews) {
+
+    const reviewsByDate = new Map<string, { total: number; positive: number; neutral: number; critical: number; googleClicks: number }>();
+    const questionScores = new Map<string, { sum: number; count: number }>();
+    const qrStats = new Map<string, { reviews: number; scoreSum: number; scoreCount: number }>();
+    const dishCounts = new Map<string, { count: number; praise: number; critique: number }>();
+
+    for (let i = 0; i < reviews.length; i++) {
+      const r = reviews[i];
+      if (r.sentiment === 'positive') positive++;
+      else if (r.sentiment === 'neutral') neutral++;
+      else if (r.sentiment === 'constructive_critical') constructive++;
+
+      const rDateStr = r.createdAt ? new Date(r.createdAt).toDateString() : '';
+      if (rDateStr === todayStr) todayReviews++;
+
+      // Daily trend aggregation
+      if (rDateStr) {
+        let dayAgg = reviewsByDate.get(rDateStr);
+        if (!dayAgg) {
+          dayAgg = { total: 0, positive: 0, neutral: 0, critical: 0, googleClicks: 0 };
+          reviewsByDate.set(rDateStr, dayAgg);
+        }
+        dayAgg.total++;
+        if (r.sentiment === 'positive') dayAgg.positive++;
+        else if (r.sentiment === 'neutral') dayAgg.neutral++;
+        else if (r.sentiment === 'constructive_critical') dayAgg.critical++;
+        if (r.isGoogleClicked) dayAgg.googleClicks++;
+      }
+
+      // Aspect ratings snapshot aggregation
       if (r.ratingsSnapshot) {
-        for (const val of Object.values(r.ratingsSnapshot)) {
+        for (const [key, val] of Object.entries(r.ratingsSnapshot)) {
           if (typeof val === 'number') {
             totalScore += val;
             scoreCount++;
+            const qStat = questionScores.get(key) || { sum: 0, count: 0 };
+            qStat.sum += val;
+            qStat.count++;
+            questionScores.set(key, qStat);
           }
         }
       }
+
+      // QR stand attribution via session map O(1)
+      const session = r.sessionId ? (this.sessionsById.get(r.sessionId) || this.data.reviewSessions.find((s) => s.id === r.sessionId)) : undefined;
+      const targetQrId = session?.qrCodeId;
+      if (targetQrId) {
+        const qStat = qrStats.get(targetQrId) || { reviews: 0, scoreSum: 0, scoreCount: 0 };
+        qStat.reviews++;
+        if (r.ratingsSnapshot) {
+          for (const val of Object.values(r.ratingsSnapshot)) {
+            if (typeof val === 'number') {
+              qStat.scoreSum += val;
+              qStat.scoreCount++;
+            }
+          }
+        }
+        qrStats.set(targetQrId, qStat);
+      }
+
+      // Shift distribution aggregation
+      if (r.createdAt) {
+        const hr = new Date(r.createdAt).getHours();
+        const bucket = hr >= 12 && hr < 15 ? 'lunch' : hr >= 15 && hr < 19 ? 'afternoon' : hr >= 19 && hr < 23 ? 'dinner' : 'lateNight';
+        shiftBuckets[bucket].reviews++;
+        if (r.ratingsSnapshot) {
+          for (const val of Object.values(r.ratingsSnapshot)) {
+            if (typeof val === 'number') {
+              shiftBuckets[bucket].ratingSum += val;
+              shiftBuckets[bucket].ratingCount++;
+            }
+          }
+        }
+      }
+
+      // Dish / Item diagnostics
+      if (r.dishesTried && Array.isArray(r.dishesTried)) {
+        for (const dish of r.dishesTried) {
+          const item = dishCounts.get(dish) || { count: 0, praise: 0, critique: 0 };
+          item.count++;
+          if (r.sentiment === 'positive') item.praise++;
+          else if (r.sentiment === 'constructive_critical') item.critique++;
+          dishCounts.set(dish, item);
+        }
+      }
     }
+
     const avgRating = scoreCount > 0 ? Number((totalScore / scoreCount).toFixed(1)) : 0.0;
 
-    // Generate daily time-series trends (Last 7 Days) strictly starting from zero
+    // ========================================================
+    // GENERATE 7-DAY DAILY TRENDS (INSTANT O(1) LOOKUPS)
+    // ========================================================
     const now = new Date();
     const dailyTrends = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const ds = d.toDateString();
       const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-      const dayReviews = reviews.filter((r) => new Date(r.createdAt).toDateString() === d.toDateString());
-      const dayScans = events.filter((e) => e.eventType === 'QR_SCAN' && new Date(e.createdAt).toDateString() === d.toDateString()).length;
-
-      const posCount = dayReviews.filter((r) => r.sentiment === 'positive').length;
-      const neuCount = dayReviews.filter((r) => r.sentiment === 'neutral').length;
-      const critCount = dayReviews.filter((r) => r.sentiment === 'constructive_critical').length;
-      const gCount = dayReviews.filter((r) => r.isGoogleClicked).length;
+      const dayReviewAgg = reviewsByDate.get(ds) || { total: 0, positive: 0, neutral: 0, critical: 0, googleClicks: 0 };
+      const dayScans = scansByDate.get(ds) || 0;
 
       dailyTrends.push({
         date: dateStr,
         day: dayName,
-        positive: posCount,
-        neutral: neuCount,
-        critical: critCount,
-        googleClicks: gCount,
+        positive: dayReviewAgg.positive,
+        neutral: dayReviewAgg.neutral,
+        critical: dayReviewAgg.critical,
+        googleClicks: dayReviewAgg.googleClicks,
         scans: dayScans,
-        totalReviews: dayReviews.length,
+        totalReviews: dayReviewAgg.total,
       });
     }
 
     // Question aspect ratings
     const questions = this.data.businessQuestions.filter((q) => q.businessId === businessId);
     const aspectRatings = questions.map((q) => {
-      let sum = 0;
-      let count = 0;
-      for (const r of reviews) {
-        if (r.ratingsSnapshot && typeof r.ratingsSnapshot[q.questionKey] === 'number') {
-          sum += r.ratingsSnapshot[q.questionKey];
-          count++;
-        }
-      }
+      const stat = questionScores.get(q.questionKey);
+      const sum = stat?.sum || 0;
+      const count = stat?.count || 0;
       return {
         key: q.questionKey,
         label: q.label,
@@ -1135,28 +1340,11 @@ class DatabaseService {
     });
 
     // Table / QR Stand Leaderboard - mapped strictly from actual QR stands
-    const qrs = this.data.qrCodes.filter((q) => q.businessId === businessId);
     const tableLeaderboard = qrs.map((qr) => {
-      const qrEvents = events.filter((e) => e.qrCodeId === qr.id);
-      const scanCount = qrEvents.filter((e) => e.eventType === 'QR_SCAN').length || qr.scanCount || 0;
-      const qrReviews = reviews.filter((r) => {
-        const session = this.data.reviewSessions.find((s) => s.id === r.sessionId);
-        return session?.qrCodeId === qr.id;
-      }).length;
-
-      let qrScoreSum = 0;
-      let qrScoreCnt = 0;
-      for (const r of reviews) {
-        const session = this.data.reviewSessions.find((s) => s.id === r.sessionId);
-        if (session?.qrCodeId === qr.id && r.ratingsSnapshot) {
-          for (const val of Object.values(r.ratingsSnapshot)) {
-            if (typeof val === 'number') {
-              qrScoreSum += val;
-              qrScoreCnt++;
-            }
-          }
-        }
-      }
+      const scanCount = scansByQr.get(qr.id) || qr.scanCount || 0;
+      const qStat = qrStats.get(qr.id);
+      const qrReviews = qStat?.reviews || 0;
+      const qrAvg = qStat && qStat.scoreCount > 0 ? Number((qStat.scoreSum / qStat.scoreCount).toFixed(1)) : 0.0;
 
       return {
         id: qr.id,
@@ -1166,49 +1354,11 @@ class DatabaseService {
         scanCount,
         reviewsGenerated: qrReviews,
         conversionRate: scanCount > 0 ? Math.round((qrReviews / scanCount) * 100) : 0,
-        avgRating: qrScoreCnt > 0 ? Number((qrScoreSum / qrScoreCnt).toFixed(1)) : 0.0,
+        avgRating: qrAvg,
       };
     });
 
-    // Shift / Hourly Distribution - calculated dynamically from real reviews/scans
-    const shiftBuckets = {
-      lunch: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
-      afternoon: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
-      dinner: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
-      lateNight: { reviews: 0, scans: 0, ratingSum: 0, ratingCount: 0 },
-    };
-
-    for (const r of reviews) {
-      const hr = new Date(r.createdAt).getHours();
-      let bucket = 'dinner';
-      if (hr >= 12 && hr < 15) bucket = 'lunch';
-      else if (hr >= 15 && hr < 19) bucket = 'afternoon';
-      else if (hr >= 19 && hr < 23) bucket = 'dinner';
-      else bucket = 'lateNight';
-
-      (shiftBuckets as any)[bucket].reviews++;
-      if (r.ratingsSnapshot) {
-        for (const val of Object.values(r.ratingsSnapshot)) {
-          if (typeof val === 'number') {
-            (shiftBuckets as any)[bucket].ratingSum += val;
-            (shiftBuckets as any)[bucket].ratingCount++;
-          }
-        }
-      }
-    }
-
-    for (const e of events) {
-      if (e.eventType === 'QR_SCAN') {
-        const hr = new Date(e.createdAt).getHours();
-        let bucket = 'dinner';
-        if (hr >= 12 && hr < 15) bucket = 'lunch';
-        else if (hr >= 15 && hr < 19) bucket = 'afternoon';
-        else if (hr >= 19 && hr < 23) bucket = 'dinner';
-        else bucket = 'lateNight';
-        (shiftBuckets as any)[bucket].scans++;
-      }
-    }
-
+    // Hourly Shift Distribution
     const totalShiftReviews = reviews.length;
     const hourlyDistribution = [
       {
@@ -1248,19 +1398,6 @@ class DatabaseService {
 
     // Customer Sentiment & Topic Intelligence - derived from real reviews
     const sentimentTopics: any[] = [];
-    const dishCounts = new Map<string, { count: number; praise: number; critique: number }>();
-    for (const r of reviews) {
-      if (r.dishesTried && Array.isArray(r.dishesTried)) {
-        for (const dish of r.dishesTried) {
-          const item = dishCounts.get(dish) || { count: 0, praise: 0, critique: 0 };
-          item.count++;
-          if (r.sentiment === 'positive') item.praise++;
-          else if (r.sentiment === 'constructive_critical') item.critique++;
-          dishCounts.set(dish, item);
-        }
-      }
-    }
-
     const kitchenDishDiagnostics: any[] = [];
     dishCounts.forEach((stats, dish) => {
       kitchenDishDiagnostics.push({
@@ -1275,12 +1412,10 @@ class DatabaseService {
 
     // Dining Floor Heatmap mapped to real stands
     const floorHeatmap = qrs.map((qr) => {
-      const qrEvents = events.filter((e) => e.qrCodeId === qr.id);
-      const qrScans = qrEvents.filter((e) => e.eventType === 'QR_SCAN').length || qr.scanCount || 0;
-      const qrReviews = reviews.filter((r) => {
-        const session = this.data.reviewSessions.find((s) => s.id === r.sessionId);
-        return session?.qrCodeId === qr.id;
-      }).length;
+      const qrScans = scansByQr.get(qr.id) || qr.scanCount || 0;
+      const qStat = qrStats.get(qr.id);
+      const qrReviews = qStat?.reviews || 0;
+      const qrAvg = qStat && qStat.scoreCount > 0 ? Number((qStat.scoreSum / qStat.scoreCount).toFixed(1)) : 0.0;
 
       return {
         id: qr.id.slice(0, 4).toUpperCase(),
@@ -1288,7 +1423,7 @@ class DatabaseService {
         section: qr.locationTag || 'Dining Area',
         scans: qrScans,
         reviews: qrReviews,
-        avgRating: qrReviews > 0 ? avgRating : 0.0,
+        avgRating: qrReviews > 0 ? (qrAvg || avgRating) : 0.0,
         status: qrScans === 0 ? 'STANDBY' : (qrReviews > 0 ? 'DELIGHTED' : 'ACTIVE'),
         lastScan: qrScans === 0 ? 'No scans yet' : 'Scanned recently',
       };
@@ -1307,7 +1442,7 @@ class DatabaseService {
       averageRatingLiftVsLocal: reviews.length > 0 ? `+${(avgRating - 4.0).toFixed(1)} ★` : '0.0 ★',
     };
 
-    const financialTelemetry = {
+        const financialTelemetry = {
       walkInRevenueInr: googleClicks * 1800,
       aggregatorCommissionsSavedInr: Math.round(googleClicks * 450),
       shieldRecoveredRevenueInr: constructive * 2000,
@@ -1414,7 +1549,7 @@ class DatabaseService {
   // --- Audit Logs ---
   async logAudit(log: AuditLog): Promise<void> {
     this.data.auditLogs.push(log);
-    await this.persist();
+    await this.persistDebounced(500);
 
     if (this.pgPool && this.pgConnected) {
       try {
