@@ -2589,863 +2589,1240 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         )}
 
         {/* ======================================================== */}
-        {/* TAB 4: AI REVIEW TONE & REPUTATION SHIELD                */}
+        {/* TAB 3: REVIEW ENGINE, AI TONE & REPUTATION SHIELD        */}
         {/* ======================================================== */}
         {activeTab === 'ai_settings' && (
-          <div className="card" style={{ padding: '36px' }}>
-            <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
-              <h3 className="serif" style={{ fontSize: '22px', fontWeight: 600 }}>Review Generation Engine & Reputation Shield</h3>
-              <p style={{ fontSize: '13.5px', color: 'var(--text-muted)' }}>
-                Customize the AI writing voice, vocabulary, and mobile rating criteria.
-              </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Top Header & Fast Save Bar */}
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '24px 28px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '16px',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      background: '#f0fdf4',
+                      border: '1.5px solid #86efac',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <SettingsIcon size={20} color="#15803d" />
+                  </div>
+                  <div>
+                    <h3 className="serif" style={{ fontSize: '22px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      Review Generation Engine &amp; Reputation Shield
+                    </h3>
+                    <p style={{ margin: '3px 0 0', fontSize: '13.5px', color: '#475569' }}>
+                      Configure automated negative feedback protection, AI writing persona, and Google Maps SEO target keywords.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(0, 56, 59, 0.2)',
+                  }}
+                >
+                  <span>{savingSettings ? 'Saving...' : '💾 Save Settings'}</span>
+                </button>
+              </div>
             </div>
 
             {settings && (
-              <div>
-                {/* Reputation Shield Threshold Control */}
-                <div className="settings-section-row">
-                  <div>
-                    <div style={{ fontSize: '15px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <ShieldIcon size={18} color="var(--primary)" />
-                      <span>Reputation Defense Shield</span>
+              <>
+                {/* 1. REPUTATION DEFENSE SHIELD (HIGH IMPACT FILTER) */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <ShieldIcon size={20} color="var(--primary)" />
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                          1. Reputation Defense Shield (Automated Negative Review Filter)
+                        </h4>
+                      </div>
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
+                        Controls which customer ratings proceed to Google Maps vs which ratings are intercepted privately into your manager dashboard.
+                      </p>
                     </div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Intercept critical ratings and divert to private manager resolution.
-                    </div>
+
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        background: shieldStrictness === 'strict' ? '#dbeafe' : '#dcfce7',
+                        color: shieldStrictness === 'strict' ? '#1e40af' : '#15803d',
+                        border: `1px solid ${shieldStrictness === 'strict' ? '#93c5fd' : '#86efac'}`,
+                      }}
+                    >
+                      ● {shieldStrictness === 'strict' ? 'Maximum Defense Active (1–3★ Intercepted)' : 'Standard Shield Active (1–2★ Intercepted)'}
+                    </span>
                   </div>
 
-                  <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
-                      <div
-                        onClick={() => {
-                          setShieldStrictness('standard');
-                          showNotification('Standard Shield: 1-2 Star ratings intercepted privately; 3-5 Star proceed to Google.');
-                        }}
-                        style={{
-                          padding: '14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: shieldStrictness === 'standard' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                          background: shieldStrictness === 'standard' ? '#fef2ee' : 'var(--surface)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <div style={{ fontWeight: 600, fontSize: '14px' }}>Standard Shield (1–2★)</div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          Intercepts severe issues (unhappy customer, service issues) while allowing neutral/positive to flow.
+                  {/* Shield Options Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+                    {/* Standard Shield */}
+                    <div
+                      onClick={() => {
+                        setShieldStrictness('standard');
+                        showNotification('Standard Shield Selected: 1-2 Star ratings intercepted privately; 3-5 Star proceed to Google.');
+                      }}
+                      style={{
+                        padding: '20px',
+                        borderRadius: '14px',
+                        border: shieldStrictness === 'standard' ? '2.5px solid #10b981' : '1.5px solid #cbd5e1',
+                        background: shieldStrictness === 'standard' ? '#f0fdf4' : '#f8fafc',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        boxShadow: shieldStrictness === 'standard' ? '0 4px 14px rgba(16, 185, 129, 0.12)' : 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <strong style={{ fontSize: '15px', color: '#0f172a' }}>Standard Shield (1–2★ Intercepted)</strong>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              background: shieldStrictness === 'standard' ? '#d1fae5' : '#e2e8f0',
+                              color: shieldStrictness === 'standard' ? '#065f46' : '#64748b',
+                            }}
+                          >
+                            {shieldStrictness === 'standard' ? '✓ ACTIVE' : 'Click to Select'}
+                          </span>
                         </div>
+                        <p style={{ fontSize: '13px', color: '#334155', margin: '0 0 12px', lineHeight: 1.5 }}>
+                          Dissatisfied customers (1★ &amp; 2★) are caught internally. Satisfied and neutral customers (3★, 4★, 5★) proceed to Google Maps review drafting.
+                        </p>
                       </div>
 
-                      <div
-                        onClick={() => {
-                          setShieldStrictness('strict');
-                          showNotification('Strict Shield: 1-3 Star ratings intercepted privately; only pure 4-5 Star flow to Google.');
-                        }}
-                        style={{
-                          padding: '14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: shieldStrictness === 'strict' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                          background: shieldStrictness === 'strict' ? '#fef2ee' : 'var(--surface)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <div style={{ fontWeight: 600, fontSize: '14px' }}>Maximum Defense (1–3★)</div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          Guarantees only genuine 4-5★ reviews ever reach Google Maps. Zero compromise.
+                      <div style={{ fontSize: '12px', color: '#047857', fontWeight: 600, background: 'rgba(16, 185, 129, 0.08)', padding: '8px 12px', borderRadius: '8px' }}>
+                        ⭐ Best for: High-volume retail, quick checkout, and rapid review velocity.
+                      </div>
+                    </div>
+
+                    {/* Maximum Defense */}
+                    <div
+                      onClick={() => {
+                        setShieldStrictness('strict');
+                        showNotification('Maximum Defense Selected: 100% of 1-3 Star ratings intercepted; only 4-5 Stars proceed to Google.');
+                      }}
+                      style={{
+                        padding: '20px',
+                        borderRadius: '14px',
+                        border: shieldStrictness === 'strict' ? '2.5px solid #2563eb' : '1.5px solid #cbd5e1',
+                        background: shieldStrictness === 'strict' ? '#eff6ff' : '#f8fafc',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        boxShadow: shieldStrictness === 'strict' ? '0 4px 14px rgba(37, 99, 235, 0.12)' : 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <strong style={{ fontSize: '15px', color: '#0f172a' }}>Maximum Defense (1–3★ Intercepted)</strong>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              background: shieldStrictness === 'strict' ? '#bfdbfe' : '#e2e8f0',
+                              color: shieldStrictness === 'strict' ? '#1e3a8a' : '#64748b',
+                            }}
+                          >
+                            {shieldStrictness === 'strict' ? '✓ ACTIVE' : 'Click to Select'}
+                          </span>
                         </div>
+                        <p style={{ fontSize: '13px', color: '#334155', margin: '0 0 12px', lineHeight: 1.5 }}>
+                          Strict 5-star filter: Guarantees that ONLY genuine 4★ and 5★ reviews reach Google Maps. 100% of 1★, 2★, and 3★ feedback is kept strictly private.
+                        </p>
+                      </div>
+
+                      <div style={{ fontSize: '12px', color: '#1d4ed8', fontWeight: 600, background: 'rgba(37, 99, 235, 0.08)', padding: '8px 12px', borderRadius: '8px' }}>
+                        🛡️ Best for: Specialty electronics, clinics, salons, and businesses guarding a 4.9★ rating.
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Tone Control */}
-                <div className="settings-section-row">
-                  <div>
-                    <div style={{ fontSize: '15px', fontWeight: 600 }}>Review Voice & Persona</div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Sets the tone of voice for generated customer reviews.
+                {/* 2. AI REVIEW VOICE & PERSONA (TONE OF VOICE) */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                  }}
+                >
+                  <div style={{ marginBottom: '18px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <SparklesIcon size={20} color="var(--primary)" />
+                      <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        2. AI Review Writing Voice &amp; Customer Persona
+                      </h4>
                     </div>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
+                      Select the writing persona Gemini uses when generating review options for customers on their phones.
+                    </p>
                   </div>
 
-                  <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '16px' }}>
-                      {[
-                        { id: 'enthusiastic', title: 'Enthusiastic', desc: 'High praise, passionate, thrilled' },
-                        { id: 'warm', title: 'Warm & Hospitable', desc: 'Cozy, friendly, personal' },
-                        { id: 'professional', title: 'Polished & Professional', desc: 'Refined, articulate, balanced' },
-                        { id: 'casual', title: 'Casual & Relaxed', desc: 'Everyday conversational tone' },
-                        { id: 'concise', title: 'Concise & Short', desc: 'Direct, 1–2 sentence review' },
-                      ].map((t) => (
+                  {/* 5 Tone Cards Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px', marginBottom: '20px' }}>
+                    {[
+                      {
+                        id: 'enthusiastic',
+                        title: 'Enthusiastic & High Praise',
+                        emoji: '⚡',
+                        desc: 'Energetic, thrilled, top-tier praise',
+                        sample: '"Hands down the best place! Super fast, honest staff, and genuine quality. 10/10 recommend!"',
+                      },
+                      {
+                        id: 'warm',
+                        title: 'Warm & Hospitable',
+                        emoji: '🤝',
+                        desc: 'Welcoming, friendly, personal touch',
+                        sample: '"Such a lovely experience. The team treated me with genuine care and took time to explain everything."',
+                      },
+                      {
+                        id: 'professional',
+                        title: 'Polished & Professional',
+                        emoji: '👔',
+                        desc: 'Refined, articulate, balanced critique',
+                        sample: '"Highly professional standards, accurate diagnostics, transparent pricing, and timely completion."',
+                      },
+                      {
+                        id: 'casual',
+                        title: 'Casual & Relaxed',
+                        emoji: '💬',
+                        desc: 'Everyday conversational, authentic tone',
+                        sample: '"Really smooth visit. Got exactly what I needed without any hassle. Definitely coming back."',
+                      },
+                      {
+                        id: 'concise',
+                        title: 'Concise & Punchy',
+                        emoji: '🎯',
+                        desc: 'Direct, 1–2 sentence quick reviews',
+                        sample: '"Outstanding service and great pricing. Friendly team and quick turnaround!"',
+                      },
+                    ].map((t) => {
+                      const isSelected = settings.reviewTone === t.id;
+
+                      return (
                         <div
                           key={t.id}
                           onClick={() => setSettings({ ...settings, reviewTone: t.id })}
                           style={{
-                            padding: '12px 14px',
-                            borderRadius: 'var(--radius-md)',
-                            border: settings.reviewTone === t.id ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-                            background: settings.reviewTone === t.id ? '#fef2ee' : 'var(--surface)',
+                            padding: '16px',
+                            borderRadius: '12px',
+                            border: isSelected ? '2px solid var(--primary)' : '1.5px solid #cbd5e1',
+                            background: isSelected ? '#f0fdf4' : '#ffffff',
                             cursor: 'pointer',
                             transition: 'all 0.15s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            boxShadow: isSelected ? '0 4px 12px rgba(0, 56, 59, 0.1)' : '0 1px 3px rgba(0,0,0,0.02)',
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{
-                              width: '12px',
-                              height: '12px',
-                              borderRadius: '50%',
-                              border: settings.reviewTone === t.id ? '4px solid var(--primary)' : '1px solid var(--border)',
-                              background: 'white',
-                            }} />
-                            <strong style={{ fontSize: '13.5px', color: settings.reviewTone === t.id ? 'var(--primary)' : 'var(--text)' }}>
-                              {t.title}
-                            </strong>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '18px' }}>{t.emoji}</span>
+                                <strong style={{ fontSize: '14px', color: isSelected ? 'var(--primary)' : '#0f172a' }}>
+                                  {t.title}
+                                </strong>
+                              </div>
+                              <span
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  borderRadius: '50%',
+                                  border: isSelected ? '5px solid var(--primary)' : '1.5px solid #94a3b8',
+                                  background: 'white',
+                                  flexShrink: 0,
+                                }}
+                              />
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '10px' }}>
+                              {t.desc}
+                            </div>
                           </div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '6px', paddingLeft: '20px' }}>
-                            {t.desc}
+
+                          <div
+                            style={{
+                              fontSize: '11.5px',
+                              color: '#334155',
+                              fontStyle: 'italic',
+                              background: isSelected ? 'rgba(0, 56, 59, 0.05)' : '#f8fafc',
+                              padding: '8px 10px',
+                              borderRadius: '8px',
+                              border: '1px solid rgba(0,0,0,0.04)',
+                              lineHeight: 1.45,
+                            }}
+                          >
+                            {t.sample}
                           </div>
                         </div>
-                      ))}
+                      );
+                    })}
+                  </div>
+
+                  {/* Format & Length Sub-Controls */}
+                  <div
+                    style={{
+                      background: '#f8fafc',
+                      border: '1.5px solid #e2e8f0',
+                      borderRadius: '12px',
+                      padding: '18px 20px',
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                      gap: '18px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                        Review Format &amp; Layout
+                      </label>
+                      <select
+                        className="form-select"
+                        value={settings.reviewFormat || 'narrative'}
+                        onChange={(e) => setSettings({ ...settings, reviewFormat: e.target.value })}
+                        style={{ width: '100%', fontSize: '13px', padding: '9px 12px', borderRadius: '8px' }}
+                      >
+                        <option value="narrative">Story Narrative (Flowing detailed experience)</option>
+                        <option value="bullet_highlights">Key Highlights &amp; Bullet Points</option>
+                        <option value="casual_conversational">Casual &amp; Conversational (Everyday punchy)</option>
+                        <option value="professional_critique">Professional Critique (Articulate evaluation)</option>
+                      </select>
+                      <span style={{ fontSize: '11.5px', color: '#64748b', display: 'block', marginTop: '4px' }}>
+                        Story format generates the highest Google engagement.
+                      </span>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                      <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label className="form-label">Review Format &amp; Style</label>
-                        <select
-                          className="form-select"
-                          value={settings.reviewFormat || 'narrative'}
-                          onChange={(e) => setSettings({ ...settings, reviewFormat: e.target.value })}
-                        >
-                          <option value="narrative">Story Narrative (Flowing detailed experience)</option>
-                          <option value="bullet_highlights">Key Highlights &amp; Bullet Points</option>
-                          <option value="casual_conversational">Casual &amp; Conversational (Everyday punchy)</option>
-                          <option value="professional_critique">Professional Critique (Articulate evaluation)</option>
-                        </select>
-                      </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                        Review Length
+                      </label>
+                      <select
+                        className="form-select"
+                        value={settings.reviewLength || 'medium'}
+                        onChange={(e) => setSettings({ ...settings, reviewLength: e.target.value })}
+                        style={{ width: '100%', fontSize: '13px', padding: '9px 12px', borderRadius: '8px' }}
+                      >
+                        <option value="short">Short (1–2 sentences · Quickest to post)</option>
+                        <option value="medium">Balanced (3–4 sentences · Recommended for SEO)</option>
+                        <option value="detailed">Detailed Story (9–10 lines · Maximum 3-pack lift)</option>
+                      </select>
+                      <span style={{ fontSize: '11.5px', color: '#64748b', display: 'block', marginTop: '4px' }}>
+                        Detailed reviews carry 2.4x more ranking weight on Google Maps.
+                      </span>
+                    </div>
 
-                      <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label className="form-label">Review Length</label>
-                        <select
-                          className="form-select"
-                          value={settings.reviewLength}
-                          onChange={(e) => setSettings({ ...settings, reviewLength: e.target.value })}
-                        >
-                          <option value="short">Short (1–2 sentences)</option>
-                          <option value="medium">Balanced (2–3 natural sentences)</option>
-                          <option value="detailed">Detailed Story (9–10 lines in-depth)</option>
-                        </select>
-                      </div>
-
-                      <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label className="form-label">Auto-Forward to Google</label>
-                        <div style={{ display: 'flex', alignItems: 'center', height: '46px', gap: '8px' }}>
-                          <input
-                            type="checkbox"
-                            id="autoForwardCheck"
-                            checked={settings.autoRedirectGoogle || false}
-                            onChange={(e) => setSettings({ ...settings, autoRedirectGoogle: e.target.checked })}
-                            style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
-                          />
-                          <label htmlFor="autoForwardCheck" style={{ fontSize: '13px', color: 'var(--text)', cursor: 'pointer' }}>
-                            Open Google Maps upon review copy
-                          </label>
-                        </div>
-                      </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                        Instant Google Forwarding
+                      </label>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          cursor: 'pointer',
+                          background: '#ffffff',
+                          padding: '10px 14px',
+                          borderRadius: '8px',
+                          border: '1px solid #cbd5e1',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          id="autoForwardCheck"
+                          checked={settings.autoRedirectGoogle || false}
+                          onChange={(e) => setSettings({ ...settings, autoRedirectGoogle: e.target.checked })}
+                          style={{ width: '18px', height: '18px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                        />
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b' }}>
+                          Open Google Maps upon review copy
+                        </span>
+                      </label>
+                      <span style={{ fontSize: '11.5px', color: '#64748b', display: 'block', marginTop: '4px' }}>
+                        Automatically launches review dialog after customer copies text.
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Vocabulary Controls */}
-                <div className="settings-section-row">
-                  <div>
-                    <div style={{ fontSize: '15px', fontWeight: 600 }}>Keywords & Vocabulary</div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Highlight your key offerings, features and avoid unwanted words.
+                {/* 3. KEYWORDS & OFFERINGS TO HIGHLIGHT (SEO ENGINE) */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Target size={20} color="#15803d" />
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                          3. Target Offerings &amp; Keywords to Naturally Mention
+                        </h4>
+                      </div>
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
+                        Our AI weaves these keywords naturally into reviews. When customer reviews mention these terms, your Google Maps local 3-pack rank lifts dramatically.
+                      </p>
                     </div>
+
+                    <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d' }}>
+                      ● Active SEO Injection
+                    </span>
                   </div>
 
-                  <div>
-                    <div style={{ marginBottom: '22px' }}>
-                      <label className="form-label">Topics to Naturally Highlight</label>
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                        {(settings.thingsToHighlight || []).map((tag: string, idx: number) => (
-                          <span key={idx} className="stat-pill stat-pill-primary" style={{ padding: '5px 12px', fontSize: '12px' }}>
-                            {tag}
+                  {/* Active Highlight Tags */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.04em' }}>
+                      Active Highlight Keywords ({((settings.thingsToHighlight || settings.targetKeywords) || []).length}):
+                    </div>
+                    {((settings.thingsToHighlight || settings.targetKeywords) || []).length === 0 ? (
+                      <div style={{ fontSize: '13px', color: '#64748b', fontStyle: 'italic', marginBottom: '8px' }}>
+                        No target keywords configured yet. Click suggestions below or type custom offerings.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {((settings.thingsToHighlight || settings.targetKeywords) || []).map((tag: string, idx: number) => (
+                          <span
+                            key={idx}
+                            style={{
+                              background: '#f0fdf4',
+                              border: '1.5px solid #86efac',
+                              color: '#15803d',
+                              fontWeight: 600,
+                              fontSize: '13px',
+                              padding: '6px 14px',
+                              borderRadius: '20px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                            }}
+                          >
+                            <span>✓ {tag}</span>
                             <button
                               type="button"
                               onClick={() => {
-                                const updated = settings.thingsToHighlight.filter((_: any, i: number) => i !== idx);
-                                setSettings({ ...settings, thingsToHighlight: updated });
+                                const current = (settings.thingsToHighlight || settings.targetKeywords) || [];
+                                const updated = current.filter((_: any, i: number) => i !== idx);
+                                setSettings({ ...settings, thingsToHighlight: updated, targetKeywords: updated });
                               }}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', marginLeft: '6px' }}
+                              title="Remove keyword"
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#15803d',
+                                cursor: 'pointer',
+                                padding: '0 2px',
+                                fontWeight: 800,
+                                fontSize: '14px',
+                                lineHeight: 1,
+                              }}
                             >
                               ✕
                             </button>
                           </span>
                         ))}
                       </div>
+                    )}
+                  </div>
 
-                      {/* Quick Select Suggestion Pills */}
-                      <div style={{ marginBottom: '10px' }}>
-                        <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
-                          Click to quickly add recommended highlights:
-                        </div>
-                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                          {(() => {
-                            const cat = (business?.mainCategory || '').toUpperCase();
-                            const sub = (business?.subcategory || '').toLowerCase();
-                            const bName = (business?.name || '').toLowerCase();
-
-                            const isRetail =
-                              cat === 'RETAIL' ||
-                              /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
-                              /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
-
-                            const isServices =
-                              cat === 'SERVICES' ||
-                              /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
-
-                            const isHealth =
-                              cat === 'HEALTH & WELLNESS' ||
-                              /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
-
-                            const items = isRetail
-                              ? [
-                                '16GB RAM',
-                                'SSD Upgrade',
-                                'Genuine Components',
-                                'Expert Consultation',
-                                'Custom PC Builds',
-                                'Quick Diagnostics',
-                                'Competitive Pricing',
-                                'Official Warranty',
-                                'Clean Setup',
-                                'Friendly Support',
-                              ]
-                              : isServices
-                                ? [
-                                  'Expert Diagnostics',
-                                  'Fast Turnaround',
-                                  'Genuine Spare Parts',
-                                  'Transparent Quotations',
-                                  'Clean Workshop',
-                                  'Honest Technicians',
-                                  'Reliable Service',
-                                ]
-                                : isHealth
-                                  ? [
-                                    'Painless Treatment',
-                                    'Courteous Doctor',
-                                    'Immaculate Hygiene',
-                                    'Attentive Staff',
-                                    'Modern Equipment',
-                                    'Personalized Care',
-                                  ]
-                                  : [
-                                    'Signature Recipes',
-                                    'Craft Beverages',
-                                    'Prompt Service',
-                                    'Warm Hospitality',
-                                    'Generous Portions',
-                                    'Cozy Ambience',
-                                    'Fresh Ingredients',
-                                  ];
-
-                            return items.map((item) => (
-                              <button
-                                key={item}
-                                type="button"
-                                onClick={() => {
-                                  if (!(settings.thingsToHighlight || []).includes(item)) {
-                                    setSettings({
-                                      ...settings,
-                                      thingsToHighlight: [...(settings.thingsToHighlight || []), item],
-                                    });
-                                  }
-                                }}
-                                style={{
-                                  background: (settings.thingsToHighlight || []).includes(item) ? '#fef2ee' : 'var(--surface)',
-                                  border: '1px solid var(--border)',
-                                  color: (settings.thingsToHighlight || []).includes(item) ? 'var(--primary)' : 'var(--text)',
-                                  padding: '3px 9px',
-                                  borderRadius: '12px',
-                                  fontSize: '11px',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                + {item}
-                              </button>
-                            ));
-                          })()}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <input
-                          type="text"
-                          className="form-input"
-                          placeholder="Type custom keyword (e.g. 16GB RAM, SSD Upgrade, Painless Treatment, Fair Pricing)..."
-                          value={newHighlightTag}
-                          onChange={(e) => setNewHighlightTag(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && newHighlightTag.trim()) {
-                              e.preventDefault();
-                              setSettings({
-                                ...settings,
-                                thingsToHighlight: [...(settings.thingsToHighlight || []), newHighlightTag.trim()],
-                              });
-                              setNewHighlightTag('');
-                            }
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          style={{ padding: '8px 14px', fontSize: '13px' }}
-                          onClick={() => {
-                            if (newHighlightTag.trim()) {
-                              setSettings({
-                                ...settings,
-                                thingsToHighlight: [...(settings.thingsToHighlight || []), newHighlightTag.trim()],
-                              });
-                              setNewHighlightTag('');
-                            }
-                          }}
-                        >
-                          Add
-                        </button>
-                      </div>
+                  {/* Category-Adaptive Quick Select Suggestion Pills */}
+                  <div style={{ marginBottom: '14px', background: '#f8fafc', padding: '14px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
+                      Click to quickly add industry-tailored keywords:
                     </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {(() => {
+                        const cat = (business?.mainCategory || '').toUpperCase();
+                        const sub = (business?.subcategory || '').toLowerCase();
+                        const bName = (business?.name || '').toLowerCase();
 
-                    <div>
-                      <label className="form-label">Forbidden Words (AI Never Uses)</label>
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                        const isRetail =
+                          cat === 'RETAIL' ||
+                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+                        const isServices =
+                          cat === 'SERVICES' ||
+                          /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+                        const isHealth =
+                          cat === 'HEALTH & WELLNESS' ||
+                          /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+                        const items = isRetail
+                          ? [
+                              '16GB RAM',
+                              'SSD Upgrade',
+                              'Custom Gaming PC',
+                              'Genuine Warranty',
+                              'Quick Diagnostics',
+                              'Fair Pricing',
+                              'Clean Setup',
+                              'Official Parts',
+                              'Helpful Support',
+                              'Fast Turnaround',
+                            ]
+                          : isServices
+                          ? [
+                              'Expert Diagnostics',
+                              'Fast Turnaround',
+                              'Genuine Spare Parts',
+                              'Transparent Quotations',
+                              'Clean Workshop',
+                              'Honest Technicians',
+                              'Reliable Quality',
+                            ]
+                          : isHealth
+                          ? [
+                              'Painless Treatment',
+                              'Courteous Doctor',
+                              'Immaculate Hygiene',
+                              'Attentive Staff',
+                              'Modern Equipment',
+                              'Personalized Care',
+                            ]
+                          : [
+                              'Signature Taste',
+                              'Craft Beverages',
+                              'Prompt Service',
+                              'Warm Hospitality',
+                              'Generous Portions',
+                              'Cozy Ambience',
+                              'Fresh Ingredients',
+                            ];
+
+                        const currentActive = (settings.thingsToHighlight || settings.targetKeywords) || [];
+
+                        return items.map((item) => {
+                          const isAdded = currentActive.includes(item);
+
+                          return (
+                            <button
+                              key={item}
+                              type="button"
+                              onClick={() => {
+                                if (!isAdded) {
+                                  const updated = [...currentActive, item];
+                                  setSettings({
+                                    ...settings,
+                                    thingsToHighlight: updated,
+                                    targetKeywords: updated,
+                                  });
+                                }
+                              }}
+                              style={{
+                                background: isAdded ? '#dcfce7' : '#ffffff',
+                                border: isAdded ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
+                                color: isAdded ? '#15803d' : '#1e293b',
+                                fontWeight: isAdded ? 700 : 500,
+                                padding: '5px 12px',
+                                borderRadius: '16px',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease',
+                              }}
+                            >
+                              {isAdded ? '✓ ' : '+ '}
+                              {item}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Add Custom Keyword Input */}
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', maxWidth: '680px' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Type custom keyword (e.g. 16GB RAM, SSD Upgrade, Doctor Care, Fair Pricing)..."
+                      value={newHighlightTag}
+                      onChange={(e) => setNewHighlightTag(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newHighlightTag.trim()) {
+                          e.preventDefault();
+                          const current = (settings.thingsToHighlight || settings.targetKeywords) || [];
+                          const updated = [...current, newHighlightTag.trim()];
+                          setSettings({ ...settings, thingsToHighlight: updated, targetKeywords: updated });
+                          setNewHighlightTag('');
+                        }
+                      }}
+                      style={{ flex: 1, padding: '10px 14px', fontSize: '13.5px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ padding: '10px 20px', fontSize: '13.5px', fontWeight: 600, whiteSpace: 'nowrap' }}
+                      onClick={() => {
+                        if (newHighlightTag.trim()) {
+                          const current = (settings.thingsToHighlight || settings.targetKeywords) || [];
+                          const updated = [...current, newHighlightTag.trim()];
+                          setSettings({ ...settings, thingsToHighlight: updated, targetKeywords: updated });
+                          setNewHighlightTag('');
+                        }
+                      }}
+                    >
+                      + Add Keyword
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. FORBIDDEN WORDS (AI STRICTLY AVOIDS) */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                  }}
+                >
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>🚫</span>
+                      <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        4. Forbidden Negative Words (AI Never Uses)
+                      </h4>
+                    </div>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
+                      Gemini will strictly never use these negative or unflattering words when generating customer reviews.
+                    </p>
+                  </div>
+
+                  {/* Active Words to Avoid */}
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.04em' }}>
+                      Active Forbidden Words ({(settings.wordsToAvoid || []).length}):
+                    </div>
+                    {(settings.wordsToAvoid || []).length === 0 ? (
+                      <div style={{ fontSize: '13px', color: '#64748b', fontStyle: 'italic', marginBottom: '8px' }}>
+                        No forbidden words added. Click suggestions below or type custom negative terms.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         {(settings.wordsToAvoid || []).map((tag: string, idx: number) => (
-                          <span key={idx} className="stat-pill stat-pill-neutral" style={{ padding: '5px 12px', fontSize: '12px' }}>
-                            {tag}
+                          <span
+                            key={idx}
+                            style={{
+                              background: '#fee2e2',
+                              border: '1.5px solid #fca5a5',
+                              color: '#991b1b',
+                              fontWeight: 600,
+                              fontSize: '13px',
+                              padding: '6px 14px',
+                              borderRadius: '20px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                            }}
+                          >
+                            <span>✕ {tag}</span>
                             <button
                               type="button"
                               onClick={() => {
                                 const updated = settings.wordsToAvoid.filter((_: any, i: number) => i !== idx);
                                 setSettings({ ...settings, wordsToAvoid: updated });
                               }}
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', marginLeft: '6px' }}
+                              title="Remove forbidden word"
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#991b1b',
+                                cursor: 'pointer',
+                                padding: '0 2px',
+                                fontWeight: 800,
+                                fontSize: '14px',
+                                lineHeight: 1,
+                              }}
                             >
                               ✕
                             </button>
                           </span>
                         ))}
                       </div>
+                    )}
+                  </div>
 
-                      {/* Quick Select Avoid Pills */}
-                      <div style={{ marginBottom: '10px' }}>
-                        <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
-                          Click to quickly forbid common negative terms:
-                        </div>
-                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                          {[
-                            'Slow Service',
-                            'Overpriced',
-                            'Noisy',
-                            'Cold Food',
-                            'Long Wait',
-                            'Rude Staff',
-                            'Small Portions',
-                          ].map((item) => (
-                            <button
-                              key={item}
-                              type="button"
-                              onClick={() => {
-                                if (!(settings.wordsToAvoid || []).includes(item)) {
-                                  setSettings({
-                                    ...settings,
-                                    wordsToAvoid: [...(settings.wordsToAvoid || []), item],
-                                  });
-                                }
-                              }}
-                              style={{
-                                background: (settings.wordsToAvoid || []).includes(item) ? '#fef2f2' : 'var(--surface)',
-                                border: '1px solid var(--border)',
-                                color: (settings.wordsToAvoid || []).includes(item) ? '#ef4444' : 'var(--text)',
-                                padding: '3px 9px',
-                                borderRadius: '12px',
-                                fontSize: '11px',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              + {item}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <input
-                          type="text"
-                          className="form-input"
-                          placeholder="Type custom word to avoid (e.g. cheap, slow, noisy)..."
-                          value={newAvoidTag}
-                          onChange={(e) => setNewAvoidTag(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && newAvoidTag.trim()) {
-                              e.preventDefault();
-                              setSettings({
-                                ...settings,
-                                wordsToAvoid: [...(settings.wordsToAvoid || []), newAvoidTag.trim()],
-                              });
-                              setNewAvoidTag('');
-                            }
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          style={{ padding: '8px 14px', fontSize: '13px' }}
-                          onClick={() => {
-                            if (newAvoidTag.trim()) {
-                              setSettings({
-                                ...settings,
-                                wordsToAvoid: [...(settings.wordsToAvoid || []), newAvoidTag.trim()],
-                              });
-                              setNewAvoidTag('');
-                            }
-                          }}
-                        >
-                          Add
-                        </button>
-                      </div>
+                  {/* Quick Select Avoid Pills */}
+                  <div style={{ marginBottom: '14px', background: '#f8fafc', padding: '14px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
+                      Click to quickly forbid common negative terms:
                     </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {[
+                        'Slow Service',
+                        'Overpriced',
+                        'Cheap Quality',
+                        'Noisy',
+                        'Long Delay',
+                        'Rude Staff',
+                        'Poor Support',
+                        'Dirty',
+                      ].map((item) => {
+                        const isAdded = (settings.wordsToAvoid || []).includes(item);
+
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => {
+                              if (!isAdded) {
+                                setSettings({
+                                  ...settings,
+                                  wordsToAvoid: [...(settings.wordsToAvoid || []), item],
+                                });
+                              }
+                            }}
+                            style={{
+                              background: isAdded ? '#fee2e2' : '#ffffff',
+                              border: isAdded ? '1.5px solid #ef4444' : '1px solid #cbd5e1',
+                              color: isAdded ? '#991b1b' : '#1e293b',
+                              fontWeight: isAdded ? 700 : 500,
+                              padding: '5px 12px',
+                              borderRadius: '16px',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {isAdded ? '✓ ' : '+ '}
+                            {item}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Custom Word Input */}
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', maxWidth: '680px' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Type custom word to avoid (e.g. cheap, broken, rude, overpriced)..."
+                      value={newAvoidTag}
+                      onChange={(e) => setNewAvoidTag(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newAvoidTag.trim()) {
+                          e.preventDefault();
+                          setSettings({
+                            ...settings,
+                            wordsToAvoid: [...(settings.wordsToAvoid || []), newAvoidTag.trim()],
+                          });
+                          setNewAvoidTag('');
+                        }
+                      }}
+                      style={{ flex: 1, padding: '10px 14px', fontSize: '13.5px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ padding: '10px 20px', fontSize: '13.5px', fontWeight: 600, whiteSpace: 'nowrap' }}
+                      onClick={() => {
+                        if (newAvoidTag.trim()) {
+                          setSettings({
+                            ...settings,
+                            wordsToAvoid: [...(settings.wordsToAvoid || []), newAvoidTag.trim()],
+                          });
+                          setNewAvoidTag('');
+                        }
+                      }}
+                    >
+                      + Forbid Word
+                    </button>
                   </div>
                 </div>
 
-                {/* OPTIONAL CUSTOMER REWARDS & SCRATCH CARD (ADVANCED SETTINGS) */}
-                <div className="settings-section-row" style={{ borderTop: '1px solid var(--border-light)', paddingTop: '24px' }}>
-                  <div>
-                    <div style={{ fontSize: '15px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <GiftIcon size={18} color="var(--primary)" />
-                      <span>Post-Review Scratch Card &amp; Rewards</span>
-                      <span className="badge badge-neutral" style={{ fontSize: '10px' }}>Optional</span>
+                {/* 5. CUSTOMER SCRATCH CARD REWARDS (OPTIONAL) */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <GiftIcon size={20} color="var(--primary)" />
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                          5. Post-Review Scratch Card &amp; Customer Rewards (Optional)
+                        </h4>
+                        <span className="badge badge-neutral" style={{ fontSize: '11px' }}>Optional</span>
+                      </div>
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
+                        Reward guests with an interactive digital scratch card on their phone immediately after submitting their review.
+                      </p>
                     </div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Reward customers with an interactive digital scratch card right after they submit or copy their Google review.
-                    </div>
+
+                    {/* Enable Toggle Switch */}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: settings.scratchCardEnabled ? '#15803d' : '#64748b' }}>
+                        {settings.scratchCardEnabled ? '✓ Rewards Enabled' : 'Rewards Disabled'}
+                      </span>
+                      <div
+                        onClick={() => setSettings({ ...settings, scratchCardEnabled: !settings.scratchCardEnabled })}
+                        style={{
+                          width: '52px',
+                          height: '28px',
+                          borderRadius: '14px',
+                          background: settings.scratchCardEnabled ? '#15803d' : '#cbd5e1',
+                          padding: '3px',
+                          transition: 'background 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '22px',
+                            height: '22px',
+                            borderRadius: '50%',
+                            background: '#ffffff',
+                            transform: settings.scratchCardEnabled ? 'translateX(24px)' : 'translateX(0)',
+                            transition: 'transform 0.2s',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                          }}
+                        />
+                      </div>
+                    </label>
                   </div>
 
-                  <div>
-                    {/* Enable Toggle Switch */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '14px 16px',
-                        background: settings.scratchCardEnabled ? '#f0fdf4' : 'var(--surface-container)',
-                        borderRadius: 'var(--radius-md)',
-                        border: settings.scratchCardEnabled ? '1.5px solid #86efac' : '1px solid var(--border)',
-                        marginBottom: '16px',
-                      }}
-                    >
+                  {settings.scratchCardEnabled && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
+                      {/* Theme Selection */}
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: '14px', color: settings.scratchCardEnabled ? '#166534' : 'var(--text)' }}>
-                          {settings.scratchCardEnabled ? '✓ Scratch Card Reward Engine Active' : 'Scratch Card Engine Disabled'}
-                        </div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                          When active, customers are invited to scratch a digital card to reveal vouchers or discounts.
-                        </div>
-                      </div>
-                      <label style={{ position: 'relative', display: 'inline-block', width: '48px', height: '26px', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={Boolean(settings.scratchCardEnabled)}
-                          onChange={(e) => setSettings({ ...settings, scratchCardEnabled: e.target.checked })}
-                          style={{ opacity: 0, width: 0, height: 0 }}
-                        />
-                        <span
-                          style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: settings.scratchCardEnabled ? 'var(--primary)' : '#ccc',
-                            borderRadius: '26px',
-                            transition: '.2s',
-                          }}
-                        >
-                          <span
-                            style={{
-                              position: 'absolute',
-                              height: '20px',
-                              width: '20px',
-                              left: settings.scratchCardEnabled ? '24px' : '3px',
-                              bottom: '3px',
-                              backgroundColor: 'white',
-                              borderRadius: '50%',
-                              transition: '.2s',
-                            }}
-                          />
-                        </span>
-                      </label>
-                    </div>
-
-                    {settings.scratchCardEnabled && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {/* Scratch Card Visual Theme */}
-                        <div>
-                          <label className="form-label" style={{ fontWeight: 600 }}>Card Theme Style</label>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
-                            {[
-                              { id: 'golden_ticket', name: 'Golden Ticket', desc: 'Luxury gold foil', bg: '#f59e0b' },
-                              { id: 'neon_glow', name: 'Neon Glow', desc: 'Cyber purple glow', bg: '#8b5cf6' },
-                              { id: 'festive_confetti', name: 'Festive Fiesta', desc: 'Emerald celebration', bg: '#10b981' },
-                              { id: 'minimal_classic', name: 'Minimal Classic', desc: 'Sleek dark slate', bg: '#475569' },
-                            ].map((theme) => (
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                          Scratch Card Visual Theme
+                        </label>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+                          {[
+                            { id: 'golden_ticket', name: 'Golden Ticket', desc: 'Luxury gold foil', bg: '#f59e0b' },
+                            { id: 'neon_glow', name: 'Neon Glow', desc: 'Cyber purple glow', bg: '#8b5cf6' },
+                            { id: 'festive_confetti', name: 'Festive Fiesta', desc: 'Emerald celebration', bg: '#10b981' },
+                            { id: 'minimal_classic', name: 'Minimal Classic', desc: 'Sleek dark slate', bg: '#475569' },
+                          ].map((theme) => {
+                            const isThemeSelected = (settings.scratchCardType || 'golden_ticket') === theme.id;
+                            return (
                               <div
                                 key={theme.id}
                                 onClick={() => setSettings({ ...settings, scratchCardType: theme.id })}
                                 style={{
                                   padding: '12px',
                                   borderRadius: '10px',
-                                  border: (settings.scratchCardType || 'golden_ticket') === theme.id ? `2px solid ${theme.bg}` : '1px solid var(--border)',
-                                  background: (settings.scratchCardType || 'golden_ticket') === theme.id ? '#faf5ff' : 'var(--surface)',
+                                  border: isThemeSelected ? `2.5px solid ${theme.bg}` : '1.5px solid #cbd5e1',
+                                  background: isThemeSelected ? '#f8fafc' : '#ffffff',
                                   cursor: 'pointer',
                                   textAlign: 'center',
+                                  boxShadow: isThemeSelected ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
                                 }}
                               >
-                                <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: theme.bg, margin: '0 auto 6px' }} />
-                                <div style={{ fontSize: '13px', fontWeight: 700 }}>{theme.name}</div>
-                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{theme.desc}</div>
+                                <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: theme.bg, margin: '0 auto 6px' }} />
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{theme.name}</div>
+                                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{theme.desc}</div>
                               </div>
-                            ))}
-                          </div>
+                            );
+                          })}
                         </div>
+                      </div>
 
-                        {/* Win Probability Slider */}
-                        <div style={{ background: 'var(--surface-container)', padding: '14px 16px', borderRadius: '10px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div>
-                              <div style={{ fontWeight: 600, fontSize: '13.5px' }}>Client Win Probability</div>
-                              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                                Percentage of customers who win the reward vs receive a courtesy note.
-                              </div>
+                      {/* Win Probability */}
+                      <div style={{ background: '#f8fafc', padding: '16px 20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <div>
+                            <strong style={{ fontSize: '14px', color: '#0f172a' }}>Customer Win Probability</strong>
+                            <div style={{ fontSize: '12.5px', color: '#64748b' }}>
+                              Percentage of customers who win the discount vs receive a thank-you note.
                             </div>
-                            <span
-                              style={{
-                                fontSize: '15px',
-                                fontWeight: 800,
-                                color: 'var(--primary)',
-                                background: '#fef2ee',
-                                padding: '4px 12px',
-                                borderRadius: '8px',
-                                border: '1px solid var(--border)',
-                              }}
-                            >
-                              {settings.scratchCardWinProbability ?? 100}% Win Chance
-                            </span>
                           </div>
-
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            step="5"
-                            value={settings.scratchCardWinProbability ?? 100}
-                            onChange={(e) => setSettings({ ...settings, scratchCardWinProbability: Number(e.target.value) })}
-                            style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
-                          />
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                            <span>0% (Rare prize)</span>
-                            <span>50% (Every 2nd customer)</span>
-                            <span>100% (Guaranteed reward for everyone)</span>
-                          </div>
+                          <span
+                            style={{
+                              fontSize: '15px',
+                              fontWeight: 800,
+                              color: '#15803d',
+                              background: '#dcfce7',
+                              padding: '4px 14px',
+                              borderRadius: '8px',
+                              border: '1px solid #86efac',
+                            }}
+                          >
+                            {settings.scratchCardWinProbability ?? 100}% Win Chance
+                          </span>
                         </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="5"
+                          value={settings.scratchCardWinProbability ?? 100}
+                          onChange={(e) => setSettings({ ...settings, scratchCardWinProbability: Number(e.target.value) })}
+                          style={{ width: '100%', accentColor: '#15803d', cursor: 'pointer' }}
+                        />
+                      </div>
 
-                        {/* Reward Details Inputs */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-                          <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label className="form-label">Reward Title</label>
-                            <input
-                              type="text"
-                              className="form-input"
-                              placeholder="e.g. 10% Off Your Next Visit, Free Dessert"
-                              value={settings.scratchCardRewardTitle || ''}
-                              onChange={(e) => setSettings({ ...settings, scratchCardRewardTitle: e.target.value })}
-                            />
-                          </div>
-
-                          <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label className="form-label">Coupon / Voucher Code</label>
-                            <input
-                              type="text"
-                              className="form-input"
-                              placeholder="e.g. VIPDINE, SAVE10, SWEETGIFT"
-                              value={settings.scratchCardCouponCode || ''}
-                              onChange={(e) => setSettings({ ...settings, scratchCardCouponCode: e.target.value })}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                          <label className="form-label">Reward Redemption Instructions</label>
+                      {/* Title & Coupon Inputs */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                            Reward Title
+                          </label>
                           <input
                             type="text"
                             className="form-input"
-                            placeholder="e.g. Present this screen to your server or cashier at billing"
-                            value={settings.scratchCardRewardDescription || ''}
-                            onChange={(e) => setSettings({ ...settings, scratchCardRewardDescription: e.target.value })}
+                            placeholder="e.g. 10% Off Your Next Purchase"
+                            value={settings.scratchCardRewardTitle || ''}
+                            onChange={(e) => setSettings({ ...settings, scratchCardRewardTitle: e.target.value })}
+                            style={{ padding: '9px 12px', fontSize: '13.5px' }}
                           />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-                          <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label className="form-label">Custom Logo URL (Optional)</label>
-                            <input
-                              type="text"
-                              className="form-input"
-                              placeholder="https://... (Leave blank to use storefront profile logo)"
-                              value={settings.scratchCardCustomLogoUrl || ''}
-                              onChange={(e) => setSettings({ ...settings, scratchCardCustomLogoUrl: e.target.value })}
-                            />
-                          </div>
-
-                          <div className="form-group" style={{ marginBottom: 0 }}>
-                            <label className="form-label">Polite Note on Miss (Loss Message)</label>
-                            <input
-                              type="text"
-                              className="form-input"
-                              placeholder="e.g. Thank you for your feedback! Better luck next time!"
-                              value={settings.scratchCardLoseMessage || ''}
-                              onChange={(e) => setSettings({ ...settings, scratchCardLoseMessage: e.target.value })}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Live Interactive Scratch Card Preview in Settings */}
-                        <div style={{ marginTop: '10px', padding: '16px', background: '#fafaf9', borderRadius: '12px', border: '1px solid #e7e5e4' }}>
-                          <div style={{ fontSize: '12px', fontWeight: 700, color: '#78716c', marginBottom: '12px', textTransform: 'uppercase' }}>
-                            Live Scratch Card Preview (Try scratching):
-                          </div>
-                          <ScratchCard
-                            cardType={settings.scratchCardType || 'golden_ticket'}
-                            rewardTitle={settings.scratchCardRewardTitle || '10% Off Your Next Visit'}
-                            rewardDescription={settings.scratchCardRewardDescription || 'Show this code to redeem!'}
-                            couponCode={settings.scratchCardCouponCode || 'SAMPLE10'}
-                            businessName={business.name}
-                            customLogoUrl={settings.scratchCardCustomLogoUrl || business.logoUrl}
-                            winProbability={settings.scratchCardWinProbability ?? 100}
-                            loseMessage={settings.scratchCardLoseMessage || 'Thank you for your review!'}
-                            previewMode={true}
+                        <div>
+                          <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>
+                            Coupon / Voucher Code
+                          </label>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="e.g. SAVE10, THANKYOU"
+                            value={settings.scratchCardCouponCode || ''}
+                            onChange={(e) => setSettings({ ...settings, scratchCardCouponCode: e.target.value })}
+                            style={{ padding: '9px 12px', fontSize: '13.5px' }}
                           />
                         </div>
                       </div>
-                    )}
-                  </div>
+
+                      {/* Live Scratch Preview */}
+                      <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '10px', textTransform: 'uppercase' }}>
+                          Live Scratch Card Preview (Try scratching):
+                        </div>
+                        <ScratchCard
+                          cardType={settings.scratchCardType || 'golden_ticket'}
+                          rewardTitle={settings.scratchCardRewardTitle || '10% Off Your Next Visit'}
+                          rewardDescription={settings.scratchCardRewardDescription || 'Show this code at billing to redeem!'}
+                          couponCode={settings.scratchCardCouponCode || 'SAMPLE10'}
+                          businessName={business.name}
+                          customLogoUrl={settings.scratchCardCustomLogoUrl || business.logoUrl}
+                          winProbability={settings.scratchCardWinProbability ?? 100}
+                          loseMessage={settings.scratchCardLoseMessage || 'Thank you for your review!'}
+                          previewMode={true}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '28px' }}>
-                  <button className="btn btn-primary" onClick={handleSaveSettings} disabled={savingSettings}>
-                    {savingSettings ? 'Saving...' : 'Save AI Tone, Format & Reward Engine'}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Questions Section */}
-            <div style={{ paddingTop: '24px', borderTop: '1px solid var(--border-light)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: 600 }}>Customer Mobile Rating Criteria</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                    Add or modify the questions your customers rate on their phones before generating reviews.
-                  </div>
-                </div>
-                <button
-                  className="btn btn-secondary"
-                  style={{ fontSize: '13px', padding: '7px 14px' }}
-                  onClick={() => {
-                    const newKey = `q_${Date.now()}`;
-                    setQuestions([
-                      ...questions,
-                      {
-                        questionKey: newKey,
-                        label: 'Overall Experience',
-                        scaleType: '1-5_STARS',
-                        displayOrder: questions.length,
-                        isRequired: true,
-                        isActive: true,
-                      },
-                    ]);
+                {/* 6. MOBILE RATING CRITERIA (QUESTIONS) */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
                   }}
                 >
-                  + Add Custom Question
-                </button>
-              </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '18px' }}>📋</span>
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                          6. Customer Mobile Rating Criteria (Questions)
+                        </h4>
+                      </div>
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
+                        Questions rated by customers on their mobile screen before our AI drafts their Google review.
+                      </p>
+                    </div>
 
-              {/* Quick Preset Buttons */}
-              <div style={{ marginBottom: '16px', background: 'var(--surface-container)', padding: '12px 14px', borderRadius: '8px' }}>
-                <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
-                  Quick Add Industry Recommended Rating Criteria:
-                </div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {(() => {
-                    const cat = (business?.mainCategory || '').toUpperCase();
-                    const sub = (business?.subcategory || '').toLowerCase();
-                    const bName = (business?.name || '').toLowerCase();
-
-                    const isRetail =
-                      cat === 'RETAIL' ||
-                      /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
-                      /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
-
-                    const isServices =
-                      cat === 'SERVICES' ||
-                      /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
-
-                    const isHealth =
-                      cat === 'HEALTH & WELLNESS' ||
-                      /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
-
-                    const presets = isRetail
-                      ? [
-                        { label: 'Product Authenticity & Genuine Quality', key: 'product_authenticity' },
-                        { label: 'Staff Technical Advice & Knowledge', key: 'tech_advice' },
-                        { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
-                        { label: 'Store Experience & Product Selection', key: 'store_selection' },
-                        { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
-                      ]
-                      : isServices
-                        ? [
-                          { label: 'Repair & Diagnostic Quality', key: 'diagnostic_quality' },
-                          { label: 'Turnaround Speed & Punctuality', key: 'turnaround_speed' },
-                          { label: 'Transparent Pricing & Estimates', key: 'transparent_pricing' },
-                          { label: 'Technician Professionalism', key: 'technician_prof' },
-                          { label: 'Overall Service Reliability', key: 'service_reliability' },
-                        ]
-                        : isHealth
-                          ? [
-                            { label: 'Treatment Quality & Results', key: 'treatment_quality' },
-                            { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
-                            { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
-                            { label: 'Appointment Punctuality', key: 'appointment_time' },
-                            { label: 'Value for Care & Consultation', key: 'care_value' },
-                          ]
-                          : [
-                            { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
-                            { label: 'Speed of Service', key: 'service_speed' },
-                            { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
-                            { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
-                            { label: 'Value for Price', key: 'value_money' },
-                          ];
-
-                    return presets.map((preset) => (
-                      <button
-                        key={preset.key}
-                        type="button"
-                        onClick={() => {
-                          const exists = questions.some((q) => q.label === preset.label);
-                          if (!exists) {
-                            setQuestions([
-                              ...questions,
-                              {
-                                questionKey: `q_${preset.key}_${Date.now()}`,
-                                label: preset.label,
-                                scaleType: '1-5_STARS',
-                                displayOrder: questions.length,
-                                isRequired: true,
-                                isActive: true,
-                              },
-                            ]);
-                            showNotification(`Added criterion: ${preset.label}`);
-                          } else {
-                            showNotification(`${preset.label} is already added!`);
-                          }
-                        }}
-                        style={{
-                          background: questions.some((q) => q.label === preset.label) ? '#f0fdf4' : 'var(--surface)',
-                          border: questions.some((q) => q.label === preset.label) ? '1px solid #86efac' : '1px solid var(--border)',
-                          color: questions.some((q) => q.label === preset.label) ? '#15803d' : 'var(--text)',
-                          padding: '5px 11px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          cursor: 'pointer',
-                          fontWeight: 500,
-                        }}
-                      >
-                        {questions.some((q) => q.label === preset.label) ? '✓ ' : '+ '}
-                        {preset.label}
-                      </button>
-                    ));
-                  })()}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
-                {questions.map((q, idx) => (
-                  <div
-                    key={q.questionKey || idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 14px',
-                      background: 'var(--surface-container)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border-light)',
-                    }}
-                  >
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-subtle)', width: '20px' }}>
-                      {idx + 1}.
-                    </span>
-                    <input
-                      className="form-input"
-                      value={q.label}
-                      onChange={(e) => {
-                        const updated = [...questions];
-                        updated[idx].label = e.target.value;
-                        setQuestions(updated);
-                      }}
-                      style={{ flex: 1, padding: '8px 12px', fontSize: '13.5px' }}
-                    />
-                    <select
-                      className="form-select"
-                      style={{ width: '150px', padding: '8px 12px', fontSize: '13px' }}
-                      value={q.scaleType}
-                      onChange={(e) => {
-                        const updated = [...questions];
-                        updated[idx].scaleType = e.target.value;
-                        setQuestions(updated);
-                      }}
-                    >
-                      <option value="1-5_STARS">⭐ 1–5 Stars</option>
-                      <option value="1-10_NUMERIC">1–10 Numeric Scale</option>
-                      <option value="THUMBS_UP_DOWN">Thumbs Up / Down</option>
-                    </select>
                     <button
-                      type="button"
-                      onClick={() => setQuestions(questions.filter((_, i) => i !== idx))}
-                      title="Remove Criterion"
-                      style={{
-                        background: 'rgba(239, 68, 68, 0.08)',
-                        border: '1px solid rgba(239, 68, 68, 0.25)',
-                        color: '#ef4444',
-                        cursor: 'pointer',
-                        padding: '7px 12px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        whiteSpace: 'nowrap',
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '13px', padding: '8px 16px', fontWeight: 600 }}
+                      onClick={() => {
+                        const newKey = `q_${Date.now()}`;
+                        setQuestions([
+                          ...questions,
+                          {
+                            questionKey: newKey,
+                            label: 'Overall Experience',
+                            scaleType: '1-5_STARS',
+                            displayOrder: questions.length,
+                            isRequired: true,
+                            isActive: true,
+                          },
+                        ]);
                       }}
                     >
-                      ✕ Delete
+                      + Add Custom Question
                     </button>
                   </div>
-                ))}
-              </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button className="btn btn-primary btn-lg" onClick={handleSaveQuestions}>
-                  Save All Criteria
-                </button>
-              </div>
-            </div>
+                  {/* Industry Presets */}
+                  <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
+                      Click to quickly add industry-tailored criteria:
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {(() => {
+                        const cat = (business?.mainCategory || '').toUpperCase();
+                        const sub = (business?.subcategory || '').toLowerCase();
+                        const bName = (business?.name || '').toLowerCase();
+
+                        const isRetail =
+                          cat === 'RETAIL' ||
+                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+                        const isServices =
+                          cat === 'SERVICES' ||
+                          /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+                        const isHealth =
+                          cat === 'HEALTH & WELLNESS' ||
+                          /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+                        const presets = isRetail
+                          ? [
+                              { label: 'Product Authenticity & Genuine Parts', key: 'product_authenticity' },
+                              { label: 'Staff Technical Knowledge & Advice', key: 'tech_advice' },
+                              { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
+                              { label: 'Store Ambience & Product Selection', key: 'store_selection' },
+                              { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
+                            ]
+                          : isServices
+                          ? [
+                              { label: 'Diagnostic & Repair Quality', key: 'diagnostic_quality' },
+                              { label: 'Turnaround Speed & Punctuality', key: 'turnaround_speed' },
+                              { label: 'Transparent Pricing & Fair Estimates', key: 'transparent_pricing' },
+                              { label: 'Technician Professionalism', key: 'technician_prof' },
+                            ]
+                          : isHealth
+                          ? [
+                              { label: 'Treatment Quality & Care', key: 'treatment_quality' },
+                              { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
+                              { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
+                              { label: 'Appointment Punctuality', key: 'appointment_time' },
+                            ]
+                          : [
+                              { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
+                              { label: 'Speed of Service', key: 'service_speed' },
+                              { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
+                              { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
+                            ];
+
+                        return presets.map((preset) => {
+                          const isAlreadyAdded = questions.some((q) => q.label === preset.label);
+                          return (
+                            <button
+                              key={preset.key}
+                              type="button"
+                              onClick={() => {
+                                if (!isAlreadyAdded) {
+                                  setQuestions([
+                                    ...questions,
+                                    {
+                                      questionKey: `q_${preset.key}_${Date.now()}`,
+                                      label: preset.label,
+                                      scaleType: '1-5_STARS',
+                                      displayOrder: questions.length,
+                                      isRequired: true,
+                                      isActive: true,
+                                    },
+                                  ]);
+                                  showNotification(`Added question: ${preset.label}`);
+                                }
+                              }}
+                              style={{
+                                background: isAlreadyAdded ? '#dcfce7' : '#ffffff',
+                                border: isAlreadyAdded ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
+                                color: isAlreadyAdded ? '#15803d' : '#1e293b',
+                                fontWeight: isAlreadyAdded ? 700 : 500,
+                                padding: '5px 12px',
+                                borderRadius: '16px',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {isAlreadyAdded ? '✓ ' : '+ '}
+                              {preset.label}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Questions List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+                    {questions.map((q, idx) => (
+                      <div
+                        key={q.questionKey || idx}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '12px 16px',
+                          background: '#f8fafc',
+                          borderRadius: '10px',
+                          border: '1.5px solid #e2e8f0',
+                        }}
+                      >
+                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#475569', width: '24px' }}>
+                          {idx + 1}.
+                        </span>
+                        <input
+                          className="form-input"
+                          value={q.label}
+                          onChange={(e) => {
+                            const updated = [...questions];
+                            updated[idx].label = e.target.value;
+                            setQuestions(updated);
+                          }}
+                          style={{ flex: 1, padding: '9px 12px', fontSize: '13.5px' }}
+                        />
+                        <select
+                          className="form-select"
+                          style={{ width: '160px', padding: '9px 12px', fontSize: '13px' }}
+                          value={q.scaleType}
+                          onChange={(e) => {
+                            const updated = [...questions];
+                            updated[idx].scaleType = e.target.value;
+                            setQuestions(updated);
+                          }}
+                        >
+                          <option value="1-5_STARS">⭐ 1–5 Stars</option>
+                          <option value="1-10_NUMERIC">1–10 Numeric</option>
+                          <option value="THUMBS_UP_DOWN">👍 Thumbs Up/Down</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setQuestions(questions.filter((_, i) => i !== idx))}
+                          title="Remove question"
+                          style={{
+                            background: '#fee2e2',
+                            border: '1px solid #fca5a5',
+                            color: '#991b1b',
+                            cursor: 'pointer',
+                            padding: '8px 14px',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          ✕ Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <button className="btn btn-primary btn-lg" onClick={handleSaveQuestions} style={{ fontWeight: 700 }}>
+                      Save Questions &amp; Rating Criteria
+                    </button>
+                  </div>
+                </div>
+
+                {/* BOTTOM STICKY SAVE BAR */}
+                <div
+                  style={{
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    borderRadius: '16px',
+                    padding: '20px 28px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '16px',
+                    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.25)',
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: '16px', color: '#f8fafc', display: 'block' }}>
+                      Ready to apply your Review Engine settings?
+                    </strong>
+                    <span style={{ fontSize: '13px', color: '#94a3b8' }}>
+                      Updates your live QR counter stands and Gemini review drafting persona instantly.
+                    </span>
+                  </div>
+
+                  <button
+                    className="btn btn-primary btn-lg"
+                    onClick={handleSaveSettings}
+                    disabled={savingSettings}
+                    style={{
+                      padding: '12px 28px',
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      background: '#38bdf8',
+                      color: '#0f172a',
+                      border: 'none',
+                    }}
+                  >
+                    {savingSettings ? 'Saving All Settings...' : 'Save All Review Settings →'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
