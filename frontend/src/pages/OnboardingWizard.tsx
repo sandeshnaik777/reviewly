@@ -27,10 +27,20 @@ interface Props {
   onComplete: (business: any) => void;
   onNavigateLogin: () => void;
   onNavigateHome?: () => void;
+  currentUser?: any;
+  initialStep?: number;
 }
 
-export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin, onNavigateHome }) => {
-  const [step, setStep] = useState(() => {
+export const OnboardingWizard: React.FC<Props> = ({
+  onComplete,
+  onNavigateLogin,
+  onNavigateHome,
+  currentUser,
+  initialStep,
+}) => {
+  const [step, setStep] = useState<number>(() => {
+    if (initialStep) return initialStep;
+    if (currentUser) return 2;
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
       if (p.get('step') === '2') return 2;
@@ -55,7 +65,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
   const [autoRenewDirect, setAutoRenewDirect] = useState<boolean>(true);
 
   // Auth & Account state
-  const [isAccountCreated, setIsAccountCreated] = useState(false);
+  const [isAccountCreated, setIsAccountCreated] = useState<boolean>(() => Boolean(currentUser));
   const [showPassword, setShowPassword] = useState(false);
   const [emailExistsNotice, setEmailExistsNotice] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -64,7 +74,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
   // Email Verification state
   const [showOtpVerification, setShowOtpVerification] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(() => Boolean(currentUser?.emailVerified));
   const [signupDevOtp, setSignupDevOtp] = useState<string | undefined>(undefined);
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [otpLoading, setOtpLoading] = useState(false);
@@ -81,13 +91,37 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
     }
   }, [otpCooldown]);
 
+  // Sync state if currentUser becomes available asynchronously
+  useEffect(() => {
+    if (currentUser) {
+      setIsAccountCreated(true);
+      if (currentUser.emailVerified) {
+        setIsEmailVerified(true);
+      }
+      setFormData((prev: any) => ({
+        ...prev,
+        ownerName: prev.ownerName || currentUser.name || '',
+        email: prev.email || currentUser.email || '',
+        phone: prev.phone || currentUser.phone || '',
+      }));
+      setStep((prev) => (prev === 1 ? 2 : prev));
+    }
+  }, [currentUser]);
+
+  // Sync initialStep if explicitly updated by parent
+  useEffect(() => {
+    if (initialStep && initialStep !== step) {
+      setStep(initialStep);
+    }
+  }, [initialStep]);
+
   // Form Data across steps
   const [formData, setFormData] = useState<any>({
     // Step 1: Merchant Account & Login Credentials
-    ownerName: '',
-    email: '',
+    ownerName: currentUser?.name || '',
+    email: currentUser?.email || '',
     password: '',
-    phone: '',
+    phone: currentUser?.phone || '',
 
     // Step 2: Category
     mainCategory: 'FOOD & HOSPITALITY',
@@ -1017,6 +1051,37 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                   </button>
                 </form>
 
+                <div style={{ margin: '14px 0 10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ flex: 1, height: '1px', background: '#fde68a' }}></div>
+                  <span style={{ fontSize: '11.5px', textTransform: 'uppercase', color: '#92400e', fontWeight: 700 }}>
+                    Or if you signed in with Google
+                  </span>
+                  <div style={{ flex: 1, height: '1px', background: '#fde68a' }}></div>
+                </div>
+
+                <div>
+                  <GoogleAuthButton
+                    label="Continue with Google"
+                    flow="onboarding"
+                    onSuccess={(res) => {
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        ownerName: res.user.name || prev.ownerName,
+                        email: res.user.email || prev.email,
+                        phone: res.user.phone || prev.phone || '',
+                      }));
+                      setIsAccountCreated(true);
+                      setIsEmailVerified(true);
+                      if (res.businesses && res.businesses.length > 0) {
+                        setCreatedBusiness(res.businesses[0]);
+                      }
+                      setStep(2);
+                    }}
+                    onError={(err) => setError(err)}
+                    disabled={loading}
+                  />
+                </div>
+
                 <div style={{ marginTop: '10px', textAlign: 'right' }}>
                   <button
                     type="button"
@@ -1789,6 +1854,32 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                 <li>Or go to Google Maps on desktop, search your business, and click <strong>Ask for reviews</strong>.</li>
                 <li>You can freely update this link anytime later in your Business Settings!</li>
               </ol>
+            </div>
+
+            {/* Skip for now option for mobile users */}
+            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData((prev: any) => ({
+                    ...prev,
+                    googleReviewUrl: prev.googleReviewUrl || 'https://maps.google.com',
+                  }));
+                  setStep(6);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--primary)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  padding: '6px 12px',
+                }}
+              >
+                Don't have your Google Maps link handy right now? Skip for now &amp; add later in dashboard →
+              </button>
             </div>
           </div>
         )}

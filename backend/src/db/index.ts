@@ -416,27 +416,30 @@ class DatabaseService {
 
   private async persist(): Promise<void> {
     this.writeLock = this.writeLock.then(async () => {
+      // CPU Optimization: Single compact JSON serialization (5-10x faster & lower memory than indented JSON)
+      const serialized = JSON.stringify(this.data);
+
+      // 1. Sync to PostgreSQL kindlyreview_store primary table (Primary persistent store)
+      if (this.pgPool && this.pgConnected) {
+        try {
+          await this.pgPool.query(
+            'INSERT INTO kindlyreview_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()',
+            ['primary', serialized]
+          );
+        } catch (pgErr) {
+          console.error('[PostgreSQL] Failed to sync state to kindlyreview_store table:', pgErr);
+        }
+      }
+
+      // 2. Sync to local JSON file (Secondary local replica/fallback)
       try {
         const dir = path.dirname(this.filePath);
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, { recursive: true });
         }
-        // CPU Optimization: Single compact JSON serialization (5-10x faster & lower memory than indented JSON)
-        const serialized = JSON.stringify(this.data);
         await fs.promises.writeFile(this.filePath, serialized, 'utf-8');
-
-        if (this.pgPool && this.pgConnected) {
-          try {
-            await this.pgPool.query(
-              'INSERT INTO kindlyreview_store (id, data, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()',
-              ['primary', serialized]
-            );
-          } catch (pgErr) {
-            console.error('Failed to sync state to PostgreSQL kindlyreview_store:', pgErr);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to write database:', err);
+      } catch (diskErr) {
+        console.warn('[DiskStorage] Notice: Failed to write local JSON replica:', diskErr);
       }
     });
     return this.writeLock;

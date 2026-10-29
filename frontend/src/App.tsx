@@ -15,6 +15,7 @@ export const App: React.FC = () => {
   const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog' | 'thank-you'>('landing');
   const [customerSlug, setCustomerSlug] = useState<string>('');
   const [blogSlug, setBlogSlug] = useState<string>('');
+  const [initialOnboardingStep, setInitialOnboardingStep] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,11 +47,33 @@ export const App: React.FC = () => {
       return;
     }
 
+    // Direct vanity route mapping for smooth ad campaign landers
+    if (normalizedPath === '/onboarding' || normalizedPath === '/signup' || normalizedPath === '/register' || normalizedPath === '/start') {
+      setView('onboarding');
+    } else if (normalizedPath === '/login' || normalizedPath === '/signin') {
+      setView('login');
+    }
+
     // Handle Google OAuth callback redirect parameters
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get('token');
     const authError = urlParams.get('auth_error');
     const flowFromUrl = urlParams.get('flow');
+    const stepParam = urlParams.get('step');
+
+    if (stepParam) {
+      const parsedStep = parseInt(stepParam, 10);
+      if (!isNaN(parsedStep)) {
+        setInitialOnboardingStep(parsedStep);
+      }
+    }
+
+    if (flowFromUrl === 'onboarding') {
+      setView('onboarding');
+      if (!stepParam) {
+        setInitialOnboardingStep(2);
+      }
+    }
 
     if (tokenFromUrl) {
       localStorage.setItem('kindlyrate_token', tokenFromUrl);
@@ -89,6 +112,8 @@ export const App: React.FC = () => {
             setView('dashboard');
           } else {
             setView('onboarding');
+            // Logged-in user setting up a business: skip Step 1 credentials directly to Step 2
+            setInitialOnboardingStep((prev) => prev || 2);
           }
         }
       })
@@ -108,6 +133,7 @@ export const App: React.FC = () => {
       setCurrentBusiness(businesses[0]);
       setView('dashboard');
     } else {
+      setInitialOnboardingStep(2);
       setView('onboarding');
     }
   };
@@ -184,6 +210,8 @@ export const App: React.FC = () => {
         onComplete={handleOnboardingComplete}
         onNavigateLogin={() => setView('login')}
         onNavigateHome={() => setView('landing')}
+        currentUser={currentUser}
+        initialStep={initialOnboardingStep}
       />
     );
   }
