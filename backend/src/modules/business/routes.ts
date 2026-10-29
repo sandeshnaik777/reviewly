@@ -472,15 +472,15 @@ businessRouter.post(
         'PROFESSIONAL',
         'OTHER',
       ]),
-      subcategory: z.string().min(2),
+      subcategory: z.string().optional().default('General'),
       customCategory: z.string().optional(),
       phone: z.string().optional().default(''),
-      address: z.string().optional(),
-      city: z.string().optional(),
-      state: z.string().optional(),
+      address: z.string().optional().default(''),
+      city: z.string().optional().default(''),
+      state: z.string().optional().default(''),
       country: z.string().default('India'),
-      pincode: z.string().optional(),
-      googleReviewUrl: z.string().min(1, 'Google Review URL is required'),
+      pincode: z.string().optional().default(''),
+      googleReviewUrl: z.string().optional().default('https://maps.google.com'),
       googleMapsShareUrl: z.string().optional(),
       description: z.string().optional(),
       openingHours: z.string().optional(),
@@ -505,6 +505,9 @@ businessRouter.post(
       let reviewUrl = (data.googleReviewUrl || '').trim();
       if (reviewUrl && !reviewUrl.startsWith('http://') && !reviewUrl.startsWith('https://')) {
         reviewUrl = `https://${reviewUrl}`;
+      }
+      if (!reviewUrl) {
+        reviewUrl = 'https://maps.google.com';
       }
       const userPhone = (req.user as any)?.phone || '';
       const finalPhone = (data.phone && data.phone.trim()) || userPhone || '';

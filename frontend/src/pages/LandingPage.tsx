@@ -39,6 +39,7 @@ import {
   LogIn,
   Key,
 } from 'lucide-react';
+import { GoogleAuthButton } from '../components/GoogleAuthButton.js';
 
 interface Props {
   onStartOnboarding: () => void;
@@ -238,6 +239,21 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
         {/* Hero Main Action Hub */}
         <div style={{ maxWidth: '680px', margin: '0 auto 36px' }}>
+          {/* 1-Click Google Sign Up Button */}
+          <div style={{ maxWidth: '360px', margin: '0 auto 14px' }}>
+            <GoogleAuthButton
+              label="Sign up with Google (Instant Free Trial)"
+              flow="onboarding"
+              onSuccess={(res) => {
+                if (res.businesses && res.businesses.length > 0) {
+                  window.location.reload();
+                } else {
+                  onStartOnboarding();
+                }
+              }}
+            />
+          </div>
+
           {/* Main Dual Action Buttons */}
           <div
             className="hero-cta-group"
@@ -247,15 +263,15 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               justifyContent: 'center',
               alignItems: 'center',
               flexWrap: 'wrap',
-              marginBottom: '16px',
+              marginBottom: '14px',
             }}
           >
             <button
               className="btn btn-primary btn-lg"
               onClick={onStartOnboarding}
               style={{
-                padding: '14px 28px',
-                fontSize: '15.5px',
+                padding: '13px 26px',
+                fontSize: '15px',
                 fontWeight: 800,
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -264,15 +280,15 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 borderRadius: '12px',
               }}
             >
-              <span>🚀 Sign Up &amp; Get Started →</span>
+              <span>🚀 Or Sign Up with Email →</span>
             </button>
 
             <button
               className="btn btn-secondary btn-lg"
               onClick={onNavigateLogin}
               style={{
-                padding: '14px 24px',
-                fontSize: '15px',
+                padding: '13px 22px',
+                fontSize: '14.5px',
                 fontWeight: 700,
                 background: '#ffffff',
                 border: '1.5px solid #cbd5e1',
@@ -287,6 +303,14 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               <Key size={16} color="#64748b" />
               <span>Sign In to Account</span>
             </button>
+          </div>
+
+          <div style={{ fontSize: '12.5px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
+            <span>⚡ 15-Second Setup</span>
+            <span>·</span>
+            <span>💳 No Credit Card Required</span>
+            <span>·</span>
+            <span>🛡️ 100% Google Policy Compliant</span>
           </div>
 
           {/* Quick-Access Pathway Helper Strip */}
@@ -429,6 +453,116 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               <ZapIcon size={16} color="#9a4018" />
               <span>#1 Google Local Pack</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* SECTION: HOW KINDLYRATE WORKS IN 3 SIMPLE STEPS          */}
+      {/* ======================================================== */}
+      <section style={{ padding: '64px 16px 54px', background: '#ffffff', borderTop: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <span className="badge badge-primary" style={{ marginBottom: '8px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              ✦ 15-Second Customer Journey
+            </span>
+            <h2 className="serif" style={{ fontSize: 'clamp(26px, 4.5vw, 38px)', fontWeight: 700, color: '#0f172a', margin: '6px 0 10px' }}>
+              How KindlyRate Works for Your Business
+            </h2>
+            <p style={{ color: '#64748b', fontSize: '16px', maxWidth: '680px', margin: '0 auto', lineHeight: 1.6 }}>
+              Most happy customers walk out without reviewing, while unhappy customers go straight to Google. KindlyRate makes getting 5-star reviews effortless in 3 simple steps:
+            </p>
+          </div>
+
+          {/* 3 Step Flow Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '20px', marginBottom: '36px' }}>
+            {/* Step 1 */}
+            <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '26px 22px', position: 'relative' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '42px', height: '42px', borderRadius: '12px', background: '#fee2e2', color: '#9a4018', fontWeight: 800, fontSize: '18px', marginBottom: '16px' }}>
+                1
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                Place Your Smart QR Stand
+              </h3>
+              <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, marginBottom: '14px' }}>
+                Place your custom laser-cut acrylic or printed QR stand at your billing counter, reception desk, or dining tables. Customers scan it with any smartphone camera in 3 seconds.
+              </p>
+              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#0f172a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                📱 Zero app download needed for customers
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '26px 22px', position: 'relative' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '42px', height: '42px', borderRadius: '12px', background: '#fef3c7', color: '#b45309', fontWeight: 800, fontSize: '18px', marginBottom: '16px' }}>
+                2
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                AI Generates 5-Star Reviews
+              </h3>
+              <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, marginBottom: '14px' }}>
+                Customers hate typing long text on phone keyboards. After answering 2 quick rating questions, our Gemini AI instantly crafts an authentic, glowing 5-star review tailored to your store.
+              </p>
+              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#0f172a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                ✨ 1-Tap Copy · Natural human tone
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '26px 22px', position: 'relative' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '42px', height: '42px', borderRadius: '12px', background: '#dcfce7', color: '#15803d', fontWeight: 800, fontSize: '18px', marginBottom: '16px' }}>
+                3
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                1-Tap Post &amp; Private Shield
+              </h3>
+              <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, marginBottom: '14px' }}>
+                Happy reviews post directly to Google Maps, pushing your business to #1 on search and driving more walk-ins. Critical ratings (1-3★) stay 100% private with you so your public score never drops.
+              </p>
+              <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#15803d', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                🛡️ 100% Google Maps Policy Compliant
+              </div>
+            </div>
+          </div>
+
+          {/* Flow Banner CTA */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #fff7ed 0%, #fffbf5 100%)',
+              border: '1.5px solid #fed7aa',
+              borderRadius: '16px',
+              padding: '24px 28px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '16px',
+              boxShadow: '0 4px 14px rgba(154, 64, 24, 0.06)',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '17px', fontWeight: 800, color: '#9a3412', marginBottom: '3px' }}>
+                Ready to turn happy customers into #1 Google rankings?
+              </div>
+              <div style={{ fontSize: '13.5px', color: '#7c2d12' }}>
+                Fast 15-second setup. You don't need your Google link right now — start free today with no credit card required.
+              </div>
+            </div>
+
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={onStartOnboarding}
+              style={{
+                padding: '12px 26px',
+                fontSize: '15px',
+                fontWeight: 800,
+                borderRadius: '10px',
+                boxShadow: '0 4px 12px rgba(154, 64, 24, 0.3)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              🚀 Start Free in 10 Seconds →
+            </button>
           </div>
         </div>
       </section>

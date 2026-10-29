@@ -120,6 +120,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
   const [convertingMapsLink, setConvertingMapsLink] = useState(false);
   const [mapsLinkSuccessMsg, setMapsLinkSuccessMsg] = useState('');
+  const [quickMapsUrl, setQuickMapsUrl] = useState('');
+  const [quickSavingMaps, setQuickSavingMaps] = useState(false);
+  const [quickMapsSuccess, setQuickMapsSuccess] = useState(false);
 
   // Settings Tags State
   const [newHighlightTag, setNewHighlightTag] = useState('');
@@ -406,6 +409,40 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       alert(err.message || 'Failed to convert Google Maps link.');
     } finally {
       setConvertingMapsLink(false);
+    }
+  };
+
+  const handleQuickConnectMaps = async () => {
+    if (!quickMapsUrl || !quickMapsUrl.trim()) {
+      showNotification('Please enter your Google Maps link or share link.');
+      return;
+    }
+    setQuickSavingMaps(true);
+    try {
+      let targetUrl = quickMapsUrl.trim();
+      try {
+        const res = await convertGoogleMapsUrl(targetUrl);
+        if (res && res.directReviewUrl) {
+          targetUrl = res.directReviewUrl;
+        }
+      } catch {}
+
+      const updated = await api.updateBusiness(businessId, {
+        googleReviewUrl: targetUrl,
+        googleMapsShareUrl: quickMapsUrl.trim(),
+      });
+      setBusiness(updated);
+      setProfileForm((prev) => ({
+        ...prev,
+        googleReviewUrl: targetUrl,
+        googleMapsShareUrl: quickMapsUrl.trim(),
+      }));
+      setQuickMapsSuccess(true);
+      showNotification('✓ Google Maps Review Link Connected Successfully!');
+    } catch (err: any) {
+      alert(err.message || 'Failed to update Google Maps link.');
+    } finally {
+      setQuickSavingMaps(false);
     }
   };
 
@@ -1295,6 +1332,58 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 )}
               </div>
             </div>
+
+            {/* Quick Setup Checklist for Google Maps Link */}
+            {(!business?.googleReviewUrl || business.googleReviewUrl === 'https://maps.google.com') && !quickMapsSuccess && (
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)',
+                  border: '2px solid #fed7aa',
+                  borderRadius: '14px',
+                  padding: '20px 24px',
+                  marginBottom: '22px',
+                  boxShadow: '0 4px 14px rgba(154, 64, 24, 0.06)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#ea580c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                    📍
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#9a3412', margin: 0 }}>
+                      Step 1: Connect Your Google Maps Listing
+                    </h3>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#7c2d12' }}>
+                      Your smart QR stand is live! Paste your Google Maps review link or share URL below so customer reviews publish directly to your store:
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '14px' }}>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/... or https://search.google.com/...)"
+                    value={quickMapsUrl}
+                    onChange={(e) => setQuickMapsUrl(e.target.value)}
+                    style={{ flex: 1, minWidth: '280px', background: '#ffffff', border: '1.5px solid #fdba74' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={quickSavingMaps || !quickMapsUrl.trim()}
+                    onClick={handleQuickConnectMaps}
+                    style={{ whiteSpace: 'nowrap', padding: '0 20px', fontWeight: 700 }}
+                  >
+                    {quickSavingMaps ? 'Connecting...' : 'Connect Google Maps Link →'}
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '12.5px', color: '#9a3412', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span>💡 <strong>Tip:</strong> Open Google Maps on phone or desktop, search your business name, tap "Share" ➔ "Copy link" and paste here!</span>
+                </div>
+              </div>
+            )}
 
             {/* Unpaid / Trial Hero Banner */}
             {!isPaidActive && (

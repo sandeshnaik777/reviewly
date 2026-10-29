@@ -452,22 +452,47 @@ export const OnboardingWizard: React.FC<Props> = ({
         handleAccountSubmit();
         return;
       }
+      setStep(2);
+      return;
     }
 
-    // Step 3 validation (Business Info)
-    if (step === 3) {
+    // Step 2: Instant Store Setup (Fast, zero-friction)
+    if (step === 2) {
       if (!formData.businessName || !formData.businessName.trim()) {
         setError('Please enter your business or store name.');
         return;
       }
-      if (!formData.phone || !formData.phone.trim()) {
-        setError('Please enter your business mobile phone number.');
+      try {
+        setLoading(true);
+        setError(null);
+        let targetBiz = createdBusiness;
+        if (!targetBiz) {
+          const setupRes = await api.setupBusiness({
+            businessName: formData.businessName.trim(),
+            mainCategory: formData.mainCategory || 'FOOD & HOSPITALITY',
+            subcategory: formData.subcategory || 'General',
+            customCategory: formData.customCategory || undefined,
+            phone: (formData.phone || '').trim(),
+            address: 'Central Location',
+            city: 'Bangalore',
+            state: 'Karnataka',
+            country: 'India',
+            pincode: '000000',
+            googleReviewUrl: 'https://maps.google.com',
+            planSlug: 'starter',
+          });
+          targetBiz = setupRes.business;
+          setCreatedBusiness(targetBiz);
+          setFirstQRSlug(setupRes.firstQRSlug);
+          setTrialPlanData(setupRes.trialPlan);
+        }
+        setStep(3); // Advance straight to software flow explanation!
         return;
-      }
-      const phoneVal = validatePhoneNumber(formData.phone);
-      if (!phoneVal.isValid) {
-        setError(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+      } catch (err: any) {
+        setError(err.message || 'Failed to setup store. Please try again.');
         return;
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -899,25 +924,26 @@ export const OnboardingWizard: React.FC<Props> = ({
         </button>
         <KindlyRateLogo height={32} />
         <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-          Step <strong>{step}</strong> of 9
+          {step <= 3 ? (
+            <>Step <strong>{step}</strong> of 3</>
+          ) : (
+            <>Plan Activation</>
+          )}
         </span>
       </div>
 
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <span className="badge badge-primary" style={{ marginBottom: '6px' }}>
-          Step {step} of 9
+          {step <= 3 ? `Step ${step} of 3` : 'Plan Activation'}
         </span>
         <h1 className="serif serif-h1" style={{ fontSize: '28px', lineHeight: 1.25 }}>
-          {step === 1 && 'Create Your Account & Login'}
-          {step === 2 && 'Choose Your Business Category'}
-          {step === 3 && 'Business Profile & Store Details'}
-          {step === 4 && 'Configure Review Questions'}
-          {step === 5 && 'Connect Your Google Review URL'}
+          {step === 1 && 'Create Your Free Account'}
+          {step === 2 && 'Name Your Store & Business'}
+          {step === 3 && 'How KindlyRate Works · Your Store is Ready!'}
           {step === 6 && 'Select Your Subscription Plan'}
           {step === 7 && 'Confirm Activation & Payment'}
-          {step === 8 && 'Onboarding Complete!'}
-          {step === 9 && 'Your First QR Code is Ready'}
+          {step > 7 && 'Onboarding Complete!'}
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '13.5px', marginTop: '4px' }}>
           {step === 1 ? (
@@ -927,6 +953,10 @@ export const OnboardingWizard: React.FC<Props> = ({
                 Sign in here
               </a>
             </>
+          ) : step === 2 ? (
+            'Fast 15-second setup. You can add your Google Maps link and customize details anytime inside your dashboard.'
+          ) : step === 3 ? (
+            `Congratulations! Your business is active. Here is how your smart review system works:`
           ) : (
             `Signed in as ${formData.ownerName || formData.email || 'Business Owner'}`
           )}
@@ -1420,154 +1450,272 @@ export const OnboardingWizard: React.FC<Props> = ({
           </div>
         )}
 
-        {/* STEP 2: Categories */}
+        {/* STEP 2: Fast Store Setup (Store Name & Category only, zero friction!) */}
         {step === 2 && (
           <div>
-            <p style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>
-              Select the industry and category that best represents your business. This dynamically shapes your review experience.
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
-              {Object.keys(categories).map((catName) => {
-                const isSelected = formData.mainCategory === catName;
-                return (
-                  <button
-                    key={catName}
-                    type="button"
-                    onClick={() => handleCategorySelect(catName, categories[catName].subcategories[0])}
-                    style={{
-                      textAlign: 'left',
-                      padding: '16px',
-                      borderRadius: 'var(--radius-md)',
-                      border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      background: isSelected ? 'var(--primary-light)' : 'var(--surface)',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: '14px', color: isSelected ? 'var(--primary)' : 'var(--text)' }}>
-                      {catName}
-                    </div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                      {categories[catName].subcategories.slice(0, 3).join(', ')}...
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Subcategory selector */}
-            <div style={{ marginTop: '24px' }}>
-              <label className="form-label">Specific Business Subcategory</label>
-              <select
-                className="form-select"
-                value={formData.subcategory}
-                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-              >
-                {(categories[formData.mainCategory]?.subcategories || []).map((sub: string) => (
-                  <option key={sub} value={sub}>
-                    {sub}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {formData.subcategory === 'Other' && (
-              <div style={{ marginTop: '16px' }}>
-                <label className="form-label">Custom Business Type</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Specialty Pottery Workshop"
-                  value={formData.customCategory}
-                  onChange={(e) => setFormData({ ...formData, customCategory: e.target.value })}
-                />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* STEP 3: Business & Store Details */}
-        {step === 3 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="form-label">Business / Store Name *</label>
+            <div className="form-group" style={{ marginBottom: '22px' }}>
+              <label className="form-label" style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+                Business or Store Name *
+              </label>
               <input
                 className="form-input"
-                placeholder="e.g. Metro Lifestyle Store or Apollo Clinic"
+                style={{ fontSize: '16px', padding: '12px 14px', borderRadius: '10px' }}
+                placeholder="e.g. Royal Spice Bistro, Sharma Electronics, or Apex Clinic"
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                 required
+                autoFocus
               />
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                Enter the name your customers know you by.
+              </div>
             </div>
 
-            <div style={{ gridColumn: '1 / -1' }}>
-              <PhoneInput
-                label="Business Phone Number"
-                required
+            <div className="form-group" style={{ marginBottom: '22px' }}>
+              <label className="form-label" style={{ fontSize: '14.5px', fontWeight: 700, color: '#0f172a' }}>
+                Select Your Business Industry
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
+                {[
+                  { key: 'FOOD & HOSPITALITY', label: '🍽️ Food & Dining', desc: 'Cafes, Restaurants, Bakeries' },
+                  { key: 'RETAIL', label: '🛍️ Retail Store', desc: 'Clothing, Electronics, Grocery' },
+                  { key: 'HEALTH & WELLNESS', label: '🩺 Clinic & Health', desc: 'Doctors, Salons, Spas' },
+                  { key: 'SERVICES', label: '💼 Services & Repair', desc: 'Auto, Technicians, Agencies' },
+                  { key: 'OTHER', label: '🏢 Other Business', desc: 'Showrooms, Specialty shops' },
+                ].map((cat) => {
+                  const isSelected = formData.mainCategory === cat.key;
+                  return (
+                    <button
+                      key={cat.key}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, mainCategory: cat.key, subcategory: cat.desc.split(',')[0].trim() })}
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px 14px',
+                        borderRadius: '10px',
+                        border: isSelected ? '2px solid var(--primary)' : '1.5px solid var(--border)',
+                        background: isSelected ? 'var(--primary-light)' : '#ffffff',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: '13.5px', color: isSelected ? 'var(--primary)' : 'var(--text)' }}>
+                        {cat.label}
+                      </div>
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '3px' }}>
+                        {cat.desc}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '22px' }}>
+              <label className="form-label" style={{ fontSize: '13.5px', fontWeight: 600, color: '#334155' }}>
+                Business Mobile Phone (Optional)
+              </label>
+              <input
+                type="tel"
+                className="form-input"
+                placeholder="e.g. 9876543210 (Optional for alerts)"
                 value={formData.phone}
-                onChange={(val) => setFormData({ ...formData, phone: val })}
-                defaultCountryCode="IN"
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
             </div>
 
-            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="form-label">Physical Address</label>
-              <input
-                className="form-input"
-                placeholder="Shop 12, Indiranagar 100ft Rd"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              />
+            {/* Reassuring Zero-Friction Trust Box */}
+            <div
+              style={{
+                background: '#f8fafc',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '14px 18px',
+                marginBottom: '26px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+              }}
+            >
+              <div style={{ fontSize: '24px' }}>🛡️</div>
+              <div style={{ fontSize: '12.5px', color: '#475569', lineHeight: 1.5 }}>
+                <strong>Zero complex setup:</strong> You do <em>not</em> need your Google Maps link or store address right now. We will generate your instant QR stand immediately, and you can connect Google Maps inside your dashboard whenever you are ready!
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">City</label>
-              <input
-                className="form-input"
-                placeholder="Bangalore"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              />
+            {/* Single Large Submit Button */}
+            <div>
+              <button
+                type="button"
+                className="btn btn-primary btn-block btn-lg"
+                disabled={loading || !formData.businessName?.trim()}
+                onClick={handleNext}
+                style={{
+                  padding: '14px 24px',
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  boxShadow: '0 4px 16px rgba(154, 64, 24, 0.35)',
+                  borderRadius: '12px',
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner"></span> Creating Your Store &amp; Stand...
+                  </>
+                ) : (
+                  '🚀 Create My Store & Get My QR Stand →'
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: Software Flow Explanation & Launch Screen */}
+        {step === 3 && (
+          <div style={{ padding: '4px 0' }}>
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: '#f0fdf4',
+                  border: '1.5px solid #86efac',
+                  color: '#166534',
+                  padding: '6px 16px',
+                  borderRadius: '999px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  marginBottom: '12px',
+                }}
+              >
+                ✓ Store Created &amp; Smart QR Stand Generated!
+              </div>
+              <h2 className="serif" style={{ fontSize: '26px', fontWeight: 700, margin: '4px 0 8px', color: '#0f172a' }}>
+                How KindlyRate Works for {formData.businessName || 'Your Business'}
+              </h2>
+              <p style={{ color: '#64748b', fontSize: '14px', maxWidth: '640px', margin: '0 auto' }}>
+                Your smart QR stand is live. Here is the exact 15-second customer flow that turns walk-ins into top-ranking Google reviews:
+              </p>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">State</label>
-              <input
-                className="form-input"
-                placeholder="Karnataka"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-              />
+            {/* 3 Step Cards Flow */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+              {/* Card 1 */}
+              <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#e0e7ff', color: '#4338ca', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px' }}>
+                    1
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#0f172a' }}>Place Your Smart Stand</div>
+                    <div style={{ fontSize: '11.5px', color: '#64748b' }}>No app download needed</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                  Place your printed or acrylic QR stand on your billing counter, reception, or tables. Customers scan it with their phone camera in 3 seconds.
+                </p>
+              </div>
+
+              {/* Card 2 */}
+              <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef3c7', color: '#b45309', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px' }}>
+                    2
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#0f172a' }}>AI Generates 5-Star Reviews</div>
+                    <div style={{ fontSize: '11.5px', color: '#64748b' }}>No typing required</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                  Customers answer 2 quick rating questions. Server-side Gemini AI instantly writes an authentic, glowing 5-star review tailored to your store.
+                </p>
+              </div>
+
+              {/* Card 3 */}
+              <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px' }}>
+                    3
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '14.5px', color: '#0f172a' }}>1-Tap Post &amp; Shield</div>
+                    <div style={{ fontSize: '11.5px', color: '#64748b' }}>100% Reputation Shield</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                  Happy customers post directly to Google Maps in 1 tap, pushing you to #1 on search. Unhappy feedback stays private with you to protect your rating!
+                </p>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">PIN / Postal Code</label>
-              <input
-                className="form-input"
-                placeholder="560038"
-                value={formData.pincode}
-                onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-              />
+            {/* Note about adding Google Maps link */}
+            <div
+              style={{
+                background: '#fffaf5',
+                border: '1.5px solid #fed7aa',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                marginBottom: '26px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+              }}
+            >
+              <div style={{ fontSize: '26px' }}>📍</div>
+              <div>
+                <strong style={{ color: '#9a3412', fontSize: '14px', display: 'block', marginBottom: '2px' }}>
+                  Next Step: Connect Your Google Maps Link Inside Dashboard
+                </strong>
+                <span style={{ fontSize: '13px', color: '#7c2d12' }}>
+                  Your dashboard is ready right now! Whenever you're ready, paste your Google Maps link inside your dashboard so customer reviews link directly to your business listing.
+                </span>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Operating Hours</label>
-              <input
-                className="form-input"
-                placeholder="e.g. Mon-Sun: 11:00 AM - 11:00 PM"
-                value={formData.openingHours}
-                onChange={(e) => setFormData({ ...formData, openingHours: e.target.value })}
-              />
-            </div>
+            {/* Main Action Hub */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn btn-primary btn-lg"
+                onClick={() => onComplete(createdBusiness)}
+                style={{
+                  padding: '14px 32px',
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  boxShadow: '0 4px 16px rgba(154, 64, 24, 0.35)',
+                  borderRadius: '12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <span>🎉 Enter My Dashboard &amp; View My QR Stand →</span>
+              </button>
 
-            <div className="form-group" style={{ gridColumn: 'span 2' }}>
-              <label className="form-label">Business Description</label>
-              <textarea
-                className="form-textarea"
-                rows={3}
-                placeholder="Tell customers what makes your business unique (key offerings, specialty products, atmosphere, quality service)..."
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
+              {firstQRSlug && (
+                <a
+                  href={`/r/${firstQRSlug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-secondary btn-lg"
+                  style={{
+                    padding: '14px 22px',
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: '#ffffff',
+                    border: '1.5px solid #cbd5e1',
+                    color: '#0f172a',
+                  }}
+                >
+                  <span>📱 Test QR Flow on Phone ↗</span>
+                </a>
+              )}
             </div>
           </div>
         )}
@@ -2490,8 +2638,8 @@ export const OnboardingWizard: React.FC<Props> = ({
           </div>
         )}
 
-        {/* Navigation Buttons for Steps 2-6 (Step 1 has its own submit button) */}
-        {step > 1 && step < 7 && (
+        {/* Navigation Buttons for Optional Steps 4-6 */}
+        {step > 3 && step < 7 && (
           <div
             style={{
               display: 'flex',
