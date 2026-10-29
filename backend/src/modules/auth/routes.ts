@@ -117,6 +117,8 @@ authRouter.post('/signup', validateBody(signupSchema), async (req: Request, res:
       email: data.email.toLowerCase(),
       passwordHash,
       name: data.name,
+      phone: data.phone,
+      phoneVerified: true,
       role: 'BUSINESS_OWNER',
       isActive: true,
       emailVerified: false,

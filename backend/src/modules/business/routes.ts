@@ -561,6 +561,10 @@ businessRouter.post(
         await db.createBusiness(targetBusiness);
       }
 
+      if (finalPhone) {
+        await db.updateUser(userId, { phone: finalPhone, phoneVerified: true });
+      }
+
       const businessId = targetBusiness.id;
 
       // Save questions
