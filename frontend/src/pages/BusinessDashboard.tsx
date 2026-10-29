@@ -149,6 +149,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
   // Google Maps AI Telemetry Refresh
   const [isRefreshingMaps, setIsRefreshingMaps] = useState(false);
+  const [initiatingPlanId, setInitiatingPlanId] = useState<string | null>(null);
 
   // Toast / Status Message
   const [toast, setToast] = useState<string | null>(null);
@@ -172,6 +173,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
   const handlePayTrial = async () => {
     try {
+      setInitiatingPlanId('trial');
       const trialPlan = plans.find((p) => p.slug === 'starter') || plans[0];
       const [order, isLoaded] = await Promise.all([
         api.createOrder(businessId, trialPlan.id, { isTrial: true }),
@@ -187,11 +189,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             ? 'Testing Pack (₹79 Starter Trial · Monthly UPI Autopay)'
             : 'Testing Pack (₹79 Starter Trial)',
           prefill: {
-            name: business?.name || 'Business Owner',
-            email: business?.email || '',
-            contact: (business?.phone || '').replace(/[^0-9]/g, '').slice(-10),
+            name: business?.name || currentUser?.name || 'Business Owner',
+            email: business?.email || currentUser?.email || '',
+            contact: (business?.phone || currentUser?.phone || '').replace(/[^0-9]/g, '').slice(-10),
           },
-          theme: { color: '#00383B' },
+          theme: { color: '#9a4018' },
           handler: async (response: any) => {
             try {
               await api.verifyPayment(businessId, {
@@ -203,8 +205,15 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               showNotification('Testing Pack Trial Activated for ₹79 via UPI Autopay!');
               loadAllData();
             } catch (vErr: any) {
-              alert(`Trial activation verification note: ${vErr.message}`);
+              showNotification(`Trial activation verification note: ${vErr.message}`);
+            } finally {
+              setInitiatingPlanId(null);
             }
+          },
+          modal: {
+            ondismiss: () => {
+              setInitiatingPlanId(null);
+            },
           },
         };
 
@@ -216,12 +225,17 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
         }
 
         const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', () => {
+          setInitiatingPlanId(null);
+        });
         rzp.open();
       } else {
-        alert('Razorpay checkout script loading. Please try again in a moment.');
+        setInitiatingPlanId(null);
+        showNotification('Razorpay checkout is loading. Please try again in a moment.');
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to start trial payment');
+      setInitiatingPlanId(null);
+      showNotification(err.message || 'Failed to start trial payment');
     }
   };
 
@@ -2657,7 +2671,218 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
             {settings && (
               <>
-                {/* 1. REPUTATION DEFENSE SHIELD (HIGH IMPACT FILTER) */}
+                {/* 1. CUSTOMER MOBILE RATING CRITERIA (QUESTIONS) - CORE RATING INPUT */}
+                <div
+                  style={{
+                    background: '#ffffff',
+                    border: '1.5px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '26px 28px',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '20px' }}>📋</span>
+                        <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                          1. Customer Mobile Rating Criteria (Questions)
+                        </h4>
+                      </div>
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
+                        Primary questions rated by customers on their mobile screen when scanning your counter QR stands.
+                      </p>
+                    </div>
+
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '13px', padding: '8px 16px', fontWeight: 600 }}
+                      onClick={() => {
+                        const newKey = `q_${Date.now()}`;
+                        setQuestions([
+                          ...questions,
+                          {
+                            questionKey: newKey,
+                            label: 'Overall Experience',
+                            scaleType: '1-5_STARS',
+                            displayOrder: questions.length,
+                            isRequired: true,
+                            isActive: true,
+                          },
+                        ]);
+                      }}
+                    >
+                      + Add Custom Question
+                    </button>
+                  </div>
+
+                  {/* Industry Presets */}
+                  <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
+                      Click to quickly add industry-tailored criteria:
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {(() => {
+                        const cat = (business?.mainCategory || '').toUpperCase();
+                        const sub = (business?.subcategory || '').toLowerCase();
+                        const bName = (business?.name || '').toLowerCase();
+
+                        const isRetail =
+                          cat === 'RETAIL' ||
+                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+                        const isServices =
+                          cat === 'SERVICES' ||
+                          /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+                        const isHealth =
+                          cat === 'HEALTH & WELLNESS' ||
+                          /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+                        const presets = isRetail
+                          ? [
+                              { label: 'Product Authenticity & Genuine Parts', key: 'product_authenticity' },
+                              { label: 'Staff Technical Knowledge & Advice', key: 'tech_advice' },
+                              { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
+                              { label: 'Store Ambience & Product Selection', key: 'store_selection' },
+                              { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
+                            ]
+                          : isServices
+                          ? [
+                              { label: 'Diagnostic & Repair Quality', key: 'diagnostic_quality' },
+                              { label: 'Turnaround Speed & Punctuality', key: 'turnaround_speed' },
+                              { label: 'Transparent Pricing & Fair Estimates', key: 'transparent_pricing' },
+                              { label: 'Technician Professionalism', key: 'technician_prof' },
+                            ]
+                          : isHealth
+                          ? [
+                              { label: 'Treatment Quality & Care', key: 'treatment_quality' },
+                              { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
+                              { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
+                              { label: 'Appointment Punctuality', key: 'appointment_time' },
+                            ]
+                          : [
+                              { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
+                              { label: 'Speed of Service', key: 'service_speed' },
+                              { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
+                              { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
+                            ];
+
+                        return presets.map((preset) => {
+                          const isAlreadyAdded = questions.some((q) => q.label === preset.label);
+                          return (
+                            <button
+                              key={preset.key}
+                              type="button"
+                              onClick={() => {
+                                if (!isAlreadyAdded) {
+                                  setQuestions([
+                                    ...questions,
+                                    {
+                                      questionKey: `q_${preset.key}_${Date.now()}`,
+                                      label: preset.label,
+                                      scaleType: '1-5_STARS',
+                                      displayOrder: questions.length,
+                                      isRequired: true,
+                                      isActive: true,
+                                    },
+                                  ]);
+                                  showNotification(`Added question: ${preset.label}`);
+                                }
+                              }}
+                              style={{
+                                background: isAlreadyAdded ? '#dcfce7' : '#ffffff',
+                                border: isAlreadyAdded ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
+                                color: isAlreadyAdded ? '#15803d' : '#1e293b',
+                                fontWeight: isAlreadyAdded ? 700 : 500,
+                                padding: '5px 12px',
+                                borderRadius: '16px',
+                                fontSize: '12px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {isAlreadyAdded ? '✓ ' : '+ '}
+                              {preset.label}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Questions List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+                    {questions.map((q, idx) => (
+                      <div
+                        key={q.questionKey || idx}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '12px 16px',
+                          background: '#f8fafc',
+                          borderRadius: '10px',
+                          border: '1.5px solid #e2e8f0',
+                        }}
+                      >
+                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#475569', width: '24px' }}>
+                          {idx + 1}.
+                        </span>
+                        <input
+                          className="form-input"
+                          value={q.label}
+                          onChange={(e) => {
+                            const updated = [...questions];
+                            updated[idx].label = e.target.value;
+                            setQuestions(updated);
+                          }}
+                          style={{ flex: 1, padding: '9px 12px', fontSize: '13.5px' }}
+                        />
+                        <select
+                          className="form-select"
+                          style={{ width: '160px', padding: '9px 12px', fontSize: '13px' }}
+                          value={q.scaleType}
+                          onChange={(e) => {
+                            const updated = [...questions];
+                            updated[idx].scaleType = e.target.value;
+                            setQuestions(updated);
+                          }}
+                        >
+                          <option value="1-5_STARS">⭐ 1–5 Stars</option>
+                          <option value="1-10_NUMERIC">1–10 Numeric</option>
+                          <option value="THUMBS_UP_DOWN">👍 Thumbs Up/Down</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => setQuestions(questions.filter((_, i) => i !== idx))}
+                          title="Remove question"
+                          style={{
+                            background: '#fee2e2',
+                            border: '1px solid #fca5a5',
+                            color: '#991b1b',
+                            cursor: 'pointer',
+                            padding: '8px 14px',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          ✕ Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <button className="btn btn-primary btn-lg" onClick={handleSaveQuestions} style={{ fontWeight: 700 }}>
+                      Save Questions &amp; Rating Criteria
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. REPUTATION DEFENSE SHIELD (HIGH IMPACT FILTER) */}
                 <div
                   style={{
                     background: '#ffffff',
@@ -2672,7 +2897,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <ShieldIcon size={20} color="var(--primary)" />
                         <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                          1. Reputation Defense Shield (Automated Negative Review Filter)
+                          2. Reputation Defense Shield (Automated Negative Review Filter)
                         </h4>
                       </div>
                       <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
@@ -2789,7 +3014,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                {/* 2. AI REVIEW VOICE & PERSONA (TONE OF VOICE) */}
+                {/* 3. AI REVIEW VOICE & PERSONA (TONE OF VOICE) */}
                 <div
                   style={{
                     background: '#ffffff',
@@ -2803,7 +3028,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <SparklesIcon size={20} color="var(--primary)" />
                       <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                        2. AI Review Writing Voice &amp; Customer Persona
+                        3. AI Review Writing Voice &amp; Customer Persona
                       </h4>
                     </div>
                     <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
@@ -2998,7 +3223,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                {/* 3. KEYWORDS & OFFERINGS TO HIGHLIGHT (SEO ENGINE) */}
+                {/* 4. KEYWORDS & OFFERINGS TO HIGHLIGHT (SEO ENGINE) */}
                 <div
                   style={{
                     background: '#ffffff',
@@ -3013,7 +3238,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Target size={20} color="#15803d" />
                         <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                          3. Target Offerings &amp; Keywords to Naturally Mention
+                          4. Target Offerings &amp; Keywords to Naturally Mention
                         </h4>
                       </div>
                       <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
@@ -3225,7 +3450,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                {/* 4. FORBIDDEN WORDS (AI STRICTLY AVOIDS) */}
+                {/* 5. FORBIDDEN WORDS (AI STRICTLY AVOIDS) */}
                 <div
                   style={{
                     background: '#ffffff',
@@ -3239,7 +3464,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '18px' }}>🚫</span>
                       <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                        4. Forbidden Negative Words (AI Never Uses)
+                        5. Forbidden Negative Words (AI Never Uses)
                       </h4>
                     </div>
                     <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
@@ -3389,7 +3614,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </div>
                 </div>
 
-                {/* 5. CUSTOMER SCRATCH CARD REWARDS (OPTIONAL) */}
+                {/* 6. CUSTOMER SCRATCH CARD REWARDS (OPTIONAL) */}
                 <div
                   style={{
                     background: '#ffffff',
@@ -3404,7 +3629,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <GiftIcon size={20} color="var(--primary)" />
                         <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                          5. Post-Review Scratch Card &amp; Customer Rewards (Optional)
+                          6. Post-Review Scratch Card &amp; Customer Rewards (Optional)
                         </h4>
                         <span className="badge badge-neutral" style={{ fontSize: '11px' }}>Optional</span>
                       </div>
@@ -3568,217 +3793,6 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* 6. MOBILE RATING CRITERIA (QUESTIONS) */}
-                <div
-                  style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '16px',
-                    padding: '26px 28px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '18px' }}>📋</span>
-                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                          6. Customer Mobile Rating Criteria (Questions)
-                        </h4>
-                      </div>
-                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#475569' }}>
-                        Questions rated by customers on their mobile screen before our AI drafts their Google review.
-                      </p>
-                    </div>
-
-                    <button
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: '13px', padding: '8px 16px', fontWeight: 600 }}
-                      onClick={() => {
-                        const newKey = `q_${Date.now()}`;
-                        setQuestions([
-                          ...questions,
-                          {
-                            questionKey: newKey,
-                            label: 'Overall Experience',
-                            scaleType: '1-5_STARS',
-                            displayOrder: questions.length,
-                            isRequired: true,
-                            isActive: true,
-                          },
-                        ]);
-                      }}
-                    >
-                      + Add Custom Question
-                    </button>
-                  </div>
-
-                  {/* Industry Presets */}
-                  <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px' }}>
-                      Click to quickly add industry-tailored criteria:
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      {(() => {
-                        const cat = (business?.mainCategory || '').toUpperCase();
-                        const sub = (business?.subcategory || '').toLowerCase();
-                        const bName = (business?.name || '').toLowerCase();
-
-                        const isRetail =
-                          cat === 'RETAIL' ||
-                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
-                          /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
-
-                        const isServices =
-                          cat === 'SERVICES' ||
-                          /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
-
-                        const isHealth =
-                          cat === 'HEALTH & WELLNESS' ||
-                          /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
-
-                        const presets = isRetail
-                          ? [
-                              { label: 'Product Authenticity & Genuine Parts', key: 'product_authenticity' },
-                              { label: 'Staff Technical Knowledge & Advice', key: 'tech_advice' },
-                              { label: 'Competitive Pricing & Value for Money', key: 'pricing_value' },
-                              { label: 'Store Ambience & Product Selection', key: 'store_selection' },
-                              { label: 'Warranty & After-Sales Support', key: 'warranty_support' },
-                            ]
-                          : isServices
-                          ? [
-                              { label: 'Diagnostic & Repair Quality', key: 'diagnostic_quality' },
-                              { label: 'Turnaround Speed & Punctuality', key: 'turnaround_speed' },
-                              { label: 'Transparent Pricing & Fair Estimates', key: 'transparent_pricing' },
-                              { label: 'Technician Professionalism', key: 'technician_prof' },
-                            ]
-                          : isHealth
-                          ? [
-                              { label: 'Treatment Quality & Care', key: 'treatment_quality' },
-                              { label: 'Staff Hospitality & Compassion', key: 'staff_care' },
-                              { label: 'Hygiene & Clinic Cleanliness', key: 'hygiene_cleanliness' },
-                              { label: 'Appointment Punctuality', key: 'appointment_time' },
-                            ]
-                          : [
-                              { label: 'Food Taste & Culinary Quality', key: 'food_taste' },
-                              { label: 'Speed of Service', key: 'service_speed' },
-                              { label: 'Staff Hospitality & Attentiveness', key: 'staff_hospitality' },
-                              { label: 'Ambiance & Cleanliness', key: 'ambiance_cleanliness' },
-                            ];
-
-                        return presets.map((preset) => {
-                          const isAlreadyAdded = questions.some((q) => q.label === preset.label);
-                          return (
-                            <button
-                              key={preset.key}
-                              type="button"
-                              onClick={() => {
-                                if (!isAlreadyAdded) {
-                                  setQuestions([
-                                    ...questions,
-                                    {
-                                      questionKey: `q_${preset.key}_${Date.now()}`,
-                                      label: preset.label,
-                                      scaleType: '1-5_STARS',
-                                      displayOrder: questions.length,
-                                      isRequired: true,
-                                      isActive: true,
-                                    },
-                                  ]);
-                                  showNotification(`Added question: ${preset.label}`);
-                                }
-                              }}
-                              style={{
-                                background: isAlreadyAdded ? '#dcfce7' : '#ffffff',
-                                border: isAlreadyAdded ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
-                                color: isAlreadyAdded ? '#15803d' : '#1e293b',
-                                fontWeight: isAlreadyAdded ? 700 : 500,
-                                padding: '5px 12px',
-                                borderRadius: '16px',
-                                fontSize: '12px',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              {isAlreadyAdded ? '✓ ' : '+ '}
-                              {preset.label}
-                            </button>
-                          );
-                        });
-                      })()}
-                    </div>
-                  </div>
-
-                  {/* Questions List */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-                    {questions.map((q, idx) => (
-                      <div
-                        key={q.questionKey || idx}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          padding: '12px 16px',
-                          background: '#f8fafc',
-                          borderRadius: '10px',
-                          border: '1.5px solid #e2e8f0',
-                        }}
-                      >
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#475569', width: '24px' }}>
-                          {idx + 1}.
-                        </span>
-                        <input
-                          className="form-input"
-                          value={q.label}
-                          onChange={(e) => {
-                            const updated = [...questions];
-                            updated[idx].label = e.target.value;
-                            setQuestions(updated);
-                          }}
-                          style={{ flex: 1, padding: '9px 12px', fontSize: '13.5px' }}
-                        />
-                        <select
-                          className="form-select"
-                          style={{ width: '160px', padding: '9px 12px', fontSize: '13px' }}
-                          value={q.scaleType}
-                          onChange={(e) => {
-                            const updated = [...questions];
-                            updated[idx].scaleType = e.target.value;
-                            setQuestions(updated);
-                          }}
-                        >
-                          <option value="1-5_STARS">⭐ 1–5 Stars</option>
-                          <option value="1-10_NUMERIC">1–10 Numeric</option>
-                          <option value="THUMBS_UP_DOWN">👍 Thumbs Up/Down</option>
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => setQuestions(questions.filter((_, i) => i !== idx))}
-                          title="Remove question"
-                          style={{
-                            background: '#fee2e2',
-                            border: '1px solid #fca5a5',
-                            color: '#991b1b',
-                            cursor: 'pointer',
-                            padding: '8px 14px',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          ✕ Delete
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button className="btn btn-primary btn-lg" onClick={handleSaveQuestions} style={{ fontWeight: 700 }}>
-                      Save Questions &amp; Rating Criteria
-                    </button>
-                  </div>
                 </div>
 
                 {/* BOTTOM STICKY SAVE BAR */}
@@ -4390,6 +4404,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     discountTag = '2 Months Free Applied!';
                   }
 
+                  const isCurrentPlan = Boolean(
+                    (subscriptionData?.plan?.slug === p.slug) ||
+                    (!subscriptionData?.plan && usage?.plan?.slug === p.slug)
+                  );
+
                   return (
                     <div
                       key={p.id}
@@ -4399,10 +4418,31 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         display: 'flex',
                         flexDirection: 'column',
                         position: 'relative',
-                        border: p.slug === 'growth' ? '2px solid var(--primary)' : '1px solid var(--border)',
+                        border: isCurrentPlan
+                          ? '2.5px solid #16a34a'
+                          : p.slug === 'growth'
+                          ? '2px solid var(--primary)'
+                          : '1px solid var(--border)',
+                        background: isCurrentPlan ? '#f0fdf4' : '#ffffff',
                       }}
                     >
-                      {p.slug === 'growth' && (
+                      {isCurrentPlan ? (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '-11px',
+                            left: '20px',
+                            background: '#16a34a',
+                            color: 'white',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            padding: '3px 12px',
+                            borderRadius: '12px',
+                          }}
+                        >
+                          ● YOUR CURRENT ACTIVE PLAN
+                        </div>
+                      ) : p.slug === 'growth' ? (
                         <div
                           style={{
                             position: 'absolute',
@@ -4418,7 +4458,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         >
                           MOST POPULAR
                         </div>
-                      )}
+                      ) : null}
 
                       {/* Header with Title and Month Duration Selector in Right Upper Container */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
@@ -4494,9 +4534,22 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
 
                       <button
                         className="btn btn-primary btn-block"
-                        style={{ marginTop: '18px', fontSize: '13.5px', padding: '10px' }}
+                        disabled={initiatingPlanId !== null}
+                        style={{
+                          marginTop: '18px',
+                          fontSize: '14px',
+                          padding: '12px 16px',
+                          fontWeight: 700,
+                          background: isCurrentPlan ? '#15803d' : 'var(--primary)',
+                          borderColor: isCurrentPlan ? '#15803d' : 'var(--primary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                        }}
                         onClick={async () => {
                           try {
+                            setInitiatingPlanId(p.id);
                             const [order, isLoaded] = await Promise.all([
                               api.createOrder(businessId, p.id, selectedDuration),
                               loadRazorpay(),
@@ -4518,12 +4571,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                                   }`
                                   : `Upgrade to ${p.name} (${selectedDuration} Months)`,
                                 prefill: {
-                                  name: business?.name || 'Business Owner',
-                                  email: business?.email || '',
-                                  contact: (business?.phone || '').replace(/[^0-9]/g, '').slice(-10),
+                                  name: business?.name || currentUser?.name || 'Business Owner',
+                                  email: business?.email || currentUser?.email || '',
+                                  contact: (business?.phone || currentUser?.phone || '').replace(/[^0-9]/g, '').slice(-10),
                                 },
                                 theme: {
-                                  color: '#00383B',
+                                  color: '#9a4018',
                                 },
                                 handler: async (response: any) => {
                                   try {
@@ -4533,15 +4586,17 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                                       signature: response.razorpay_signature,
                                       subscriptionId: response.razorpay_subscription_id,
                                     });
-                                    showNotification(`Payment Successful! Account upgraded to ${p.name} with UPI Autopay.`);
+                                    showNotification(`Payment Successful! Account upgraded to ${p.name}.`);
                                     loadAllData();
                                   } catch (vErr: any) {
-                                    alert(`Payment verification failed: ${vErr.message}`);
+                                    showNotification(`Payment verification note: ${vErr.message}`);
+                                  } finally {
+                                    setInitiatingPlanId(null);
                                   }
                                 },
                                 modal: {
                                   ondismiss: () => {
-                                    console.log('Razorpay modal closed');
+                                    setInitiatingPlanId(null);
                                   },
                                 },
                               };
@@ -4553,18 +4608,30 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               }
                               const rzp = new (window as any).Razorpay(options);
                               rzp.on('payment.failed', (resp: any) => {
-                                alert(`Payment Failed: ${resp.error?.description || 'Transaction cancelled'}`);
+                                setInitiatingPlanId(null);
+                                showNotification(`Payment Notice: ${resp.error?.description || 'Transaction was not completed'}`);
                               });
                               rzp.open();
                             } else {
-                              alert(`Razorpay checkout script loading. Created Order: ${order.orderId}. Please try again in a moment.`);
+                              setInitiatingPlanId(null);
+                              showNotification('Razorpay checkout is loading. Please try again in a moment.');
                             }
                           } catch (err: any) {
-                            alert(err.message || 'Failed to initialize payment');
+                            setInitiatingPlanId(null);
+                            showNotification(err.message || 'Failed to initialize payment');
                           }
                         }}
                       >
-                        Select {p.name} (₹{p.priceInr})
+                        {initiatingPlanId === p.id ? (
+                          <>
+                            <span className="spinner" style={{ width: '16px', height: '16px' }} />
+                            <span>Opening Secure Checkout...</span>
+                          </>
+                        ) : isCurrentPlan ? (
+                          <span>✓ Active Plan (Switch / Renew: ₹{activePrice})</span>
+                        ) : (
+                          <span>Upgrade to {p.name} (₹{activePrice}) →</span>
+                        )}
                       </button>
                     </div>
                   );

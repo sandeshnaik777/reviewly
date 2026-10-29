@@ -138,6 +138,13 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
     }
   };
 
+  const handleCopyAndOpenGoogle = async () => {
+    await handleCopyReview();
+    setTimeout(() => {
+      handleOpenGoogle();
+    }, 450);
+  };
+
   // Direct Google Review Shortcut
   const handleOpenGoogleDirect = () => {
     const url = data?.business?.googleReviewUrl;
@@ -766,85 +773,104 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               );
             })()}
 
-            {/* SECTION: Review Format & Layout Style */}
-            <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
-              <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
-                Review Format & Layout
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                {[
-                  { id: 'narrative', label: 'Story Narrative', desc: 'Flowing natural experience' },
-                  { id: 'bullet_highlights', label: 'Key Highlights', desc: 'Bulleted top takeaways' },
-                  { id: 'casual_conversational', label: 'Conversational', desc: 'Short, friendly & direct' },
-                  { id: 'professional_critique', label: 'Articulate Critique', desc: 'Balanced & articulate' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setReviewFormat(item.id as any)}
-                    style={{
-                      padding: '10px 8px',
-                      borderRadius: '8px',
-                      textAlign: 'left',
-                      border: reviewFormat === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      background: reviewFormat === item.id ? '#fef2ee' : 'var(--surface)',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: '12.5px', color: reviewFormat === item.id ? 'var(--primary)' : 'var(--text)' }}>
-                      {item.label}
-                    </div>
-                    <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      {item.desc}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Optional Customer Fine-Tuning (Format & Length) in Smooth Accordion */}
+            <details
+              style={{
+                marginTop: '14px',
+                background: '#ffffff',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+              }}
+            >
+              <summary
+                style={{
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#334155',
+                  userSelect: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <span>⚙️ Optional: Review Format &amp; Length</span>
+                <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, background: '#fef2ee', padding: '2px 8px', borderRadius: '10px' }}>
+                  {reviewLength === 'short' ? 'Short' : reviewLength === 'detailed' ? 'Detailed' : 'Standard'} · {reviewFormat.replace('_', ' ')}
+                </span>
+              </summary>
 
-            {/* SECTION: Review Length / Story Depth Selector */}
-            <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
-              <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
-                Review Length & Detail
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px' }}>
-                {[
-                  { id: 'short', label: 'Crisp & Quick', desc: '1–2 lines' },
-                  { id: 'medium', label: 'Balanced', desc: '3–4 lines' },
-                  { id: 'detailed', label: 'Detailed Story', desc: '9–10 lines in-depth' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setReviewLength(item.id as any)}
-                    style={{
-                      padding: '10px 6px',
-                      borderRadius: '8px',
-                      textAlign: 'center',
-                      border: reviewLength === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      background: reviewLength === item.id ? '#fef2ee' : 'var(--surface)',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: '12.5px', color: reviewLength === item.id ? 'var(--primary)' : 'var(--text)' }}>
-                      {item.label}
-                    </div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      {item.desc}
-                    </div>
-                  </button>
-                ))}
+              <div style={{ paddingTop: '14px', borderTop: '1px solid #e2e8f0', marginTop: '12px' }}>
+                <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
+                  Review Format &amp; Layout
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '14px' }}>
+                  {[
+                    { id: 'narrative', label: 'Story Narrative', desc: 'Flowing natural experience' },
+                    { id: 'bullet_highlights', label: 'Key Highlights', desc: 'Bulleted top takeaways' },
+                    { id: 'casual_conversational', label: 'Conversational', desc: 'Short, friendly & direct' },
+                    { id: 'professional_critique', label: 'Articulate Critique', desc: 'Balanced & articulate' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setReviewFormat(item.id as any)}
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: '8px',
+                        textAlign: 'left',
+                        border: reviewFormat === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
+                        background: reviewFormat === item.id ? '#fef2ee' : 'var(--surface)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: '12px', color: reviewFormat === item.id ? 'var(--primary)' : 'var(--text)' }}>
+                        {item.label}
+                      </div>
+                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        {item.desc}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <label className="form-label" style={{ marginBottom: '6px', fontWeight: 600 }}>
+                  Review Length
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px' }}>
+                  {[
+                    { id: 'short', label: 'Crisp & Quick', desc: '1–2 lines' },
+                    { id: 'medium', label: 'Balanced', desc: '3–4 lines' },
+                    { id: 'detailed', label: 'Detailed Story', desc: '9–10 lines' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setReviewLength(item.id as any)}
+                      style={{
+                        padding: '10px 6px',
+                        borderRadius: '8px',
+                        textAlign: 'center',
+                        border: reviewLength === item.id ? '2px solid var(--primary)' : '1px solid var(--border)',
+                        background: reviewLength === item.id ? '#fef2ee' : 'var(--surface)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, fontSize: '12px', color: reviewLength === item.id ? 'var(--primary)' : 'var(--text)' }}>
+                        {item.label}
+                      </div>
+                      <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        {item.desc}
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)', margin: '4px 0 0', lineHeight: 1.4 }}>
-                {reviewLength === 'detailed'
-                  ? 'Detailed Story (9–10 lines): Crafts a comprehensive, natural experience covering reason for visit, service/items, honesty, and recommendation.'
-                  : reviewLength === 'short'
-                  ? 'Crisp & Quick: Direct 1-2 line everyday recommendation for quick posting.'
-                  : 'Balanced: Standard 3-4 line natural conversational Google review.'}
-              </p>
-            </div>
+            </details>
 
             {/* Optional Customer Note */}
             <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
@@ -908,59 +934,71 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               />
             </div>
 
-            {/* Instructions Strip */}
+            {/* 1-Tap Posting Helper */}
             <div
               style={{
-                background: 'var(--surface-container)',
-                borderRadius: 'var(--radius-md)',
-                padding: '14px 16px',
-                marginBottom: '18px',
+                background: '#f0fdf4',
+                border: '1.5px solid #86efac',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                marginBottom: '16px',
+                textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
-                How to post to Google in 2 clicks:
+              <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#166534', marginBottom: '3px' }}>
+                ⭐ 1-Tap Google Maps Posting
               </div>
-              <div style={{ fontSize: '13px', color: 'var(--text)', lineHeight: 1.5 }}>
-                1. Tap <strong>Copy Review Text</strong>.<br />
-                2. Tap <strong>Post to Google Maps</strong> and paste your review!
+              <div style={{ fontSize: '12.5px', color: '#15803d', lineHeight: 1.4 }}>
+                Tap the button below. Your review is copied automatically, and Google Maps will open ready to paste!
               </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
-                className={`btn btn-lg ${copied ? 'btn-secondary' : 'btn-outline'}`}
-                onClick={handleCopyReview}
-                style={{ fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-              >
-                {copied ? (
-                  <>
-                    <CheckCircleIcon size={18} color="#15803d" />
-                    <span>Copied to Clipboard!</span>
-                  </>
-                ) : (
-                  <>
-                    <ClipboardCopyIcon size={18} />
-                    <span>Copy Review Text</span>
-                  </>
-                )}
-              </button>
-
-              <button
                 className="btn btn-primary btn-lg"
-                onClick={handleOpenGoogle}
-                style={{ fontSize: '15.5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+                onClick={handleCopyAndOpenGoogle}
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 800,
+                  padding: '16px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  boxShadow: '0 4px 16px rgba(154, 64, 24, 0.35)',
+                  borderRadius: '12px',
+                }}
               >
-                <GoogleLogo size={20} />
-                <span>Post on Google Maps ↗</span>
+                <GoogleLogo size={22} />
+                <span>{copied ? '✓ Copied! Opening Google Maps...' : '📋 Copy & Post on Google Maps ↗'}</span>
               </button>
 
-              <button
-                className="btn btn-secondary"
-                style={{ marginTop: '4px', fontSize: '13px' }}
-                onClick={() => setGeneratedReview(null)}
-              >
-                ← Adjust Ratings
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleCopyReview}
+                  style={{
+                    flex: 1,
+                    fontSize: '12.5px',
+                    padding: '9px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <ClipboardCopyIcon size={14} />
+                  <span>{copied ? '✓ Text Copied' : 'Copy Text Only'}</span>
+                </button>
+
+                <button
+                  className="btn btn-secondary"
+                  style={{ flex: 1, fontSize: '12.5px', padding: '9px 12px' }}
+                  onClick={() => setGeneratedReview(null)}
+                >
+                  ← Adjust Ratings
+                </button>
+              </div>
             </div>
 
             {/* OPTIONAL SCRATCH CARD REWARD (If enabled by merchant) */}
