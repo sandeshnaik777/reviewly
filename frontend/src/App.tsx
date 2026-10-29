@@ -19,9 +19,10 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const path = window.location.pathname;
+    const normalizedPath = path.length > 1 ? path.replace(/\/+$/, '') : path;
 
     // Check if customer is on post-payment Thank You page (Google Ads conversion target)
-    if (path === '/thank-you' || path === '/success' || path === '/order-confirmed') {
+    if (normalizedPath === '/thank-you' || normalizedPath === '/success' || normalizedPath === '/order-confirmed') {
       setView('thank-you');
       setLoading(false);
       return;
