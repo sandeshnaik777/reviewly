@@ -40,8 +40,8 @@ export const config = {
   },
 
   razorpay: {
-    keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_Tl2MArOfBOPxJJ',
-    keySecret: process.env.RAZORPAY_KEY_SECRET || 'xBpdUXMs0YQbRQ8Wrb0EpzcH',
+    keyId: process.env.RAZORPAY_KEY_ID || 'rzp_live_TtcTPHvti99kgp',
+    keySecret: process.env.RAZORPAY_KEY_SECRET || 'zBynQeOeOIjxmux01Cp9le1V',
     webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_webhook_secret_sample',
   },
 
