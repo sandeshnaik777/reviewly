@@ -65,29 +65,45 @@ import { PhoneInput } from '../components/PhoneInput.js';
 import { validatePhoneNumber } from '../utils/phoneValidator.js';
 import { loadRazorpay } from '../utils/razorpay.js';
 
+const DEFAULT_SETTINGS = {
+  reviewTone: 'friendly',
+  reviewLength: 'medium',
+  autoRedirectGoogle: false,
+  thingsToHighlight: [],
+  targetKeywords: [],
+  scratchCardEnabled: false,
+  scratchCardType: 'golden_ticket',
+  scratchCardRewardTitle: '10% Off Your Next Visit',
+  scratchCardRewardDescription: 'Show this code at billing to redeem!',
+  scratchCardCouponCode: 'WELCOME10',
+  scratchCardWinProbability: 100,
+  scratchCardLoseMessage: 'Thank you for your review!',
+};
+
 interface Props {
   businessId: string;
+  initialBusiness?: any;
   onLogout: () => void;
   onSwitchBusiness?: () => void;
 }
 
-export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => {
+export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness, onLogout }) => {
   const [activeTab, setActiveTab] = useState<
     'overview' | 'qrs' | 'ai_settings' | 'history' | 'profile' | 'subscription' | 'custom_software'
   >('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialBusiness);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [showEmailVerifyModal, setShowEmailVerifyModal] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
-  const [business, setBusiness] = useState<any>(null);
+  const [business, setBusiness] = useState<any>(initialBusiness || null);
   const [usage, setUsage] = useState<any>(null);
   const [qrs, setQrs] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [questions, setQuestions] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<any>(DEFAULT_SETTINGS);
   const [analytics, setAnalytics] = useState<any>(null);
   const [plans, setPlans] = useState<any[]>([]);
   const [planDurations, setPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({});
@@ -387,15 +403,20 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           setInquiryForm((prev) => ({ ...prev, contactPhone: bRes.phone || '' }));
           setHelpForm((prev) => ({ ...prev, phone: bRes.phone || '' }));
 
-          setUsage(boot.usage);
+          setUsage(boot.usage || null);
           setQrs(boot.qrs || []);
           setReviews(boot.reviews || []);
-          setQuestions(boot.questions || []);
-          setSettings(boot.settings);
-          setAnalytics(boot.analytics);
+          setQuestions((boot.questions || []).map((q: any) => ({
+            ...q,
+            label: q.label || q.text || 'Rating Criteria',
+            displayOrder: q.displayOrder ?? q.order ?? 0,
+            isActive: q.isActive ?? q.active ?? true,
+          })));
+          setSettings(boot.settings || DEFAULT_SETTINGS);
+          setAnalytics(boot.analytics || null);
           setPlans(boot.plans || []);
           setSystemNotifications(boot.notifications || []);
-          setSubscriptionData(boot.subscription);
+          setSubscriptionData(boot.subscription || null);
           setPaymentHistory(boot.paymentHistory || []);
           return;
         }
@@ -441,15 +462,20 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
       setInquiryForm((prev) => ({ ...prev, contactPhone: bRes.phone || '' }));
       setHelpForm((prev) => ({ ...prev, phone: bRes.phone || '' }));
 
-      setUsage(uRes);
-      setQrs(qRes);
-      setReviews(rRes);
-      setQuestions(qsRes);
-      setSettings(sRes);
-      setAnalytics(aRes);
-      setPlans(pRes);
+      setUsage(uRes || null);
+      setQrs(qRes || []);
+      setReviews(rRes || []);
+      setQuestions((qsRes || []).map((q: any) => ({
+        ...q,
+        label: q.label || q.text || 'Rating Criteria',
+        displayOrder: q.displayOrder ?? q.order ?? 0,
+        isActive: q.isActive ?? q.active ?? true,
+      })));
+      setSettings(sRes || DEFAULT_SETTINGS);
+      setAnalytics(aRes || null);
+      setPlans(pRes || []);
       setSystemNotifications(notifRes || []);
-      setSubscriptionData(subRes);
+      setSubscriptionData(subRes || null);
       setPaymentHistory(histRes || []);
     } catch (e: any) {
       console.error('Failed to load dashboard data:', e);
@@ -701,7 +727,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     setSettings(newSettings);
     setNewTargetKeyword('');
     try {
-      await api.saveSettings(business.id, newSettings);
+      await api.saveSettings(business?.id || businessId, newSettings);
       showNotification(`Target keyword "${trimmed}" saved`);
     } catch (e: any) {
       console.warn('Failed saving target keyword:', e);
@@ -719,14 +745,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
     };
     setSettings(newSettings);
     try {
-      await api.saveSettings(business.id, newSettings);
+      await api.saveSettings(business?.id || businessId, newSettings);
       showNotification(`Removed keyword "${keyword}"`);
     } catch (e: any) {
       console.warn('Failed removing target keyword:', e);
     }
   };
 
-  if (loading || !business) {
+  if (loading && !business) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
         <div style={{ position: 'relative', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -740,6 +766,30 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: 0, maxWidth: '320px', lineHeight: 1.5 }}>
             Syncing customer reviews, smart QR stands, and real-time growth insights
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!business && !loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '420px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚠️</div>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
+            Unable to Load Business Data
+          </h3>
+          <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+            We could not connect to your business profile. Please check your connection or try refreshing.
+          </p>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <button className="btn btn-primary" onClick={loadAllData} style={{ fontSize: '13px', padding: '8px 18px' }}>
+              ↻ Retry Loading
+            </button>
+            <button className="btn btn-secondary" onClick={onLogout} style={{ fontSize: '13px', padding: '8px 18px' }}>
+              Sign Out
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -883,14 +933,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
           {/* Business Info Card */}
           <div className="dashboard-biz-card">
             <div className="dashboard-biz-avatar">
-              {business.name ? business.name.charAt(0).toUpperCase() : 'K'}
+              {business?.name ? business.name.charAt(0).toUpperCase() : 'K'}
             </div>
             <div className="dashboard-biz-info">
-              <div className="dashboard-biz-name" title={business.name}>
-                {business.name}
+              <div className="dashboard-biz-name" title={business?.name || 'Your Business'}>
+                {business?.name || 'Your Business'}
               </div>
               <div className="dashboard-biz-meta">
-                {business.city || 'Local Area'} · {business.subcategory}
+                {business?.city || 'Local Area'} · {business?.subcategory || 'Business'}
               </div>
             </div>
           </div>
@@ -951,21 +1001,23 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </a>
             )}
 
-            <a
-              href={business.googleReviewUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="dashboard-nav-item"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="dashboard-nav-item-content">
-                <span className="dashboard-nav-item-icon">
-                  <GoogleLogo size={16} />
-                </span>
-                <span>Google Maps Profile</span>
-              </div>
-              <ExternalLink size={13} color="var(--text-subtle)" />
-            </a>
+            {business?.googleReviewUrl && (
+              <a
+                href={business.googleReviewUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="dashboard-nav-item"
+                style={{ textDecoration: 'none' }}
+              >
+                <div className="dashboard-nav-item-content">
+                  <span className="dashboard-nav-item-icon">
+                    <GoogleLogo size={16} />
+                  </span>
+                  <span>Google Maps Profile</span>
+                </div>
+                <ExternalLink size={13} color="var(--text-subtle)" />
+              </a>
+            )}
           </div>
         </nav>
 
@@ -1058,7 +1110,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </span>
               </div>
               <div className="hide-mobile" style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                {business.name} · {business.city || 'Local Area'} · <strong style={{ color: 'var(--primary)' }}>{roi.googleLocalPackRank}</strong> ·{' '}
+                {business?.name || 'Your Business'} · {business?.city || 'Local Area'} · <strong style={{ color: 'var(--primary)' }}>{roi.googleLocalPackRank}</strong> ·{' '}
                 <span style={{ color: 'var(--success)', fontWeight: 600 }}>{roi.reputationProtectionScore} Defense Active</span>
               </div>
             </div>
@@ -1411,7 +1463,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             </div>
 
             {/* Quick Setup Checklist for Google Maps Link */}
-            {(!business?.googleReviewUrl || business.googleReviewUrl === 'https://maps.google.com') && !quickMapsSuccess && !mapsSetupDismissed && (
+            {(!business?.googleReviewUrl || business?.googleReviewUrl === 'https://maps.google.com') && !quickMapsSuccess && !mapsSetupDismissed && (
               <div
                 className="dashboard-card-responsive"
                 style={{
@@ -1873,7 +1925,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     'Staff Technical Advice',
                     'Diagnostic & Repair Speed',
                   ].map((presetLabel) => {
-                    const isAlreadyAdded = questions.some((q) => q.label.toLowerCase() === presetLabel.toLowerCase());
+                    const isAlreadyAdded = questions.some((q) => (q.label || q.text || '').toLowerCase() === presetLabel.toLowerCase());
                     return (
                       <button
                         key={presetLabel}
@@ -1950,7 +2002,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         {idx + 1}
                       </span>
                       <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {q.label}
+                        {q.label || q.text || 'Rating Question'}
                       </span>
                       <span style={{ color: '#f59e0b', fontSize: '12px', letterSpacing: '1px' }} className="hide-mobile">
                         ★★★★★
@@ -2140,7 +2192,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <Zap size={14} color="var(--primary)" />
-                      <span>Click to add suggested keywords for {business.subcategory || business.mainCategory || 'your business'}:</span>
+                      <span>Click to add suggested keywords for {business?.subcategory || business?.mainCategory || 'your business'}:</span>
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       {suggestions.map((sug: string) => {
@@ -2523,7 +2575,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     Financial Telemetry &amp; Aggregator Savings
                   </h4>
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700 }}>
-                    Net: +₹{financial.totalMonthlyImpactInr.toLocaleString()}/mo
+                    Net: +₹{(financial?.totalMonthlyImpactInr ?? 0).toLocaleString()}/mo
                   </span>
                 </div>
                 <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
@@ -2537,7 +2589,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Guests discovering via Google Maps 5★ pack</div>
                     </div>
                     <div style={{ fontWeight: 800, fontSize: '16px', color: '#15803d' }}>
-                      +₹{financial.walkInRevenueInr.toLocaleString()}
+                      +₹{(financial?.walkInRevenueInr ?? 0).toLocaleString()}
                     </div>
                   </div>
 
@@ -2547,7 +2599,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Aggregator commissions saved on direct walk-in customers</div>
                     </div>
                     <div style={{ fontWeight: 800, fontSize: '16px', color: 'var(--primary)' }}>
-                      +₹{financial.aggregatorCommissionsSavedInr.toLocaleString()}
+                      +₹{(financial?.aggregatorCommissionsSavedInr ?? 0).toLocaleString()}
                     </div>
                   </div>
 
@@ -2557,7 +2609,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied customers intercepted and recovered privately</div>
                     </div>
                     <div style={{ fontWeight: 800, fontSize: '16px', color: '#16a34a' }}>
-                      +₹{financial.shieldRecoveredRevenueInr.toLocaleString()}
+                      +₹{(financial?.shieldRecoveredRevenueInr ?? 0).toLocaleString()}
                     </div>
                   </div>
 
@@ -2631,8 +2683,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
             {/* 3x3 GEO-GRID RANK TRACKER HEATMAP */}
             <GeoGridHeatmap
               geoGrid={analytics?.geoGrid}
-              businessName={business.name}
-              city={business.city || 'Local Area'}
+              businessName={business?.name || 'Your Business'}
+              city={business?.city || 'Local Area'}
               onRefresh={handleRefreshMapsRankings}
               isRefreshing={isRefreshingMaps}
             />
@@ -2684,7 +2736,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700, padding: '6px 12px' }}>
                     {localSeo.averageRankLift || 'Baseline Setup'}
                   </span>
-                  {business.googleReviewUrl && (
+                  {business?.googleReviewUrl && (
                     <a
                       href={business.googleReviewUrl}
                       target="_blank"
@@ -3564,7 +3616,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                             ];
 
                         return presets.map((preset) => {
-                          const isAlreadyAdded = questions.some((q) => q.label === preset.label);
+                          const isAlreadyAdded = questions.some((q) => (q.label || q.text || '') === preset.label);
                           return (
                             <button
                               key={preset.key}
@@ -3625,7 +3677,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                         </span>
                         <input
                           className="form-input"
-                          value={q.label}
+                          value={q.label || q.text || ''}
                           onChange={(e) => {
                             const updated = [...questions];
                             updated[idx].label = e.target.value;
@@ -4320,8 +4372,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                           rewardTitle={settings.scratchCardRewardTitle || '10% Off Your Next Visit'}
                           rewardDescription={settings.scratchCardRewardDescription || 'Show this code at billing to redeem!'}
                           couponCode={settings.scratchCardCouponCode || 'SAMPLE10'}
-                          businessName={business.name}
-                          customLogoUrl={settings.scratchCardCustomLogoUrl || business.logoUrl}
+                          businessName={business?.name || 'Your Business'}
+                          customLogoUrl={settings.scratchCardCustomLogoUrl || business?.logoUrl}
                           winProbability={settings.scratchCardWinProbability ?? 100}
                           loseMessage={settings.scratchCardLoseMessage || 'Thank you for your review!'}
                           previewMode={true}
@@ -4407,7 +4459,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 .filter(
                   (r) =>
                     (!sentimentFilter || r.sentiment === sentimentFilter) &&
-                    (!searchTerm || r.generatedText.toLowerCase().includes(searchTerm.toLowerCase()))
+                    (!searchTerm || (r.generatedText || r.comment || '').toLowerCase().includes(searchTerm.toLowerCase()))
                 )
                 .map((r) => {
                   const isShielded = r.sentiment === 'constructive_critical';
@@ -4933,7 +4985,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     {subscriptionData?.plan?.name || usage?.plan?.name || 'Growth Pack'}
                   </h3>
                   <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '4px' }}>
-                    Quota: {usage?.reviewLimit?.toLocaleString()} reviews per billing cycle
+                    Quota: {(usage?.reviewLimit ?? 100).toLocaleString()} reviews per billing cycle
                   </div>
                   {subscriptionData?.nextBillingDate && (
                     <div style={{ fontSize: '12.5px', color: '#78716c', marginTop: '4px' }}>
@@ -4996,7 +5048,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   let originalPrice = p.originalPriceInr || Math.round(p.priceInr * 1.5);
                   let durationLabel = '1 Month';
                   let durationSub = '/month';
-                  let reviewLimitDisplay = `${p.reviewGenerationLimit.toLocaleString()} Monthly Reviews`;
+                  let reviewLimitDisplay = `${(p.reviewGenerationLimit ?? 100).toLocaleString()} Monthly Reviews`;
                   let discountTag: string | null = null;
 
                   if (selectedDuration === 3) {
@@ -5004,14 +5056,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     originalPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 3;
                     durationLabel = '3 Months';
                     durationSub = `for 3 mos (₹${Math.round(activePrice / 3)}/mo)`;
-                    reviewLimitDisplay = `${(p.reviewGenerationLimit * 3).toLocaleString()} Total Reviews (Quarterly)`;
+                    reviewLimitDisplay = `${((p.reviewGenerationLimit ?? 100) * 3).toLocaleString()} Total Reviews (Quarterly)`;
                     discountTag = 'Quarterly Pack';
                   } else if (selectedDuration === 6) {
                     activePrice = p.priceInr6Months || p.priceInr * 6;
                     originalPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 6;
                     durationLabel = '6 Months';
                     durationSub = `for 6 mos (₹${Math.round(activePrice / 6)}/mo)`;
-                    reviewLimitDisplay = `${(p.reviewGenerationLimit * 6).toLocaleString()} Total Reviews (Semi-Annual)`;
+                    reviewLimitDisplay = `${((p.reviewGenerationLimit ?? 100) * 6).toLocaleString()} Total Reviews (Semi-Annual)`;
                     discountTag = 'Semi-Annual Pack';
                   } else if (selectedDuration === 12) {
                     // 1 Year Pack gets discount of 2 months!
@@ -5019,7 +5071,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                     originalPrice = (p.originalPriceInr || Math.round(p.priceInr * 1.5)) * 12;
                     durationLabel = '1 Year';
                     durationSub = `for 1 yr (₹${Math.round(activePrice / 12)}/mo)`;
-                    reviewLimitDisplay = `${(p.reviewGenerationLimit * 12).toLocaleString()} Total Reviews (1-Year Pass)`;
+                    reviewLimitDisplay = `${((p.reviewGenerationLimit ?? 100) * 12).toLocaleString()} Total Reviews (1-Year Pass)`;
                     discountTag = '2 Months Free Applied!';
                   }
 
@@ -5560,7 +5612,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   </a>
                   <a
                     href={`https://wa.me/918123824899?text=${encodeURIComponent(
-                      `Hello! I manage "${business.name}" and would like details regarding custom software development (Delivery fleet / ERP / Billing / Custom Apps).`
+                      `Hello! I manage "${business?.name || 'My Business'}" and would like details regarding custom software development (Delivery fleet / ERP / Billing / Custom Apps).`
                     )}`}
                     target="_blank"
                     rel="noreferrer"
@@ -5602,7 +5654,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                   Schedule Free Engineering Consultation
                 </span>
                 <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: '4px 0 6px', color: '#0f172a' }}>
-                  Tell Us What You Want to Build for {business.name}
+                  Tell Us What You Want to Build for {business?.name || 'Your Business'}
                 </h3>
                 <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
                   Our senior software architects will analyze your business requirements, prepare a turnkey architectural plan, and provide an accurate cost and timeline estimate.
@@ -5829,7 +5881,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
               </div>
 
               <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                Tell us what system you need for <strong>{business.name}</strong>. Our engineering team will prepare a custom proposal and architectural plan.
+                Tell us what system you need for <strong>{business?.name || 'Your Business'}</strong>. Our engineering team will prepare a custom proposal and architectural plan.
               </p>
 
               <form onSubmit={handleSubmitInquiry}>
@@ -5962,7 +6014,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                 </a>
                 <a
                   href={`https://wa.me/918123824899?text=${encodeURIComponent(
-                    `Hello Support! I manage "${business.name}" and need assistance with my dashboard/reviews.`
+                    `Hello Support! I manage "${business?.name || 'My Business'}" and need assistance with my dashboard/reviews.`
                   )}`}
                   target="_blank"
                   rel="noreferrer"

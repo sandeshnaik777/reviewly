@@ -129,18 +129,22 @@ export const App: React.FC = () => {
     setCurrentUser(user);
     if (user.role === 'PLATFORM_ADMIN') {
       setView('admin');
+      window.history.pushState({}, '', '/');
     } else if (businesses && businesses.length > 0) {
       setCurrentBusiness(businesses[0]);
       setView('dashboard');
+      window.history.pushState({}, '', '/');
     } else {
       setInitialOnboardingStep(2);
       setView('onboarding');
+      window.history.pushState({}, '', '/onboarding');
     }
   };
 
   const handleOnboardingComplete = (business: any) => {
     setCurrentBusiness(business);
     setView('dashboard');
+    window.history.pushState({}, '', '/');
   };
 
   const handleLogout = async () => {
@@ -197,6 +201,7 @@ export const App: React.FC = () => {
     return (
       <BusinessDashboard
         businessId={currentBusiness.id}
+        initialBusiness={currentBusiness}
         onLogout={handleLogout}
         onSwitchBusiness={() => {}}
       />
