@@ -737,7 +737,15 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         currency: order.currency || 'INR',
         name: 'KindlyRate Platform',
         description: isSub
-          ? `${selectedPlan.name} · ${dur === 12 ? '1-Year Autopay' : 'Monthly UPI Autopay'}`
+          ? `${selectedPlan.name} · ${
+              dur === 12
+                ? '1-Year Autopay (2 Mos Free)'
+                : dur === 6
+                ? '6-Month Autopay'
+                : dur === 3
+                ? '3-Month Autopay'
+                : 'Monthly UPI Autopay'
+            }`
           : `${selectedPlan.name} (${dur} Month${dur > 1 ? 's' : ''})`,
         prefill: {
           name: formData.ownerName,

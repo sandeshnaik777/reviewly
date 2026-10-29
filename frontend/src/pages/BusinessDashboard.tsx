@@ -4128,8 +4128,16 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, onLogout }) => 
                               currency: order.currency,
                               name: 'KindlyRate Platform',
                               description: isSub
-                                ? `Upgrade to ${p.name} · Monthly UPI Autopay`
-                                : `Upgrade to ${p.name}`,
+                                ? `Upgrade to ${p.name} · ${
+                                    selectedDuration === 12
+                                      ? '1-Year Autopay (2 Mos Free)'
+                                      : selectedDuration === 6
+                                      ? '6-Month Autopay'
+                                      : selectedDuration === 3
+                                      ? '3-Month Autopay'
+                                      : 'Monthly UPI Autopay'
+                                  }`
+                                : `Upgrade to ${p.name} (${selectedDuration} Months)`,
                               prefill: {
                                 name: business?.name || 'Business Owner',
                                 email: business?.email || '',

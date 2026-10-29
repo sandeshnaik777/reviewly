@@ -44,6 +44,20 @@ const RAZORPAY_PLAN_MAP_MONTHLY: Record<string, string> = {
   pro: 'plan_Ttd2AG8y0o19Vb',     // ₹249/mo Scale / Pro Pack
 };
 
+const RAZORPAY_PLAN_MAP_3MONTHS: Record<string, string> = {
+  starter: 'plan_Tte5hayKibAHNI', // ₹229 / 3 mos
+  trial: 'plan_Tte5hayKibAHNI',
+  growth: 'plan_Tte5U66o8lkzTL',  // ₹429 / 3 mos
+  pro: 'plan_Tte5hxelxwrgHw',     // ₹749 / 3 mos
+};
+
+const RAZORPAY_PLAN_MAP_6MONTHS: Record<string, string> = {
+  starter: 'plan_Tte5hpTIOzZgri', // ₹429 / 6 mos
+  trial: 'plan_Tte5hpTIOzZgri',
+  growth: 'plan_Tte5ULo6FLycsQ',  // ₹799 / 6 mos
+  pro: 'plan_Tte5i5C1tJ4w0p',     // ₹1,449 / 6 mos
+};
+
 const RAZORPAY_PLAN_MAP_YEARLY: Record<string, string> = {
   starter: 'plan_TtdVkbhz7I8Eob', // ₹790/yr Testing Pack (2 Mos Free)
   trial: 'plan_TtdVkbhz7I8Eob',
@@ -97,20 +111,30 @@ export class RazorpayPaymentService implements PaymentService {
       try {
         const auth = Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64');
 
-        // Check if Autopay Subscription applies (monthly or yearly plans with autoRenew)
+        // Check if Autopay Subscription applies (1M, 3M, 6M, 12M plans with autoRenew)
         const planSlug = isTrial || finalAmount === 79 ? 'trial' : (plan?.slug || 'growth');
         let rzpPlanId: string | undefined = undefined;
+        let totalCount = 60; // Default cycle count
 
-        if (autoRenew && durationMonths === 12) {
-          rzpPlanId = RAZORPAY_PLAN_MAP_YEARLY[planSlug];
-        } else if (autoRenew && (durationMonths === 1 || !durationMonths)) {
-          rzpPlanId = RAZORPAY_PLAN_MAP_MONTHLY[planSlug];
+        if (autoRenew) {
+          if (durationMonths === 12) {
+            rzpPlanId = RAZORPAY_PLAN_MAP_YEARLY[planSlug];
+            totalCount = 10; // 10 annual billing cycles
+          } else if (durationMonths === 6) {
+            rzpPlanId = RAZORPAY_PLAN_MAP_6MONTHS[planSlug];
+            totalCount = 20; // 20 semi-annual cycles (10 years)
+          } else if (durationMonths === 3) {
+            rzpPlanId = RAZORPAY_PLAN_MAP_3MONTHS[planSlug];
+            totalCount = 40; // 40 quarterly cycles (10 years)
+          } else {
+            rzpPlanId = RAZORPAY_PLAN_MAP_MONTHLY[planSlug];
+            totalCount = 60; // 60 monthly cycles (5 years)
+          }
         }
 
         // If plan with autoRenew enabled, create live Razorpay Autopay Subscription
         if (rzpPlanId) {
           try {
-            const totalCount = durationMonths === 12 ? 10 : 60; // 10 years (yearly) or 5 years (monthly)
             const subRes = await fetch('https://api.razorpay.com/v1/subscriptions', {
               method: 'POST',
               headers: {
