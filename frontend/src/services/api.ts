@@ -23,7 +23,11 @@ export async function apiRequest<T = any>(endpoint: string, options: RequestInit
   const json = await response.json().catch(() => ({}));
 
   if (!response.ok || json.success === false) {
-    const errorMsg = json.error?.message || response.statusText || 'An error occurred';
+    let errorMsg = json.error?.message || response.statusText || 'An error occurred';
+    if (json.error?.details && Array.isArray(json.error.details) && json.error.details.length > 0 && !errorMsg.includes(':')) {
+      const summary = json.error.details.map((d: any) => `${d.path ? d.path + ': ' : ''}${d.message}`).join(', ');
+      errorMsg = `${errorMsg}: ${summary}`;
+    }
     const err: any = new Error(errorMsg);
     err.code = json.error?.code || 'UNKNOWN_ERROR';
     err.status = response.status;

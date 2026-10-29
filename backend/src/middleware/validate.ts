@@ -13,7 +13,8 @@ export function validateBody(schema: ZodSchema) {
           path: i.path.join('.'),
           message: i.message,
         }));
-        return next(new AppError('Validation error in request body.', 400, 'VALIDATION_ERROR', issues));
+        const summary = issues.map((i) => `${i.path ? i.path + ': ' : ''}${i.message}`).join(', ');
+        return next(new AppError(`Validation error: ${summary}`, 400, 'VALIDATION_ERROR', issues));
       }
       next(err);
     }
@@ -31,7 +32,8 @@ export function validateQuery(schema: ZodSchema) {
           path: i.path.join('.'),
           message: i.message,
         }));
-        return next(new AppError('Validation error in query parameters.', 400, 'VALIDATION_ERROR', issues));
+        const summary = issues.map((i) => `${i.path ? i.path + ': ' : ''}${i.message}`).join(', ');
+        return next(new AppError(`Validation error in query parameters: ${summary}`, 400, 'VALIDATION_ERROR', issues));
       }
       next(err);
     }

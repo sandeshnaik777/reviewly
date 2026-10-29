@@ -474,13 +474,13 @@ businessRouter.post(
       ]),
       subcategory: z.string().min(2),
       customCategory: z.string().optional(),
-      phone: z.string().min(6, 'Phone number is required'),
+      phone: z.string().optional().default(''),
       address: z.string().optional(),
       city: z.string().optional(),
       state: z.string().optional(),
       country: z.string().default('India'),
       pincode: z.string().optional(),
-      googleReviewUrl: z.string().url('Google Review URL must be a valid link'),
+      googleReviewUrl: z.string().min(1, 'Google Review URL is required'),
       googleMapsShareUrl: z.string().optional(),
       description: z.string().optional(),
       openingHours: z.string().optional(),
@@ -501,6 +501,14 @@ businessRouter.post(
       const data = req.body;
       const userId = req.user!.id;
 
+      // Sanitize and ensure proper URL protocol
+      let reviewUrl = (data.googleReviewUrl || '').trim();
+      if (reviewUrl && !reviewUrl.startsWith('http://') && !reviewUrl.startsWith('https://')) {
+        reviewUrl = `https://${reviewUrl}`;
+      }
+      const userPhone = (req.user as any)?.phone || '';
+      const finalPhone = (data.phone && data.phone.trim()) || userPhone || '';
+
       // Check if business with this name already exists for this owner
       const existingBusinesses = await db.findBusinessesByOwnerId(userId);
       let targetBusiness = existingBusinesses.find((b) => b.name.toLowerCase() === data.businessName.toLowerCase());
@@ -511,13 +519,13 @@ businessRouter.post(
           mainCategory: data.mainCategory,
           subcategory: data.subcategory,
           customCategory: data.customCategory,
-          phone: data.phone,
+          phone: finalPhone || targetBusiness.phone,
           address: data.address || targetBusiness.address,
           city: data.city || targetBusiness.city,
           state: data.state || targetBusiness.state,
           country: data.country || targetBusiness.country,
           pincode: data.pincode || targetBusiness.pincode,
-          googleReviewUrl: data.googleReviewUrl,
+          googleReviewUrl: reviewUrl || targetBusiness.googleReviewUrl,
           googleMapsShareUrl: data.googleMapsShareUrl || targetBusiness.googleMapsShareUrl,
           description: data.description,
           openingHours: data.openingHours,
@@ -535,14 +543,14 @@ businessRouter.post(
           mainCategory: data.mainCategory,
           subcategory: data.subcategory,
           customCategory: data.customCategory,
-          phone: data.phone,
+          phone: finalPhone,
           email: req.user!.email,
           address: data.address || 'Central Address',
           city: data.city || 'Metropolis',
           state: data.state || 'State',
           country: data.country || 'India',
           pincode: data.pincode || '000000',
-          googleReviewUrl: data.googleReviewUrl,
+          googleReviewUrl: reviewUrl,
           googleMapsShareUrl: data.googleMapsShareUrl || undefined,
           description: data.description,
           openingHours: data.openingHours,

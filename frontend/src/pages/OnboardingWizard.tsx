@@ -146,6 +146,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           ...prev,
           ownerName: meRes.user.name || prev.ownerName,
           email: meRes.user.email || prev.email,
+          phone: meRes.user.phone || prev.phone || '',
         }));
       }
 
@@ -421,16 +422,18 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
     // Step 3 validation (Business Info)
     if (step === 3) {
-      if (!formData.businessName.trim()) {
+      if (!formData.businessName || !formData.businessName.trim()) {
         setError('Please enter your business or store name.');
         return;
       }
-      if (formData.phone) {
-        const phoneVal = validatePhoneNumber(formData.phone);
-        if (!phoneVal.isValid) {
-          setError(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
-          return;
-        }
+      if (!formData.phone || !formData.phone.trim()) {
+        setError('Please enter your business mobile phone number.');
+        return;
+      }
+      const phoneVal = validatePhoneNumber(formData.phone);
+      if (!phoneVal.isValid) {
+        setError(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+        return;
       }
     }
 
@@ -526,24 +529,30 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
 
       // 1. Ensure business is created/setup if not yet created
       if (!targetBiz) {
+        if (!formData.businessName || !formData.businessName.trim()) {
+          setError('Please provide your business name.');
+          setStep(3);
+          return;
+        }
+
         try {
           const setupRes = await api.setupBusiness({
-            businessName: formData.businessName,
-            mainCategory: formData.mainCategory,
-            subcategory: formData.subcategory,
+            businessName: formData.businessName.trim(),
+            mainCategory: formData.mainCategory || 'FOOD & HOSPITALITY',
+            subcategory: formData.subcategory || 'General',
             customCategory: formData.customCategory || undefined,
-            phone: formData.phone,
+            phone: (formData.phone || '').trim(),
             address: formData.address || 'Central Address',
             city: formData.city || 'Metropolis',
             state: formData.state || 'State',
             country: formData.country || 'India',
             pincode: formData.pincode || '000000',
-            googleReviewUrl: formData.googleReviewUrl,
+            googleReviewUrl: formData.googleReviewUrl || 'https://maps.google.com',
             googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
             description: formData.description,
             openingHours: formData.openingHours,
             questions: formData.questions,
-            planSlug: formData.planSlug,
+            planSlug: formData.planSlug || 'starter',
           });
 
           targetBiz = setupRes.business;
@@ -554,36 +563,40 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           setFirstQRSlug(targetQR);
           setTrialPlanData(trialPlan);
         } catch (setupErr: any) {
-          // If setup fails, attempt idempotent register fallback
-          const regRes = await api.register({
-            email: formData.email,
-            password: formData.password,
-            ownerName: formData.ownerName,
-            businessName: formData.businessName,
-            mainCategory: formData.mainCategory,
-            subcategory: formData.subcategory,
-            customCategory: formData.customCategory || undefined,
-            phone: formData.phone,
-            address: formData.address || 'Central Address',
-            city: formData.city || 'Metropolis',
-            state: formData.state || 'State',
-            country: formData.country || 'India',
-            pincode: formData.pincode || '000000',
-            googleReviewUrl: formData.googleReviewUrl,
-            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
-            description: formData.description,
-            openingHours: formData.openingHours,
-            questions: formData.questions,
-            planSlug: formData.planSlug,
-          });
+          // If setup fails and account wasn't pre-created (e.g. offline form with password), fallback to register
+          if (!isAccountCreated && formData.password) {
+            const regRes = await api.register({
+              email: formData.email,
+              password: formData.password,
+              ownerName: formData.ownerName,
+              businessName: formData.businessName.trim(),
+              mainCategory: formData.mainCategory || 'FOOD & HOSPITALITY',
+              subcategory: formData.subcategory || 'General',
+              customCategory: formData.customCategory || undefined,
+              phone: (formData.phone || '').trim(),
+              address: formData.address || 'Central Address',
+              city: formData.city || 'Metropolis',
+              state: formData.state || 'State',
+              country: formData.country || 'India',
+              pincode: formData.pincode || '000000',
+              googleReviewUrl: formData.googleReviewUrl || 'https://maps.google.com',
+              googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
+              description: formData.description,
+              openingHours: formData.openingHours,
+              questions: formData.questions,
+              planSlug: formData.planSlug || 'starter',
+            });
 
-          targetBiz = regRes.business;
-          targetQR = regRes.firstQRSlug;
-          trialPlan = regRes.trialPlan;
+            targetBiz = regRes.business;
+            targetQR = regRes.firstQRSlug;
+            trialPlan = regRes.trialPlan;
 
-          setCreatedBusiness(targetBiz);
-          setFirstQRSlug(targetQR);
-          setTrialPlanData(trialPlan);
+            setCreatedBusiness(targetBiz);
+            setFirstQRSlug(targetQR);
+            setTrialPlanData(trialPlan);
+          } else {
+            throw setupErr;
+          }
         }
       }
 
@@ -678,24 +691,30 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
       let targetQR = firstQRSlug;
 
       if (!targetBiz) {
+        if (!formData.businessName || !formData.businessName.trim()) {
+          setError('Please provide your business name.');
+          setStep(3);
+          return;
+        }
+
         try {
           const setupRes = await api.setupBusiness({
-            businessName: formData.businessName,
-            mainCategory: formData.mainCategory,
-            subcategory: formData.subcategory,
+            businessName: formData.businessName.trim(),
+            mainCategory: formData.mainCategory || 'FOOD & HOSPITALITY',
+            subcategory: formData.subcategory || 'General',
             customCategory: formData.customCategory || undefined,
-            phone: formData.phone,
+            phone: (formData.phone || '').trim(),
             address: formData.address || 'Central Address',
             city: formData.city || 'Metropolis',
             state: formData.state || 'State',
             country: formData.country || 'India',
             pincode: formData.pincode || '000000',
-            googleReviewUrl: formData.googleReviewUrl,
+            googleReviewUrl: formData.googleReviewUrl || 'https://maps.google.com',
             googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
             description: formData.description,
             openingHours: formData.openingHours,
             questions: formData.questions,
-            planSlug: formData.planSlug,
+            planSlug: formData.planSlug || 'starter',
           });
 
           targetBiz = setupRes.business;
@@ -703,32 +722,36 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
           setCreatedBusiness(targetBiz);
           setFirstQRSlug(targetQR);
         } catch (setupErr: any) {
-          const regRes = await api.register({
-            email: formData.email,
-            password: formData.password,
-            ownerName: formData.ownerName,
-            businessName: formData.businessName,
-            mainCategory: formData.mainCategory,
-            subcategory: formData.subcategory,
-            customCategory: formData.customCategory || undefined,
-            phone: formData.phone,
-            address: formData.address || 'Central Address',
-            city: formData.city || 'Metropolis',
-            state: formData.state || 'State',
-            country: formData.country || 'India',
-            pincode: formData.pincode || '000000',
-            googleReviewUrl: formData.googleReviewUrl,
-            googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
-            description: formData.description,
-            openingHours: formData.openingHours,
-            questions: formData.questions,
-            planSlug: formData.planSlug,
-          });
+          if (!isAccountCreated && formData.password) {
+            const regRes = await api.register({
+              email: formData.email,
+              password: formData.password,
+              ownerName: formData.ownerName,
+              businessName: formData.businessName.trim(),
+              mainCategory: formData.mainCategory || 'FOOD & HOSPITALITY',
+              subcategory: formData.subcategory || 'General',
+              customCategory: formData.customCategory || undefined,
+              phone: (formData.phone || '').trim(),
+              address: formData.address || 'Central Address',
+              city: formData.city || 'Metropolis',
+              state: formData.state || 'State',
+              country: formData.country || 'India',
+              pincode: formData.pincode || '000000',
+              googleReviewUrl: formData.googleReviewUrl || 'https://maps.google.com',
+              googleMapsShareUrl: formData.googleMapsShareUrl || undefined,
+              description: formData.description,
+              openingHours: formData.openingHours,
+              questions: formData.questions,
+              planSlug: formData.planSlug || 'starter',
+            });
 
-          targetBiz = regRes.business;
-          targetQR = regRes.firstQRSlug;
-          setCreatedBusiness(targetBiz);
-          setFirstQRSlug(targetQR);
+            targetBiz = regRes.business;
+            targetQR = regRes.firstQRSlug;
+            setCreatedBusiness(targetBiz);
+            setFirstQRSlug(targetQR);
+          } else {
+            throw setupErr;
+          }
         }
       }
 
@@ -1182,6 +1205,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
                         ...prev,
                         ownerName: res.user.name || prev.ownerName,
                         email: res.user.email || prev.email,
+                        phone: res.user.phone || prev.phone || '',
                       }));
                       setIsAccountCreated(true);
                       setIsEmailVerified(true);
