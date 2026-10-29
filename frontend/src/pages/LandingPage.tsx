@@ -36,6 +36,8 @@ import {
   Globe,
   Building2,
   Gift,
+  LogIn,
+  Key,
 } from 'lucide-react';
 
 interface Props {
@@ -139,11 +141,12 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       <nav
         style={{
           background: 'var(--surface)',
-          borderBottom: '1px solid var(--border-light)',
+          borderBottom: '1.5px solid var(--border-light)',
           padding: '12px 18px',
           position: 'sticky',
           top: 0,
           zIndex: 100,
+          boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
         }}
       >
         <div className="landing-nav-container">
@@ -166,18 +169,39 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               <BookOpen size={14} style={{ marginRight: '4px' }} /> Articles &amp; Blog
             </button>
             <button
-              className="btn btn-secondary hide-on-phone"
+              className="btn btn-secondary"
               onClick={onNavigateLogin}
-              style={{ fontSize: '13px', padding: '7px 14px' }}
+              style={{
+                fontSize: '13.5px',
+                padding: '7px 14px',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#ffffff',
+                border: '1.5px solid #cbd5e1',
+                color: '#0f172a',
+                borderRadius: '8px',
+              }}
             >
-              Merchant Login
+              <LogIn size={14} color="#475569" />
+              <span>Sign In</span>
             </button>
             <button
               className="btn btn-primary"
               onClick={onStartOnboarding}
-              style={{ fontSize: '13px', padding: '7px 14px' }}
+              style={{
+                fontSize: '13.5px',
+                padding: '7px 16px',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(154, 64, 24, 0.25)',
+                borderRadius: '8px',
+              }}
             >
-              Start for ₹79 →
+              <span>Sign Up Free →</span>
             </button>
           </div>
         </div>
@@ -212,13 +236,140 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           Place smart acrylic QR stands at your billing counters, reception, or tables. Customers tap ratings in 30 seconds, and our server-side AI crafts personalized, authentic reviews ready to paste straight to Google Maps.
         </p>
 
-        <div className="hero-cta-group" style={{ marginBottom: '36px' }}>
-          <button className="btn btn-primary btn-lg" onClick={onStartOnboarding} style={{ padding: '12px 24px', fontSize: '15px' }}>
-            Start Testing Pack (₹79 Trial) →
-          </button>
-          <button className="btn btn-secondary btn-lg" onClick={onNavigateLogin} style={{ padding: '12px 24px', fontSize: '15px' }}>
-            Explore Live Business Demo
-          </button>
+        {/* Hero Main Action Hub */}
+        <div style={{ maxWidth: '680px', margin: '0 auto 36px' }}>
+          {/* Main Dual Action Buttons */}
+          <div
+            className="hero-cta-group"
+            style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              marginBottom: '16px',
+            }}
+          >
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={onStartOnboarding}
+              style={{
+                padding: '14px 28px',
+                fontSize: '15.5px',
+                fontWeight: 800,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 16px rgba(154, 64, 24, 0.35)',
+                borderRadius: '12px',
+              }}
+            >
+              <span>🚀 Sign Up &amp; Get Started →</span>
+            </button>
+
+            <button
+              className="btn btn-secondary btn-lg"
+              onClick={onNavigateLogin}
+              style={{
+                padding: '14px 24px',
+                fontSize: '15px',
+                fontWeight: 700,
+                background: '#ffffff',
+                border: '1.5px solid #cbd5e1',
+                color: '#0f172a',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.05)',
+              }}
+            >
+              <Key size={16} color="#64748b" />
+              <span>Sign In to Account</span>
+            </button>
+          </div>
+
+          {/* Quick-Access Pathway Helper Strip */}
+          <div
+            style={{
+              background: '#ffffff',
+              border: '1.5px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '10px 16px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '12px',
+              fontSize: '12.5px',
+              color: '#475569',
+              flexWrap: 'wrap',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.03)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#15803d', fontWeight: 700 }}>● New Merchant?</span>
+              <button
+                type="button"
+                onClick={onStartOnboarding}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--primary)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                  fontSize: '12.5px',
+                }}
+              >
+                Create Account in 2 mins
+              </button>
+            </div>
+
+            <span style={{ color: '#cbd5e1' }} className="hide-on-phone">|</span>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#0f172a', fontWeight: 700 }}>● Already Registered?</span>
+              <button
+                type="button"
+                onClick={onNavigateLogin}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#2563eb',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                  fontSize: '12.5px',
+                }}
+              >
+                Sign In Here
+              </button>
+            </div>
+
+            <span style={{ color: '#cbd5e1' }} className="hide-on-phone">|</span>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#d97706', fontWeight: 700 }}>● Live Demo?</span>
+              <button
+                type="button"
+                onClick={onNavigateLogin}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#d97706',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: 0,
+                  textDecoration: 'underline',
+                  fontSize: '12.5px',
+                }}
+              >
+                1-Click Demo Login
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Live Social Proof Strip */}

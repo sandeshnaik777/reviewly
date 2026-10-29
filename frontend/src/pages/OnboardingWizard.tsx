@@ -866,6 +866,44 @@ export const OnboardingWizard: React.FC<Props> = ({ onComplete, onNavigateLogin,
         {/* STEP 1: Account Login Credentials & Signup */}
         {step === 1 && (
           <div>
+            {!isAccountCreated && (
+              <div style={{ display: 'flex', borderRadius: '10px', background: '#f1f5f9', border: '1px solid #e2e8f0', padding: '4px', marginBottom: '22px' }}>
+                <button
+                  type="button"
+                  style={{
+                    flex: 1,
+                    padding: '9px 12px',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    background: '#ffffff',
+                    color: '#0f172a',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '8px',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                    cursor: 'default',
+                  }}
+                >
+                  🚀 Sign Up Free
+                </button>
+                <button
+                  type="button"
+                  onClick={onNavigateLogin}
+                  style={{
+                    flex: 1,
+                    padding: '9px 12px',
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    background: 'transparent',
+                    color: '#475569',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  🔑 Have an account? Sign In
+                </button>
+              </div>
+            )}
             <p style={{ marginBottom: '20px', color: 'var(--text-muted)', fontSize: '14px' }}>
               First, create your business login credentials. Your account is activated immediately so you can access your dashboard anytime on mobile or desktop.
             </p>

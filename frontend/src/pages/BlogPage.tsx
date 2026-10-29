@@ -487,7 +487,7 @@ export const BlogPage: React.FC<Props> = ({
               ← Back to Home
             </button>
             <button
-              className="btn btn-secondary hide-on-phone"
+              className="btn btn-secondary"
               onClick={onNavigateLogin}
               style={{ fontSize: '13px', padding: '7px 14px' }}
             >
@@ -498,7 +498,7 @@ export const BlogPage: React.FC<Props> = ({
               onClick={onStartOnboarding}
               style={{ fontSize: '13px', padding: '7px 16px' }}
             >
-              Get Started for ₹79 →
+              Sign Up Free →
             </button>
           </div>
         </div>
