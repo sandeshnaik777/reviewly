@@ -6,6 +6,7 @@ import { requireTenant } from '../../middleware/tenant.js';
 import { validateBody } from '../../middleware/validate.js';
 import { qrService } from './service.js';
 import { AppError } from '../../middleware/errorHandler.js';
+import { convertMapsUrlToDirectReviewUrl } from '../business/mapsService.js';
 
 export const qrRouter = Router();
 
@@ -28,11 +29,19 @@ qrRouter.post(
     z.object({
       name: z.string().min(1, 'QR code name is required'),
       locationTag: z.string().default('Counter'),
+      googleReviewUrl: z.string().optional(),
+      googleMapsShareUrl: z.string().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const qr = await qrService.createQRCode(req.tenantId!, req.body.name, req.body.locationTag);
+      const qr = await qrService.createQRCode(
+        req.tenantId!,
+        req.body.name,
+        req.body.locationTag,
+        req.body.googleReviewUrl,
+        req.body.googleMapsShareUrl
+      );
       res.status(201).json({ success: true, data: qr });
     } catch (err) {
       next(err);
@@ -77,16 +86,45 @@ qrRouter.patch(
     z.object({
       name: z.string().optional(),
       locationTag: z.string().optional(),
+      googleReviewUrl: z.string().optional(),
+      googleMapsShareUrl: z.string().optional(),
       isActive: z.boolean().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const updated = await db.updateQRCode(req.params.id as string, req.tenantId!, req.body);
+      const updates = { ...req.body };
+      if (updates.googleReviewUrl && updates.googleReviewUrl.trim()) {
+        try {
+          const converted = await convertMapsUrlToDirectReviewUrl(updates.googleReviewUrl.trim());
+          if (converted?.directReviewUrl) {
+            updates.googleReviewUrl = converted.directReviewUrl;
+          }
+        } catch {}
+      }
+      const updated = await db.updateQRCode(req.params.id as string, req.tenantId!, updates);
       if (!updated) {
         throw new AppError('QR Code not found', 404, 'NOT_FOUND');
       }
       res.json({ success: true, data: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Tenant Protected: Delete QR code
+qrRouter.delete(
+  '/business/:businessId/qrs/:id',
+  authenticate,
+  requireTenant,
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const deleted = await db.deleteQRCode(req.params.id as string, req.tenantId!);
+      if (!deleted) {
+        throw new AppError('QR Code not found or already deleted', 404, 'NOT_FOUND');
+      }
+      res.json({ success: true, message: 'QR Code deleted successfully' });
     } catch (err) {
       next(err);
     }

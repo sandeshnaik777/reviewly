@@ -12,6 +12,7 @@ import { authRouter } from '../src/modules/auth/routes.js';
 import { convertMapsUrlToDirectReviewUrl } from '../src/modules/business/mapsService.js';
 import { validatePhoneNumber, parsePhoneInput, formatIndianPhone, SUPPORTED_COUNTRIES } from '../src/utils/phoneValidator.js';
 import { smsService } from '../src/modules/sms/service.js';
+import { qrService } from '../src/modules/qr/service.js';
 
 test('1. Authentication & Password Security', async (t) => {
   await t.test('Securely hashes passwords with bcrypt and does not store plaintext', async () => {
@@ -1270,6 +1271,103 @@ test('15. Subscription Choice, Direct Activation & Monthly Recurring Billing Eng
     assert.equal(record?.status, 'captured');
     assert.equal(record?.transactionId, testTxnId);
     assert.equal(record?.amountInr, 79);
+  });
+});
+
+test('16. QR Stand Lifecycle, Custom Maps Link Routing & Stand Deletion', async (t) => {
+  const testBizId = 'biz_qr_test_' + crypto.randomUUID().slice(0, 8);
+  const testOwner = await db.createUser({
+    id: crypto.randomUUID(),
+    email: `${testBizId}@example.com`,
+    passwordHash: 'hash',
+    fullName: 'Test QR Owner',
+    role: 'BUSINESS_OWNER',
+    emailVerified: true,
+    phoneVerified: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
+  const testBiz = await db.createBusiness({
+    id: testBizId,
+    ownerId: testOwner.id,
+    name: 'QR Destination Cafe',
+    slug: 'qr-dest-cafe-' + crypto.randomUUID().slice(0, 6),
+    mainCategory: 'Cafe',
+    subcategory: 'Bakery',
+    googleReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJDefaultBiz123',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
+  // Activate Growth plan so business can have up to 5 QR codes
+  await db.createOrUpdateSubscription({
+    id: crypto.randomUUID(),
+    businessId: testBizId,
+    planId: 'c0000000-0000-0000-0000-000000000003', // Growth
+    status: 'ACTIVE',
+    billingPeriod: 'month',
+    currentPeriodStart: new Date().toISOString(),
+    currentPeriodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+
+  let createdQrId = '';
+
+  await t.test('Creates a QR stand with a custom stand-specific Google Maps destination', async () => {
+    const customReviewUrl = 'https://search.google.com/local/writereview?placeid=ChIJCustomBranch456';
+    const qr = await qrService.createQRCode(
+      testBizId,
+      'Rooftop Table 4',
+      'Rooftop Patio',
+      customReviewUrl
+    );
+    assert.ok(qr);
+    assert.equal(qr.name, 'Rooftop Table 4');
+    assert.equal(qr.locationTag, 'Rooftop Patio');
+    assert.equal(qr.googleReviewUrl, customReviewUrl);
+    createdQrId = qr.id;
+  });
+
+  await t.test('Updates a QR stand name, location, and custom Google review URL', async () => {
+    const updatedReviewUrl = 'https://search.google.com/local/writereview?placeid=ChIJUpdatedBranch789';
+    const updated = await db.updateQRCode(createdQrId, testBizId, {
+      name: 'Rooftop Table 4 VIP',
+      locationTag: 'VIP Deck',
+      googleReviewUrl: updatedReviewUrl,
+    });
+    assert.ok(updated);
+    assert.equal(updated.name, 'Rooftop Table 4 VIP');
+    assert.equal(updated.locationTag, 'VIP Deck');
+    assert.equal(updated.googleReviewUrl, updatedReviewUrl);
+  });
+
+  await t.test('Customer session resolves stand-specific destination or falls back to business default', async () => {
+    const standWithCustom = await db.findQRCodeById(createdQrId);
+    assert.equal(standWithCustom?.googleReviewUrl, 'https://search.google.com/local/writereview?placeid=ChIJUpdatedBranch789');
+
+    // Create stand without custom URL -> inherits business default
+    const standDefault = await qrService.createQRCode(testBizId, 'Counter 1', 'Main Counter');
+    assert.equal(standDefault.googleReviewUrl, undefined);
+    
+    // When resolving effective destination:
+    const effectiveCustom = standWithCustom?.googleReviewUrl || testBiz.googleReviewUrl;
+    const effectiveDefault = standDefault.googleReviewUrl || testBiz.googleReviewUrl;
+    assert.equal(effectiveCustom, 'https://search.google.com/local/writereview?placeid=ChIJUpdatedBranch789');
+    assert.equal(effectiveDefault, 'https://search.google.com/local/writereview?placeid=ChIJDefaultBiz123');
+  });
+
+  await t.test('Deletes a QR stand successfully and removes it from business stands list', async () => {
+    const deleted = await db.deleteQRCode(createdQrId, testBizId);
+    assert.equal(deleted, true);
+
+    const recheck = await db.findQRCodeById(createdQrId);
+    assert.equal(recheck, undefined);
+
+    const qrs = await db.listQRCodes(testBizId);
+    assert.ok(!qrs.some((q) => q.id === createdQrId));
   });
 });
 

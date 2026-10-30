@@ -116,6 +116,8 @@ export interface QRCodeItem {
   locationTag: string;
   isActive: boolean;
   scanCount: number;
+  googleReviewUrl?: string;
+  googleMapsShareUrl?: string;
   reviewsGenerated?: number;
   conversionRate?: number;
   googleClicks?: number;

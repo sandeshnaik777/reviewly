@@ -58,6 +58,8 @@ import {
   Code2,
   Briefcase,
   Sparkles,
+  Trash2,
+  Edit2,
 } from 'lucide-react';
 import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
 import { ScratchCard } from '../components/ScratchCard.js';
@@ -145,10 +147,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
   const [newHighlightTag, setNewHighlightTag] = useState('');
   const [newTargetKeyword, setNewTargetKeyword] = useState('');
 
-  // Create QR Modal State
+  // Create & Edit QR Modal State
   const [showQRModal, setShowQRModal] = useState(false);
   const [newQRName, setNewQRName] = useState('');
   const [newQRLocation, setNewQRLocation] = useState('Table 1');
+  const [newQRGoogleReviewUrl, setNewQRGoogleReviewUrl] = useState('');
+  const [editingQR, setEditingQR] = useState<any | null>(null);
 
   // Software Inquiry Callback Modal
   const [showInquiryModal, setShowInquiryModal] = useState(false);
@@ -586,17 +590,72 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     }
   };
 
-  // 2. Create QR Code
+  // 2. Create, Edit & Delete QR Stands
   const handleCreateQR = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const created = await api.createQR(businessId, newQRName || 'QR Stand', newQRLocation);
+      let finalReviewUrl = newQRGoogleReviewUrl.trim();
+      if (finalReviewUrl) {
+        try {
+          const res = await convertGoogleMapsUrl(finalReviewUrl);
+          if (res?.directReviewUrl) {
+            finalReviewUrl = res.directReviewUrl;
+          }
+        } catch {}
+      }
+      const created = await api.createQR(
+        businessId,
+        newQRName || 'QR Stand',
+        newQRLocation,
+        finalReviewUrl || undefined
+      );
       setQrs([...qrs, created]);
       setShowQRModal(false);
       setNewQRName('');
+      setNewQRLocation('Table 1');
+      setNewQRGoogleReviewUrl('');
       showNotification(`QR Stand "${created.name}" created and synced to telemetry grid`);
     } catch (err: any) {
       alert(err.message || 'Failed to create QR code.');
+    }
+  };
+
+  const handleUpdateQR = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingQR) return;
+    try {
+      let finalReviewUrl = (editingQR.googleReviewUrl || '').trim();
+      if (finalReviewUrl) {
+        try {
+          const res = await convertGoogleMapsUrl(finalReviewUrl);
+          if (res?.directReviewUrl) {
+            finalReviewUrl = res.directReviewUrl;
+          }
+        } catch {}
+      }
+      const updated = await api.updateQR(businessId, editingQR.id, {
+        name: editingQR.name,
+        locationTag: editingQR.locationTag,
+        googleReviewUrl: finalReviewUrl || '',
+      });
+      setQrs(qrs.map((q) => (q.id === editingQR.id ? { ...q, ...updated } : q)));
+      setEditingQR(null);
+      showNotification(`QR Stand "${updated.name}" updated successfully`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to update QR Stand.');
+    }
+  };
+
+  const handleDeleteQR = async (qrId: string, qrName: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${qrName}"? This stand will be permanently removed.`)) {
+      return;
+    }
+    try {
+      await api.deleteQR(businessId, qrId);
+      setQrs(qrs.filter((q) => q.id !== qrId));
+      showNotification(`QR Stand "${qrName}" deleted successfully`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete QR Stand.');
     }
   };
 
@@ -3333,14 +3392,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   Quick Stand Generator
                 </h4>
               </div>
-              <form onSubmit={handleCreateQR} className="form-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr)) auto', gap: '14px', alignItems: 'flex-end' }}>
+              <form onSubmit={handleCreateQR} className="form-grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr)) auto', gap: '14px', alignItems: 'flex-end' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '12px' }}>Stand / Location Name *</label>
+                  <label className="form-label" style={{ fontSize: '12px' }}>Stand Name *</label>
                   <input
                     type="text"
                     required
                     className="form-input"
-                    placeholder="e.g. Table 1, Billing Counter, Bar"
+                    placeholder="e.g. Table 1, Counter, Bar"
                     value={newQRName}
                     onChange={(e) => setNewQRName(e.target.value)}
                   />
@@ -3350,9 +3409,19 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Counter 1, Billing Desk, Reception, Table 1"
+                    placeholder="e.g. Counter 1, Billing Desk, Table 1"
                     value={newQRLocation}
                     onChange={(e) => setNewQRLocation(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontSize: '12px' }}>Google Maps Link (Optional)</label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder={business?.googleReviewUrl || 'Inherits business default'}
+                    value={newQRGoogleReviewUrl}
+                    onChange={(e) => setNewQRGoogleReviewUrl(e.target.value)}
                   />
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ padding: '10px 22px', whiteSpace: 'nowrap', height: '46px' }}>
@@ -3443,7 +3512,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             background: 'var(--surface-container)',
                             padding: '8px 12px',
                             borderRadius: '8px',
-                            marginBottom: '16px',
+                            marginBottom: '10px',
                             fontSize: '12px',
                           }}
                         >
@@ -3461,6 +3530,39 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                           >
                             Copy
                           </button>
+                        </div>
+
+                        {/* Active Google Review Destination for this Stand */}
+                        <div style={{ background: qr.googleReviewUrl ? '#f0fdf4' : '#f8fafc', border: qr.googleReviewUrl ? '1px solid #bbf7d0' : '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', marginBottom: '16px', fontSize: '12px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span style={{ fontWeight: 600, color: qr.googleReviewUrl ? '#166534' : '#475569', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <GoogleLogo size={13} />
+                              <span>Google Destination</span>
+                            </span>
+                            <span className={`badge ${qr.googleReviewUrl ? 'badge-success' : 'badge-neutral'}`} style={{ fontSize: '9.5px', padding: '1px 6px' }}>
+                              {qr.googleReviewUrl ? 'Stand Custom Link' : 'Business Default'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <a
+                              href={qr.googleReviewUrl || business?.googleReviewUrl || 'https://maps.google.com'}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ color: qr.googleReviewUrl ? '#15803d' : '#64748b', textDecoration: 'underline', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, fontSize: '11px' }}
+                              title="Click to verify where customers are redirected"
+                            >
+                              {qr.googleReviewUrl || business?.googleReviewUrl || 'Default Business Link'}
+                            </a>
+                            <a
+                              href={qr.googleReviewUrl || business?.googleReviewUrl || 'https://maps.google.com'}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn btn-outline btn-sm"
+                              style={{ padding: '2px 8px', fontSize: '10px', whiteSpace: 'nowrap' }}
+                            >
+                              Test Link ↗
+                            </a>
+                          </div>
                         </div>
 
                         {/* Per-QR Performance & Usage Telemetry */}
@@ -3566,6 +3668,28 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             onClick={() => window.print()}
                           >
                             Print Stand
+                          </button>
+                        </div>
+
+                        {/* Stand Management Actions */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ fontSize: '12px', padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                            onClick={() => setEditingQR({ ...qr })}
+                          >
+                            <Edit2 size={13} />
+                            <span>Edit Stand</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-outline"
+                            style={{ fontSize: '12px', padding: '6px 10px', color: '#b91c1c', borderColor: '#fca5a5', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                            onClick={() => handleDeleteQR(qr.id, qr.name)}
+                          >
+                            <Trash2 size={13} />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </div>
@@ -4764,17 +4888,28 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                           href={profileForm.googleReviewUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="btn btn-primary"
+                          className="btn btn-secondary"
                           style={{ whiteSpace: 'nowrap', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
                           title="Click to verify the Google review dialog opens"
                         >
                           <GoogleLogo size={14} />
-                          <span>Test Link ↗</span>
+                          <span>Test ↗</span>
                         </a>
                       )}
                     </div>
-                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '5px' }}>
-                      When customers click &quot;Post on Google Maps&quot;, this exact URL directly opens their review submission popup.
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                        When customers tap &quot;Post on Google Maps&quot;, this exact URL directly opens their review submission popup.
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        disabled={savingProfile}
+                        onClick={handleSaveProfile}
+                        style={{ fontSize: '12px', padding: '6px 14px' }}
+                      >
+                        {savingProfile ? 'Saving...' : '✓ Save Google Destination'}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -5997,13 +6132,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               padding: '12px',
             }}
           >
-            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '420px' }}>
+            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '440px' }}>
               <h3 className="serif" style={{ fontSize: '19px', marginBottom: '14px' }}>
-                New Table QR Stand
+                New Smart QR Stand
               </h3>
               <form onSubmit={handleCreateQR}>
                 <div className="form-group">
-                  <label className="form-label">QR Stand Name</label>
+                  <label className="form-label">QR Stand Name *</label>
                   <input
                     type="text"
                     className="form-input"
@@ -6018,11 +6153,27 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Billing Counter, Service Desk, Consultation Room, Front Lobby"
+                    placeholder="e.g. Billing Counter, Service Desk, Front Lobby"
                     value={newQRLocation}
                     onChange={(e) => setNewQRLocation(e.target.value)}
                     required
                   />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Specific Google Maps Link (Optional)</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Empty = Business Default</span>
+                  </label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder={business?.googleReviewUrl || 'https://maps.app.goo.gl/...'}
+                    value={newQRGoogleReviewUrl}
+                    onChange={(e) => setNewQRGoogleReviewUrl(e.target.value)}
+                  />
+                  <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    Direct customers from this specific stand to a different branch or custom Google review dialog.
+                  </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowQRModal(false)}>
@@ -6030,6 +6181,87 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   </button>
                   <button type="submit" className="btn btn-primary">
                     Create QR Stand
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit QR Stand Modal */}
+        {editingQR && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1100,
+              padding: '12px',
+            }}
+          >
+            <div className="card modal-responsive-card" style={{ width: '100%', maxWidth: '440px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <h3 className="serif" style={{ fontSize: '19px', margin: 0 }}>
+                  Edit QR Stand: {editingQR.name}
+                </h3>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setEditingQR(null)}
+                  style={{ padding: '2px 8px', fontSize: '12px' }}
+                >
+                  ✕
+                </button>
+              </div>
+              <form onSubmit={handleUpdateQR}>
+                <div className="form-group">
+                  <label className="form-label">QR Stand Name *</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingQR.name || ''}
+                    onChange={(e) => setEditingQR({ ...editingQR, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Placement Section Tag</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editingQR.locationTag || ''}
+                    onChange={(e) => setEditingQR({ ...editingQR, locationTag: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Google Maps Review Destination</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Empty = Business Default</span>
+                  </label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    placeholder={business?.googleReviewUrl || 'Inherits default business review link'}
+                    value={editingQR.googleReviewUrl || ''}
+                    onChange={(e) => setEditingQR({ ...editingQR, googleReviewUrl: e.target.value })}
+                  />
+                  <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    Paste a specific Google Maps link or leave empty to use your default business link.
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '18px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setEditingQR(null)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Save Changes
                   </button>
                 </div>
               </form>

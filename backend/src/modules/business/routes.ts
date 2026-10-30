@@ -162,7 +162,23 @@ businessRouter.put(
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const updated = await db.updateBusiness(req.tenantId!, req.body);
+      const updates = { ...req.body };
+      if (updates.googleReviewUrl && updates.googleReviewUrl.trim()) {
+        try {
+          const converted = await convertMapsUrlToDirectReviewUrl(updates.googleReviewUrl.trim());
+          if (converted?.directReviewUrl) {
+            updates.googleReviewUrl = converted.directReviewUrl;
+          }
+        } catch {}
+      } else if (updates.googleMapsShareUrl && updates.googleMapsShareUrl.trim()) {
+        try {
+          const converted = await convertMapsUrlToDirectReviewUrl(updates.googleMapsShareUrl.trim());
+          if (converted?.directReviewUrl) {
+            updates.googleReviewUrl = converted.directReviewUrl;
+          }
+        } catch {}
+      }
+      const updated = await db.updateBusiness(req.tenantId!, updates);
       res.json({ success: true, data: updated });
     } catch (err) {
       next(err);

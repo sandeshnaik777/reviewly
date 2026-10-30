@@ -900,6 +900,19 @@ class DatabaseService {
     return this.data.qrCodes[idx];
   }
 
+  async deleteQRCode(id: string, businessId: string): Promise<boolean> {
+    const idx = this.data.qrCodes.findIndex((q) => q.id === id && q.businessId === businessId);
+    if (idx === -1) return false;
+    this.data.qrCodes.splice(idx, 1);
+    const list = this.qrsByBusinessId.get(businessId);
+    if (list) {
+      const qIdx = list.findIndex((q) => q.id === id);
+      if (qIdx !== -1) list.splice(qIdx, 1);
+    }
+    await this.persist();
+    return true;
+  }
+
   async incrementQRScan(slug: string): Promise<void> {
     const qr = this.data.qrCodes.find((q) => q.slug === slug);
     if (qr) {

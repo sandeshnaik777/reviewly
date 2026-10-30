@@ -114,10 +114,14 @@ export const api = {
 
   // QR Codes
   getQRs: (businessId: string) => apiRequest(`/qrs/business/${businessId}/qrs`),
-  createQR: (businessId: string, name: string, locationTag: string) =>
-    apiRequest(`/qrs/business/${businessId}/qrs`, { method: 'POST', body: JSON.stringify({ name, locationTag }) }),
+  createQR: (businessId: string, name: string, locationTag: string, googleReviewUrl?: string, googleMapsShareUrl?: string) =>
+    apiRequest(`/qrs/business/${businessId}/qrs`, { method: 'POST', body: JSON.stringify({ name, locationTag, googleReviewUrl, googleMapsShareUrl }) }),
   toggleQR: (businessId: string, qrId: string, updates: any) =>
     apiRequest(`/qrs/business/${businessId}/qrs/${qrId}`, { method: 'PATCH', body: JSON.stringify(updates) }),
+  updateQR: (businessId: string, qrId: string, updates: any) =>
+    apiRequest(`/qrs/business/${businessId}/qrs/${qrId}`, { method: 'PATCH', body: JSON.stringify(updates) }),
+  deleteQR: (businessId: string, qrId: string) =>
+    apiRequest(`/qrs/business/${businessId}/qrs/${qrId}`, { method: 'DELETE' }),
 
   // Customer (Anonymous)
   getCustomerQR: (slug: string) => apiRequest(`/customer/qr/${slug}`),

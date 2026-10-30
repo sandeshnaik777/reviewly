@@ -12,3 +12,7 @@ frontend/.env
 npm-debug.log*
 .DS_Store
 .agents/
+videofile/
+audiofile/
+marketing/
+

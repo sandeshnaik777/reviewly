@@ -71,7 +71,7 @@ customerRouter.get('/qr/:slug', qrScanRateLimiter, async (req: Request, res: Res
           logoUrl: business.logoUrl,
           coverImageUrl: business.coverImageUrl,
           description: business.description,
-          googleReviewUrl: business.googleReviewUrl,
+          googleReviewUrl: qr.googleReviewUrl || business.googleReviewUrl,
           instagramUrl: business.instagramUrl,
           facebookUrl: business.facebookUrl,
           whatsappUrl: business.whatsappUrl,
@@ -80,6 +80,7 @@ customerRouter.get('/qr/:slug', qrScanRateLimiter, async (req: Request, res: Res
           id: qr.id,
           name: qr.name,
           locationTag: qr.locationTag,
+          googleReviewUrl: qr.googleReviewUrl || business.googleReviewUrl,
         },
         questions: questions.map((q) => ({
           questionKey: q.questionKey,
@@ -226,13 +227,16 @@ customerRouter.post(
         createdAt: new Date().toISOString(),
       });
 
+      const sessionQr = session.qrCodeId ? await db.findQRCodeById(session.qrCodeId) : undefined;
+      const targetReviewUrl = sessionQr?.googleReviewUrl || business.googleReviewUrl;
+
       res.status(201).json({
         success: true,
         data: {
           reviewId,
           reviewText: aiResult.reviewText,
           sentiment: aiResult.sentiment,
-          googleReviewUrl: business.googleReviewUrl,
+          googleReviewUrl: targetReviewUrl,
         },
       });
     } catch (err) {
