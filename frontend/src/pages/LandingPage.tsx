@@ -827,10 +827,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             {(() => {
               const dur = landingPlanDurations.starter || 1;
               const price = dur === 3 ? 229 : dur === 6 ? 449 : dur === 12 ? 790 : 79;
-              const reg = dur === 3 ? 447 : dur === 6 ? 894 : dur === 12 ? 1788 : 149;
+              const reg = dur === 3 ? 999 : dur === 6 ? 1999 : dur === 12 ? 3999 : 499;
               const sub = dur === 3 ? 'for 3 mos (₹76/mo)' : dur === 6 ? 'for 6 mos (₹75/mo)' : dur === 12 ? 'for 1 yr (₹66/mo)' : '/month';
               const reviews = dur === 3 ? '300 Total AI reviews (Quarterly)' : dur === 6 ? '600 Total AI reviews (Semi-Annual)' : dur === 12 ? '1,200 Total AI reviews (1-Year Pass)' : '100 AI reviews / month';
-              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹79 First Month Offer (Reg. ₹149)';
+              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹79 First Month Offer (Reg. ₹499)';
 
               return (
                 <div className="card" style={{ padding: '32px 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
@@ -908,10 +908,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             {(() => {
               const dur = landingPlanDurations.growth || 1;
               const price = dur === 3 ? 429 : dur === 6 ? 849 : dur === 12 ? 1490 : 149;
-              const reg = dur === 3 ? 747 : dur === 6 ? 1494 : dur === 12 ? 2988 : 249;
+              const reg = dur === 3 ? 1999 : dur === 6 ? 3499 : dur === 12 ? 5999 : 999;
               const sub = dur === 3 ? 'for 3 mos (₹143/mo)' : dur === 6 ? 'for 6 mos (₹142/mo)' : dur === 12 ? 'for 1 yr (₹124/mo)' : '/month';
               const reviews = dur === 3 ? '1,500 Total AI reviews (Quarterly)' : dur === 6 ? '3,000 Total AI reviews (Semi-Annual)' : dur === 12 ? '6,000 Total AI reviews (1-Year Pass)' : '500 AI reviews / month';
-              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹149 First Month Offer (Reg. ₹249)';
+              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹149 First Month Offer (Reg. ₹999)';
 
               return (
                 <div className="card" style={{ padding: '32px 24px', textAlign: 'left', border: '2px solid var(--primary)', position: 'relative', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 30px rgba(154, 64, 24, 0.12)' }}>
@@ -994,10 +994,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             {(() => {
               const dur = landingPlanDurations.pro || 1;
               const price = dur === 3 ? 699 : dur === 6 ? 1399 : dur === 12 ? 2490 : 249;
-              const reg = dur === 3 ? 1197 : dur === 6 ? 2394 : dur === 12 ? 4788 : 399;
+              const reg = dur === 3 ? 2999 : dur === 6 ? 4999 : dur === 12 ? 8999 : 1499;
               const sub = dur === 3 ? 'for 3 mos (₹233/mo)' : dur === 6 ? 'for 6 mos (₹233/mo)' : dur === 12 ? 'for 1 yr (₹208/mo)' : '/month';
               const reviews = dur === 3 ? '3,000 Total AI reviews (Quarterly)' : dur === 6 ? '6,000 Total AI reviews (Semi-Annual)' : dur === 12 ? '12,000 Total AI reviews (1-Year Pass)' : '1,000 AI reviews / month';
-              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹249 First Month Offer (Reg. ₹399)';
+              const tag = dur === 12 ? '2 Months Free Applied' : dur === 3 ? 'Quarterly Pack' : dur === 6 ? 'Semi-Annual Pack' : '₹249 First Month Offer (Reg. ₹1,499)';
 
               return (
                 <div className="card" style={{ padding: '32px 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>

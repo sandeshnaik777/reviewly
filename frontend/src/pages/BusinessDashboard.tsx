@@ -1369,7 +1369,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 <span>DIWALI FLASH SALE 🎈</span>
               </span>
               <strong style={{ color: '#78350f', fontSize: '13px' }}>
-                All Plans Discounted: Testing Pass <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹499</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹79</span> · Growth <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹249</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹149/mo</span>
+                All Plans Discounted: Testing Pass <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹499</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹79</span> · Growth <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹999</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹149/mo</span> · Pro <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹1,499</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹249/mo</span>
               </strong>
               <span style={{ color: '#78350f', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, background: '#fef08a', padding: '2px 7px', borderRadius: '6px', border: '1px solid #fde047' }}>
                 ⏳ {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
@@ -1602,7 +1602,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
                     {/* Headline with Strikethrough Price */}
                     <h3 className="serif" style={{ fontSize: '23px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
-                      Diwali Flash Sale Live Across All Plans · Save Up to 84% Today
+                      Diwali Flash Sale Live Across All Plans · Save Up to 85% Today
                     </h3>
 
                     <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
@@ -1625,8 +1625,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                         <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Growth Pack ⭐</div>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
                           <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹149<span style={{ fontSize: '11px', fontWeight: 500 }}>/mo</span></span>
-                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹249</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>40% OFF</span>
+                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹999</span>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>85% OFF</span>
                         </div>
                         <div style={{ fontSize: '11px', color: '#78350f' }}>500 reviews · 5 QR Stands</div>
                       </div>
@@ -1635,8 +1635,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                         <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Scale Pro Pack</div>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
                           <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹249<span style={{ fontSize: '11px', fontWeight: 500 }}>/mo</span></span>
-                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹399</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>38% OFF</span>
+                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹1,499</span>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>83% OFF</span>
                         </div>
                         <div style={{ fontSize: '11px', color: '#78350f' }}>1,000 reviews · 15 QR Stands</div>
                       </div>

@@ -3176,9 +3176,9 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                       }}
                     >
                       <option value="starter">Testing Pack (₹79 Trial)</option>
-                      <option value="starter">Testing Pack (₹79/mo, Reg. ₹149)</option>
-                      <option value="growth">Growth Pack (₹149/mo, Reg. ₹249)</option>
-                      <option value="pro">Scale / Pro Pack (₹249/mo, Reg. ₹399)</option>
+                      <option value="starter">Testing Pack (₹79/mo, Reg. ₹499)</option>
+                      <option value="growth">Growth Pack (₹149/mo, Reg. ₹999)</option>
+                      <option value="pro">Scale / Pro Pack (₹249/mo, Reg. ₹1,499)</option>
                     </select>
                   </div>
 

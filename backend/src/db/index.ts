@@ -65,7 +65,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     slug: 'trial',
     name: '7-Day Free Trial Pass (Deprecated)',
     priceInr: 79,
-    originalPriceInr: 149,
+    originalPriceInr: 499,
     offerBadge: 'Deprecated',
     billingPeriod: 'month',
     reviewGenerationLimit: 50,
@@ -85,8 +85,8 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr3Months: 229,
     priceInr6Months: 429,
     priceInr1Year: 790, // 2 Months Free (10 × ₹79)
-    originalPriceInr: 149,
-    offerBadge: '🪔 Diwali Offer · ₹79 (Reg. ₹149)',
+    originalPriceInr: 499,
+    offerBadge: '🪔 Diwali Offer · ₹79 (Reg. ₹499)',
     billingPeriod: 'month',
     reviewGenerationLimit: 100,
     qrCodeLimit: 2,
@@ -94,7 +94,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     customQuestionsEnabled: true,
     customBrandingEnabled: false,
     teamMembersLimit: 1,
-    features: ['100 AI review generations/mo', 'Special trial offer: ₹79 (Reg. ₹149)', '2 Smart QR Stands', 'Category question builder', 'Scan & copy analytics', 'Fast email & WhatsApp support'],
+    features: ['100 AI review generations/mo', 'Special trial offer: ₹79 (Reg. ₹499)', '2 Smart QR Stands', 'Category question builder', 'Scan & copy analytics', 'Fast email & WhatsApp support'],
     isActive: true,
   },
   {
@@ -105,8 +105,8 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr3Months: 429,
     priceInr6Months: 799,
     priceInr1Year: 1490, // 2 Months Free (10 × ₹149)
-    originalPriceInr: 249,
-    offerBadge: '🪔 Diwali Offer · ₹149 (Reg. ₹249)',
+    originalPriceInr: 999,
+    offerBadge: '🪔 Diwali Offer · ₹149 (Reg. ₹999)',
     billingPeriod: 'month',
     reviewGenerationLimit: 500,
     qrCodeLimit: 5,
@@ -114,7 +114,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     customQuestionsEnabled: true,
     customBrandingEnabled: true,
     teamMembersLimit: 3,
-    features: ['500 AI review generations/mo', 'First month offer: ₹149 (Reg. ₹249)', '5 Smart QR Stands', 'Custom question builder', 'Full funnel analytics', 'Tone & length customization', 'Priority support'],
+    features: ['500 AI review generations/mo', 'First month offer: ₹149 (Reg. ₹999)', '5 Smart QR Stands', 'Custom question builder', 'Full funnel analytics', 'Tone & length customization', 'Priority support'],
     isActive: true,
   },
   {
@@ -125,8 +125,8 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     priceInr3Months: 719,
     priceInr6Months: 1349,
     priceInr1Year: 2490, // 2 Months Free (10 × ₹249)
-    originalPriceInr: 399,
-    offerBadge: '🪔 Diwali Offer · ₹249 (Reg. ₹399)',
+    originalPriceInr: 1499,
+    offerBadge: '🪔 Diwali Offer · ₹249 (Reg. ₹1,499)',
     billingPeriod: 'month',
     reviewGenerationLimit: 1000,
     qrCodeLimit: 15,
@@ -134,7 +134,7 @@ const DEFAULT_PLANS: SubscriptionPlan[] = [
     customQuestionsEnabled: true,
     customBrandingEnabled: true,
     teamMembersLimit: 10,
-    features: ['1,000 AI review generations/mo', 'First month offer: ₹249 (Reg. ₹399)', '15 Smart QR Stands', 'Advanced anti-abuse guards', 'Multi-staff RBAC', 'Aura reputation shield', 'Dedicated SLA'],
+    features: ['1,000 AI review generations/mo', 'First month offer: ₹249 (Reg. ₹1,499)', '15 Smart QR Stands', 'Advanced anti-abuse guards', 'Multi-staff RBAC', 'Aura reputation shield', 'Dedicated SLA'],
     isActive: true,
   },
 ];
