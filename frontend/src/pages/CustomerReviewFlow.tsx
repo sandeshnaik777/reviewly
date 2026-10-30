@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
-import { MapPin, Check } from 'lucide-react';
+import { MapPin, Check, Heart, Sparkles } from 'lucide-react';
 import {
   KindlyRateLogo,
   GoogleLogo,
   SparklesIcon,
-  DirectReviewIcon,
   StarIcon,
   InstagramLogo,
   FacebookLogo,
   WhatsAppLogo,
   ClipboardCopyIcon,
   GiftIcon,
-  CheckCircleIcon,
-  StorefrontIcon,
 } from '../components/Logos.js';
 import { ScratchCard } from '../components/ScratchCard.js';
 
@@ -26,16 +23,13 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<any>(null);
 
-  // Review Flow Mode: defaults directly to 'ai' rating criteria for 0-friction fast completion
-  const [reviewMode, setReviewMode] = useState<'choice' | 'ai'>('ai');
-
   // Form State
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [customerComment, setCustomerComment] = useState('');
   const [selectedDishes, setSelectedDishes] = useState<string[]>([]);
   const [customDish, setCustomDish] = useState('');
   const [showAddDish, setShowAddDish] = useState(false);
-  const [reviewLength, setReviewLength] = useState<'short' | 'medium' | 'detailed'>('medium');
+  const [reviewLength] = useState<'short' | 'medium' | 'detailed'>('medium');
   const [reviewFormat, setReviewFormat] = useState<
     'narrative' | 'bullet_highlights' | 'casual_conversational' | 'professional_critique'
   >('narrative');
@@ -59,7 +53,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
 
       // Pre-fill default ratings to 5 stars
       const initialRatings: Record<string, number> = {};
-      res.questions.forEach((q: any) => {
+      (res.questions || []).forEach((q: any) => {
         initialRatings[q.questionKey] = 5;
       });
       setRatings(initialRatings);
@@ -74,16 +68,17 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
     }
   };
 
-  const ratingLabels: Record<number, { text: string; color: string; bg: string }> = {
-    5: { text: '⭐⭐⭐⭐⭐ Outstanding', color: '#b45309', bg: '#fef3c7' },
-    4: { text: '⭐⭐⭐⭐ Great', color: '#15803d', bg: '#dcfce7' },
-    3: { text: '⭐⭐⭐ Good', color: '#0369a1', bg: '#e0f2fe' },
-    2: { text: '⭐⭐ Fair', color: '#d97706', bg: '#fef3c7' },
-    1: { text: '⭐ Needs Attention', color: '#dc2626', bg: '#fee2e2' },
-  };
-
   const handleRatingChange = (key: string, val: number) => {
     setRatings((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const handleSetAllFives = () => {
+    const all: Record<string, number> = {};
+    const qs = data?.questions || [];
+    qs.forEach((q: any) => {
+      all[q.questionKey] = 5;
+    });
+    setRatings(all);
   };
 
   const toggleDish = (dish: string) => {
@@ -153,7 +148,6 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
     }, 450);
   };
 
-  // Direct Google Review Shortcut
   const handleOpenGoogleDirect = () => {
     const url = data?.business?.googleReviewUrl;
     if (url) {
@@ -195,7 +189,7 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
       <div className="mobile-viewport" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', padding: '40px 20px' }}>
           <div className="spinner" style={{ borderTopColor: 'var(--primary)', borderColor: 'var(--border)' }}></div>
-          <p style={{ marginTop: '16px', color: 'var(--text-muted)' }}>Loading review experience...</p>
+          <p style={{ marginTop: '16px', color: 'var(--text-muted)', fontSize: '13.5px' }}>Loading review experience...</p>
         </div>
       </div>
     );
@@ -204,661 +198,485 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
   if (error && !data) {
     return (
       <div className="mobile-viewport" style={{ padding: '40px 20px', textAlign: 'center' }}>
-        <h2 className="serif" style={{ fontSize: '24px', color: 'var(--error)', marginBottom: '12px' }}>Review Page Unavailable</h2>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>{error}</p>
+        <h2 className="serif" style={{ fontSize: '22px', color: 'var(--error)', marginBottom: '12px' }}>Review Page Unavailable</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '24px', fontSize: '13.5px' }}>{error}</p>
         <button className="btn btn-secondary" onClick={loadQRDetails}>Try Again</button>
       </div>
     );
   }
 
-  const { business, questions } = data;
+  const { business } = data;
+  const questions = (data.questions && data.questions.length > 0)
+    ? data.questions
+    : [{ questionKey: 'overall_experience', label: 'Overall Experience' }];
+
+  const allFives = questions.every((q: any) => (ratings[q.questionKey] ?? 5) === 5);
+
+  // Category-Aware Quick Highlight Pills
+  const suggestions = (() => {
+    const cat = (business?.mainCategory || '').toUpperCase();
+    const sub = (business?.subcategory || '').toLowerCase();
+    const bName = (business?.name || '').toLowerCase();
+
+    const isRetail =
+      cat === 'RETAIL' ||
+      /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
+      /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
+
+    const isServices =
+      cat === 'SERVICES' ||
+      /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
+
+    const isHealth =
+      cat === 'HEALTH & WELLNESS' ||
+      /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
+
+    const targetKeywords: string[] = data?.targetKeywords || [];
+    const rawSuggestions = isRetail
+      ? [
+          'High Quality',
+          'Fast Diagnostics',
+          'Genuine Products',
+          'Fair Pricing',
+          'Helpful Staff',
+          'Great Value',
+        ]
+      : isServices
+      ? [
+          'Quick Service',
+          'Transparent Billing',
+          'Honest Work',
+          'Neat Workmanship',
+          'Polite Team',
+          'Highly Recommended',
+        ]
+      : isHealth
+      ? [
+          'Painless Care',
+          'Friendly Staff',
+          'Clean Clinic',
+          'Short Wait Time',
+          'Professional Doctor',
+          'Great Advice',
+        ]
+      : cat === 'FOOD & HOSPITALITY'
+      ? [
+          'Delicious Food',
+          'Warm Hospitality',
+          'Quick Service',
+          'Great Ambiance',
+          'Fresh Quality',
+          'Fair Prices',
+        ]
+      : [
+          'Quality Service',
+          'Helpful Staff',
+          'Quick Turnaround',
+          'Fair Pricing',
+          'Clean Space',
+          'Great Hospitality',
+        ];
+
+    return Array.from(new Set([...targetKeywords, ...rawSuggestions]));
+  })();
 
   return (
-    <div className="mobile-viewport">
-      {/* Business Header Banner */}
+    <div className="mobile-viewport" style={{ background: '#fdfbf9', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* 🌟 WARM & WELCOMING HEADER */}
       <div
         style={{
-          background: 'linear-gradient(180deg, #fffcfb 0%, #faf6f2 100%)',
-          padding: '24px 20px 20px',
-          borderBottom: '1px solid #ede8e3',
+          background: 'linear-gradient(180deg, #fff7ed 0%, #ffffff 100%)',
+          padding: '18px 16px 14px',
           textAlign: 'center',
+          borderBottom: '1px solid #fed7aa44',
         }}
       >
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#ecfdf5', color: '#15803d', border: '1px solid #bbf7d0', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, marginBottom: '8px' }}>
-          <Check size={12} strokeWidth={3} />
-          <span>Verified Google Business</span>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#fef3c7',
+            color: '#92400e',
+            fontSize: '11px',
+            fontWeight: 800,
+            padding: '3px 10px',
+            borderRadius: '20px',
+            marginBottom: '6px',
+            letterSpacing: '0.3px',
+          }}
+        >
+          <span>✨</span>
+          <span>THANK YOU FOR VISITING!</span>
         </div>
-        <h1 className="serif" style={{ fontSize: '24px', fontWeight: 700, lineHeight: 1.25, marginBottom: '6px', color: '#0f172a' }}>
+
+        <h1
+          className="serif"
+          style={{
+            fontSize: '21px',
+            fontWeight: 800,
+            lineHeight: 1.2,
+            margin: '2px 0 4px',
+            color: '#0f172a',
+          }}
+        >
           {business.name}
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', margin: 0 }}>
-          <MapPin size={13} color="var(--primary)" /> {business.city || 'Local Area'} · {business.subcategory}
-        </p>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            fontSize: '12px',
+            color: '#64748b',
+          }}
+        >
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#15803d', fontWeight: 600 }}>
+            <Check size={12} strokeWidth={3} />
+            <span>Verified Google Store</span>
+          </span>
+          <span>•</span>
+          <span>{business.city || 'Local Store'}</span>
+        </div>
+
+        {business.welcomeMessage && (
+          <p style={{ margin: '6px 0 0', fontSize: '12px', color: '#9a3412', fontStyle: 'italic', lineHeight: 1.4 }}>
+            "{business.welcomeMessage}"
+          </p>
+        )}
       </div>
 
-      <div style={{ padding: '20px 16px', flex: 1, paddingBottom: reviewMode === 'ai' && !generatedReview ? '100px' : '40px' }}>
-        {error && <div className="alert alert-error">{error}</div>}
+      <div style={{ padding: '14px 14px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {error && <div className="alert alert-error" style={{ marginBottom: '12px', fontSize: '13px' }}>{error}</div>}
 
         {/* ======================================================== */}
-        {/* SCREEN 1: FIRST CHOICE (AI GENERATION vs DIRECT GOOGLE)   */}
+        {/* SCREEN 1: COMPACT RATING & DRAFT CREATION                */}
         {/* ======================================================== */}
-        {reviewMode === 'choice' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-              <h2 className="serif" style={{ fontSize: '22px', fontWeight: 600 }}>
-                How would you like to review us?
-              </h2>
-              <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                Select your preferred way to share your experience
-              </p>
-            </div>
-
-            {/* OPTION 1: Generate with AI (Recommended) */}
+        {!generatedReview ? (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* 🌟 UNIFIED ULTRA-COMPACT RATING CARD */}
             <div
-              className="card"
               style={{
-                padding: '22px 20px',
-                border: '1.5px solid var(--primary)',
-                background: '#fffcfb',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                position: 'relative',
+                background: '#ffffff',
+                border: '1.5px solid #fed7aa',
+                borderRadius: '14px',
+                padding: '12px 14px',
+                marginBottom: '10px',
+                boxShadow: '0 2px 10px rgba(234, 88, 12, 0.04)',
               }}
-              onClick={() => setReviewMode('ai')}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span className="stat-pill stat-pill-primary" style={{ fontSize: '11.5px' }}>
-                  Recommended · Fast & Easy
-                </span>
-                <SparklesIcon size={22} color="var(--primary)" />
-              </div>
-
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)', marginBottom: '6px' }}>
-                Personalized Review in 15s
-              </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>
-                Rate a few quick criteria and get an authentic, natural review draft crafted from your genuine experience.
-              </p>
-
-              <button
-                className="btn btn-primary btn-block"
-                style={{ fontSize: '14.5px', padding: '12px' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setReviewMode('ai');
-                }}
-              >
-                <SparklesIcon size={16} color="white" />
-                <span>Draft My Review →</span>
-              </button>
-            </div>
-
-            {/* OPTION 2: Direct Google Review */}
-            <div
-              className="card"
-              style={{
-                padding: '22px 20px',
-                border: '1px solid var(--border)',
-                background: 'var(--surface)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-              onClick={handleOpenGoogleDirect}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11.5px' }}>
-                  Direct Option
-                </span>
-                <GoogleLogo size={22} />
-              </div>
-
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)', marginBottom: '6px' }}>
-                Direct Google Review
-              </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>
-                Prefer writing in your own words? Skip the questions and open our official Google Maps page directly.
-              </p>
-
-              <button
-                className="btn btn-secondary btn-block"
-                style={{ fontSize: '14.5px', padding: '12px', borderColor: 'var(--border)' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenGoogleDirect();
-                }}
-              >
-                <GoogleLogo size={18} />
-                <span>Open Google Reviews ↗</span>
-              </button>
-            </div>
-
-            {/* OPTIONAL SOCIAL MEDIA CONNECTIONS (Only shown if added by merchant) */}
-            {(Boolean(business?.instagramUrl?.trim()) || Boolean(business?.whatsappUrl?.trim()) || Boolean(business?.facebookUrl?.trim())) && (
+              {/* Card Header with 1-Tap All 5★ */}
               <div
-                className="card"
                 style={{
-                  padding: '16px 18px',
-                  background: '#ffffff',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: 'var(--radius-lg)',
-                  textAlign: 'center',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '8px',
+                  paddingBottom: '8px',
+                  borderBottom: '1px solid #f1f5f9',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text)' }}>Connect With Us</span>
-                  <span className="badge badge-success" style={{ fontSize: '10px', padding: '2px 7px' }}>Official</span>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
+                    How was your experience?
+                  </div>
+                  <div style={{ fontSize: '11px', color: allFives ? '#15803d' : '#ea580c', fontWeight: 600 }}>
+                    {allFives ? '⭐⭐⭐⭐⭐ 5.0 · Outstanding' : 'Tap stars to customize rating'}
+                  </div>
                 </div>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                  Follow our official channels for offers, news &amp; direct assistance
-                </p>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-                  {Boolean(business?.instagramUrl?.trim()) && (
-                    <button
-                      type="button"
-                      onClick={() => handleSocialClick('instagram', business.instagramUrl)}
-                      className="btn"
+                <button
+                  type="button"
+                  onClick={handleSetAllFives}
+                  style={{
+                    background: allFives ? '#dcfce7' : '#fff7ed',
+                    border: allFives ? '1px solid #86efac' : '1px solid #fdba74',
+                    color: allFives ? '#15803d' : '#ea580c',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '3px 9px',
+                    borderRadius: '16px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {allFives ? '✓ All 5★' : '⚡ Rate All 5★'}
+                </button>
+              </div>
+
+              {/* Compact Criteria Rows (Takes minimal height!) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {questions.map((q: any) => {
+                  const currentRating = ratings[q.questionKey] ?? 5;
+                  return (
+                    <div
+                      key={q.questionKey}
                       style={{
-                        flex: '1 1 auto',
-                        minWidth: '120px',
-                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                        color: '#ffffff',
-                        border: 'none',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        padding: '10px 14px',
-                        borderRadius: '999px',
-                        display: 'inline-flex',
+                        display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 8px rgba(220, 39, 67, 0.25)',
-                        cursor: 'pointer',
+                        justifyContent: 'space-between',
+                        padding: '3px 0',
                       }}
                     >
-                      <InstagramLogo size={18} />
-                      <span>Follow on Instagram</span>
-                    </button>
+                      <span
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          color: '#334155',
+                          flex: 1,
+                          paddingRight: '6px',
+                          lineHeight: 1.25,
+                        }}
+                      >
+                        {q.label || q.text || 'Service Quality'}
+                      </span>
+                      <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => handleRatingChange(q.questionKey, star)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              padding: '2px',
+                              cursor: 'pointer',
+                              fontSize: '23px',
+                              lineHeight: 1,
+                              color: star <= currentRating ? '#f59e0b' : '#e2e8f0',
+                              transform: star <= currentRating ? 'scale(1.05)' : 'scale(1)',
+                              transition: 'all 0.1s ease',
+                            }}
+                            aria-label={`Rate ${star} star`}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 💡 COMPACT HORIZONTAL QUICK MENTIONS */}
+            {suggestions.length > 0 && (
+              <div style={{ marginBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                  <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#64748b' }}>
+                    💡 Tap what you liked (Optional):
+                  </span>
+                  {selectedDishes.length > 0 && (
+                    <span style={{ fontSize: '10.5px', color: '#ea580c', fontWeight: 700 }}>
+                      {selectedDishes.length} selected
+                    </span>
                   )}
+                </div>
 
-                  {Boolean(business?.whatsappUrl?.trim()) && (
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '5px',
+                    overflowX: 'auto',
+                    paddingBottom: '3px',
+                    WebkitOverflowScrolling: 'touch',
+                    scrollbarWidth: 'none',
+                  }}
+                >
+                  {suggestions.map((item) => {
+                    const isSelected = selectedDishes.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => toggleDish(item)}
+                        style={{
+                          whiteSpace: 'nowrap',
+                          padding: '5px 10px',
+                          borderRadius: '16px',
+                          fontSize: '11.5px',
+                          fontWeight: isSelected ? 700 : 500,
+                          background: isSelected ? '#fff7ed' : '#ffffff',
+                          border: isSelected ? '1.5px solid #ea580c' : '1px solid #e2e8f0',
+                          color: isSelected ? '#ea580c' : '#475569',
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        {isSelected ? '✓ ' : '+ '}
+                        {item}
+                      </button>
+                    );
+                  })}
+
+                  {selectedDishes
+                    .filter((d) => !suggestions.includes(d))
+                    .map((customItem) => (
+                      <button
+                        key={customItem}
+                        type="button"
+                        onClick={() => toggleDish(customItem)}
+                        style={{
+                          whiteSpace: 'nowrap',
+                          padding: '5px 10px',
+                          borderRadius: '16px',
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          background: '#fff7ed',
+                          border: '1.5px solid #ea580c',
+                          color: '#ea580c',
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                        }}
+                      >
+                        ✓ {customItem} ✕
+                      </button>
+                    ))}
+
+                  {!showAddDish ? (
                     <button
                       type="button"
-                      onClick={() => handleSocialClick('whatsapp', business.whatsappUrl)}
-                      className="btn"
+                      onClick={() => setShowAddDish(true)}
                       style={{
-                        flex: '1 1 auto',
-                        minWidth: '120px',
-                        background: '#25D366',
-                        color: '#ffffff',
-                        border: 'none',
-                        fontSize: '13px',
+                        whiteSpace: 'nowrap',
+                        padding: '5px 9px',
+                        borderRadius: '16px',
+                        fontSize: '11px',
                         fontWeight: 600,
-                        padding: '10px 14px',
-                        borderRadius: '999px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 8px rgba(37, 211, 102, 0.25)',
+                        border: '1px dashed #cbd5e1',
+                        background: 'transparent',
+                        color: '#64748b',
                         cursor: 'pointer',
+                        flexShrink: 0,
                       }}
                     >
-                      <WhatsAppLogo size={18} />
-                      <span>Chat on WhatsApp</span>
+                      + Custom
                     </button>
-                  )}
-
-                  {Boolean(business?.facebookUrl?.trim()) && (
-                    <button
-                      type="button"
-                      onClick={() => handleSocialClick('facebook', business.facebookUrl)}
-                      className="btn"
-                      style={{
-                        flex: '1 1 auto',
-                        minWidth: '120px',
-                        background: '#1877F2',
-                        color: '#ffffff',
-                        border: 'none',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        padding: '10px 14px',
-                        borderRadius: '999px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 8px rgba(24, 119, 242, 0.25)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <FacebookLogo size={18} />
-                      <span>Visit Facebook</span>
-                    </button>
+                  ) : (
+                    <div style={{ display: 'inline-flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
+                      <input
+                        type="text"
+                        placeholder="e.g. Latte"
+                        value={customDish}
+                        onChange={(e) => setCustomDish(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddCustomDish();
+                          }
+                        }}
+                        autoFocus
+                        style={{
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          width: '90px',
+                          borderRadius: '12px',
+                          border: '1px solid #cbd5e1',
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCustomDish}
+                        style={{
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          borderRadius: '12px',
+                          background: '#ea580c',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Add
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowAddDish(false);
+                          setCustomDish('');
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#94a3b8',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
             )}
-          </div>
-        )}
 
-        {/* ======================================================== */}
-        {/* SCREEN 2: AI REVIEW FLOW (Questions & Ratings)            */}
-        {/* ======================================================== */}
-        {reviewMode === 'ai' && !generatedReview && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <div>
-                <h2 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                  Rate Your Experience
-                </h2>
-                <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0' }}>
-                  Tap stars for each aspect
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleOpenGoogleDirect}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #cbd5e1',
-                  color: '#334155',
-                  fontSize: '11.5px',
-                  fontWeight: 600,
-                  padding: '5px 12px',
-                  borderRadius: '20px',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                }}
-                title="Open Google Maps directly without AI assistance"
-              >
-                <GoogleLogo size={13} />
-                <span>Write Direct ↗</span>
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* Quick 1-Tap 5-Star Banner */}
-              <div
-                onClick={() => {
-                  const allFives: Record<string, number> = {};
-                  questions.forEach((q: any) => { allFives[q.questionKey] = 5; });
-                  setRatings(allFives);
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                  border: '1.5px solid #fcd34d',
-                  borderRadius: '12px',
-                  padding: '12px 16px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.1)',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '18px' }}>⭐</span>
-                  <div>
-                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#92400e' }}>
-                      Loved everything?
-                    </div>
-                    <div style={{ fontSize: '11.5px', color: '#b45309' }}>
-                      Tap to set all aspects to 5★ instantly
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const allFives: Record<string, number> = {};
-                    questions.forEach((q: any) => { allFives[q.questionKey] = 5; });
-                    setRatings(allFives);
-                  }}
-                  style={{
-                    background: '#d97706',
-                    color: '#ffffff',
-                    border: 'none',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Rate All 5★
-                </button>
-              </div>
-
-              {questions.map((q: any) => {
-                const currentRating = ratings[q.questionKey] || 5;
-                const labelInfo = ratingLabels[currentRating] || ratingLabels[5];
-
-                return (
-                  <div
-                    key={q.questionKey}
-                    className="card"
-                    style={{
-                      padding: '16px 18px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px',
-                      borderRadius: '14px',
-                      border: '1px solid #e2e8f0',
-                      background: '#ffffff',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.02)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: '15px', color: '#0f172a' }}>
-                        {q.label}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '11.5px',
-                          fontWeight: 700,
-                          color: labelInfo.color,
-                          background: labelInfo.bg,
-                          padding: '3px 8px',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        {labelInfo.text}
-                      </span>
-                    </div>
-
-                    <div className="star-rating" style={{ display: 'flex', gap: '6px', justifyContent: 'space-between', padding: '4px 0', width: '100%' }}>
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          className={`star-btn ${star <= currentRating ? 'active' : ''}`}
-                          onClick={() => handleRatingChange(q.questionKey, star)}
-                          aria-label={`Rate ${star} stars`}
-                          style={{
-                            padding: '6px 2px',
-                            flex: '1 1 0',
-                            minWidth: '38px',
-                            maxWidth: '54px',
-                            height: '46px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: '10px',
-                            background: star <= currentRating ? '#fff8f4' : '#f8fafc',
-                            border: star <= currentRating ? '1.5px solid #fed7aa' : '1px solid #e2e8f0',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                          }}
-                        >
-                          <StarIcon size={26} filled={star <= currentRating} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Category-Aware Products / Services / Dishes Chips */}
-            {(() => {
-              const cat = (business?.mainCategory || '').toUpperCase();
-              const sub = (business?.subcategory || '').toLowerCase();
-              const bName = (business?.name || '').toLowerCase();
-
-              const isRetail =
-                cat === 'RETAIL' ||
-                /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
-                /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
-
-              const isServices =
-                cat === 'SERVICES' ||
-                /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
-
-              const isHealth =
-                cat === 'HEALTH & WELLNESS' ||
-                /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
-
-              const targetKeywords: string[] = data?.targetKeywords || [];
-              const rawSuggestions = isRetail
-                ? [
-                    '16GB RAM Upgrade',
-                    'Custom Gaming PC Build',
-                    'Laptop Upgrade & SSD',
-                    'Mechanical Keyboard',
-                    'GPU Graphics Card',
-                    'High Refresh Monitor',
-                    'Fast RAM & Storage',
-                    'Technical Diagnostics',
-                    'Genuine Components',
-                  ]
-                : isServices
-                ? [
-                    'Periodic Maintenance',
-                    'Brake & Suspension',
-                    'Engine Diagnostics',
-                    'Oil & Filter Service',
-                    'AC Servicing',
-                    'Wheel Alignment',
-                    'Express Repair',
-                    'Transparent Billing',
-                  ]
-                : isHealth
-                ? [
-                    'Hair Styling & Cut',
-                    'Facial & Skincare',
-                    'Spa Wellness Therapy',
-                    'Dental Cleaning',
-                    'Doctor Consultation',
-                    'Pedicure & Manicure',
-                    'Attentive Staff',
-                    'Clean Clinic',
-                  ]
-                : cat === 'FOOD & HOSPITALITY'
-                ? [
-                    'Signature Dishes',
-                    'Chef Specials',
-                    'Woodfired Pizza',
-                    'Crispy Starters',
-                    'Craft Beverages',
-                    'Fresh Dessert',
-                    'Tasting Platter',
-                    'Warm Hospitality',
-                  ]
-                : [
-                    'Quality Service',
-                    'Helpful Team',
-                    'Fair Pricing',
-                    'Clean Atmosphere',
-                    'Prompt Turnaround',
-                    'Professional Care',
-                    'Highly Recommended',
-                    'Great Hospitality',
-                  ];
-
-              const suggestions = Array.from(new Set([...targetKeywords, ...rawSuggestions]));
-
-              const sectionTitle = isRetail
-                ? 'Products, Hardware or Services Purchased'
-                : isServices
-                ? 'Services or Maintenance Performed'
-                : isHealth
-                ? 'Treatments or Care Received'
-                : cat === 'FOOD & HOSPITALITY'
-                ? 'Dishes or Beverages Enjoyed'
-                : 'Products, Offerings or Services Highlighted';
-
-              const sectionSubtitle = isRetail
-                ? 'Tap items to mention them in your review, or type any specific component:'
-                : isServices
-                ? 'Tap services to mention them in your review, or type any specific work:'
-                : isHealth
-                ? 'Tap treatments to mention them in your review, or type any care received:'
-                : cat === 'FOOD & HOSPITALITY'
-                ? 'Tap dishes to mention them in your review, or type your favorites:'
-                : 'Tap items to mention them in your review, or type your highlights:';
-
-              return (
-                <div className="card" style={{ marginTop: '14px', padding: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <label className="form-label" style={{ marginBottom: 0, fontWeight: 600 }}>
-                      {sectionTitle} <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(Optional)</span>
-                    </label>
-                    {selectedDishes.length > 0 && (
-                      <span style={{ fontSize: '11.5px', color: 'var(--primary)', fontWeight: 600 }}>
-                        {selectedDishes.length} selected
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                    {sectionSubtitle}
-                  </p>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
-                    {suggestions.map((item) => {
-                      const isSelected = selectedDishes.includes(item);
-                      return (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => toggleDish(item)}
-                          style={{
-                            padding: '7px 13px',
-                            borderRadius: '20px',
-                            fontSize: '12.5px',
-                            fontWeight: isSelected ? 600 : 500,
-                            border: isSelected ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-                            background: isSelected ? '#fef2ee' : 'var(--surface)',
-                            color: isSelected ? 'var(--primary)' : 'var(--text)',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                          }}
-                        >
-                          {isSelected ? '✓ ' : '+ '}
-                          {item}
-                        </button>
-                      );
-                    })}
-
-                    {selectedDishes
-                      .filter((d) => !suggestions.includes(d))
-                      .map((customItem) => (
-                        <button
-                          key={customItem}
-                          type="button"
-                          onClick={() => toggleDish(customItem)}
-                          style={{
-                            padding: '7px 13px',
-                            borderRadius: '20px',
-                            fontSize: '12.5px',
-                            fontWeight: 600,
-                            border: '1.5px solid var(--primary)',
-                            background: '#fef2ee',
-                            color: 'var(--primary)',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                          }}
-                        >
-                          ✓ {customItem} ✕
-                        </button>
-                      ))}
-
-                    {!showAddDish ? (
-                      <button
-                        type="button"
-                        onClick={() => setShowAddDish(true)}
-                        style={{
-                          padding: '7px 13px',
-                          borderRadius: '20px',
-                          fontSize: '12.5px',
-                          fontWeight: 600,
-                          border: '1px dashed var(--primary)',
-                          background: 'transparent',
-                          color: 'var(--primary)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        + Add Custom Item
-                      </button>
-                    ) : (
-                      <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
-                        <input
-                          type="text"
-                          className="form-input"
-                          placeholder="e.g. Custom item..."
-                          value={customDish}
-                          onChange={(e) => setCustomDish(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddCustomDish();
-                            }
-                          }}
-                          autoFocus
-                          style={{ padding: '6px 10px', fontSize: '12.5px', width: '130px', borderRadius: '16px' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddCustomDish}
-                          className="btn btn-primary"
-                          style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '16px' }}
-                        >
-                          Add
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowAddDish(false);
-                            setCustomDish('');
-                          }}
-                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px' }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Optional Customer Note */}
-            <div
-              className="card"
-              style={{
-                marginTop: '14px',
-                padding: '16px',
-                borderRadius: '14px',
-                border: '1px solid #e2e8f0',
-                background: '#ffffff',
-              }}
-            >
-              <label style={{ display: 'block', fontSize: '13.5px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
-                Special shoutout or compliment? <span style={{ fontWeight: 400, color: '#94a3b8' }}>(Optional)</span>
-              </label>
-              <textarea
-                className="form-textarea"
-                rows={2}
-                placeholder="e.g. Loved the friendly staff, quick service, loved the food..."
+            {/* 💬 COMPACT 1-LINE COMPLIMENT INPUT */}
+            <div style={{ marginBottom: '12px' }}>
+              <input
+                type="text"
+                placeholder="💬 Compliment or shoutout for staff? (Optional)"
                 value={customerComment}
                 onChange={(e) => setCustomerComment(e.target.value)}
-                maxLength={500}
-                style={{ borderRadius: '10px', fontSize: '13.5px', padding: '10px 12px' }}
+                maxLength={300}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  fontSize: '12.5px',
+                  borderRadius: '10px',
+                  border: '1px solid #cbd5e1',
+                  background: '#ffffff',
+                  color: '#0f172a',
+                  outline: 'none',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                }}
               />
             </div>
 
-            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+            {/* 🚀 PRIMARY CTA: GENERATE DRAFT IN 1 TAP */}
+            <button
+              type="button"
+              onClick={handleGenerateReview}
+              disabled={submitting}
+              className="btn btn-primary btn-block"
+              style={{
+                fontSize: '15px',
+                fontWeight: 800,
+                padding: '13px 18px',
+                borderRadius: '12px',
+                background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
+                borderColor: '#9a3412',
+                boxShadow: '0 4px 14px rgba(194, 65, 12, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+                cursor: 'pointer',
+              }}
+            >
+              {submitting ? (
+                <>
+                  <span className="spinner"></span>
+                  <span>Writing Your Review Draft...</span>
+                </>
+              ) : (
+                <>
+                  <SparklesIcon size={16} color="white" />
+                  <span>Generate 5-Star Review with AI ✨</span>
+                </>
+              )}
+            </button>
+
+            <div style={{ textAlign: 'center', marginTop: '6px', fontSize: '11px', color: '#94a3b8' }}>
+              ⚡ Ready in 3 seconds · You can edit text before posting
+            </div>
+
+            {/* 🔗 DIRECT GOOGLE REVIEW LINK */}
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
               <button
                 type="button"
                 onClick={handleOpenGoogleDirect}
@@ -866,60 +684,48 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                   background: 'transparent',
                   border: 'none',
                   color: '#64748b',
-                  fontSize: '12.5px',
+                  fontSize: '11.5px',
                   fontWeight: 600,
                   cursor: 'pointer',
                   textDecoration: 'underline',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '4px',
                 }}
               >
-                <GoogleLogo size={13} />
-                <span>Prefer writing in your own words? Open Google Maps directly ↗</span>
+                <GoogleLogo size={12} />
+                <span>Or write in your own words on Google Maps ↗</span>
               </button>
             </div>
 
-            {/* OPTIONAL SOCIAL MEDIA CONNECTIONS (Shown if added by merchant) */}
-            {(Boolean(business?.instagramUrl?.trim()) || Boolean(business?.whatsappUrl?.trim()) || Boolean(business?.facebookUrl?.trim())) && (
-              <div
-                className="card"
-                style={{
-                  marginTop: '16px',
-                  padding: '14px 16px',
-                  background: '#ffffff',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: 'var(--radius-lg)',
-                  textAlign: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>
-                    Connect With {business.name}
-                  </span>
-                  <span className="badge badge-primary" style={{ fontSize: '10px', padding: '1px 6px' }}>Official</span>
+            {/* 🌐 COMPACT SOCIAL MEDIA LINKS */}
+            {(Boolean(business?.instagramUrl?.trim()) ||
+              Boolean(business?.whatsappUrl?.trim()) ||
+              Boolean(business?.facebookUrl?.trim())) && (
+              <div style={{ marginTop: '14px', textAlign: 'center', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginBottom: '6px' }}>
+                  Connect with {business.name}:
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginTop: '10px' }}>
+                <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   {Boolean(business?.instagramUrl?.trim()) && (
                     <button
                       type="button"
                       onClick={() => handleSocialClick('instagram', business.instagramUrl)}
-                      className="btn"
                       style={{
-                        background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                        color: '#ffffff',
+                        background: 'linear-gradient(45deg, #f09433 0%, #dc2743 50%, #bc1888 100%)',
+                        color: '#fff',
                         border: 'none',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 600,
-                        padding: '8px 12px',
-                        borderRadius: '999px',
+                        padding: '4px 10px',
+                        borderRadius: '16px',
+                        cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer',
+                        gap: '4px',
                       }}
                     >
-                      <InstagramLogo size={15} />
+                      <InstagramLogo size={12} />
                       <span>Instagram</span>
                     </button>
                   )}
@@ -927,22 +733,21 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                     <button
                       type="button"
                       onClick={() => handleSocialClick('whatsapp', business.whatsappUrl)}
-                      className="btn"
                       style={{
                         background: '#25D366',
-                        color: '#ffffff',
+                        color: '#fff',
                         border: 'none',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 600,
-                        padding: '8px 12px',
-                        borderRadius: '999px',
+                        padding: '4px 10px',
+                        borderRadius: '16px',
+                        cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer',
+                        gap: '4px',
                       }}
                     >
-                      <WhatsAppLogo size={15} />
+                      <WhatsAppLogo size={12} />
                       <span>WhatsApp</span>
                     </button>
                   )}
@@ -950,22 +755,21 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                     <button
                       type="button"
                       onClick={() => handleSocialClick('facebook', business.facebookUrl)}
-                      className="btn"
                       style={{
                         background: '#1877F2',
-                        color: '#ffffff',
+                        color: '#fff',
                         border: 'none',
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 600,
-                        padding: '8px 12px',
-                        borderRadius: '999px',
+                        padding: '4px 10px',
+                        borderRadius: '16px',
+                        cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer',
+                        gap: '4px',
                       }}
                     >
-                      <FacebookLogo size={15} />
+                      <FacebookLogo size={12} />
                       <span>Facebook</span>
                     </button>
                   )}
@@ -973,156 +777,176 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
               </div>
             )}
           </div>
-        )}
-
-        {/* ======================================================== */}
-        {/* SCREEN 3: GENERATED REVIEW & POST TO GOOGLE              */}
-        {/* ======================================================== */}
-        {reviewMode === 'ai' && generatedReview && (
-          <div>
-            <div style={{ textAlign: 'center', marginBottom: '18px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#ecfdf5', color: '#15803d', border: '1px solid #bbf7d0', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, marginBottom: '8px' }}>
-                <Check size={13} strokeWidth={3} />
-                <span>Review Ready</span>
+        ) : (
+          /* ======================================================== */
+          /* SCREEN 2: GENERATED REVIEW READY & ONE-TAP POSTING      */
+          /* ======================================================== */
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: '#ecfdf5',
+                  color: '#15803d',
+                  border: '1px solid #bbf7d0',
+                  padding: '3px 10px',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  marginBottom: '6px',
+                }}
+              >
+                <Check size={12} strokeWidth={3} />
+                <span>REVIEW READY</span>
               </div>
-              <h2 className="serif" style={{ fontSize: '22px', fontWeight: 700, margin: '2px 0 4px', color: '#0f172a' }}>
-                Your Review is Ready!
+              <h2
+                className="serif"
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 800,
+                  margin: '2px 0 4px',
+                  color: '#0f172a',
+                }}
+              >
+                Thank You for Supporting Us! ❤️
               </h2>
-              <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
-                Personalize any words below or post directly to Google Maps
+              <p style={{ fontSize: '12.5px', color: '#64748b', margin: 0 }}>
+                Copy your review below and post on Google Maps in 1 click:
               </p>
             </div>
 
+            {/* Clean Review Box with Tap to Edit */}
             <div
               style={{
                 background: '#ffffff',
                 border: '1.5px solid #fed7aa',
-                borderRadius: '16px',
-                padding: '16px',
-                marginBottom: '16px',
-                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.07)',
+                borderRadius: '14px',
+                padding: '12px 14px',
+                marginBottom: '12px',
+                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.05)',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '14px' }}>⭐⭐⭐⭐⭐</span>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#c2410c' }}>5-Star Experience</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ fontSize: '13px', color: '#f59e0b' }}>★★★★★</span>
+                  <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#c2410c' }}>5-Star Experience</span>
                 </div>
-                <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 500 }}>
-                  Tap text to edit
-                </span>
+                <span style={{ fontSize: '10.5px', color: '#94a3b8' }}>Tap to edit</span>
               </div>
+
               <textarea
                 className="form-textarea"
-                rows={reviewLength === 'detailed' ? 8 : 5}
+                rows={4}
                 style={{
-                  fontSize: '15.5px',
-                  lineHeight: 1.65,
-                  minHeight: '130px',
-                  padding: '12px 14px',
-                  borderRadius: '12px',
+                  fontSize: '14px',
+                  lineHeight: 1.55,
+                  padding: '10px 12px',
+                  borderRadius: '10px',
                   border: '1px solid #e2e8f0',
                   color: '#1e293b',
                   background: '#fffdfa',
                   fontFamily: 'inherit',
+                  width: '100%',
                 }}
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {/* Post to Google Maps Button */}
+            <button
+              type="button"
+              className="btn btn-primary btn-block"
+              onClick={handleCopyAndOpenGoogle}
+              style={{
+                fontSize: '15px',
+                fontWeight: 800,
+                padding: '13px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 16px rgba(194, 65, 12, 0.35)',
+                borderRadius: '12px',
+                background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
+                borderColor: '#9a3412',
+                width: '100%',
+                cursor: 'pointer',
+              }}
+            >
+              <GoogleLogo size={18} />
+              <span>{copied ? '✓ Copied! Opening Google Maps...' : '📋 Copy Review & Open Google Maps ↗'}</span>
+            </button>
+
+            <div style={{ textAlign: 'center', fontSize: '11.5px', color: '#64748b', marginTop: '6px' }}>
+              ✨ Copies automatically · Just tap <b>Paste</b> on Google Maps!
+            </div>
+
+            {/* Secondary Controls */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
               <button
-                className="btn btn-primary btn-lg"
-                onClick={handleCopyAndOpenGoogle}
+                type="button"
+                onClick={handleCopyReview}
                 style={{
-                  fontSize: '16px',
-                  fontWeight: 800,
-                  padding: '15px 20px',
+                  flex: 1,
+                  background: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  color: '#334155',
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  padding: '7px 10px',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '10px',
-                  boxShadow: '0 4px 16px rgba(154, 64, 24, 0.35)',
-                  borderRadius: '14px',
-                  width: '100%',
+                  gap: '4px',
+                  cursor: 'pointer',
                 }}
               >
-                <GoogleLogo size={22} />
-                <span>{copied ? '✓ Copied! Opening Google Maps...' : '📋 Copy & Open Google Maps ↗'}</span>
+                <ClipboardCopyIcon size={13} />
+                <span>{copied ? '✓ Copied' : 'Copy Text'}</span>
               </button>
-
-              <div style={{ textAlign: 'center', fontSize: '12px', color: '#64748b' }}>
-                ✨ Copies automatically &amp; opens Google Maps so you just tap <b>Paste</b>
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                <button
-                  type="button"
-                  onClick={handleCopyReview}
-                  style={{
-                    flex: 1,
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
-                    color: '#334155',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    padding: '9px 12px',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <ClipboardCopyIcon size={14} />
-                  <span>{copied ? '✓ Copied' : 'Copy Text'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  style={{
-                    flex: 1,
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
-                    color: '#475569',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    padding: '9px 12px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => setGeneratedReview(null)}
-                >
-                  ← Adjust Ratings
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setGeneratedReview(null)}
+                style={{
+                  flex: 1,
+                  background: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  color: '#475569',
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  padding: '7px 10px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                ← Edit Ratings
+              </button>
             </div>
 
-            {/* OPTIONAL SCRATCH CARD REWARD (If enabled by merchant) */}
+            {/* Optional Scratch Card Reward */}
             {data?.scratchCard?.enabled && (
-              <div style={{ marginTop: '22px', marginBottom: '14px' }}>
-                <div style={{ textAlign: 'center', marginBottom: '14px' }}>
+              <div style={{ marginTop: '16px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '8px' }}>
                   <span
                     className="badge badge-primary"
                     style={{
-                      fontSize: '11px',
-                      padding: '4px 12px',
+                      fontSize: '10.5px',
+                      padding: '3px 10px',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '5px',
+                      gap: '4px',
                     }}
                   >
-                    <GiftIcon size={13} color="var(--primary)" />
-                    <span>Customer Appreciation Reward</span>
+                    <GiftIcon size={12} color="var(--primary)" />
+                    <span>Customer Reward</span>
                   </span>
-                  <h3 className="serif" style={{ fontSize: '19px', margin: '8px 0 3px', color: 'var(--text)' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, margin: '4px 0 2px', color: 'var(--text)' }}>
                     Scratch to Reveal Your Perk
-                  </h3>
-                  <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: 0 }}>
-                    Special thank-you voucher for reviewing {business.name}!
-                  </p>
+                  </div>
                 </div>
 
                 <ScratchCard
@@ -1137,161 +961,17 @@ export const CustomerReviewFlow: React.FC<Props> = ({ slug }) => {
                 />
               </div>
             )}
-
-              {/* OPTIONAL SOCIAL MEDIA CONNECTIONS on Review Completion */}
-              {(Boolean(business?.instagramUrl?.trim()) || Boolean(business?.whatsappUrl?.trim()) || Boolean(business?.facebookUrl?.trim())) && (
-                <div
-                  className="card"
-                  style={{
-                    marginTop: '16px',
-                    padding: '16px 18px',
-                    background: '#ffffff',
-                    border: '1px solid var(--border-light)',
-                    borderRadius: 'var(--radius-lg)',
-                    textAlign: 'center',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text)' }}>
-                      Follow {business.name}
-                    </span>
-                    <span className="badge badge-primary" style={{ fontSize: '10px', padding: '2px 7px' }}>Community</span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '14px' }}>
-                    Stay connected with us for special perks &amp; newest updates
-                  </p>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-                    {Boolean(business?.instagramUrl?.trim()) && (
-                      <button
-                        type="button"
-                        onClick={() => handleSocialClick('instagram', business.instagramUrl)}
-                        className="btn"
-                        style={{
-                          flex: '1 1 auto',
-                          minWidth: '120px',
-                          background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                          color: '#ffffff',
-                          border: 'none',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          padding: '10px 14px',
-                          borderRadius: '999px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '8px',
-                          boxShadow: '0 2px 8px rgba(220, 39, 67, 0.25)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <InstagramLogo size={18} />
-                        <span>Follow on Instagram</span>
-                      </button>
-                    )}
-
-                    {Boolean(business?.whatsappUrl?.trim()) && (
-                      <button
-                        type="button"
-                        onClick={() => handleSocialClick('whatsapp', business.whatsappUrl)}
-                        className="btn"
-                        style={{
-                          flex: '1 1 auto',
-                          minWidth: '120px',
-                          background: '#25D366',
-                          color: '#ffffff',
-                          border: 'none',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          padding: '10px 14px',
-                          borderRadius: '999px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '8px',
-                          boxShadow: '0 2px 8px rgba(37, 211, 102, 0.25)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <WhatsAppLogo size={18} />
-                        <span>Chat on WhatsApp</span>
-                      </button>
-                    )}
-
-                    {Boolean(business?.facebookUrl?.trim()) && (
-                      <button
-                        type="button"
-                        onClick={() => handleSocialClick('facebook', business.facebookUrl)}
-                        className="btn"
-                        style={{
-                          flex: '1 1 auto',
-                          minWidth: '120px',
-                          background: '#1877F2',
-                          color: '#ffffff',
-                          border: 'none',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          padding: '10px 14px',
-                          borderRadius: '999px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '8px',
-                          boxShadow: '0 2px 8px rgba(24, 119, 242, 0.25)',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <FacebookLogo size={18} />
-                        <span>Visit Facebook</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+          </div>
         )}
 
         {/* Brand Trust Watermark */}
-        <div style={{ textAlign: 'center', marginTop: '32px', marginBottom: '12px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: 0.75, fontSize: '12px', color: 'var(--text-muted)' }}>
+        <div style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '16px', paddingBottom: '6px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', opacity: 0.65, fontSize: '11px', color: '#94a3b8' }}>
             <span>Powered by</span>
-            <KindlyRateLogo height={18} />
+            <KindlyRateLogo height={14} />
           </div>
         </div>
       </div>
-
-      {/* Sticky Bottom Button for AI Rating Step */}
-      {reviewMode === 'ai' && !generatedReview && (
-        <div className="sticky-bottom-bar" style={{ textAlign: 'center', padding: '12px 16px 14px' }}>
-          <button
-            className="btn btn-primary btn-lg btn-block"
-            onClick={handleGenerateReview}
-            disabled={submitting}
-            style={{
-              fontSize: '16px',
-              fontWeight: 700,
-              padding: '15px 20px',
-              borderRadius: '14px',
-              boxShadow: '0 4px 14px rgba(154, 64, 24, 0.35)',
-            }}
-          >
-            {submitting ? (
-              <>
-                <span className="spinner"></span>
-                <span>Writing Your Review Draft...</span>
-              </>
-            ) : (
-              <>
-                <SparklesIcon size={18} color="white" />
-                <span>Generate My Review Draft ✨</span>
-              </>
-            )}
-          </button>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
-            ⚡ Ready in 5 seconds · Zero signup needed
-          </div>
-        </div>
-      )}
     </div>
   );
 };
