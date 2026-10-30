@@ -286,3 +286,4 @@ Striking side-by-side split screen commercial product comparison. LEFT SIDE: A d
 ```
 Dramatic conceptual commercial visual. A sleek black smartphone floating in mid-air against a deep slate studio background. On the screen, a 1-star rating is intercepted by a glowing 3D holographic emerald green protective energy shield. Emerging from the shield is a confidential notification bubble with a green WhatsApp icon reading "Private Customer Feedback: Issue resolved directly by manager". Contrast between red danger and green safety, hyper-detailed Octane 3D render, photorealistic glass reflections, 8k --ar 1:1 --style raw --v 6.1
 ```
+

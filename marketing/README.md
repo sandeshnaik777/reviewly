@@ -58,3 +58,4 @@ marketing/
   - Server-side Gemini AI review generation in natural, authentic English.
   - 1-Tap "Copy Review & Open Google Maps" direct redirection.
   - 100% Reputation Shield routing 1–3 star complaints privately to the store manager.
+

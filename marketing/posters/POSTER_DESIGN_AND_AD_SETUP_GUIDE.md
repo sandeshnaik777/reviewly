@@ -145,3 +145,4 @@ Follow the official KindlyRate brand design tokens:
 >  
 > Activate your clinic setup today for just ₹79.  
 > 👉 **https://kindlyrate.com** | Call: **+91 81238 24899**
+
