@@ -15,7 +15,44 @@ export const ThankYouPage: React.FC<ThankYouPageProps> = ({
 }) => {
   useEffect(() => {
     document.title = 'Order Confirmed — Thank You for Your Purchase | KindlyRate';
-  }, []);
+
+    // Google tag (gtag.js) Google Ads Conversion Tracking (AW-18507163783)
+    try {
+      if (typeof window !== 'undefined') {
+        const win = window as any;
+        win.dataLayer = win.dataLayer || [];
+        if (!win.gtag) {
+          win.gtag = function () {
+            win.dataLayer.push(arguments);
+          };
+        }
+
+        // Dynamically ensure script tag is present if not already added
+        if (!document.querySelector('script[src*="AW-18507163783"]')) {
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18507163783';
+          document.head.appendChild(script);
+        }
+
+        win.gtag('js', new Date());
+        win.gtag('config', 'AW-18507163783', {
+          page_path: '/thank-you',
+          page_title: 'Order Confirmed — Thank You for Your Purchase',
+        });
+
+        // Fire Google Ads Conversion Event
+        win.gtag('event', 'conversion', {
+          send_to: 'AW-18507163783',
+          value: 79.0,
+          currency: 'INR',
+          transaction_id: `tx_${Date.now()}`,
+        });
+      }
+    } catch (err) {
+      console.warn('[GoogleAds] Conversion tag error:', err);
+    }
+  }, [businessName]);
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--surface)', display: 'flex', flexDirection: 'column' }}>

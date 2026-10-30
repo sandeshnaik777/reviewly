@@ -699,6 +699,19 @@ export const OnboardingWizard: React.FC<Props> = ({
               subscriptionId: resp.razorpay_subscription_id,
             });
             window.history.pushState({}, '', '/thank-you');
+            try {
+              if (typeof window !== 'undefined') {
+                const win = window as any;
+                if (win.gtag) {
+                  win.gtag('event', 'conversion', {
+                    send_to: 'AW-18507163783',
+                    value: 79.0,
+                    currency: 'INR',
+                    transaction_id: resp.razorpay_payment_id || resp.razorpay_order_id,
+                  });
+                }
+              }
+            } catch {}
             setStep(8); // Step 8: Welcome - ONLY after successful payment verification!
           } catch (vErr: any) {
             setError(`Trial payment verification note: ${vErr.message || 'Verification failed'}`);
@@ -869,6 +882,19 @@ export const OnboardingWizard: React.FC<Props> = ({
               subscriptionId: resp.razorpay_subscription_id,
             });
             window.history.pushState({}, '', '/thank-you');
+            try {
+              if (typeof window !== 'undefined') {
+                const win = window as any;
+                if (win.gtag) {
+                  win.gtag('event', 'conversion', {
+                    send_to: 'AW-18507163783',
+                    value: 79.0,
+                    currency: 'INR',
+                    transaction_id: resp.razorpay_payment_id || resp.razorpay_order_id,
+                  });
+                }
+              }
+            } catch {}
             setStep(8); // Step 8: Welcome - ONLY after successful payment verification!
           } catch (vErr: any) {
             setError(`Payment verification note: ${vErr.message || 'Signature mismatch'}`);
