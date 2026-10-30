@@ -30,7 +30,7 @@ This guide walks you through generating a high-converting, photorealistic 30-sec
    - **Clarity + Similarity:** `85%`.
    - **Style Exaggeration:** `15%` (gives commercial broadcast punch).
 6. Click **Generate** and download the 24-bit 48kHz WAV audio file.
-7. *Tip:* Ensure the total spoken duration is between **28.0 and 29.5 seconds**. If it exceeds 30s, increase the speech speed slider to `1.08x` or edit micro-pauses.
+7. *Exact 30-Second Timing Rule:* The updated 64-word script generates between **27.5 and 28.5 seconds** of spoken audio at `1.08x` speed. This leaves exactly 1.5 seconds for opening and closing brand sound!
 
 ---
 
@@ -88,11 +88,11 @@ Real screen recordings build massive credibility in ads.
 ### STEP 4: Editing, Text Overlays & Motion Graphics in CapCut / Premiere
 1. Import the ElevenLabs voiceover track onto Audio Track 1.
 2. Align the 5 video scenes exactly to the voiceover beats:
-   - `00:00 - 00:05` -> Scene 1 (The Pain)
-   - `00:05 - 00:11` -> Scene 2 (Customer Hesitation)
-   - `00:11 - 00:19` -> Scene 3 (KindlyRate Acrylic Stand & AI Flow)
-   - `00:19 - 00:24` -> Scene 4 (Reputation Shield)
-   - `00:24 - 00:30` -> Scene 5 (Rank #1 + ₹79 Offer CTA)
+   - `00:00 - 00:05` -> Scene 1 (The Hook: 100 Happy Customers)
+   - `00:05 - 00:10` -> Scene 2 (Customer Hesitation: Don't know what to write)
+   - `00:10 - 00:18` -> Scene 3 (KindlyRate Acrylic Stand & 3s AI Flow)
+   - `00:18 - 00:24` -> Scene 4 (Reputation Shield: Blocks bad reviews)
+   - `00:24 - 00:30` -> Scene 5 (Rank #1 + ₹79 Diwali Pass CTA)
 3. Add **High-Converting Text Overlays**:
    - Font: **Plus Jakarta Sans** or **Montserrat** (Extra Bold, 800 weight).
    - Text Color: Crisp White with `#ea580c` (Accent Orange) or `#16a34a` (Green) highlight keywords.
@@ -131,3 +131,4 @@ Real screen recordings build massive credibility in ads.
    - Primary: *"Stop Begging Customers for Google Reviews! Get Our Smart Acrylic Stand + AI Review Engine for Just ₹79."*
    - Description: *"Rank #1 on Google Maps. Turn 100+ daily walk-ins into authentic 5-star reviews in 30 seconds. Includes 100% Reputation Shield against negative feedback."*
    - CTA Button: **Get Offer** / **Sign Up**
+
