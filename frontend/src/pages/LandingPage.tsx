@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   KindlyRateBrand,
   KindlyRateLogo,
@@ -45,9 +45,10 @@ interface Props {
   onStartOnboarding: () => void;
   onNavigateLogin: () => void;
   onNavigateBlog?: (slug?: string) => void;
+  initialSection?: string;
 }
 
-export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin, onNavigateBlog }) => {
+export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin, onNavigateBlog, initialSection }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isFast, setIsFast] = useState(false);
   const [legalModal, setLegalModal] = useState<LegalModalType>(() => {
@@ -56,9 +57,24 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       if (p.includes('/terms')) return 'terms';
       if (p.includes('/privacy')) return 'privacy';
       if (p.includes('/refund')) return 'refund';
+      if (p.includes('/help')) return 'help';
     }
     return null;
   });
+
+  useEffect(() => {
+    const hash = (typeof window !== 'undefined' ? window.location.hash.replace('#', '') : '') || initialSection;
+    const path = typeof window !== 'undefined' ? window.location.pathname.replace(/^\/+/, '') : '';
+    const target = hash || (['pricing', 'features', 'faq', 'reviews', 'testimonials', 'blog'].includes(path) ? path : null);
+    if (target) {
+      setTimeout(() => {
+        const el = document.getElementById(target);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+    }
+  }, [initialSection]);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [landingPlanDurations, setLandingPlanDurations] = useState<Record<string, 1 | 3 | 6 | 12>>({
     starter: 1,
@@ -140,6 +156,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
     <div className="app-container" style={{ background: '#faf8f5' }}>
       {/* Navigation */}
       <nav
+        aria-label="Main Website Navigation"
         style={{
           background: 'var(--surface)',
           borderBottom: '1.5px solid var(--border-light)',
@@ -152,7 +169,18 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       >
         <div className="landing-nav-container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <KindlyRateBrand iconSize={36} fontSize={22} />
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.history.pushState({}, '', '/');
+              }}
+              style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+              title="KindlyRate Home"
+            >
+              <KindlyRateBrand iconSize={36} fontSize={22} />
+            </a>
             <span
               className="stat-pill stat-pill-success hide-on-phone"
               style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
@@ -161,17 +189,96 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button
-              className="btn btn-secondary hide-on-phone"
-              onClick={() => (onNavigateBlog ? onNavigateBlog() : setLegalModal('blog'))}
-              style={{ fontSize: '13px', padding: '7px 14px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+          {/* Crawlable Desktop Nav Links */}
+          <div className="hide-on-phone" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <a
+              href="/features"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState({}, '', '/features');
+              }}
+              style={{
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13.5px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+              }}
             >
-              <BookOpen size={14} style={{ marginRight: '4px' }} /> Articles &amp; Blog
-            </button>
-            <button
+              Features
+            </a>
+            <a
+              href="/pricing"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState({}, '', '/pricing');
+              }}
+              style={{
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13.5px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+              }}
+            >
+              Pricing
+            </a>
+            <a
+              href="/blog"
+              onClick={(e) => {
+                e.preventDefault();
+                if (onNavigateBlog) {
+                  onNavigateBlog();
+                } else {
+                  window.location.href = '/blog';
+                }
+              }}
+              style={{
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13.5px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+              }}
+            >
+              <BookOpen size={14} style={{ marginRight: '2px' }} /> Articles &amp; Blog
+            </a>
+            <a
+              href="/faq"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState({}, '', '/faq');
+              }}
+              style={{
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13.5px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+              }}
+            >
+              FAQ
+            </a>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <a
+              href="/login"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateLogin();
+              }}
               className="btn btn-secondary"
-              onClick={onNavigateLogin}
               style={{
                 fontSize: '13.5px',
                 padding: '7px 14px',
@@ -183,14 +290,19 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 border: '1.5px solid #cbd5e1',
                 color: '#0f172a',
                 borderRadius: '8px',
+                textDecoration: 'none',
               }}
             >
               <LogIn size={14} color="#475569" />
               <span>Sign In</span>
-            </button>
-            <button
+            </a>
+            <a
+              href="/signup"
+              onClick={(e) => {
+                e.preventDefault();
+                onStartOnboarding();
+              }}
               className="btn btn-primary"
-              onClick={onStartOnboarding}
               style={{
                 fontSize: '13.5px',
                 padding: '7px 16px',
@@ -200,10 +312,12 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 gap: '6px',
                 boxShadow: '0 2px 8px rgba(154, 64, 24, 0.25)',
                 borderRadius: '8px',
+                textDecoration: 'none',
+                color: '#ffffff',
               }}
             >
               <span>Sign Up Free →</span>
-            </button>
+            </a>
           </div>
         </div>
       </nav>
@@ -460,7 +574,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       {/* ======================================================== */}
       {/* SECTION: HOW KINDLYRATE WORKS IN 3 SIMPLE STEPS          */}
       {/* ======================================================== */}
-      <section style={{ padding: '64px 16px 54px', background: '#ffffff', borderTop: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)' }}>
+      <section id="features" style={{ padding: '64px 16px 54px', background: '#ffffff', borderTop: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <span className="badge badge-primary" style={{ marginBottom: '8px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -570,7 +684,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       {/* ======================================================== */}
       {/* SECTION 2: LIVE REVIEWS MOVING LEFT TO RIGHT (ANIMATED)  */}
       {/* ======================================================== */}
-      <section style={{ padding: '64px 0 54px', background: 'var(--surface)', borderTop: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)', overflow: 'hidden' }}>
+      <section id="testimonials" style={{ padding: '64px 0 54px', background: 'var(--surface)', borderTop: '1px solid var(--border-light)', borderBottom: '1px solid var(--border-light)', overflow: 'hidden' }}>
         <div className="desktop-container" style={{ maxWidth: '1280px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
             <div>
@@ -810,7 +924,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       </section>
 
       {/* Pricing Section (Aligned Grid) */}
-      <section style={{ padding: '80px 20px' }}>
+      <section id="pricing" style={{ padding: '80px 20px' }}>
         <div className="desktop-container" style={{ textAlign: 'center', maxWidth: '1080px' }}>
           <div style={{ display: 'inline-block', marginBottom: '14px' }}>
             <span className="stat-pill stat-pill-primary" style={{ fontSize: '13px', padding: '6px 16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -1120,7 +1234,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       {/* ======================================================== */}
       {/* SECTION: FEATURED ARTICLES & GROWTH GUIDES               */}
       {/* ======================================================== */}
-      <section style={{ padding: '72px 20px', background: '#faf8f5', borderTop: '1px solid var(--border-light)' }}>
+      <section id="blog" style={{ padding: '72px 20px', background: '#faf8f5', borderTop: '1px solid var(--border-light)' }}>
         <div className="desktop-container" style={{ maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', marginBottom: '12px' }}>
             <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -1337,27 +1451,67 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13.5px', padding: 0 }}>
               <li>
-                <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/features"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/features');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Smart Table QR Stands
                 </a>
               </li>
               <li>
-                <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/features"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/features');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Server-Side AI Drafter
                 </a>
               </li>
               <li>
-                <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/features"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/features');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Aura Live Telemetry &amp; Heatmap
                 </a>
               </li>
               <li>
-                <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/features"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/features');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Reputation Shield Defense
                 </a>
               </li>
               <li>
-                <a href="#pricing" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/pricing"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/pricing');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Subscription Packs &amp; Pricing
                 </a>
               </li>
@@ -1371,30 +1525,57 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13.5px', padding: 0 }}>
               <li>
-                <button
-                  type="button"
-                  onClick={() => setLegalModal('help')}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
+                <a
+                  href="/help"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setLegalModal('help');
+                    window.history.pushState({}, '', '/help');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Help Center &amp; Support Desk
-                </button>
+                </a>
               </li>
               <li>
-                <a href="#faq" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/faq"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/faq');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Frequently Asked Questions
                 </a>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => (onNavigateBlog ? onNavigateBlog() : setLegalModal('blog'))}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
+                <a
+                  href="/blog"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onNavigateBlog) {
+                      onNavigateBlog();
+                    } else {
+                      window.location.href = '/blog';
+                    }
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Articles &amp; Growth Blog
-                </button>
+                </a>
               </li>
               <li>
-                <a href="#features" style={{ color: '#94a3b8', textDecoration: 'none' }}>
+                <a
+                  href="/features"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState({}, '', '/features');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
                   Platform Architecture &amp; Guides
                 </a>
               </li>
@@ -1414,40 +1595,56 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13.5px', padding: 0 }}>
               <li>
-                <button
-                  type="button"
-                  onClick={() => setLegalModal('terms')}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
+                <a
+                  href="/terms"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setLegalModal('terms');
+                    window.history.pushState({}, '', '/terms');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Terms of Service &amp; Agreement
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => setLegalModal('privacy')}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
+                <a
+                  href="/privacy"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setLegalModal('privacy');
+                    window.history.pushState({}, '', '/privacy');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Privacy Policy (DPDP 2023)
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => setLegalModal('refund')}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
+                <a
+                  href="/refund"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setLegalModal('refund');
+                    window.history.pushState({}, '', '/refund');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Refund &amp; Cancellation Policy
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  type="button"
-                  onClick={() => setLegalModal('help')}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 0, fontSize: '13.5px', textAlign: 'left' }}
+                <a
+                  href="/help"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setLegalModal('help');
+                    window.history.pushState({}, '', '/help');
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Grievance Redressal Desk
-                </button>
+                </a>
               </li>
             </ul>
 
@@ -1481,29 +1678,41 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <span>INR (₹) Accepted via UPI &amp; Cards</span>
             <span>·</span>
-            <button
-              type="button"
-              onClick={() => setLegalModal('terms')}
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0, fontSize: '12.5px' }}
+            <a
+              href="/terms"
+              onClick={(e) => {
+                e.preventDefault();
+                setLegalModal('terms');
+                window.history.pushState({}, '', '/terms');
+              }}
+              style={{ color: '#64748b', textDecoration: 'none', fontSize: '12.5px' }}
             >
               Terms
-            </button>
+            </a>
             <span>·</span>
-            <button
-              type="button"
-              onClick={() => setLegalModal('privacy')}
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0, fontSize: '12.5px' }}
+            <a
+              href="/privacy"
+              onClick={(e) => {
+                e.preventDefault();
+                setLegalModal('privacy');
+                window.history.pushState({}, '', '/privacy');
+              }}
+              style={{ color: '#64748b', textDecoration: 'none', fontSize: '12.5px' }}
             >
               Privacy
-            </button>
+            </a>
             <span>·</span>
-            <button
-              type="button"
-              onClick={() => setLegalModal('refund')}
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 0, fontSize: '12.5px' }}
+            <a
+              href="/refund"
+              onClick={(e) => {
+                e.preventDefault();
+                setLegalModal('refund');
+                window.history.pushState({}, '', '/refund');
+              }}
+              style={{ color: '#64748b', textDecoration: 'none', fontSize: '12.5px' }}
             >
               Refunds
-            </button>
+            </a>
           </div>
         </div>
       </footer>

@@ -15,6 +15,7 @@ export const App: React.FC = () => {
   const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog' | 'thank-you'>('landing');
   const [customerSlug, setCustomerSlug] = useState<string>('');
   const [blogSlug, setBlogSlug] = useState<string>('');
+  const [initialLandingSection, setInitialLandingSection] = useState<string>('');
   const [initialOnboardingStep, setInitialOnboardingStep] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
@@ -47,11 +48,20 @@ export const App: React.FC = () => {
       return;
     }
 
-    // Direct vanity route mapping for smooth ad campaign landers
+    // Direct vanity route mapping for smooth ad campaign landers & Google Sitelinks
     if (normalizedPath === '/onboarding' || normalizedPath === '/signup' || normalizedPath === '/register' || normalizedPath === '/start') {
       setView('onboarding');
     } else if (normalizedPath === '/login' || normalizedPath === '/signin') {
       setView('login');
+    } else if (normalizedPath === '/pricing') {
+      setInitialLandingSection('pricing');
+      setView('landing');
+    } else if (normalizedPath === '/features') {
+      setInitialLandingSection('features');
+      setView('landing');
+    } else if (normalizedPath === '/faq') {
+      setInitialLandingSection('faq');
+      setView('landing');
     }
 
     // Handle Google OAuth callback redirect parameters
@@ -252,6 +262,7 @@ export const App: React.FC = () => {
     <LandingPage
       onStartOnboarding={() => setView('onboarding')}
       onNavigateLogin={() => setView('login')}
+      initialSection={initialLandingSection}
       onNavigateBlog={(slug?: string) => {
         if (slug) {
           window.history.pushState({}, '', `/blog/${slug}`);

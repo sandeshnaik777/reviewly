@@ -238,14 +238,86 @@
           "@id": "https://kindlyrate.com/#website",
           "url": "https://kindlyrate.com",
           "name": "KindlyRate",
-          "publisher": { "@id": "https://kindlyrate.com/#organization" }
+          "alternateName": ["Kindly Rate", "KindlyRate Reviews", "KindlyRate.com"],
+          "publisher": { "@id": "https://kindlyrate.com/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://kindlyrate.com/blog?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://kindlyrate.com/#sitelinks",
+          "name": "Site Navigation Sitelinks",
+          "itemListElement": [
+            {
+              "@type": "SiteNavigationElement",
+              "position": 1,
+              "name": "Sign In",
+              "description": "Log into your KindlyRate merchant dashboard to monitor QR stand scans and manage reviews.",
+              "url": "https://kindlyrate.com/login"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 2,
+              "name": "Sign Up Free",
+              "description": "Register your business and deploy your custom AI-powered Google Maps review QR stand.",
+              "url": "https://kindlyrate.com/signup"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 3,
+              "name": "Pricing & Packs",
+              "description": "View Testing Pack at ₹79, Growth Pack at ₹149/mo, and Scale Pro Pack at ₹249/mo.",
+              "url": "https://kindlyrate.com/pricing"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 4,
+              "name": "Articles & Blog",
+              "description": "Guides and playbooks on dominating Google Maps Local 3-Pack and review automation.",
+              "url": "https://kindlyrate.com/blog"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 5,
+              "name": "Features & Technology",
+              "description": "Explore AI review drafting, smart NFC counter stands, and 100% private Reputation Shield.",
+              "url": "https://kindlyrate.com/features"
+            },
+            {
+              "@type": "SiteNavigationElement",
+              "position": 6,
+              "name": "Help & Support",
+              "description": "Help center, merchant guides, and customer care for KindlyRate.",
+              "url": "https://kindlyrate.com/help"
+            }
+          ]
         }
       ]
     }
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static Crawlable Semantic Structure for Search Engines (Hydrated by React on load) -->
+      <header style="display:none">
+        <nav aria-label="Main Navigation">
+          <a href="/">KindlyRate Home</a>
+          <a href="/pricing">Subscription Packs &amp; Pricing</a>
+          <a href="/features">Platform Features &amp; Smart QR Stands</a>
+          <a href="/blog">Articles &amp; Local SEO Blog</a>
+          <a href="/login">Merchant Sign In</a>
+          <a href="/signup">Sign Up Free</a>
+          <a href="/faq">Frequently Asked Questions</a>
+          <a href="/help">Help Center &amp; Support</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/refund">Refund Policy</a>
+        </nav>
+      </header>
+    </div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
