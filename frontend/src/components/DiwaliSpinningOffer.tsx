@@ -91,13 +91,14 @@ export const DiwaliSpinningOffer: React.FC<Props> = ({
           background: '#121215',
           border: '1px solid #27272a',
           borderRadius: '20px',
-          padding: '28px 24px',
-          maxWidth: '500px',
+          padding: '24px 18px',
+          maxWidth: '480px',
           width: '100%',
           position: 'relative',
           boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)',
           color: '#ffffff',
           textAlign: 'center',
+          margin: 'auto',
         }}
       >
         {/* Close Button */}
@@ -184,8 +185,8 @@ export const DiwaliSpinningOffer: React.FC<Props> = ({
             : 'Tap the wheel below to spin. Every spin unlocks exclusive discounted pricing on review automation.'}
         </p>
 
-        {/* The Wheel Container */}
-        <div style={{ position: 'relative', width: '270px', height: '270px', margin: '0 auto 20px' }}>
+        {/* The Wheel Container (Responsive scale on mobile) */}
+        <div style={{ position: 'relative', width: 'min(260px, 68vw)', height: 'min(260px, 68vw)', margin: '0 auto 20px' }}>
           {/* Golden Pointer Indicator (Top Center) */}
           <div
             style={{

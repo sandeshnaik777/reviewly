@@ -941,6 +941,59 @@ a {
   }
 }
 
+/* Real Customer Metrics Ribbon & Industry Trust Strip */
+.home-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.industry-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .home-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .industry-trust-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 540px) {
+  .home-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .home-metrics-grid > div {
+    padding: 12px 10px !important;
+  }
+  .home-metrics-grid .metric-val {
+    font-size: 19px !important;
+  }
+  .home-metrics-grid .metric-title {
+    font-size: 11.5px !important;
+  }
+  .home-metrics-grid .metric-desc {
+    font-size: 10px !important;
+  }
+
+  .industry-trust-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .industry-trust-grid > div {
+    padding: 10px 12px !important;
+  }
+}
+
 .testimonial-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

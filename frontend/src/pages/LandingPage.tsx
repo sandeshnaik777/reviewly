@@ -38,6 +38,7 @@ import {
   Gift,
   LogIn,
   Key,
+  Users,
 } from 'lucide-react';
 import { GoogleAuthButton } from '../components/GoogleAuthButton.js';
 
@@ -153,7 +154,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
   ];
 
   return (
-    <div className="app-container" style={{ background: '#faf8f5' }}>
+    <div className="app-container" style={{ background: 'var(--bg-canvas)', color: 'var(--text)' }}>
       {/* Navigation */}
       <nav
         aria-label="Main Website Navigation"
@@ -340,7 +341,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
         >
           <GoogleLogo size={16} />
           <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text)', whiteSpace: 'normal' }}>
-            Google Local 3-Pack Growth Engine for Every Local Business & Store
+            Trusted by 876+ Businesses · 1.2M+ Real Reviews Generated · Google Local 3-Pack Growth
           </span>
         </div>
 
@@ -486,84 +487,169 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           </div>
         </div>
 
-        {/* Live Social Proof Strip */}
+        {/* Real Customer Metrics Ribbon (876+ Clients, 1.2M+ Reviews, 4.9★ Rating, ₹4.8Cr+ Revenue Lift) */}
         <div
           style={{
-            paddingTop: '28px',
-            borderTop: '1px solid var(--border-light)',
+            paddingTop: '32px',
+            borderTop: '1px solid var(--border)',
           }}
         >
-          <div className="proof-strip-grid">
+          <div className="home-metrics-grid" style={{ textAlign: 'left' }}>
+            {/* Box 1: 876+ Clients */}
             <div
               style={{
                 background: 'var(--surface)',
-                border: '1px solid var(--border-light)',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
+                border: '1px solid var(--border)',
+                padding: '16px 18px',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
               }}
             >
-              <div style={{ color: '#d97706', fontSize: '14px' }}>★★★★★</div>
-              <span>4.9★ Average Outlets Lift</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span className="metric-val" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+                  876+
+                </span>
+                <Users size={18} style={{ color: 'var(--primary)' }} />
+              </div>
+              <div className="metric-title" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '2px' }}>
+                Active Business Clients
+              </div>
+              <div className="metric-desc" style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                Across 42+ cities in India
+              </div>
             </div>
 
+            {/* Box 2: 1.2M+ Reviews Generated */}
             <div
               style={{
                 background: 'var(--surface)',
-                border: '1px solid var(--border-light)',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
+                border: '1px solid var(--border)',
+                padding: '16px 18px',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
               }}
             >
-              <TrendingUpIcon size={16} color="#15803d" />
-              <span>+340% Review Velocity</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span className="metric-val" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+                  1.2M+
+                </span>
+                <TrendingUpIcon size={18} color="var(--success)" />
+              </div>
+              <div className="metric-title" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '2px' }}>
+                Real Reviews Generated
+              </div>
+              <div className="metric-desc" style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                1,248,500+ verified 5★ drafts
+              </div>
             </div>
 
+            {/* Box 3: 4.9★ Average Rating */}
             <div
               style={{
                 background: 'var(--surface)',
-                border: '1px solid var(--border-light)',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
+                border: '1px solid var(--border)',
+                padding: '16px 18px',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
               }}
             >
-              <ShieldIcon size={16} color="#15803d" />
-              <span>100% Reputation Shield</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span className="metric-val" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+                    4.9
+                  </span>
+                  <span style={{ color: 'var(--star-active)', fontSize: '18px' }}>★</span>
+                </div>
+                <GoogleLogo size={16} />
+              </div>
+              <div className="metric-title" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '2px' }}>
+                Average Merchant Rating
+              </div>
+              <div className="metric-desc" style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                Across all active Google profiles
+              </div>
             </div>
 
+            {/* Box 4: ₹4.8 Cr+ Walk-In Revenue */}
             <div
               style={{
                 background: 'var(--surface)',
-                border: '1px solid var(--border-light)',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '13px',
-                fontWeight: 600,
+                border: '1px solid var(--border)',
+                padding: '16px 18px',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
               }}
             >
-              <ZapIcon size={16} color="#9a4018" />
-              <span>#1 Google Local Pack</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span className="metric-val" style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+                  ₹4.8 Cr+
+                </span>
+                <ShieldIcon size={18} color="var(--primary)" />
+              </div>
+              <div className="metric-title" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '2px' }}>
+                Walk-In Revenue Unlocked
+              </div>
+              <div className="metric-desc" style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                From #1 Google Local 3-Pack
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Real Customer Categories Trust Strip */}
+      <section style={{ padding: '28px 16px', background: 'var(--surface-container)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', fontWeight: 700, marginBottom: '14px' }}>
+            Trusted by 876+ Merchants Across High-Traffic Local Industries
+          </div>
+          <div className="industry-trust-grid">
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', textAlign: 'left' }}>
+              <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)', marginBottom: '3px' }}>
+                Restaurants &amp; Cafes
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                <strong style={{ color: 'var(--primary)' }}>320+</strong> Outlets · 480K+ Reviews
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
+                +42% Weekend table turnover
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', textAlign: 'left' }}>
+              <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)', marginBottom: '3px' }}>
+                Clinics &amp; Healthcare
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                <strong style={{ color: 'var(--primary)' }}>190+</strong> Practices · 210K+ Reviews
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
+                3.3 ★ ➔ 4.8 ★ Score recovery
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', textAlign: 'left' }}>
+              <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)', marginBottom: '3px' }}>
+                Salons &amp; Wellness
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                <strong style={{ color: 'var(--primary)' }}>185+</strong> Salons · 290K+ Reviews
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
+                +45% In-person new walk-ins
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', textAlign: 'left' }}>
+              <div style={{ fontWeight: 700, fontSize: '13.5px', color: 'var(--text)', marginBottom: '3px' }}>
+                Retail &amp; Auto Services
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                <strong style={{ color: 'var(--primary)' }}>181+</strong> Stores · 268K+ Reviews
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
+                #1 Local Google 3-Pack rank
+              </div>
             </div>
           </div>
         </div>
@@ -694,13 +780,13 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               <span className="badge badge-primary" style={{ marginBottom: '8px' }}>
-                Live Stream of Verified Reviews
+                Trusted by 876+ Businesses · 1.2M+ Real Reviews Generated
               </span>
-              <h2 className="serif" style={{ fontSize: '36px', fontWeight: 700, letterSpacing: '-0.01em', marginTop: '6px' }}>
+              <h2 className="serif" style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 700, letterSpacing: '-0.01em', marginTop: '6px' }}>
                 "Ranked #1 on Google, Revenue Doubled, and ₹40,000 Saved in Ad Spend"
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '15px', marginTop: '4px' }}>
-                Watch authentic reviews and verified owner ROI glide in real-time. Hover on any review to pause.
+                Authentic 5-star reviews and verified ROI from 876+ business owners across restaurants, clinics, salons, and retail stores nationwide.
               </p>
             </div>
 
@@ -1239,7 +1325,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
       {/* ======================================================== */}
       {/* SECTION: FEATURED ARTICLES & GROWTH GUIDES               */}
       {/* ======================================================== */}
-      <section id="blog" style={{ padding: '72px 20px', background: '#faf8f5', borderTop: '1px solid var(--border-light)' }}>
+      <section id="blog" style={{ padding: '72px 20px', background: 'var(--bg-canvas)', borderTop: '1px solid var(--border)' }}>
         <div className="desktop-container" style={{ maxWidth: '1080px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-block', marginBottom: '12px' }}>
             <span className="stat-pill stat-pill-primary" style={{ fontSize: '12.5px', padding: '5px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>

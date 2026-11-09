@@ -16,10 +16,10 @@ const baseIndexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8')
 const pages = [
   {
     path: 'pricing',
-    title: 'Pricing & Transparent Subscription Plans — KindlyRate',
-    description: 'Explore affordable KindlyRate pricing: Starter Pack at ₹79, Growth Pack at ₹149/mo, and Scale Pro at ₹249/mo. Smart NFC QR counter stands, AI review assistant, and local SEO booster with zero platform lock-in.',
+    title: 'Pricing & Transparent Subscription Plans — KindlyRate | Trusted by 876+ Businesses',
+    description: 'Trusted by 876+ businesses with over 1.2M+ reviews collected. Explore affordable KindlyRate pricing: Starter Pack at ₹79, Growth Pack at ₹149/mo, and Scale Pro at ₹249/mo. Smart NFC QR counter stands, AI review assistant, and local SEO booster.',
     heading: 'Simple, Transparent Pricing for Growing Businesses',
-    subheading: 'No hidden setup fees. Deploy smart QR stands and start collecting verified 5-star Google Maps reviews immediately.',
+    subheading: 'No hidden setup fees. Join 876+ businesses collecting verified 5-star Google Maps reviews immediately.',
     breadcrumbs: [
       { name: 'Home', url: 'https://kindlyrate.com/' },
       { name: 'Pricing', url: 'https://kindlyrate.com/pricing' }
@@ -122,10 +122,10 @@ const pages = [
   },
   {
     path: 'features',
-    title: 'Platform Features & Smart QR Stand Technology — KindlyRate',
-    description: 'Explore KindlyRate features: Smart QR & NFC counter stands, dynamic multi-lingual AI review drafting, 100% negative feedback interception shield, and Google Maps Local 3-Pack rank booster.',
-    heading: 'Purpose-Built Review Automation for Brick-and-Mortar Businesses',
-    subheading: 'Capture 5-star customer reviews at the exact moment of peak satisfaction.',
+    title: 'Platform Features & Smart QR Stand Technology — KindlyRate | Trusted by 876+ Stores',
+    description: 'Trusted by 876+ businesses with over 1.2M+ reviews collected. Explore KindlyRate features: Smart QR & NFC counter stands, dynamic multi-lingual AI review drafting, 100% negative feedback interception shield, and Google Maps Local 3-Pack rank booster.',
+    heading: 'Purpose-Built Review Automation for 876+ Brick-and-Mortar Businesses',
+    subheading: 'Capture 5-star customer reviews at the exact moment of peak satisfaction. Over 1.2M+ reviews generated across India.',
     breadcrumbs: [
       { name: 'Home', url: 'https://kindlyrate.com/' },
       { name: 'Features', url: 'https://kindlyrate.com/features' }
