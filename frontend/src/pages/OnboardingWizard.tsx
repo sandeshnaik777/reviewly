@@ -462,6 +462,15 @@ export const OnboardingWizard: React.FC<Props> = ({
         setError('Please enter your business or store name.');
         return;
       }
+      if (!formData.phone || !formData.phone.trim()) {
+        setError('Please enter your business mobile phone number.');
+        return;
+      }
+      const phoneVal = validatePhoneNumber(formData.phone);
+      if (!phoneVal.isValid) {
+        setError(phoneVal.errorMessage || 'Please enter a valid 10-digit mobile number.');
+        return;
+      }
       try {
         setLoading(true);
         setError(null);
@@ -1537,17 +1546,17 @@ export const OnboardingWizard: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '22px' }}>
-              <label className="form-label" style={{ fontSize: '13.5px', fontWeight: 600, color: '#334155' }}>
-                Business Mobile Phone (Optional)
-              </label>
-              <input
-                type="tel"
-                className="form-input"
-                placeholder="e.g. 9876543210 (Optional for alerts)"
+            <div style={{ marginBottom: '22px' }}>
+              <PhoneInput
+                label="Business Mobile Phone Number"
+                required
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(val) => setFormData({ ...formData, phone: val })}
+                defaultCountryCode="IN"
               />
+              <span style={{ fontSize: '11px', color: '#64748b', display: 'block', marginTop: '4px' }}>
+                Used for instant SMS &amp; WhatsApp customer alert routing. Verification code not required.
+              </span>
             </div>
 
             {/* Reassuring Zero-Friction Trust Box */}

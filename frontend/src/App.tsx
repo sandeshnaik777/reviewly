@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage.js';
 import { LandingPage } from './pages/LandingPage.js';
 import { BlogPage } from './pages/BlogPage.js';
 import { ThankYouPage } from './pages/ThankYouPage.js';
+import { updatePageSeo } from './utils/seo.js';
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -18,6 +19,57 @@ export const App: React.FC = () => {
   const [initialLandingSection, setInitialLandingSection] = useState<string>('');
   const [initialOnboardingStep, setInitialOnboardingStep] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+
+  // Sync client-side SEO tags (Title, Canonical, Description)
+  useEffect(() => {
+    const path = window.location.pathname;
+    const normalized = path.length > 1 ? path.replace(/\/+$/, '') : path;
+    if (view === 'landing') {
+      if (initialLandingSection === 'pricing' || normalized === '/pricing') {
+        updatePageSeo({
+          title: 'Pricing & Transparent Subscription Plans — KindlyRate',
+          description: 'Explore affordable KindlyRate pricing: Starter Pack at ₹79, Growth Pack at ₹149/mo, and Scale Pro at ₹249/mo. Smart NFC QR counter stands, AI review assistant, and local SEO booster.',
+          path: '/pricing',
+        });
+      } else if (initialLandingSection === 'features' || normalized === '/features') {
+        updatePageSeo({
+          title: 'Platform Features & Smart QR Stand Technology — KindlyRate',
+          description: 'Discover KindlyRate features: Smart QR & NFC counter stands, dynamic AI review assistant, 100% negative feedback interception shield, and Google Maps Local 3-Pack rank booster.',
+          path: '/features',
+        });
+      } else if (initialLandingSection === 'faq' || normalized === '/faq') {
+        updatePageSeo({
+          title: 'Frequently Asked Questions — KindlyRate Google Reviews Platform',
+          description: 'Frequently asked questions about KindlyRate: How smart QR stands work, pricing, Google Maps compliance, negative review interception, and hardware delivery.',
+          path: '/faq',
+        });
+      } else {
+        updatePageSeo({
+          title: 'KindlyRate — #1 AI Google Reviews & Local SEO Platform for Every Business',
+          description: 'Turn happy customers into verified 5-star Google Maps reviews automatically with KindlyRate. Smart QR counter stands, AI-assisted natural English drafting, target keyword injection, and 100% Reputation Shield.',
+          path: '/',
+        });
+      }
+    } else if (view === 'login') {
+      updatePageSeo({
+        title: 'Merchant Sign In — KindlyRate Business Portal',
+        description: 'Log into your KindlyRate merchant portal to monitor real-time QR stand scans, customize AI prompt keywords, view analytics, and manage customer reviews.',
+        path: '/login',
+      });
+    } else if (view === 'onboarding') {
+      updatePageSeo({
+        title: 'Get Started Free — Create Your KindlyRate Merchant Account',
+        description: 'Create your KindlyRate merchant account in 60 seconds. Claim your smart review stand, configure your Google Business Profile, and start capturing 5-star reviews.',
+        path: '/signup',
+      });
+    } else if (view === 'blog' && !blogSlug) {
+      updatePageSeo({
+        title: 'Local SEO Playbooks & Google Maps Ranking Guides — KindlyRate Blog',
+        description: 'Expert actionable playbooks on Google Maps Local 3-Pack optimization, smart QR counter stands, review velocity algorithms, and legal reputation management for brick-and-mortar merchants.',
+        path: '/blog',
+      });
+    }
+  }, [view, initialLandingSection, blogSlug]);
 
   useEffect(() => {
     const path = window.location.pathname;

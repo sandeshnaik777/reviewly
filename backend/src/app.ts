@@ -208,11 +208,46 @@ export function createApp(): Express {
     if (req.path.startsWith('/api')) {
       return next();
     }
-    const indexFile = path.join(staticPath, 'index.html');
+
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-    res.sendFile(indexFile, (err) => {
-      if (err) next();
-    });
+
+    // 1. Check for pre-rendered route-specific static HTML
+    const cleanPath = req.path.replace(/^\/+|\/+$/g, '');
+    if (cleanPath) {
+      const routeSpecificHtml = path.join(staticPath, cleanPath, 'index.html');
+      if (fs.existsSync(routeSpecificHtml)) {
+        return res.sendFile(routeSpecificHtml, (err) => {
+          if (err) next();
+        });
+      }
+    }
+
+    // 2. Base index.html with dynamic canonical injection to prevent duplicate URL penalties
+    const indexFile = path.join(staticPath, 'index.html');
+    if (!fs.existsSync(indexFile)) {
+      return next();
+    }
+
+    try {
+      let content = fs.readFileSync(indexFile, 'utf-8');
+      const reqUrl = `https://kindlyrate.com${req.path}`;
+      
+      // Ensure canonical tag matches requested path exactly
+      content = content.replace(
+        /<link\s+rel="canonical"\s+href=".*?"\s*\/?>/i,
+        `<link rel="canonical" href="${reqUrl}" />`
+      );
+      content = content.replace(
+        /<meta\s+property="og:url"\s+content=".*?"\s*\/?>/i,
+        `<meta property="og:url" content="${reqUrl}" />`
+      );
+
+      res.type('text/html').send(content);
+    } catch {
+      res.sendFile(indexFile, (err) => {
+        if (err) next();
+      });
+    }
   });
 
   // 8. Centralized Error Handler (Section 28)

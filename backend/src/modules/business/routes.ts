@@ -527,6 +527,9 @@ businessRouter.post(
       }
       const userPhone = (req.user as any)?.phone || '';
       const finalPhone = (data.phone && data.phone.trim()) || userPhone || '';
+      if (finalPhone && !userPhone) {
+        await db.updateUser(userId, { phone: finalPhone });
+      }
 
       // Check if business with this name already exists for this owner
       const existingBusinesses = await db.findBusinessesByOwnerId(userId);
