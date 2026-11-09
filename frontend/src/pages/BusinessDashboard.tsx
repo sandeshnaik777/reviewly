@@ -60,7 +60,23 @@ import {
   Sparkles,
   Trash2,
   Edit2,
+  Sun,
+  Moon,
+  AlertTriangle,
+  RefreshCw,
+  Star,
+  Flame,
+  Heart,
+  Coffee,
+  Save,
+  Clock,
+  Lightbulb,
+  Shield,
+  Store,
+  Check,
+  Lock,
 } from 'lucide-react';
+import { DiwaliSpinningOffer } from '../components/DiwaliSpinningOffer.js';
 import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
 import { ScratchCard } from '../components/ScratchCard.js';
 import { convertGoogleMapsUrl } from '../utils/mapsUrlHelper.js';
@@ -95,6 +111,25 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     'overview' | 'qrs' | 'ai_settings' | 'history' | 'profile' | 'subscription' | 'custom_software'
   >('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Dark / Light Mode Theme
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('kindlyrate_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('kindlyrate_theme', theme);
+    }
+  }, [theme]);
 
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -841,7 +876,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
         <div style={{ textAlign: 'center', maxWidth: '420px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
-          <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚠️</div>
+          <AlertTriangle size={36} color="#d97706" style={{ margin: '0 auto 12px', display: 'block' }} />
           <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
             Unable to Load Business Data
           </h3>
@@ -849,8 +884,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             We could not connect to your business profile. Please check your connection or try refreshing.
           </p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-            <button className="btn btn-primary" onClick={loadAllData} style={{ fontSize: '13px', padding: '8px 18px' }}>
-              ↻ Retry Loading
+            <button className="btn btn-primary" onClick={loadAllData} style={{ fontSize: '13px', padding: '8px 18px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <RefreshCw size={14} />
+              <span>Retry Loading</span>
             </button>
             <button className="btn btn-secondary" onClick={onLogout} style={{ fontSize: '13px', padding: '8px 18px' }}>
               Sign Out
@@ -902,14 +938,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     phoneCallClicks: 0,
     phoneCallsGrowth: '0%',
     topThreeShare: '0%',
-    headline: 'Google Maps Search Telemetry Active',
-    rankingMessage: `Real-time Google Maps telemetry active for ${business?.city || 'your area'}. As customers scan your QR code and post 5-star reviews, your live search rank and local 3-pack visibility will dynamically climb.`,
+    headline: 'Google Maps Rank Tracker Active',
+    rankingMessage: `Live ranking tracker active for ${business?.city || 'your area'}. As customers scan your QR code and post 5-star reviews, your store's Google Maps ranking and local visibility will climb.`,
   };
 
   const navTabs = [
     {
       id: 'overview' as const,
-      label: 'Mission Control',
+      label: 'Overview',
       icon: <ChartBarIcon size={18} />,
       badge: null,
     },
@@ -1183,6 +1219,31 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           </div>
 
           <div className="dashboard-topbar-actions">
+            {/* Theme Mode Toggle (Dark / Light) */}
+            <button
+              type="button"
+              onClick={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
+              style={{
+                background: 'var(--surface-container)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
+                padding: '7px 12px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s ease',
+              }}
+              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+              aria-label={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+            >
+              {theme === 'light' ? <Moon size={15} color="#6366f1" /> : <Sun size={15} color="#f59e0b" />}
+              <span className="hide-mobile">{theme === 'light' ? 'Dark' : 'Light'}</span>
+            </button>
+
             {/* Announcements & Notifications Bell */}
             <button
               type="button"
@@ -1354,10 +1415,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             </button>
             <button
               onClick={handleDismissSystemNotif}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '13px', padding: '0 4px' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '13px', padding: '0 4px', display: 'flex', alignItems: 'center' }}
               title="Dismiss announcement"
             >
-              ✕
+              <X size={14} />
             </button>
           </div>
         </div>
@@ -1395,10 +1456,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             </button>
             <button
               onClick={handleDismissEmailBanner}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#854d0e', fontSize: '13px', padding: '0 4px' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#854d0e', fontSize: '13px', padding: '0 4px', display: 'flex', alignItems: 'center' }}
               title="Dismiss for now"
             >
-              ✕
+              <X size={14} />
             </button>
           </div>
         </div>
@@ -1421,17 +1482,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '18px', flexShrink: 0 }}>🪔</span>
+            <Flame size={18} color="#ea580c" style={{ flexShrink: 0 }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ background: '#dc2626', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+              <span style={{ background: '#dc2626', color: '#ffffff', fontSize: '10px', fontWeight: 800, padding: '2px 7px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 <span className="telemetry-pulse" style={{ background: '#ffffff', width: '5px', height: '5px' }} />
-                <span>DIWALI FLASH SALE 🎈</span>
+                <span>FESTIVE FLASH SALE</span>
               </span>
               <strong style={{ color: '#78350f', fontSize: '13px' }}>
                 All Plans Discounted: Testing Pass <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹499</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹79</span> · Growth <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹999</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹149/mo</span> · Pro <span style={{ textDecoration: 'line-through', color: '#b91c1c', marginRight: '2px' }}>₹1,499</span><span style={{ color: '#ea580c', fontWeight: 800 }}>₹249/mo</span>
               </strong>
-              <span style={{ color: '#78350f', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, background: '#fef08a', padding: '2px 7px', borderRadius: '6px', border: '1px solid #fde047' }}>
-                ⏳ {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
+              <span style={{ color: '#78350f', fontSize: '12px', fontFamily: 'monospace', fontWeight: 700, background: '#fef08a', padding: '2px 7px', borderRadius: '6px', border: '1px solid #fde047', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Clock size={12} />
+                <span>{offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s</span>
               </span>
             </div>
           </div>
@@ -1448,9 +1510,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 fontWeight: 800,
                 boxShadow: '0 2px 6px rgba(234, 88, 12, 0.3)',
                 whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
               }}
             >
-              🎉 Claim ₹79 Pass →
+              <Sparkles size={13} />
+              <span>Claim ₹79 Pass →</span>
             </button>
             <button
               onClick={() => setActiveTab('subscription')}
@@ -1467,11 +1533,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
         <main className="dashboard-content-body">
 
         {/* ======================================================== */}
-        {/* TAB 1: MISSION CONTROL OVERVIEW                          */}
+        {/* TAB 1: STORE OVERVIEW                                    */}
         {/* ======================================================== */}
         {activeTab === 'overview' && (
           <div>
-            {/* Mission Control Page Header */}
+            {/* Store Overview Page Header */}
             <div
               style={{
                 display: 'flex',
@@ -1490,14 +1556,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
                   <h2 className="serif" style={{ fontSize: '22px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                    Mission Control
+                    Store Overview
                   </h2>
                   <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d', fontWeight: 700 }}>
-                    ● Live Telemetry
+                    ● Live Status
                   </span>
                 </div>
                 <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
-                  Real-time Google Maps performance, review conversion velocity, and customer sentiment for <strong style={{ color: '#0f172a' }}>{business?.name || 'your business'}</strong>
+                  Live reviews, customer ratings, and Google Maps ranking tracker for <strong style={{ color: '#0f172a' }}>{business?.name || 'your store'}</strong>
                 </p>
               </div>
 
@@ -1510,7 +1576,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   style={{ fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
                   <RefreshIcon size={14} />
-                  <span>{isRefreshingMaps ? 'Syncing...' : 'Sync Telemetry'}</span>
+                  <span>{isRefreshingMaps ? 'Syncing...' : 'Refresh Data'}</span>
                 </button>
                 {qrs[0] && (
                   <a
@@ -1543,8 +1609,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#ea580c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', flexShrink: 0 }}>
-                      📍
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#ea580c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <MapPin size={16} color="#ffffff" />
                     </div>
                     <div>
                       <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#9a3412', margin: 0 }}>
@@ -1560,7 +1626,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     style={{ background: 'none', border: 'none', color: '#9a3412', cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '2px 6px' }}
                     title="Dismiss for now"
                   >
-                    ✕ Later
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <X size={12} /> Later
+                    </span>
                   </button>
                 </div>
 
@@ -1585,174 +1653,20 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '12px', color: '#9a3412', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span>💡 <strong>Tip:</strong> Search your business on Google Maps, tap "Share" ➔ "Copy link" and paste here!</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    <Lightbulb size={13} color="#ea580c" /> <strong>Tip:</strong> Search your business on Google Maps, tap "Share" ➔ "Copy link" and paste here!
+                  </span>
                 </div>
               </div>
             )}
 
-
-            {/* Grand Festive Launch Offer Hero Card (Shown when unpaid / free preview) */}
+            {/* Interactive Festive Spinning Gear Offer */}
             {!isPaidActive && (
-              <div
-                className="card dashboard-card-responsive"
-                style={{
-                  background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 45%, #fffbeb 100%)',
-                  border: '2px solid #f59e0b',
-                  padding: '24px 26px',
-                  marginBottom: '24px',
-                  borderRadius: '16px',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 8px 30px rgba(245, 158, 11, 0.18)',
-                }}
-              >
-                {/* Floating Festive Balloons & Sparkles Background Accent */}
-                <div style={{ position: 'absolute', top: '-10px', right: '16px', fontSize: '38px', opacity: 0.85, pointerEvents: 'none', userSelect: 'none' }}>
-                  🎈🪔✨
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', position: 'relative', zIndex: 1 }}>
-                  <div style={{ maxWidth: '720px' }}>
-                    {/* Urgency Badge + Timer */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                      <span
-                        style={{
-                          background: 'linear-gradient(90deg, #dc2626 0%, #ea580c 100%)',
-                          color: '#ffffff',
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          padding: '3px 10px',
-                          borderRadius: '20px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          letterSpacing: '0.4px',
-                          boxShadow: '0 2px 6px rgba(220, 38, 38, 0.3)',
-                        }}
-                      >
-                        <span className="telemetry-pulse" style={{ background: '#ffffff', width: '5px', height: '5px' }} />
-                        <span>🪔 DIWALI &amp; GRAND LAUNCH FLASH SALE 🎈</span>
-                      </span>
-
-                      {/* Live Ticking Countdown Timer */}
-                      <div
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: '#78350f',
-                          color: '#fef3c7',
-                          padding: '3px 10px',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          fontWeight: 800,
-                          fontFamily: 'monospace',
-                          boxShadow: '0 2px 6px rgba(120, 53, 15, 0.25)',
-                        }}
-                        title="Special launch price expires when timer hits 0"
-                      >
-                        <span style={{ fontSize: '13px' }}>⏳</span>
-                        <span>OFFER ENDS IN:</span>
-                        <span style={{ color: '#fef08a', background: 'rgba(0,0,0,0.25)', padding: '1px 5px', borderRadius: '4px' }}>
-                          {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Headline with Strikethrough Price */}
-                    <h3 className="serif" style={{ fontSize: '23px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
-                      Diwali Flash Sale Live Across All Plans · Save Up to 85% Today
-                    </h3>
-
-                    <p style={{ margin: '0 0 12px', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
-                      🎉 Special festive discounts active across all tiers! Choose our ₹79 Testing Pass or save with Growth &amp; Pro packs (plus 2 months free on yearly billing). Includes physical acrylic QR stands and live Google review automation.
-                    </p>
-
-                    {/* All Plans Comparison Cards */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '14px' }}>
-                      <div style={{ background: '#ffffff', border: '1.5px solid #fed7aa', borderRadius: '10px', padding: '10px 12px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Testing Pass</div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
-                          <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹79</span>
-                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹499</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>84% OFF</span>
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#78350f' }}>100 reviews · 2 QR Stands</div>
-                      </div>
-
-                      <div style={{ background: '#ffffff', border: '1.5px solid #fdba74', borderRadius: '10px', padding: '10px 12px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Growth Pack ⭐</div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
-                          <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹149<span style={{ fontSize: '11px', fontWeight: 500 }}>/mo</span></span>
-                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹999</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>85% OFF</span>
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#78350f' }}>500 reviews · 5 QR Stands</div>
-                      </div>
-
-                      <div style={{ background: '#ffffff', border: '1.5px solid #fed7aa', borderRadius: '10px', padding: '10px 12px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#ea580c', textTransform: 'uppercase' }}>Scale Pro Pack</div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '2px 0' }}>
-                          <span style={{ fontSize: '20px', fontWeight: 800, color: '#78350f' }}>₹249<span style={{ fontSize: '11px', fontWeight: 500 }}>/mo</span></span>
-                          <span style={{ fontSize: '12px', color: '#b91c1c', textDecoration: 'line-through' }}>₹1,499</span>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', background: '#dcfce7', padding: '1px 5px', borderRadius: '4px' }}>83% OFF</span>
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#78350f' }}>1,000 reviews · 15 QR Stands</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Choice Buttons for User */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '220px', width: '100%', maxWidth: '280px' }}>
-                    <button
-                      className="btn btn-primary btn-lg"
-                      onClick={handlePayTrial}
-                      style={{
-                        fontSize: '14.5px',
-                        padding: '12px 18px',
-                        background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
-                        borderColor: '#9a3412',
-                        whiteSpace: 'nowrap',
-                        fontWeight: 800,
-                        boxShadow: '0 4px 14px rgba(194, 65, 12, 0.35)',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        width: '100%',
-                      }}
-                    >
-                      <Sparkles size={16} color="#ffffff" />
-                      <span>Claim ₹79 Festive Offer →</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('subscription')}
-                      style={{
-                        background: '#ffffff',
-                        border: '1.5px solid #d97706',
-                        color: '#92400e',
-                        padding: '9px 14px',
-                        borderRadius: '10px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        transition: 'all 0.15s ease',
-                        width: '100%',
-                      }}
-                    >
-                      Or Choose Growth / Yearly Pack (2 Mos Free) →
-                    </button>
-
-                    <div style={{ textAlign: 'center', fontSize: '11px', color: '#b45309', fontWeight: 500 }}>
-                      ⚡ Instant activation via Razorpay / UPI
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <DiwaliSpinningOffer
+                onClaimTrial={handlePayTrial}
+                onViewAllPlans={() => setActiveTab('subscription')}
+                offerTimeLeft={offerTimeLeft}
+              />
             )}
 
             {/* Overview Top 4 KPIs & Mobile Quick Actions */}
@@ -1784,7 +1698,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, color: '#0f172a' }}>
                     {analytics?.avgRating ? `${analytics.avgRating}` : '5.0'}
                   </div>
-                  <div style={{ color: '#f59e0b', fontSize: '18px', letterSpacing: '1px' }}>★★★★★</div>
+                  <div style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} size={15} fill="#f59e0b" color="#f59e0b" />
+                    ))}
+                  </div>
                 </div>
                 <div style={{ fontSize: '12.5px', color: '#15803d', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
@@ -1895,7 +1813,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   className="btn btn-secondary"
                   style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px solid #fed7aa', background: '#fffaf5' }}
                 >
-                  <span>⭐</span>
+                  <Star size={14} color="#ea580c" />
                   <span>Questions ({questions.length})</span>
                 </button>
                 <button
@@ -1913,7 +1831,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   className="btn btn-secondary"
                   style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#ea580c', border: '1.5px solid #fdba74' }}
                 >
-                  <span>🪔</span>
+                  <Flame size={14} color="#ea580c" />
                   <span>Festive Offer ₹79</span>
                 </button>
               </div>
@@ -1927,28 +1845,32 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               className={`overview-segment-tab ${overviewSection === 'activity' ? 'active' : ''}`}
               onClick={() => setOverviewSection('activity')}
             >
-              📊 Weekly Activity
+              <BarChart3 size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
+              <span>Weekly Activity</span>
             </button>
             <button
               type="button"
               className={`overview-segment-tab ${overviewSection === 'setup' ? 'active' : ''}`}
               onClick={() => setOverviewSection('setup')}
             >
-              ⭐ Questions &amp; Keywords ({questions.length})
+              <Star size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
+              <span>Questions &amp; Keywords ({questions.length})</span>
             </button>
             <button
               type="button"
               className={`overview-segment-tab ${overviewSection === 'seo' ? 'active' : ''}`}
               onClick={() => setOverviewSection('seo')}
             >
-              📍 Maps &amp; GeoGrid
+              <MapPin size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
+              <span>Google Maps Rankings</span>
             </button>
             <button
               type="button"
               className={`overview-segment-tab ${overviewSection === 'roi' ? 'active' : ''}`}
               onClick={() => setOverviewSection('roi')}
             >
-              💰 ROI &amp; Competitors
+              <TrendingUp size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
+              <span>Business Impact &amp; Competitors</span>
             </button>
           </div>
 
@@ -1962,14 +1884,16 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   className={`overview-sub-tab ${setupSubtab === 'questions' ? 'active' : ''}`}
                   onClick={() => setSetupSubtab('questions')}
                 >
-                  ⭐ Rating Questions ({questions.length})
+                  <Star size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Rating Questions ({questions.length})</span>
                 </button>
                 <button
                   type="button"
                   className={`overview-sub-tab ${setupSubtab === 'keywords' ? 'active' : ''}`}
                   onClick={() => setSetupSubtab('keywords')}
                 >
-                  🎯 Target Keywords ({((settings?.targetKeywords || settings?.thingsToHighlight) || []).length})
+                  <Target size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Target Keywords ({((settings?.targetKeywords || settings?.thingsToHighlight) || []).length})</span>
                 </button>
               </div>
 
@@ -1988,8 +1912,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', border: '1px solid #fdba74', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                          ⭐
+                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', border: '1px solid #fdba74', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Star size={16} color="#ea580c" />
                         </div>
                         <div>
                           <h4 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
@@ -2012,7 +1936,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                         className="btn btn-secondary btn-sm"
                         style={{ fontSize: '12px', padding: '6px 12px' }}
                       >
-                        ⚙️ Advanced AI Tone →
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                          <SlidersHorizontal size={13} /> AI Settings →
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -2020,7 +1946,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               {/* 1-Tap Category Presets (Food, Retail, Services, Health) */}
               <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
                 <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                  💡 Tap to add common rating criteria for your store:
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    <Lightbulb size={13} color="#ea580c" /> Tap to add common rating criteria for your store:
+                  </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {[
@@ -2112,8 +2040,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                       <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {q.label || q.text || 'Rating Question'}
                       </span>
-                      <span style={{ color: '#f59e0b', fontSize: '12px', letterSpacing: '1px' }} className="hide-mobile">
-                        ★★★★★
+                      <span style={{ display: 'inline-flex', gap: '2px', alignItems: 'center' }} className="hide-mobile">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} size={11} fill="#f59e0b" color="#f59e0b" />
+                        ))}
                       </span>
                     </div>
 
@@ -2130,12 +2060,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                           color: '#ef4444',
                           cursor: 'pointer',
                           padding: '4px 6px',
-                          fontSize: '13px',
-                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
                         }}
                         title="Delete question"
                       >
-                        ✕
+                        <X size={14} />
                       </button>
                     </div>
                   </div>
@@ -2220,12 +2150,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             color: '#15803d',
                             cursor: 'pointer',
                             padding: '0 2px',
-                            fontWeight: 800,
-                            fontSize: '14px',
-                            lineHeight: 1,
+                            display: 'inline-flex',
+                            alignItems: 'center',
                           }}
                         >
-                          ✕
+                          <X size={12} />
                         </button>
                       </span>
                     ))}
@@ -2372,7 +2301,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           </div>
           )}
 
-          {/* 📊 SECTION 1: WEEKLY REVIEW ACTIVITY & 3 GROWTH ACTIONS */}
+          {/* SECTION 1: WEEKLY REVIEW ACTIVITY & 3 GROWTH ACTIONS */}
           {overviewSection === 'activity' && (
             <div>
               {/* Feature Sub-Navigation */}
@@ -2382,14 +2311,16 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   className={`overview-sub-tab ${weeklyViewSubtab === 'chart' ? 'active' : ''}`}
                   onClick={() => setWeeklyViewSubtab('chart')}
                 >
-                  📊 7-Day Review Chart
+                  <BarChart3 size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>7-Day Review Chart</span>
                 </button>
                 <button
                   type="button"
                   className={`overview-sub-tab ${weeklyViewSubtab === 'tips' ? 'active' : ''}`}
                   onClick={() => setWeeklyViewSubtab('tips')}
                 >
-                  💡 3 Growth Tips
+                  <Lightbulb size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>3 Growth Tips</span>
                 </button>
               </div>
 
@@ -2538,7 +2469,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               {/* Bottom Simple Summary */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px', fontSize: '12.5px', color: '#64748b', flexWrap: 'wrap', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>💡</span>
+                  <Lightbulb size={14} color="#ea580c" />
                   <span><strong>Tip:</strong> Customer reviews peak during weekend lunch and evening checkout hours.</span>
                 </div>
                 <div style={{ fontSize: '11.5px', color: '#16a34a', fontWeight: 600 }}>
@@ -2563,8 +2494,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef3c7', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                    💡
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef3c7', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Lightbulb size={18} color="#ea580c" />
                   </div>
                   <div>
                     <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
@@ -2694,7 +2625,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           </div>
           )}
 
-          {/* 💰 SECTION 4: ROI, COMPETITORS & PEAK ACTIVITY */}
+          {/* SECTION 4: ROI, COMPETITORS & PEAK ACTIVITY */}
           {overviewSection === 'roi' && (
             <div>
               {/* Feature Sub-Navigation */}
@@ -2704,21 +2635,24 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   className={`overview-sub-tab ${roiSubtab === 'financial' ? 'active' : ''}`}
                   onClick={() => setRoiSubtab('financial')}
                 >
-                  💰 Revenue Impact &amp; Savings
+                  <TrendingUp size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Revenue Impact &amp; Savings</span>
                 </button>
                 <button
                   type="button"
                   className={`overview-sub-tab ${roiSubtab === 'competitors' ? 'active' : ''}`}
                   onClick={() => setRoiSubtab('competitors')}
                 >
-                  🎯 Competitor Radar
+                  <Target size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Competitor Radar</span>
                 </button>
                 <button
                   type="button"
                   className={`overview-sub-tab ${roiSubtab === 'peakhours' ? 'active' : ''}`}
                   onClick={() => setRoiSubtab('peakhours')}
                 >
-                  ⏰ Peak Hours &amp; Praise Themes
+                  <Clock size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Peak Hours &amp; Praise Themes</span>
                 </button>
               </div>
 
@@ -2852,10 +2786,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                     <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                      Customer Peak Hours &amp; Activity Telemetry
+                      Customer Peak Hours &amp; Store Activity
                     </h4>
                     <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 700 }}>
-                      {reviews.length > 0 ? '● Telemetry Active' : 'Awaiting Scans'}
+                      {reviews.length > 0 ? '● Active' : 'Awaiting Scans'}
                     </span>
                   </div>
                   <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
@@ -2865,8 +2799,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
                       <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontSize: '20px', marginBottom: '4px' }}>⏰</div>
-                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Activity Telemetry Standby</div>
+                        <Clock size={22} color="#64748b" style={{ margin: '0 auto 6px', display: 'block' }} />
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Activity Tracker Standby</div>
                         <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Hourly distribution begins tracking with your first customer scan.</div>
                       </div>
                     ) : (
@@ -2877,7 +2811,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                               {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 6px', marginLeft: '6px' }}>Peak Shift</span>}
                             </div>
                             <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
-                              {shift.reviews} reviews · {shift.avgRating} ★ · <span style={{ color: '#64748b', fontWeight: 500 }}>{shift.turnRate}</span>
+                              {shift.reviews} reviews · {shift.avgRating} / 5 · <span style={{ color: '#64748b', fontWeight: 500 }}>{shift.turnRate}</span>
                             </div>
                           </div>
                           <div style={{ height: '7px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
@@ -2937,7 +2871,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             </div>
           )}
 
-          {/* 📍 SECTION 3: MAPS & GEOGRID RANKING TRACKER */}
+          {/* SECTION 3: MAPS & RANKING TRACKER */}
           {overviewSection === 'seo' && (
             <div>
               {/* Feature Sub-Navigation */}
@@ -2947,14 +2881,16 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   className={`overview-sub-tab ${seoSubtab === 'grid' ? 'active' : ''}`}
                   onClick={() => setSeoSubtab('grid')}
                 >
-                  🗺️ 3x3 Geo-Grid Rank Heatmap
+                  <MapPin size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Local Maps Ranking Heatmap</span>
                 </button>
                 <button
                   type="button"
                   className={`overview-sub-tab ${seoSubtab === 'table' ? 'active' : ''}`}
                   onClick={() => setSeoSubtab('table')}
                 >
-                  📋 Keyword Search Rankings ({keywordRankings.length})
+                  <BarChart3 size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
+                  <span>Keyword Search Rankings ({keywordRankings.length})</span>
                 </button>
               </div>
 
@@ -3136,7 +3072,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                       <tr>
                         <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
                           <div style={{ marginBottom: '8px' }}><MapPin size={24} color="var(--primary)" /></div>
-                          <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Awaiting Live Google Maps Telemetry</div>
+                          <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Awaiting Initial Google Maps Scans</div>
                           <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Click "Refresh Live Maps Rank" above or generate your first customer reviews to track real-time 3-pack positions.</div>
                         </td>
                       </tr>
@@ -3255,7 +3191,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '18px' }}>⚠️</span>
+                  <AlertTriangle size={18} color="#d97706" style={{ flexShrink: 0 }} />
                   <div style={{ fontSize: '13px', color: '#854d0e' }}>
                     <strong>QR Stands in Sandbox Preview:</strong> Scans will function, but live Google review drafting requires an active subscription.
                   </div>
@@ -3314,7 +3250,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <BarChart3 size={20} />
                     <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                      QR Stand Conversion Telemetry
+                      QR Stand Performance
                     </h4>
                     <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d' }}>
                       ● Live Attribution
@@ -3327,7 +3263,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span className="stat-pill stat-pill-primary" style={{ fontSize: '11.5px', padding: '6px 12px' }}>
-                    {qrs.some((q) => (q.scanCount || 0) > 0) ? `Top Performer: ${qrs[0]?.name || 'Table 1'} (${qrs[0]?.conversionRate || 0}% conv.)` : 'Telemetry Active · Ready for Customer Scans'}
+                    {qrs.some((q) => (q.scanCount || 0) > 0) ? `Top Performer: ${qrs[0]?.name || 'Table 1'} (${qrs[0]?.conversionRate || 0}% conv.)` : 'Ready for Customer Scans'}
                   </span>
                 </div>
               </div>
@@ -3763,7 +3699,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     boxShadow: '0 2px 6px rgba(0, 56, 59, 0.2)',
                   }}
                 >
-                  <span>{savingSettings ? 'Saving...' : '💾 Save Settings'}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <Save size={15} /> {savingSettings ? 'Saving...' : 'Save Settings'}
+                  </span>
                 </button>
               </div>
             </div>
@@ -3783,7 +3721,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '20px' }}>📋</span>
+                        <SlidersHorizontal size={20} color="var(--primary)" />
                         <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
                           1. Customer Mobile Rating Criteria (Questions)
                         </h4>
@@ -3948,9 +3886,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             setQuestions(updated);
                           }}
                         >
-                          <option value="1-5_STARS">⭐ 1–5 Stars</option>
+                          <option value="1-5_STARS">1–5 Stars</option>
                           <option value="1-10_NUMERIC">1–10 Numeric</option>
-                          <option value="THUMBS_UP_DOWN">👍 Thumbs Up/Down</option>
+                          <option value="THUMBS_UP_DOWN">Thumbs Up / Down</option>
                         </select>
                         <button
                           type="button"
@@ -3966,9 +3904,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             fontSize: '12px',
                             fontWeight: 700,
                             whiteSpace: 'nowrap',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
                           }}
                         >
-                          ✕ Delete
+                          <Trash2 size={13} />
+                          <span>Delete</span>
                         </button>
                       </div>
                     ))}
@@ -4107,7 +4049,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                       </div>
 
                       <div style={{ fontSize: '12px', color: '#1d4ed8', fontWeight: 600, background: 'rgba(37, 99, 235, 0.08)', padding: '8px 12px', borderRadius: '8px' }}>
-                        🛡️ Best for: Specialty electronics, clinics, salons, and businesses guarding a 4.9★ rating.
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                          <Shield size={13} /> Best for: Specialty electronics, clinics, salons, and businesses guarding a 4.9★ rating.
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -4138,12 +4082,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   {/* Compact Tone Selector */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '18px' }}>
                     {[
-                      { id: 'enthusiastic', label: 'Enthusiastic', emoji: '⚡', desc: 'Energetic & high praise' },
-                      { id: 'warm', label: 'Warm & Friendly', emoji: '🤝', desc: 'Welcoming & personal' },
-                      { id: 'professional', label: 'Professional', emoji: '👔', desc: 'Polished & articulate' },
-                      { id: 'casual', label: 'Casual & Relaxed', emoji: '💬', desc: 'Everyday & authentic' },
-                      { id: 'concise', label: 'Concise & Punchy', emoji: '🎯', desc: 'Short 1–2 sentences' },
+                      { id: 'enthusiastic', label: 'Enthusiastic', icon: Zap, desc: 'Energetic & high praise' },
+                      { id: 'warm', label: 'Warm & Friendly', icon: Heart, desc: 'Welcoming & personal' },
+                      { id: 'professional', label: 'Professional', icon: Briefcase, desc: 'Polished & articulate' },
+                      { id: 'casual', label: 'Casual & Relaxed', icon: Coffee, desc: 'Everyday & authentic' },
+                      { id: 'concise', label: 'Concise & Punchy', icon: Target, desc: 'Short 1–2 sentences' },
                     ].map((t) => {
+                      const IconComp = t.icon;
                       const isSelected = settings.reviewTone === t.id;
                       return (
                         <button
@@ -4165,7 +4110,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             transition: 'all 0.15s ease',
                           }}
                         >
-                          <span style={{ fontSize: '16px' }}>{t.emoji}</span>
+                          <IconComp size={15} color={isSelected ? 'var(--primary)' : '#64748b'} />
                           <span style={{ fontWeight: 600 }}>{t.label}</span>
                           <span style={{ fontSize: '11px', color: isSelected ? 'var(--primary)' : '#64748b', opacity: 0.85 }}>
                             · {t.desc}
@@ -5099,109 +5044,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
         {/* ======================================================== */}
         {activeTab === 'subscription' && (
           <div>
-            {/* Grand Festive Launch Offer Hero Card in Subscription Tab */}
+            {/* Interactive Festive Spinning Gear Offer in Subscription Tab */}
             {!usage?.subscription?.trialActivated ? (
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, #fff7ed 0%, #fef3c7 45%, #fffbeb 100%)',
-                  border: '2px solid #f59e0b',
-                  borderRadius: '16px',
-                  padding: '24px 26px',
-                  marginBottom: '24px',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 8px 30px rgba(245, 158, 11, 0.16)',
-                }}
-              >
-                {/* Floating Festive Balloons & Sparkles Background Accent */}
-                <div style={{ position: 'absolute', top: '-10px', right: '16px', fontSize: '38px', opacity: 0.85, pointerEvents: 'none', userSelect: 'none' }}>
-                  🎈🪔✨
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', position: 'relative', zIndex: 1 }}>
-                  <div style={{ maxWidth: '680px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                      <span
-                        style={{
-                          background: 'linear-gradient(90deg, #dc2626 0%, #ea580c 100%)',
-                          color: '#ffffff',
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          padding: '3px 10px',
-                          borderRadius: '20px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          letterSpacing: '0.4px',
-                          boxShadow: '0 2px 6px rgba(220, 38, 38, 0.3)',
-                        }}
-                      >
-                        <span className="telemetry-pulse" style={{ background: '#ffffff', width: '5px', height: '5px' }} />
-                        <span>🪔 DIWALI &amp; GRAND LAUNCH FLASH SALE 🎈</span>
-                      </span>
-
-                      {/* Live Ticking Countdown Timer */}
-                      <div
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: '#78350f',
-                          color: '#fef3c7',
-                          padding: '3px 10px',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          fontWeight: 800,
-                          fontFamily: 'monospace',
-                          boxShadow: '0 2px 6px rgba(120, 53, 15, 0.25)',
-                        }}
-                      >
-                        <span>⏳ ENDS IN:</span>
-                        <span style={{ color: '#fef08a', background: 'rgba(0,0,0,0.25)', padding: '1px 5px', borderRadius: '4px' }}>
-                          {offerTimeLeft.hours}h : {offerTimeLeft.minutes}m : {offerTimeLeft.seconds}s
-                        </span>
-                      </div>
-                    </div>
-
-                    <h3 className="serif" style={{ fontSize: '24px', fontWeight: 800, margin: '6px 0 6px', color: '#78350f', lineHeight: 1.25 }}>
-                      Choose Any Active Pack or Claim the <span style={{ textDecoration: 'line-through', color: '#b91c1c', fontSize: '20px', marginRight: '4px' }}>₹499</span>
-                      <span style={{ color: '#ea580c', fontSize: '28px' }}>₹79</span> Launch Pass
-                    </h3>
-
-                    <p style={{ margin: '0 0 12px', fontSize: '13.5px', color: '#92400e', lineHeight: 1.55 }}>
-                      You have complete flexibility: start with our 30-day Testing Pass for ₹79, or select a Growth / Pro plan below (with 2 months free on yearly billing). <em>Festive launch rates revert to regular prices once the timer expires.</em>
-                    </p>
-
-                    <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: '12px', color: '#78350f', fontWeight: 600 }}>
-                      <span>✓ Instant Razorpay/UPI Setup</span>
-                      <span>✓ 2 Counter QR Stands Dispatched</span>
-                      <span>✓ 100 5-Star Reviews Guaranteed</span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '220px' }}>
-                    <button
-                      className="btn btn-primary"
-                      onClick={handlePayTrial}
-                      style={{
-                        fontSize: '14px',
-                        padding: '12px 20px',
-                        background: 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
-                        borderColor: '#9a3412',
-                        fontWeight: 800,
-                        boxShadow: '0 4px 14px rgba(194, 65, 12, 0.35)',
-                        borderRadius: '10px',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      🎉 Claim ₹79 Festive Offer →
-                    </button>
-                    <div style={{ textAlign: 'center', fontSize: '11.5px', color: '#b45309', fontWeight: 600 }}>
-                      Or select from all subscription tiers below ↓
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <DiwaliSpinningOffer
+                onClaimTrial={handlePayTrial}
+                onViewAllPlans={() => setActiveTab('subscription')}
+                offerTimeLeft={offerTimeLeft}
+              />
             ) : (
               <div
                 style={{
@@ -5297,8 +5146,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
             <div style={{ marginBottom: '16px' }}>
               <h4 style={{ fontSize: '18px', fontWeight: 600 }}>Upgrade or Switch Subscription Pack</h4>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                🪔 Diwali flash sale active across all tiers! Cancel or switch anytime.
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Flame size={14} color="#ea580c" />
+                <span>Special festive discount active across all tiers. Cancel or switch anytime.</span>
               </p>
             </div>
 
@@ -5445,7 +5295,10 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             boxShadow: '0 2px 6px rgba(220, 38, 38, 0.25)',
                           }}
                         >
-                          🪔 DIWALI FLASH SALE
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Flame size={12} color="#ffffff" />
+                            <span>FESTIVE FLASH SALE</span>
+                          </span>
                         </span>
                         {autoRenewChoice && (
                           <span style={{ fontSize: '11px', fontWeight: 600, color: '#166534', background: '#dcfce7', padding: '2px 7px', borderRadius: '8px' }}>
@@ -6058,8 +5911,9 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     Submit Consultation Request →
                   </button>
 
-                  <div style={{ fontSize: '12.5px', color: '#64748b' }}>
-                    🔒 Confidential · Free Architecture Blueprint · Response within 4 hours
+                  <div style={{ fontSize: '12.5px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Lock size={13} color="#64748b" />
+                    <span>Confidential · Free Architecture Blueprint · Response within 4 hours</span>
                   </div>
                 </div>
               </form>
@@ -6094,7 +5948,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             style={!isPaidActive ? { color: '#b45309', fontWeight: 700 } : undefined}
           >
             <Zap size={18} color={!isPaidActive ? '#d97706' : 'currentColor'} />
-            <span>{!isPaidActive ? '🪔 ₹79 Offer' : 'Plans'}</span>
+            <span>{!isPaidActive ? '₹79 Offer' : 'Plans'}</span>
           </button>
           <button
             type="button"

@@ -394,7 +394,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 borderRadius: '12px',
               }}
             >
-              <span>🚀 Or Sign Up with Email →</span>
+              <span>Sign Up with Email →</span>
             </button>
 
             <button
@@ -419,12 +419,10 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             </button>
           </div>
 
-          <div style={{ fontSize: '12.5px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-            <span>⚡ 15-Second Setup</span>
-            <span>·</span>
-            <span>💳 No Credit Card Required</span>
-            <span>·</span>
-            <span>🛡️ 100% Google Policy Compliant</span>
+          <div style={{ fontSize: '12.5px', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', flexWrap: 'wrap', marginBottom: '14px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Zap size={14} color="#ea580c" /> 15-Second Setup</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><CreditCard size={14} color="#ea580c" /> No Credit Card Required</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><ShieldCheck size={14} color="#ea580c" /> 100% Google Policy Compliant</span>
           </div>
 
           {/* Quick-Access Pathway Helper Strip */}
@@ -602,7 +600,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 Place your custom laser-cut acrylic or printed QR stand at your billing counter, reception desk, or dining tables. Customers scan it with any smartphone camera in 3 seconds.
               </p>
               <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#0f172a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                📱 Zero app download needed for customers
+                <Store size={14} color="#ea580c" />
+                <span>Zero app download needed for customers</span>
               </div>
             </div>
 
@@ -618,7 +617,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 Customers hate typing long text on phone keyboards. After answering 2 quick rating questions, our Gemini AI instantly crafts an authentic, glowing 5-star review tailored to your store.
               </p>
               <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#0f172a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                ✨ 1-Tap Copy · Natural human tone
+                <Sparkles size={14} color="#ea580c" />
+                <span>1-Tap Copy · Natural human tone</span>
               </div>
             </div>
 
@@ -634,7 +634,8 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 Happy reviews post directly to Google Maps, pushing your business to #1 on search and driving more walk-ins. Critical ratings (1-3★) stay 100% private with you so your public score never drops.
               </p>
               <div style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#15803d', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                🛡️ 100% Google Maps Policy Compliant
+                <ShieldCheck size={14} color="#15803d" />
+                <span>100% Google Maps Policy Compliant</span>
               </div>
             </div>
           </div>
@@ -673,9 +674,13 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                 borderRadius: '10px',
                 boxShadow: '0 4px 12px rgba(154, 64, 24, 0.3)',
                 whiteSpace: 'nowrap',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              🚀 Start Free in 10 Seconds →
+              <Zap size={16} />
+              <span>Start Free in 10 Seconds →</span>
             </button>
           </div>
         </div>
@@ -1093,7 +1098,7 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                     <li style={{ color: 'var(--text)', fontWeight: 600 }}>✓ {reviews}</li>
                     <li>✓ 5 Smart QR Stands (counters/desks/tables)</li>
                     <li>✓ Full custom question &amp; keyword builder</li>
-                    <li>✓ Aura Live Telemetry &amp; Growth Heatmap</li>
+                    <li>✓ Google Maps Rank Tracker &amp; Growth Heatmap</li>
                     <li>✓ Service Diagnostics &amp; Staff Leaderboard</li>
                     <li>✓ Maximum Defense Reputation Shield</li>
                   </ul>
