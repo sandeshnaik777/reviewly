@@ -87,24 +87,11 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
 
   const handleClick = async () => {
     if (disabled || loading) return;
+    setLoading(true);
 
-    // 1. If Google Client ID and GIS are ready, prompt GIS One Tap / Popup
-    if (googleClientId && (window as any).google?.accounts?.id) {
-      try {
-        (window as any).google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('[GoogleAuth] One Tap prompt skipped, using full Google OAuth flow...');
-            window.location.href = `/api/auth/google/login?flow=${flow}`;
-          }
-        });
-        return;
-      } catch (promptErr) {
-        console.warn('[GoogleAuth] Prompt error, falling back to OAuth redirect:', promptErr);
-      }
-    }
-
-    // 2. Direct browser navigation to Google OAuth 2.0 Web flow
+    // Direct browser navigation to Google OAuth 2.0 Web flow
     // Initiates official accounts.google.com consent screen
+    // This is 100% immune to GIS origin_mismatch and works reliably on all mobile and desktop browsers
     window.location.href = `/api/auth/google/login?flow=${flow}`;
   };
 

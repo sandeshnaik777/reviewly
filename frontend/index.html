@@ -23,6 +23,13 @@
     <link rel="canonical" href="https://kindlyrate.com/" />
     <meta name="theme-color" content="#9a4018" />
 
+    <script>
+      // Enforce canonical domain to prevent OAuth origin_mismatch
+      if (window.location.hostname === 'www.kindlyrate.com') {
+        window.location.replace('https://kindlyrate.com' + window.location.pathname + window.location.search + window.location.hash);
+      }
+    </script>
+
     <!-- Search Engine Verification -->
     <meta name="msvalidate.01" content="FE6D343F323CC4491930A8E1A3C6F6F9" />
 
