@@ -48,3 +48,4 @@ export function updatePageSeo({ title, description, path }: PageSeoConfig) {
   const ogTitle = document.querySelector('meta[property="og:title"]');
   if (ogTitle) ogTitle.setAttribute('content', title);
 }
+

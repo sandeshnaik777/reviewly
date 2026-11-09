@@ -1452,67 +1452,42 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13.5px', padding: 0 }}>
               <li>
                 <a
-                  href="/features"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-                    window.history.pushState({}, '', '/features');
-                  }}
+                  href="/google-review-stand"
                   style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
-                  Smart Table QR Stands
+                  Smart Google Review Stands (NFC + QR)
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/google-maps-seo"
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
+                  Google Maps Local 3-Pack SEO Engine
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/negative-review-shield"
+                  style={{ color: '#94a3b8', textDecoration: 'none' }}
+                >
+                  Reputation Shield (Negative Feedback Defense)
                 </a>
               </li>
               <li>
                 <a
                   href="/features"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-                    window.history.pushState({}, '', '/features');
-                  }}
                   style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
-                  Server-Side AI Drafter
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/features"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-                    window.history.pushState({}, '', '/features');
-                  }}
-                  style={{ color: '#94a3b8', textDecoration: 'none' }}
-                >
-                  Aura Live Telemetry &amp; Heatmap
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/features"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-                    window.history.pushState({}, '', '/features');
-                  }}
-                  style={{ color: '#94a3b8', textDecoration: 'none' }}
-                >
-                  Reputation Shield Defense
+                  Server-Side AI Review Drafter
                 </a>
               </li>
               <li>
                 <a
                   href="/pricing"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-                    window.history.pushState({}, '', '/pricing');
-                  }}
                   style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
-                  Subscription Packs &amp; Pricing
+                  Subscription Packs &amp; Pricing (From ₹79)
                 </a>
               </li>
             </ul>
@@ -1654,6 +1629,35 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               Helpline: <a href="tel:+918123824899" style={{ color: '#38bdf8' }}>+91 81238 24899</a>
             </div>
           </div>
+        </div>
+
+        {/* Industry Solutions SEO Internal Link Row */}
+        <div
+          style={{
+            maxWidth: '1280px',
+            margin: '32px auto 0',
+            paddingTop: '20px',
+            borderTop: '1px solid #27272a',
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px',
+            fontSize: '12.5px',
+            color: '#64748b',
+          }}
+        >
+          <span style={{ fontWeight: 700, color: '#cbd5e1' }}>Industry Solutions:</span>
+          <a href="/google-reviews-for-restaurants" style={{ color: '#94a3b8', textDecoration: 'none' }}>Restaurants &amp; Cafes</a>
+          <span>·</span>
+          <a href="/google-reviews-for-clinics" style={{ color: '#94a3b8', textDecoration: 'none' }}>Dental &amp; Healthcare Clinics</a>
+          <span>·</span>
+          <a href="/google-reviews-for-salons" style={{ color: '#94a3b8', textDecoration: 'none' }}>Salons &amp; Luxury Spas</a>
+          <span>·</span>
+          <a href="/google-reviews-for-retail" style={{ color: '#94a3b8', textDecoration: 'none' }}>Retail Shops &amp; Showrooms</a>
+          <span>·</span>
+          <a href="/google-review-stand" style={{ color: '#94a3b8', textDecoration: 'none' }}>Smart NFC QR Counter Stands</a>
+          <span>·</span>
+          <a href="/google-maps-seo" style={{ color: '#94a3b8', textDecoration: 'none' }}>Local 3-Pack Rank #1 Strategy</a>
         </div>
 
         {/* Footer Bottom Bar */}

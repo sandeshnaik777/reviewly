@@ -426,6 +426,360 @@ const pages = [
         <p style="font-size: 15px; color: #475569; line-height: 1.6;">You can cancel your KindlyRate subscription at any time directly from your merchant billing dashboard with zero cancellation penalties.</p>
       </section>
     `
+  },
+  {
+    path: 'google-review-stand',
+    title: 'Smart Google Review Stands (NFC + QR) for Countertops — KindlyRate',
+    description: 'Boost 5-star Google Maps reviews with KindlyRate laser-cut acrylic smart QR & NFC counter stands. Tap with phone or scan QR code in 3 seconds. Pre-programmed, zero setup, starts at ₹79.',
+    heading: 'Smart Google Review Stands & NFC Counter Displays for Businesses',
+    subheading: 'Physical on-counter tap & scan review stands that turn customer footfall into verified 5-star Google Maps reviews.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Google Review Stands', url: 'https://kindlyrate.com/google-review-stand' }
+    ],
+    schemaType: 'Product',
+    schemaExtra: {
+      name: 'KindlyRate Smart Google Review Stand (NFC + QR)',
+      description: 'Laser-crafted countertop acrylic stand with integrated NTAG213 contactless NFC chip and dynamic QR code.',
+      brand: { '@type': 'Brand', name: 'KindlyRate' },
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'INR',
+        lowPrice: '79',
+        highPrice: '249',
+        offerCount: '3',
+        offers: [
+          {
+            '@type': 'Offer',
+            name: 'Testing Starter Pack',
+            price: '79',
+            priceCurrency: 'INR',
+            availability: 'https://schema.org/InStock',
+            description: 'Physical acrylic review stand with 30-day full platform access.'
+          }
+        ]
+      }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Google Review Stand</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">Smart Google Review Stands (NFC + QR) for Shops, Clinics &amp; Restaurants</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          The single most effective way to collect authentic 5-star Google Maps reviews at your billing counter, reception desk, or dining table. Customers tap with their phone or scan the high-contrast QR code in 3 seconds.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 48px;">
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">⚡ Contactless NFC Tap &amp; Review</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Embedded with high-frequency NTAG213 chips compatible with 100% of modern iOS and Android smartphones. No app download required. The customer simply touches their phone to the stand, and your branded review flow opens instantly.
+            </p>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">🎯 Dynamic High-Density QR Code</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Laser-printed high-contrast QR codes that scan instantly in any lighting condition, even from a distance or through low-light phone cameras.
+            </p>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">🛡️ Built-in Reputation Shield</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Happy customers (4–5 stars) are routed directly to Google Maps with AI-drafted praise. Unhappy customers (1–3 stars) are privately routed to your WhatsApp/dashboard, protecting your public rating.
+            </p>
+          </div>
+        </div>
+
+        <div style="background: #fffaf8; border: 2px solid #9a4018; border-radius: 16px; padding: 36px; text-align: center; margin-bottom: 48px;">
+          <h2 style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Get Your Smart Review Stand for Just ₹79</h2>
+          <p style="font-size: 16px; color: #475569; max-width: 600px; margin: 0 auto 24px; line-height: 1.6;">
+            Deploy in under 5 minutes. No technical expertise required. Shipped directly to your store, clinic, or business counter.
+          </p>
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Order Your Stand Now →</a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'google-maps-seo',
+    title: 'Google Maps Local 3-Pack SEO & Ranking Booster Software — KindlyRate',
+    description: 'Dominate Google Maps local search with KindlyRate. Accelerate genuine review velocity, inject high-intent search keywords into customer reviews, and capture Rank #1 on Google Local 3-Pack.',
+    heading: 'Dominate Google Maps Local 3-Pack Rankings in 2026',
+    subheading: 'Turn customer footfall into the #1 ranking factor on Google Maps: consistent, keyword-rich 5-star customer reviews.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Google Maps Local 3-Pack SEO', url: 'https://kindlyrate.com/google-maps-seo' }
+    ],
+    schemaType: 'SoftwareApplication',
+    schemaExtra: {
+      name: 'KindlyRate Local 3-Pack SEO Engine',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'All',
+      offers: { '@type': 'Offer', price: '79', priceCurrency: 'INR' }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Google Maps SEO</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">How to Rank #1 on Google Maps Local 3-Pack in 2026</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          Over 73% of high-intent local buyers click on the Google Maps Local 3-Pack without ever scrolling down to organic web links. KindlyRate's review acceleration engine optimizes all three pillars of Google's local search algorithm.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 24px; margin-bottom: 48px;">
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px; background: #ffffff;">
+            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">1. Continuous Review Velocity Beats Review Volume</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Google values <em>recency and velocity</em> over old review counts. A business receiving 4 to 6 reviews every single day from on-counter QR stands outranks an older competitor with 500 stale reviews collected two years ago.
+            </p>
+          </div>
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px; background: #ffffff;">
+            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">2. Semantic Keyword Injection in Customer Text</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Google's search bots extract semantic entities from customer reviews. When customers mention phrases like "best dental implants", "flawless haircut", or "delicious woodfired pizza", Google justifies your business as the #1 answer for those local search queries.
+            </p>
+          </div>
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px; background: #ffffff;">
+            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">3. Proximity Radius Expansion</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              When your listing has superior prominence (higher review velocity and high sentiment score), Google expands your geographical visibility up to 8.5 km outside your immediate physical location.
+            </p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Boost Your Google Maps Ranking →</a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'negative-review-shield',
+    title: 'Reputation Shield — Stop Unfair 1-Star Google Reviews Legally | KindlyRate',
+    description: 'Protect your Google Maps rating from damaging 1-star reviews. KindlyRate 100% Reputation Shield intercepts dissatisfied customer feedback privately before it hits Google Maps.',
+    heading: 'Protect Your Business from Unfair 1-Star Reviews & Rating Drops',
+    subheading: 'Intercept complaints privately in real time. 100% compliant with Google Business Profile policies.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Reputation Shield', url: 'https://kindlyrate.com/negative-review-shield' }
+    ],
+    schemaType: 'SoftwareApplication',
+    schemaExtra: {
+      name: 'KindlyRate Reputation Shield',
+      applicationCategory: 'SecurityApplication',
+      operatingSystem: 'All',
+      offers: { '@type': 'Offer', price: '79', priceCurrency: 'INR' }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Reputation Shield</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">How to Shield Your Business from Unfair 1-Star Reviews Legally</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          A single 1-star review on Google Maps can lower your rating, reduce customer footfall, and cost your business thousands in lost revenue. KindlyRate intercepts customer grievances privately before they become public complaints.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 48px;">
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px; background: #ffffff;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">Private Grievance Interception</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              When a dissatisfied customer selects 1 to 3 stars, the flow opens a dedicated private feedback form. The complaint goes straight to the owner WhatsApp and dashboard for immediate on-the-spot resolution.
+            </p>
+          </div>
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px; background: #ffffff;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">100% FTC &amp; Google Compliant</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              KindlyRate never prohibits customers from posting or engages in illicit review gating. Customers choose their feedback voluntarily, ensuring full compliance with Google Maps terms of service.
+            </p>
+          </div>
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 28px; background: #ffffff;">
+            <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">Instant Resolution Alert SLA</h2>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Managers receive SMS and WhatsApp notifications within 10 seconds of a customer issue, enabling staff to resolve complaints while the customer is still inside the premises.
+            </p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Protect Your Google Reputation →</a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'google-reviews-for-restaurants',
+    title: 'Google Review Stands for Restaurants & Cafes — KindlyRate',
+    description: 'Turn dining customers into verified 5-star Google Maps reviews. Custom acrylic table talkers and bill-folder QR stands for restaurants, cafes, bars, and bakeries.',
+    heading: 'Smart Google Review Stands for Restaurants, Cafes & Food Outlets',
+    subheading: 'Capture 5-star diner reviews at the table when food and hospitality are freshest in memory.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Restaurants & Cafes', url: 'https://kindlyrate.com/google-reviews-for-restaurants' }
+    ],
+    schemaType: 'Product',
+    schemaExtra: {
+      name: 'KindlyRate Restaurant Google Review Stand',
+      description: 'Acrylic table talker and bill-folder review QR stand for restaurants and cafes.',
+      brand: { '@type': 'Brand', name: 'KindlyRate' }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Restaurants &amp; Cafes</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">Google Review Stands for Restaurants, Bistros &amp; Cafes</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          When diners finish their meal and receive the bill, that is your moment of peak gratitude. Placing KindlyRate table stands or bill-folder QR cards captures 5-star reviews before customers walk out the door.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">🍽️ Dining Keyword Injection</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">Our AI suggests dish names (e.g. "authentic pasta", "crispy dosa", "cozy ambience") which diners paste into reviews, driving top rankings for menu queries.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">🍷 Wrong Order Protection</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">If a table experienced cold food or slow service, Reputation Shield routes the complaint straight to the restaurant manager before they write a bad review online.</p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Get Restaurant Review Stands →</a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'google-reviews-for-clinics',
+    title: 'Google Reviews for Dental Clinics & Healthcare Practices — KindlyRate',
+    description: 'Help patients share positive treatment experiences on Google Maps. Smart reception desk review stands for dental clinics, dermatologists, eye care, and doctors.',
+    heading: 'Capture 5-Star Patient Reviews & Rank #1 for Local Medical Searches',
+    subheading: 'Build patient trust with high-volume verified Google reviews at your reception counter.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Healthcare & Clinics', url: 'https://kindlyrate.com/google-reviews-for-clinics' }
+    ],
+    schemaType: 'Product',
+    schemaExtra: {
+      name: 'KindlyRate Healthcare Google Review Stand',
+      description: 'Smart reception desk review stand for medical clinics and healthcare practices.',
+      brand: { '@type': 'Brand', name: 'KindlyRate' }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Healthcare &amp; Clinics</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">Google Reviews for Dental Clinics, Doctors &amp; Hospitals</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          Patients choose doctors and dental clinics almost exclusively based on Google Maps reviews. When patients complete their appointment and pay at reception, a 30-second QR tap captures their genuine relief and gratitude.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">🦷 Medical Keyword Prompts</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">Suggests keywords like "painless root canal", "gentle pediatric dentist", "clean and hygienic clinic" to rank #1 on high-value medical searches.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">🏥 Patient Grievance Interception</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">Billing questions or long wait times are caught privately on the spot, preventing angry patients from taking frustration out on Google Maps.</p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Deploy Clinic Stands Today →</a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'google-reviews-for-salons',
+    title: 'Google Review Stands for Salons, Spas & Beauty Parlours — KindlyRate',
+    description: 'Boost salon walk-ins and appointment bookings. Smart mirror and reception QR stands for hair salons, unisex beauty parlours, nail bars, and luxury spas.',
+    heading: 'Turn Styling Clients into 5-Star Google Reviews Automatically',
+    subheading: 'Capture glowing customer testimonials right at the styling mirror or billing counter.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Salons & Spas', url: 'https://kindlyrate.com/google-reviews-for-salons' }
+    ],
+    schemaType: 'Product',
+    schemaExtra: {
+      name: 'KindlyRate Salon Review Stand',
+      description: 'Smart NFC QR counter stand for beauty parlours, salons, and spas.',
+      brand: { '@type': 'Brand', name: 'KindlyRate' }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Salons &amp; Spas</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">Google Review Stands for Salons, Spas &amp; Beauty Parlours</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          When a client loves their haircut, facial, or styling, their satisfaction is at its peak right at the mirror. Placing KindlyRate stands at styling stations and the cash counter drives 300% more 5-star Google reviews.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">✂️ Styling &amp; Hair Care Keywords</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">Our AI assistant suggests keywords like "best bridal makeup", "expert hair colorist", "relaxing Swedish massage" that clients seamlessly paste into Google.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">💄 Private Client Recovery</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">If a client isn't fully happy with a shade or cut, Reputation Shield catches it immediately so your senior stylist can fix it before any negative review appears.</p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Order Salon Stands →</a>
+        </div>
+      </section>
+    `
+  },
+  {
+    path: 'google-reviews-for-retail',
+    title: 'Google Review Stands for Retail Shops & Showrooms — KindlyRate',
+    description: 'Capture customer reviews at the cash register. Smart acrylic counter stands for clothing boutiques, electronics stores, optical shops, jewellery, and supermarkets.',
+    heading: 'Accelerate 5-Star Google Reviews at Your Retail Billing Counter',
+    subheading: 'Convert retail checkout footfall into dominant Google Maps local search rankings.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Retail Shops & Showrooms', url: 'https://kindlyrate.com/google-reviews-for-retail' }
+    ],
+    schemaType: 'Product',
+    schemaExtra: {
+      name: 'KindlyRate Retail Review Stand',
+      description: 'Countertop smart QR NFC review stand for retail outlets and stores.',
+      brand: { '@type': 'Brand', name: 'KindlyRate' }
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Retail Shops &amp; Showrooms</span>
+        </nav>
+        <h1 style="font-size: 38px; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.25;">Google Review Stands for Retail Shops, Boutiques &amp; Showrooms</h1>
+        <p style="font-size: 19px; color: #475569; max-width: 850px; line-height: 1.6; margin-bottom: 36px;">
+          Retail shoppers are in a hurry, but while the card machine processes or items are bagged, they have 30 seconds. A physical tap stand on the counter converts casual buyers into verified Google reviewers effortlessly.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px;">
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">🛍️ Retail Search Keywords</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">Prompts shoppers with tags like "wide clothing collection", "honest pricing", "helpful store associates" to establish local search authority.</p>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">🏪 Multi-Checkout Support</h2>
+            <p style="font-size: 14px; color: #475569; line-height: 1.6;">Deploy stands across multiple billing registers, track performance per checkout counter, and identify top-performing customer service staff.</p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Deploy Retail Stands →</a>
+        </div>
+      </section>
+    `
   }
 ];
 

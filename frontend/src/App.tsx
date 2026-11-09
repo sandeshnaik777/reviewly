@@ -25,7 +25,49 @@ export const App: React.FC = () => {
     const path = window.location.pathname;
     const normalized = path.length > 1 ? path.replace(/\/+$/, '') : path;
     if (view === 'landing') {
-      if (initialLandingSection === 'pricing' || normalized === '/pricing') {
+      if (normalized === '/google-review-stand') {
+        updatePageSeo({
+          title: 'Smart Google Review Stands (NFC + QR) for Countertops — KindlyRate',
+          description: 'Boost 5-star Google Maps reviews with KindlyRate laser-cut acrylic smart QR & NFC counter stands. Tap with phone or scan QR code in 3 seconds. Pre-programmed, zero setup, starts at ₹79.',
+          path: '/google-review-stand',
+        });
+      } else if (normalized === '/google-maps-seo') {
+        updatePageSeo({
+          title: 'Google Maps Local 3-Pack SEO & Ranking Booster Software — KindlyRate',
+          description: 'Dominate Google Maps local search with KindlyRate. Accelerate genuine review velocity, inject high-intent search keywords into customer reviews, and capture Rank #1 on Google Local 3-Pack.',
+          path: '/google-maps-seo',
+        });
+      } else if (normalized === '/negative-review-shield') {
+        updatePageSeo({
+          title: 'Reputation Shield — Stop Unfair 1-Star Google Reviews Legally | KindlyRate',
+          description: 'Protect your Google Maps rating from damaging 1-star reviews. KindlyRate 100% Reputation Shield intercepts dissatisfied customer feedback privately before it hits Google Maps.',
+          path: '/negative-review-shield',
+        });
+      } else if (normalized === '/google-reviews-for-restaurants') {
+        updatePageSeo({
+          title: 'Google Review Stands for Restaurants & Cafes — KindlyRate',
+          description: 'Turn dining customers into verified 5-star Google Maps reviews. Custom acrylic table talkers and bill-folder QR stands for restaurants, cafes, bars, and bakeries.',
+          path: '/google-reviews-for-restaurants',
+        });
+      } else if (normalized === '/google-reviews-for-clinics') {
+        updatePageSeo({
+          title: 'Google Reviews for Dental Clinics & Healthcare Practices — KindlyRate',
+          description: 'Help patients share positive treatment experiences on Google Maps. Smart reception desk review stands for dental clinics, dermatologists, eye care, and doctors.',
+          path: '/google-reviews-for-clinics',
+        });
+      } else if (normalized === '/google-reviews-for-salons') {
+        updatePageSeo({
+          title: 'Google Review Stands for Salons, Spas & Beauty Parlours — KindlyRate',
+          description: 'Boost salon walk-ins and appointment bookings. Smart mirror and reception QR stands for hair salons, unisex beauty parlours, nail bars, and luxury spas.',
+          path: '/google-reviews-for-salons',
+        });
+      } else if (normalized === '/google-reviews-for-retail') {
+        updatePageSeo({
+          title: 'Google Review Stands for Retail Shops & Showrooms — KindlyRate',
+          description: 'Capture customer reviews at the cash register. Smart acrylic counter stands for clothing boutiques, electronics stores, optical shops, jewellery, and supermarkets.',
+          path: '/google-reviews-for-retail',
+        });
+      } else if (initialLandingSection === 'pricing' || normalized === '/pricing') {
         updatePageSeo({
           title: 'Pricing & Transparent Subscription Plans — KindlyRate',
           description: 'Explore affordable KindlyRate pricing: Starter Pack at ₹79, Growth Pack at ₹149/mo, and Scale Pro at ₹249/mo. Smart NFC QR counter stands, AI review assistant, and local SEO booster.',
@@ -113,6 +155,14 @@ export const App: React.FC = () => {
       setView('landing');
     } else if (normalizedPath === '/faq') {
       setInitialLandingSection('faq');
+      setView('landing');
+    } else if (
+      normalizedPath === '/google-review-stand' ||
+      normalizedPath === '/google-maps-seo' ||
+      normalizedPath === '/negative-review-shield' ||
+      normalizedPath.startsWith('/google-reviews-for-')
+    ) {
+      setInitialLandingSection('features');
       setView('landing');
     }
 
