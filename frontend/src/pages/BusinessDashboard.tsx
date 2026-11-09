@@ -38,6 +38,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  ArrowRight,
   LogOut,
   ExternalLink,
   Bell,
@@ -343,6 +344,25 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     (usage?.subscription?.status === 'ACTIVE') ||
     (usage?.subscription?.status === 'TRIAL' && usage?.subscription?.trialActivated === true)
   );
+
+  // Lucky Festive Spin Modal popup state
+  const [showSpinModal, setShowSpinModal] = useState<boolean>(false);
+
+  // Auto-prompt lucky spin popup once per session for unpaid visitors after short delay
+  useEffect(() => {
+    if (!loading && !isPaidActive) {
+      try {
+        const alreadyShown = sessionStorage.getItem('kindlyrate_spin_auto_shown');
+        if (!alreadyShown) {
+          const timer = setTimeout(() => {
+            setShowSpinModal(true);
+            sessionStorage.setItem('kindlyrate_spin_auto_shown', 'true');
+          }, 1400);
+          return () => clearTimeout(timer);
+        }
+      } catch {}
+    }
+  }, [loading, isPaidActive]);
 
   useEffect(() => {
     loadAllData();
@@ -876,12 +896,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
   if (!business) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', flexDirection: 'column', gap: '16px', padding: '24px' }}>
-        <div style={{ textAlign: 'center', maxWidth: '420px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '32px 24px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+        <div style={{ textAlign: 'center', maxWidth: '420px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px 24px', boxShadow: 'var(--shadow-md)' }}>
           <AlertTriangle size={36} color="#d97706" style={{ margin: '0 auto 12px', display: 'block' }} />
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '0 0 8px 0' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text)', margin: '0 0 8px 0' }}>
             Unable to Load Business Data
           </h3>
-          <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '0 0 20px 0', lineHeight: 1.5 }}>
             We could not connect to your business profile. Please check your connection or try refreshing.
           </p>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
@@ -1139,7 +1159,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               onClick={() => setShowHelpModal(true)}
               style={{
                 width: '100%',
-                background: '#ffffff',
+                background: 'var(--surface)',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '6px 10px',
@@ -1220,6 +1240,33 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           </div>
 
           <div className="dashboard-topbar-actions">
+            {/* Festive Spin & Win Trigger Button */}
+            {!isPaidActive && (
+              <button
+                type="button"
+                onClick={() => setShowSpinModal(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)',
+                  color: '#ffffff',
+                  border: '1px solid #fde047',
+                  padding: '7px 13px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)',
+                }}
+                title="Spin Diwali Lucky Wheel - Win 84% OFF"
+              >
+                <Sparkles size={14} color="#fef08a" />
+                <span className="hide-mobile">Spin & Win 84% OFF</span>
+                <span className="show-mobile-only">Spin</span>
+              </button>
+            )}
+
             {/* Theme Mode Toggle (Dark / Light) */}
             <button
               type="button"
@@ -1547,11 +1594,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 flexWrap: 'wrap',
                 gap: '14px',
                 marginBottom: '20px',
-                background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
                 borderRadius: '14px',
                 padding: '18px 22px',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div>
@@ -1640,7 +1687,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/...)"
                     value={quickMapsUrl}
                     onChange={(e) => setQuickMapsUrl(e.target.value)}
-                    style={{ flex: 1, minWidth: '200px', background: '#ffffff', border: '1.5px solid #fdba74' }}
+                    style={{ flex: 1, minWidth: '200px', background: 'var(--surface)', border: '1.5px solid #fdba74' }}
                   />
                   <button
                     type="button"
@@ -1661,13 +1708,80 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               </div>
             )}
 
-            {/* Interactive Festive Spinning Gear Offer */}
+            {/* Sleek Festive Banner Trigger for Lucky Wheel Popup */}
             {!isPaidActive && (
-              <DiwaliSpinningOffer
-                onClaimTrial={handlePayTrial}
-                onViewAllPlans={() => setActiveTab('subscription')}
-                offerTimeLeft={offerTimeLeft}
-              />
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(245, 158, 11, 0.12) 100%)',
+                  border: '1.5px solid rgba(234, 88, 12, 0.28)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: '16px 22px',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                  flexWrap: 'wrap',
+                  boxShadow: 'var(--shadow-sm)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #b45309, #f59e0b)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Sparkles size={22} />
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', background: '#dc2626', color: '#ffffff', padding: '2px 8px', borderRadius: '4px' }}>
+                        Diwali Special
+                      </span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        Closes in <strong>{offerTimeLeft.hours}h {offerTimeLeft.minutes}m {offerTimeLeft.seconds}s</strong>
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginTop: '3px' }}>
+                      Spin the Lucky Wheel to unlock 84% OFF (Instant 14-Day Growth Trial for ₹79)
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowSpinModal(true)}
+                    className="btn btn-primary"
+                    style={{
+                      background: 'linear-gradient(135deg, #b45309 0%, #ea580c 50%, #f59e0b 100%)',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: 'var(--radius-lg)',
+                      fontSize: '13.5px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)',
+                    }}
+                  >
+                    <Sparkles size={16} />
+                    <span>Spin Lucky Wheel</span>
+                    <ArrowRight size={15} />
+                  </button>
+                </div>
+              </div>
             )}
 
             {/* Overview Top 4 KPIs & Mobile Quick Actions */}
@@ -1685,18 +1799,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               <div
                 className="card dashboard-kpi-card"
                 style={{
-                  background: '#ffffff',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '14px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-lg)',
                   padding: '20px 22px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Customer Rating Index
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '6px' }}>
-                  <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, color: '#0f172a' }}>
+                  <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, color: 'var(--text)' }}>
                     {analytics?.avgRating ? `${analytics.avgRating}` : '5.0'}
                   </div>
                   <div style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
@@ -1705,8 +1819,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                     ))}
                   </div>
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#15803d', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
+                <div style={{ fontSize: '12.5px', color: 'var(--success)', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
                   <span>{reviews.length > 0 ? 'Verified rating active' : 'Awaiting initial ratings'}</span>
                 </div>
               </div>
@@ -1714,37 +1828,37 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               <div
                 className="card dashboard-kpi-card"
                 style={{
-                  background: '#ffffff',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '14px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-lg)',
                   padding: '20px 22px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   <GoogleLogo size={14} />
                   <span>Google Maps Driven</span>
                 </div>
-                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: '#15803d' }}>
+                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: 'var(--success)' }}>
                   {analytics?.googleClicks ?? 0}
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px' }}>
-                  <strong style={{ color: '#0f172a' }}>{analytics?.funnel?.copiedToGoogle ?? 0}%</strong> conversion from scans
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                  <strong style={{ color: 'var(--text)' }}>{analytics?.funnel?.copiedToGoogle ?? 0}%</strong> conversion from scans
                 </div>
               </div>
 
               <div
                 className="card dashboard-kpi-card"
                 style={{
-                  background: '#ffffff',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '14px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-lg)',
                   padding: '20px 22px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                     AI Reviews Generated
                   </div>
                   <button
@@ -1766,29 +1880,29 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: 'var(--primary)' }}>
                   {analytics?.generated ?? 0}
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px' }}>
-                  From <strong style={{ color: '#0f172a' }}>{analytics?.ratings ?? 0}</strong> rating sessions
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                  From <strong style={{ color: 'var(--text)' }}>{analytics?.ratings ?? 0}</strong> rating sessions
                 </div>
               </div>
 
               <div
                 className="card dashboard-kpi-card"
                 style={{
-                  background: '#ffffff',
-                  border: '1.5px solid #e2e8f0',
-                  borderRadius: '14px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-lg)',
                   padding: '20px 22px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
                   Total QR Scans
                 </div>
-                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: '#0f172a' }}>
+                <div className="kpi-value" style={{ fontSize: '34px', fontWeight: 800, marginTop: '6px', color: 'var(--text)' }}>
                   {analytics?.scans ?? 0}
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '6px' }}>
-                  Across <strong style={{ color: '#0f172a' }}>{qrs.length}</strong> active counter stations
+                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                  Across <strong style={{ color: 'var(--text)' }}>{qrs.length}</strong> active counter stations
                 </div>
               </div>
             </div>
@@ -1902,12 +2016,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 <div
                   className="card dashboard-card-responsive"
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #fed7aa',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '24px 26px',
                     marginBottom: '24px',
-                    boxShadow: '0 4px 16px rgba(234, 88, 12, 0.05)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
@@ -2006,7 +2120,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   placeholder="Type any custom question (e.g. Doctor Consultation, Delivery Speed, Room View)..."
                   value={newOverviewQuestion}
                   onChange={(e) => setNewOverviewQuestion(e.target.value)}
-                  style={{ flex: 1, minWidth: '220px', fontSize: '13.5px', background: '#ffffff', border: '1.5px solid #cbd5e1' }}
+                  style={{ flex: 1, minWidth: '220px', fontSize: '13.5px', background: 'var(--surface)', border: '1px solid var(--border)' }}
                 />
                 <button
                   type="submit"
@@ -2086,19 +2200,19 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             <div
               className="card dashboard-card-responsive"
               style={{
-                background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
                 borderRadius: '16px',
                 padding: '24px 28px',
                 marginBottom: '24px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <Target size={22} color="var(--primary)" />
                   <div>
-                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                       Target Keywords &amp; Services to Mention in Reviews
                     </h3>
                     <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
@@ -2327,11 +2441,11 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
               {/* 1. WEEKLY REVIEW ACTIVITY (SIMPLIFIED & CLEAN) */}
               {weeklyViewSubtab === 'chart' && (
-                <div className="card dashboard-card-responsive" style={{ padding: '24px 26px', marginBottom: '24px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                <div className="card dashboard-card-responsive" style={{ padding: '24px 26px', marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                       Weekly Reviews (Last 7 Days)
                     </h3>
                     <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700 }}>
@@ -2485,12 +2599,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             <div
               className="card dashboard-card-responsive"
               style={{
-                background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
                 borderRadius: '16px',
                 padding: '24px 26px',
                 marginBottom: '24px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
@@ -2659,53 +2773,53 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
               {/* Sub-Feature 1: Financial Telemetry & Aggregator Savings */}
               {roiSubtab === 'financial' && (
-              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', marginBottom: '24px' }}>
+              <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                     Revenue Impact &amp; Aggregator Savings
                   </h4>
                   <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700 }}>
                     Net: +₹{(financial?.totalMonthlyImpactInr ?? 0).toLocaleString()}/mo
                   </span>
                 </div>
-                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px', marginTop: '2px' }}>
                   Quantified financial value delivered directly to your bottom line.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Direct Walk-In Revenue Lift</div>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Guests discovering via Google Maps 5★ pack</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Direct Walk-In Revenue Lift</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Guests discovering via Google Maps 5★ pack</div>
                     </div>
-                    <div style={{ fontWeight: 800, fontSize: '16px', color: '#15803d' }}>
+                    <div style={{ fontWeight: 800, fontSize: '16px', color: 'var(--success)' }}>
                       +₹{(financial?.walkInRevenueInr ?? 0).toLocaleString()}
                     </div>
                   </div>
 
-                  <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Direct Walk-In Commission Saved</div>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>Aggregator commissions saved on direct walk-in customers</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Direct Walk-In Commission Saved</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Aggregator commissions saved on direct walk-in customers</div>
                     </div>
                     <div style={{ fontWeight: 800, fontSize: '16px', color: 'var(--primary)' }}>
                       +₹{(financial?.aggregatorCommissionsSavedInr ?? 0).toLocaleString()}
                     </div>
                   </div>
 
-                  <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Shield Recovered Revenue</div>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied customers intercepted and recovered privately</div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Shield Recovered Revenue</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{roi.negativeReviewsShielded ?? 0} dissatisfied customers intercepted and recovered privately</div>
                     </div>
-                    <div style={{ fontWeight: 800, fontSize: '16px', color: '#16a34a' }}>
+                    <div style={{ fontWeight: 800, fontSize: '16px', color: 'var(--success)' }}>
                       +₹{(financial?.shieldRecoveredRevenueInr ?? 0).toLocaleString()}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 4px', fontSize: '13px', color: '#64748b' }}>
-                    <span>Customer Acquisition Cost: <strong style={{ color: '#15803d' }}>₹0</strong> (vs ₹450 Google Ads CPC)</span>
-                    <span>LTV Multiplier: <strong style={{ color: '#0f172a' }}>{financial.customerLifetimeValueMultiplier}</strong></span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 4px', fontSize: '13px', color: 'var(--text-muted)' }}>
+                    <span>Customer Acquisition Cost: <strong style={{ color: 'var(--success)' }}>₹0</strong> (vs ₹450 Google Ads CPC)</span>
+                    <span>LTV Multiplier: <strong style={{ color: 'var(--text)' }}>{financial.customerLifetimeValueMultiplier}</strong></span>
                   </div>
                 </div>
               </div>
@@ -2713,14 +2827,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
               {/* Sub-Feature 2: Competitor Radar */}
               {roiSubtab === 'competitors' && (
-              <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', marginBottom: '24px' }}>
+              <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                     Local Search Dominance &amp; Competitor Radar
                   </h4>
                   <span className="stat-pill stat-pill-primary" style={{ fontSize: '11px', fontWeight: 700 }}>{roi.googleLocalPackRank || 'Radar Active'}</span>
                 </div>
-                <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', marginTop: '2px' }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', marginTop: '2px' }}>
                   Your Google Maps local 3-pack search share vs top 3 local rivals.
                 </p>
 
@@ -2784,35 +2898,35 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 }}
               >
                 {/* Hourly / Peak Shift Heatmap */}
-                <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                       Customer Peak Hours &amp; Store Activity
                     </h4>
                     <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 700 }}>
                       {reviews.length > 0 ? '● Active' : 'Awaiting Scans'}
                     </span>
                   </div>
-                  <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '18px', marginTop: '2px' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px', marginTop: '2px' }}>
                     Customer activity, review submission velocity, and visit patterns.
                   </p>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
-                      <div style={{ padding: '24px', textAlign: 'center', color: '#64748b', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                        <Clock size={22} color="#64748b" style={{ margin: '0 auto 6px', display: 'block' }} />
-                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Activity Tracker Standby</div>
+                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--surface-container)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                        <Clock size={22} color="var(--text-muted)" style={{ margin: '0 auto 6px', display: 'block' }} />
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Activity Tracker Standby</div>
                         <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Hourly distribution begins tracking with your first customer scan.</div>
                       </div>
                     ) : (
                       analytics.hourlyDistribution.map((shift: any, idx: number) => (
-                        <div key={idx} style={{ padding: '12px 14px', background: shift.isPeak ? '#fef3ee' : '#f8fafc', borderRadius: '10px', border: shift.isPeak ? '1.5px solid #fed7aa' : '1px solid #e2e8f0' }}>
+                        <div key={idx} style={{ padding: '12px 14px', background: shift.isPeak ? 'var(--primary-light)' : 'var(--surface-container)', borderRadius: '10px', border: shift.isPeak ? '1.5px solid var(--border)' : '1px solid var(--border)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div style={{ fontWeight: 700, fontSize: '14px', color: shift.isPeak ? 'var(--primary)' : '#0f172a' }}>
+                            <div style={{ fontWeight: 700, fontSize: '14px', color: shift.isPeak ? 'var(--primary)' : 'var(--text)' }}>
                               {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 6px', marginLeft: '6px' }}>Peak Shift</span>}
                             </div>
-                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
-                              {shift.reviews} reviews · {shift.avgRating} / 5 · <span style={{ color: '#64748b', fontWeight: 500 }}>{shift.turnRate}</span>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)' }}>
+                              {shift.reviews} reviews · {shift.avgRating} / 5 · <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>{shift.turnRate}</span>
                             </div>
                           </div>
                           <div style={{ height: '7px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
@@ -2831,14 +2945,14 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </div>
 
                 {/* Topic & Offering Sentiment Intelligence */}
-                <div className="card" style={{ padding: '26px', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                       Customer Praise &amp; Mention Themes
                     </h4>
                     <span className="stat-pill stat-pill-success" style={{ fontSize: '11px', fontWeight: 700 }}>AI Intelligence</span>
                   </div>
-                  <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', marginTop: '2px' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', marginTop: '2px' }}>
                     Real customer themes frequently mentioned in generated reviews.
                   </p>
 
@@ -2911,23 +3025,23 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 <div
                   className="card"
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '28px',
                     marginBottom: '24px',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.04)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #a7f3d0' }}>
-                    <TrendingUpIcon size={22} color="#15803d" />
+                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(34, 197, 94, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(34, 197, 94, 0.25)' }}>
+                    <TrendingUpIcon size={22} color="var(--success)" />
                   </div>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <h4 style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      <h4 style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                         Google Maps Keyword Rankings Tracker
                       </h4>
                       <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d' }}>
@@ -3271,20 +3385,20 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
               {/* 4 Summary Stat Cards */}
               <div className="dashboard-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
-                <div style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+                <div style={{ background: 'var(--surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                     Total QR Scans
                   </div>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', marginTop: '4px' }}>
                     {qrs.reduce((sum: number, q: any) => sum + (q.scanCount || 0), 0)}
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#16a34a', marginTop: '4px', fontWeight: 600 }}>
-                    ▲ Across {qrs.length} physical stands
+                  <div style={{ fontSize: '11.5px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
+                    Across {qrs.length} physical stands
                   </div>
                 </div>
 
-                <div style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+                <div style={{ background: 'var(--surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                     Reviews Generated
                   </div>
                   <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--primary)', marginTop: '4px' }}>
@@ -3295,23 +3409,23 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                   </div>
                 </div>
 
-                <div style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+                <div style={{ background: 'var(--surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                     Overall Conversion Rate
                   </div>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: '#16a34a', marginTop: '4px' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--success)', marginTop: '4px' }}>
                     {(() => { const totalScans = qrs.reduce((sum: number, q: any) => sum + (q.scanCount || 0), 0); const totalReviews = qrs.reduce((sum: number, q: any) => sum + (q.reviewsGenerated || 0), 0); return totalScans > 0 ? Math.round((totalReviews / totalScans) * 100) : 0; })()}%
                   </div>
-                  <div style={{ fontSize: '11.5px', color: '#15803d', marginTop: '4px', fontWeight: 600 }}>
-                    ⭐ Industry High (Avg is 18%)
+                  <div style={{ fontSize: '11.5px', color: 'var(--success)', marginTop: '4px', fontWeight: 600 }}>
+                    Industry High (Avg is 18%)
                   </div>
                 </div>
 
-                <div style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #e2e8f0', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>
-                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' }}>
+                <div style={{ background: 'var(--surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                  <div style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                     Google Maps Clicks
                   </div>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: '#2563eb', marginTop: '4px' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 800, color: '#3b82f6', marginTop: '4px' }}>
                     {qrs.reduce((sum: number, q: any) => sum + (q.googleClicks || 0), 0)}
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -3646,8 +3760,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             {/* Top Header & Fast Save Bar */}
             <div
               style={{
-                background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
                 borderRadius: '16px',
                 padding: '24px 28px',
                 display: 'flex',
@@ -3655,7 +3769,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 gap: '16px',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div>
@@ -3712,18 +3826,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 {/* 1. CUSTOMER MOBILE RATING CRITERIA (QUESTIONS) - CORE RATING INPUT */}
                 <div
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '26px 28px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <SlidersHorizontal size={20} color="var(--primary)" />
-                        <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                           1. Customer Mobile Rating Criteria (Questions)
                         </h4>
                       </div>
@@ -3927,18 +4041,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 {/* 2. REPUTATION DEFENSE SHIELD (HIGH IMPACT FILTER) */}
                 <div
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '26px 28px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <ShieldIcon size={20} color="var(--primary)" />
-                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                           2. Reputation Defense Shield (Automated Negative Review Filter)
                         </h4>
                       </div>
@@ -4061,17 +4175,17 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 {/* 3. AI REVIEW VOICE & PERSONA (SIMPLIFIED) */}
                 <div
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '24px 26px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <SparklesIcon size={18} color="var(--primary)" />
-                      <h4 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                         3. AI Review Writing Voice &amp; Tone
                       </h4>
                     </div>
@@ -4177,18 +4291,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 {/* 4. KEYWORDS & OFFERINGS TO HIGHLIGHT (SEO ENGINE) */}
                 <div
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '26px 28px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Target size={20} color="#15803d" />
-                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        <Target size={20} color="var(--success)" />
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                           4. Target Offerings &amp; Keywords to Naturally Mention
                         </h4>
                       </div>
@@ -4404,18 +4518,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 {/* 5. CUSTOMER SCRATCH CARD REWARDS (OPTIONAL) */}
                 <div
                   style={{
-                    background: '#ffffff',
-                    border: '1.5px solid #e2e8f0',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
                     borderRadius: '16px',
                     padding: '26px 28px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.02)',
+                    boxShadow: 'var(--shadow-sm)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <GiftIcon size={20} color="var(--primary)" />
-                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                        <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
                           5. Post-Review Scratch Card &amp; Customer Rewards (Optional)
                         </h4>
                         <span className="badge badge-neutral" style={{ fontSize: '11px' }}>Optional</span>
@@ -5045,13 +5159,78 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
         {/* ======================================================== */}
         {activeTab === 'subscription' && (
           <div>
-            {/* Interactive Festive Spinning Gear Offer in Subscription Tab */}
+            {/* Sleek Festive Banner Trigger in Subscription Tab */}
             {!usage?.subscription?.trialActivated ? (
-              <DiwaliSpinningOffer
-                onClaimTrial={handlePayTrial}
-                onViewAllPlans={() => setActiveTab('subscription')}
-                offerTimeLeft={offerTimeLeft}
-              />
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(245, 158, 11, 0.12) 100%)',
+                  border: '1.5px solid rgba(234, 88, 12, 0.28)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: '18px 22px',
+                  marginBottom: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                  flexWrap: 'wrap',
+                  boxShadow: 'var(--shadow-sm)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #b45309, #f59e0b)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Sparkles size={22} />
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', background: '#dc2626', color: '#ffffff', padding: '2px 8px', borderRadius: '4px' }}>
+                        Special Offer
+                      </span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                        Offer expires in <strong>{offerTimeLeft.hours}h {offerTimeLeft.minutes}m {offerTimeLeft.seconds}s</strong>
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)', marginTop: '4px' }}>
+                      Spin the Festive Wheel for 84% OFF ₹79 Launch Pass
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSpinModal(true)}
+                  className="btn btn-primary"
+                  style={{
+                    background: 'linear-gradient(135deg, #b45309 0%, #ea580c 50%, #f59e0b 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '11px 22px',
+                    borderRadius: 'var(--radius-lg)',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)',
+                  }}
+                >
+                  <Sparkles size={16} />
+                  <span>Spin Lucky Wheel</span>
+                  <ArrowRight size={15} />
+                </button>
+              </div>
             ) : (
               <div
                 style={{
@@ -5817,22 +5996,22 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             <div
               className="card"
               style={{
-                background: '#ffffff',
-                border: '1.5px solid #e2e8f0',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
                 borderRadius: '16px',
                 padding: '28px 32px',
                 marginTop: '24px',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
               <div style={{ marginBottom: '18px' }}>
                 <span className="badge badge-primary" style={{ fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
                   Schedule Free Engineering Consultation
                 </span>
-                <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: '4px 0 6px', color: '#0f172a' }}>
+                <h3 className="serif" style={{ fontSize: '20px', fontWeight: 700, margin: '4px 0 6px', color: 'var(--text)' }}>
                   Tell Us What You Want to Build for {business?.name || 'Your Business'}
                 </h3>
-                <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0 }}>
+                <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: 0 }}>
                   Our senior software architects will analyze your business requirements, prepare a turnkey architectural plan, and provide an accurate cost and timeline estimate.
                 </p>
               </div>
@@ -6451,6 +6630,18 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             showNotification('Email successfully verified!');
             loadAllData();
           }}
+        />
+
+        {/* Festive Lucky Spin Modal Popup */}
+        <DiwaliSpinningOffer
+          isOpen={showSpinModal}
+          onClose={() => setShowSpinModal(false)}
+          onClaimTrial={handlePayTrial}
+          onViewAllPlans={() => {
+            setShowSpinModal(false);
+            setActiveTab('subscription');
+          }}
+          offerTimeLeft={offerTimeLeft}
         />
     </div>
   );
