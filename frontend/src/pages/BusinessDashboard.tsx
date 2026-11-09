@@ -52,6 +52,7 @@ import {
   MapPin,
   MessageSquare,
   BarChart3,
+  TrendingUp,
   CheckCircle2,
   Zap,
   Layers,
