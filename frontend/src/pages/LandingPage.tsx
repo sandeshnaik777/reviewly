@@ -706,9 +706,9 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
 
             {/* Interactive Moving Stream Controls */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <span className="telemetry-pulse" />
-                <span>Moving Left to Right →</span>
+              <span className="stat-pill stat-pill-neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }} />
+                <span>Live Reviews Stream</span>
               </span>
 
               <button

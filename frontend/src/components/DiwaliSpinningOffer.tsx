@@ -88,14 +88,14 @@ export const DiwaliSpinningOffer: React.FC<Props> = ({
     >
       <div
         style={{
-          background: 'linear-gradient(150deg, #181d2f 0%, #111827 50%, #1a162b 100%)',
-          border: '2px solid rgba(245, 158, 11, 0.55)',
-          borderRadius: '24px',
+          background: '#121215',
+          border: '1px solid #27272a',
+          borderRadius: '20px',
           padding: '28px 24px',
-          maxWidth: '520px',
+          maxWidth: '500px',
           width: '100%',
           position: 'relative',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(245, 158, 11, 0.22)',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05)',
           color: '#ffffff',
           textAlign: 'center',
         }}
@@ -168,23 +168,20 @@ export const DiwaliSpinningOffer: React.FC<Props> = ({
         </div>
 
         <h3
-          className="serif"
           style={{
-            fontSize: '24px',
-            fontWeight: 800,
+            fontSize: '22px',
+            fontWeight: 700,
             margin: '4px 0 6px',
-            background: 'linear-gradient(135deg, #ffffff 30%, #fef08a 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            letterSpacing: '-0.3px',
+            color: '#f4f4f5',
+            letterSpacing: '-0.02em',
           }}
         >
           {showPrize ? 'Congratulations! Offer Unlocked' : 'Spin to Unlock Your Festive Offer'}
         </h3>
-        <p style={{ fontSize: '13px', color: '#94a3b8', margin: '0 auto 18px', maxWidth: '420px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '13px', color: '#a1a1aa', margin: '0 auto 18px', maxWidth: '400px', lineHeight: 1.5 }}>
           {showPrize
-            ? 'Your 84% discount has been unlocked! Claim your ₹79 Launch Pass or apply savings across any plan.'
-            : 'Tap the wheel below to spin. Every spin is guaranteed to unlock up to 85% OFF your review automation setup.'}
+            ? 'Your 84% discount has been unlocked. Claim your ₹79 Testing Pass or apply savings across any plan.'
+            : 'Tap the wheel below to spin. Every spin unlocks exclusive discounted pricing on review automation.'}
         </p>
 
         {/* The Wheel Container */}

@@ -570,9 +570,9 @@ export const LegalModals: React.FC<Props> = ({ type, onClose }) => {
           {activeTab === 'help' && (
             <div>
               <div style={{ marginBottom: '18px' }}>
-                <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="telemetry-pulse" />
-                  Live Support Desk: 100% Operational
+                <span className="stat-pill stat-pill-neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }} />
+                  Customer Support
                 </span>
                 <h2 className="serif" style={{ fontSize: '24px', fontWeight: 700, margin: '8px 0 4px', color: '#0f172a' }}>
                   Merchant Help Center &amp; Direct Support
