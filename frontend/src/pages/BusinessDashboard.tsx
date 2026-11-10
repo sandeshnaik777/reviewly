@@ -78,6 +78,7 @@ import {
   Check,
   Lock,
 } from 'lucide-react';
+import { LegalModals, LegalModalType } from '../components/LegalModals.js';
 import { DiwaliSpinningOffer } from '../components/DiwaliSpinningOffer.js';
 import { GeoGridHeatmap } from '../components/GeoGridHeatmap.js';
 import { ScratchCard } from '../components/ScratchCard.js';
@@ -249,6 +250,33 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
     minutes: '47',
     seconds: '19',
   });
+
+  // Legal Modals & Account Deletion State
+  const [legalModal, setLegalModal] = useState<LegalModalType>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim().toUpperCase() !== 'DELETE') {
+      setDeleteError('Please type DELETE to confirm account deletion.');
+      return;
+    }
+    try {
+      setIsDeletingAccount(true);
+      setDeleteError(null);
+      await api.deleteAccount();
+      if (onLogout) {
+        onLogout();
+      } else {
+        window.location.href = '/';
+      }
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to delete account. Please try again.');
+      setIsDeletingAccount(false);
+    }
+  };
 
   useEffect(() => {
     let expiry = 0;
@@ -1195,6 +1223,68 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             <LogOut size={15} />
             <span>Sign Out</span>
           </button>
+
+          {/* Hidden Legal Documents & Terms Links */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              fontSize: '11px',
+              color: 'var(--text-subtle)',
+              marginTop: '10px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setLegalModal('terms')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-subtle)',
+                cursor: 'pointer',
+                padding: 0,
+                fontSize: '11px',
+                textDecoration: 'underline',
+              }}
+            >
+              Terms
+            </button>
+            <span>·</span>
+            <button
+              type="button"
+              onClick={() => setLegalModal('privacy')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-subtle)',
+                cursor: 'pointer',
+                padding: 0,
+                fontSize: '11px',
+                textDecoration: 'underline',
+              }}
+            >
+              Privacy
+            </button>
+            <span>·</span>
+            <button
+              type="button"
+              onClick={() => setLegalModal('refund')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-subtle)',
+                cursor: 'pointer',
+                padding: 0,
+                fontSize: '11px',
+                textDecoration: 'underline',
+              }}
+            >
+              Refunds
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -5144,6 +5234,87 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                 </button>
               </div>
             </form>
+
+            {/* Legal & Compliance Section */}
+            <div style={{ marginTop: '36px', paddingTop: '24px', borderTop: '1px solid var(--border)' }}>
+              <h4 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
+                Platform Legal & Compliance Policies
+              </h4>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 14px' }}>
+                Review KindlyRate's terms of service, privacy & data protection commitments, and merchant policies.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setLegalModal('terms')}
+                  style={{ fontSize: '12.5px', padding: '7px 14px' }}
+                >
+                  Terms of Service
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setLegalModal('privacy')}
+                  style={{ fontSize: '12.5px', padding: '7px 14px' }}
+                >
+                  Privacy Policy
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setLegalModal('refund')}
+                  style={{ fontSize: '12.5px', padding: '7px 14px' }}
+                >
+                  Merchant Refund Policy
+                </button>
+              </div>
+            </div>
+
+            {/* Danger Zone: Account Deletion */}
+            <div
+              style={{
+                marginTop: '28px',
+                padding: '20px',
+                borderRadius: '12px',
+                border: '1px solid rgba(220, 38, 38, 0.35)',
+                background: 'rgba(220, 38, 38, 0.04)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+                <div>
+                  <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#dc2626', margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Trash2 size={16} />
+                    <span>Danger Zone · Delete Account</span>
+                  </h4>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, maxWidth: '560px', lineHeight: 1.5 }}>
+                    Permanently delete your merchant profile, active QR stands, customer review history, and disconnect Google Maps routing. This action cannot be reversed.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteConfirmText('');
+                    setDeleteError(null);
+                    setShowDeleteModal(true);
+                  }}
+                  style={{
+                    background: '#dc2626',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '9px 18px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(220, 38, 38, 0.25)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  Delete Account
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -6636,6 +6807,112 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           }}
           offerTimeLeft={offerTimeLeft}
         />
+
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteModal && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 10000,
+              backgroundColor: 'rgba(0, 0, 0, 0.72)',
+              backdropFilter: 'blur(6px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px',
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !isDeletingAccount) {
+                setShowDeleteModal(false);
+              }
+            }}
+          >
+            <div
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                padding: '28px',
+                maxWidth: '460px',
+                width: '100%',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                color: 'var(--text)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', color: '#dc2626' }}>
+                <div style={{ background: 'rgba(220, 38, 38, 0.1)', padding: '8px', borderRadius: '50%' }}>
+                  <AlertTriangle size={24} color="#dc2626" />
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
+                  Permanently Delete Account?
+                </h3>
+              </div>
+
+              <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>
+                This will immediately and irreversibly delete your login credentials, <strong>{business?.name || 'your business'}</strong>, all QR stand routes, customer review logs, and analytics.
+              </p>
+
+              {deleteError && (
+                <div className="alert alert-error" style={{ marginBottom: '14px', fontSize: '12.5px' }}>
+                  {deleteError}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '12.5px', fontWeight: 600, marginBottom: '6px', color: 'var(--text)' }}>
+                  To confirm, type <strong style={{ color: '#dc2626' }}>DELETE</strong> below:
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="DELETE"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  disabled={isDeletingAccount}
+                  style={{ width: '100%', textTransform: 'uppercase' }}
+                  autoFocus
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeletingAccount}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={isDeletingAccount || deleteConfirmText.trim().toUpperCase() !== 'DELETE'}
+                  style={{
+                    background: deleteConfirmText.trim().toUpperCase() === 'DELETE' ? '#dc2626' : '#9ca3af',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: deleteConfirmText.trim().toUpperCase() === 'DELETE' ? 'pointer' : 'not-allowed',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  {isDeletingAccount ? <span className="spinner" /> : 'Permanently Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Legal Modals (Terms, Privacy, Refund) */}
+        {legalModal && (
+          <LegalModals type={legalModal} onClose={() => setLegalModal(null)} />
+        )}
     </div>
   );
 };

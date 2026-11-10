@@ -942,6 +942,45 @@ authRouter.get('/me', authenticate, async (req: AuthenticatedRequest, res: Respo
 });
 
 /**
+ * DELETE /api/auth/account
+ * Permanently deletes the authenticated user account and all owned businesses and data
+ */
+authRouter.delete('/account', authenticate, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user!;
+    if (user.role === 'PLATFORM_ADMIN') {
+      return res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Platform Administrator account cannot be deleted.' },
+      });
+    }
+
+    const deleted = await db.deleteUserAccount(user.id);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'User account not found.' },
+      });
+    }
+
+    res.clearCookie(config.jwt.cookieName, {
+      httpOnly: true,
+      secure: config.env === 'production',
+      sameSite: config.env === 'production' ? 'none' : 'lax',
+      path: '/',
+    });
+
+    res.json({
+      success: true,
+      data: { message: 'Account permanently deleted.' },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+/**
  * POST /api/auth/send-verification-otp
  * Dispatches a 6-digit verification code with a 60-second cooldown rate limit
  */

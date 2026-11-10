@@ -60,6 +60,14 @@ export const api = {
     }
     return apiRequest('/auth/logout', { method: 'POST' });
   },
+  deleteAccount: () => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('kindlyrate_token');
+      localStorage.removeItem('kindlyreview_token');
+      localStorage.removeItem('reviewly_token');
+    }
+    return apiRequest('/auth/account', { method: 'DELETE' });
+  },
   getMe: () => apiRequest('/auth/me'),
   sendVerificationOtp: (email?: string) =>
     apiRequest('/auth/send-verification-otp', { method: 'POST', body: JSON.stringify({ email }) }),

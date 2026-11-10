@@ -600,6 +600,45 @@ class DatabaseService {
     return updated;
   }
 
+  async deleteUserAccount(userId: string): Promise<boolean> {
+    const userIndex = this.data.users.findIndex((u) => u.id === userId);
+    if (userIndex === -1) return false;
+
+    const user = this.data.users[userIndex];
+    if (user.email) {
+      this.usersByEmail.delete(user.email.toLowerCase());
+    }
+    this.usersById.delete(userId);
+    this.data.users.splice(userIndex, 1);
+
+    // Find all businesses owned by this user
+    const ownedBusinesses = this.data.businesses.filter((b) => b.ownerId === userId);
+    const ownedBusinessIds = new Set(ownedBusinesses.map((b) => b.id));
+
+    // Remove owned businesses
+    this.data.businesses = this.data.businesses.filter((b) => b.ownerId !== userId);
+
+    // Remove associated QR codes
+    if (this.data.qrCodes) {
+      this.data.qrCodes = this.data.qrCodes.filter((qr) => !ownedBusinessIds.has(qr.businessId));
+    }
+
+    // Remove associated questions
+    if (this.data.questions) {
+      this.data.questions = this.data.questions.filter((q) => !ownedBusinessIds.has(q.businessId));
+    }
+
+    // Remove associated settings
+    if (this.data.settings) {
+      this.data.settings = this.data.settings.filter((s) => !ownedBusinessIds.has(s.businessId));
+    }
+
+    this.rebuildIndexes();
+    await this.persist();
+    return true;
+  }
+
+
   // --- Email Verifications ---
   async createEmailVerification(record: EmailVerificationRecord): Promise<EmailVerificationRecord> {
     if (!this.data.emailVerifications) this.data.emailVerifications = [];
