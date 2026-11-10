@@ -2068,7 +2068,11 @@ class DatabaseService {
       this.data.systemNotifications = [];
     }
     return this.data.systemNotifications
-      .filter((n) => !n.targetBusinessId || n.targetBusinessId === targetBusinessId)
+      .filter((n) => {
+        // Job applicant notifications must NEVER be visible to merchants
+        if (n.title && n.title.startsWith('New Candidate:')) return false;
+        return !n.targetBusinessId || n.targetBusinessId === targetBusinessId;
+      })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 

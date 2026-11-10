@@ -63,8 +63,6 @@ import {
   Trash2,
   Edit2,
   Palette,
-  Sun,
-  Moon,
   AlertTriangle,
   RefreshCw,
   Star,
@@ -116,24 +114,13 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
   >('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Dark / Light Mode Theme
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('kindlyrate_theme');
-      if (saved === 'dark' || saved === 'light') return saved;
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
-    }
-    return 'light';
-  });
-
+  // Enforce Clean Light Mode (Dark mode removed per user request)
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('kindlyrate_theme', theme);
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.removeItem('kindlyrate_theme');
     }
-  }, [theme]);
+  }, []);
 
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -1394,30 +1381,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
               </button>
             )}
 
-            {/* Theme Mode Toggle (Dark / Light) */}
-            <button
-              type="button"
-              onClick={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
-              style={{
-                background: 'var(--surface-container)',
-                color: 'var(--text)',
-                border: '1px solid var(--border)',
-                padding: '7px 12px',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '12.5px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s ease',
-              }}
-              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-              aria-label={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
-            >
-              {theme === 'light' ? <Moon size={15} color="#6366f1" /> : <Sun size={15} color="#f59e0b" />}
-              <span className="hide-mobile">{theme === 'light' ? 'Dark' : 'Light'}</span>
-            </button>
+
 
             {/* Announcements & Notifications Bell */}
             <button
@@ -1707,1704 +1671,397 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
         {/* TAB 1: STORE OVERVIEW                                    */}
         {/* ======================================================== */}
         {activeTab === 'overview' && (
-          <div>
-            {/* Store Overview Page Header */}
+          <div style={{ maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            {/* 1. Store Status & Greeting Bar */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '14px',
-                marginBottom: '20px',
+                gap: '12px',
+                marginBottom: '16px',
+                padding: '12px 16px',
                 background: 'var(--surface)',
                 border: '1px solid var(--border)',
-                borderRadius: '14px',
-                padding: '18px 22px',
+                borderRadius: '12px',
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                  <h2 className="serif" style={{ fontSize: '22px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                    Store Overview
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                    {business?.name || 'Your Business'}
                   </h2>
-                  <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d', fontWeight: 700 }}>
-                    ● Live Status
+                  <span style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d', fontWeight: 700, padding: '2px 8px', borderRadius: '12px' }}>
+                    ● Stand Active
                   </span>
                 </div>
-                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
-                  Live reviews, customer ratings, and Google Maps ranking tracker for <strong style={{ color: '#0f172a' }}>{business?.name || 'your store'}</strong>
+                <p style={{ margin: '3px 0 0', fontSize: '12.5px', color: '#64748b' }}>
+                  {business?.city || 'Local Area'} · Counter Review Stand
                 </p>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <button
                   type="button"
                   onClick={handleRefreshMapsRankings}
                   disabled={isRefreshingMaps}
                   className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  style={{ fontSize: '12px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '5px' }}
                 >
-                  <RefreshIcon size={14} />
-                  <span>{isRefreshingMaps ? 'Syncing...' : 'Refresh Data'}</span>
+                  <RefreshIcon size={13} />
+                  <span>{isRefreshingMaps ? 'Syncing...' : 'Refresh'}</span>
                 </button>
-                {qrs[0] && (
-                  <a
-                    href={`/r/${qrs[0].slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-primary btn-sm"
-                    style={{ fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <SparklesIcon size={14} color="#ffffff" />
-                    <span>Open Review Flow ↗</span>
-                  </a>
-                )}
               </div>
             </div>
 
-            {/* Quick Setup Checklist for Google Maps Link */}
+            {/* 2. Connect Google Maps (Only shown when not connected) */}
             {(!business?.googleReviewUrl || business?.googleReviewUrl === 'https://maps.google.com') && !quickMapsSuccess && !mapsSetupDismissed && (
               <div
-                className="dashboard-card-responsive"
                 style={{
-                  background: 'linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)',
-                  border: '2px solid #fed7aa',
-                  borderRadius: '14px',
-                  padding: '16px 20px',
-                  marginBottom: '20px',
-                  boxShadow: '0 4px 14px rgba(154, 64, 24, 0.06)',
-                  position: 'relative',
+                  background: '#fffaf8',
+                  border: '1.5px solid #fed7aa',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  marginBottom: '16px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#ea580c', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <MapPin size={16} color="#ffffff" />
-                    </div>
-                    <div>
-                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#9a3412', margin: 0 }}>
-                        Step 1: Connect Your Google Maps Listing
-                      </h3>
-                      <p style={{ margin: 0, fontSize: '12.5px', color: '#7c2d12' }}>
-                        Paste your Google Maps review link or share URL so reviews publish directly to your store:
-                      </p>
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <MapPin size={16} color="#ea580c" />
+                    <strong style={{ fontSize: '14px', color: '#9a3412' }}>Connect Google Maps Review Link</strong>
                   </div>
-                  <button
-                    onClick={handleDismissMapsSetup}
-                    style={{ background: 'none', border: 'none', color: '#9a3412', cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '2px 6px' }}
-                    title="Dismiss for now"
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <X size={12} /> Later
-                    </span>
+                  <button onClick={handleDismissMapsSetup} style={{ background: 'none', border: 'none', color: '#9a3412', cursor: 'pointer', fontSize: '11px', fontWeight: 600 }}>
+                    Dismiss
                   </button>
                 </div>
-
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                <p style={{ fontSize: '12px', color: '#7c2d12', margin: '0 0 10px' }}>
+                  Paste your Google Maps share link so reviews publish directly to your store profile:
+                </p>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="Paste Google Maps link (e.g. https://maps.app.goo.gl/...)"
+                    placeholder="Paste link: https://maps.app.goo.gl/..."
                     value={quickMapsUrl}
                     onChange={(e) => setQuickMapsUrl(e.target.value)}
-                    style={{ flex: 1, minWidth: '200px', background: 'var(--surface)', border: '1.5px solid #fdba74' }}
+                    style={{ flex: 1, minWidth: '180px', fontSize: '13px', padding: '8px 12px' }}
                   />
                   <button
                     type="button"
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-sm"
                     disabled={quickSavingMaps || !quickMapsUrl.trim()}
                     onClick={handleQuickConnectMaps}
-                    style={{ whiteSpace: 'nowrap', padding: '0 18px', fontWeight: 700 }}
+                    style={{ whiteSpace: 'nowrap', fontWeight: 700 }}
                   >
-                    {quickSavingMaps ? 'Connecting...' : 'Connect Link →'}
+                    {quickSavingMaps ? 'Saving...' : 'Connect Link →'}
                   </button>
-                </div>
-
-                <div style={{ display: 'flex', gap: '12px', marginTop: '10px', fontSize: '12px', color: '#9a3412', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                    <Lightbulb size={13} color="#ea580c" /> <strong>Tip:</strong> Search your business on Google Maps, tap "Share" ➔ "Copy link" and paste here!
-                  </span>
                 </div>
               </div>
             )}
 
-            {/* Sleek Festive Banner Trigger for Lucky Wheel Popup */}
-            {!isPaidActive && (
+            {/* 3. Essential 3 KPIs (Clean, Compact, Easy to read on mobile) */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                gap: '12px',
+                marginBottom: '18px',
+              }}
+            >
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px 16px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '11.5px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Total Reviews
+                </div>
+                <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>
+                  {reviews.length}
+                </div>
+                <div style={{ fontSize: '11.5px', color: '#16a34a', fontWeight: 600, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Star size={13} fill="#f59e0b" color="#f59e0b" />
+                  <span>{analytics?.avgRating ? `${analytics.avgRating} ★` : '5.0 ★'} Avg Rating</span>
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px 16px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '11.5px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Counter Scans
+                </div>
+                <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>
+                  {analytics?.scans ?? 0}
+                </div>
+                <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>
+                  Total stand visits
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '14px 16px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '11.5px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Google Maps Clicks
+                </div>
+                <div style={{ fontSize: '26px', fontWeight: 800, color: '#9a4018', marginTop: '4px' }}>
+                  {analytics?.googleClicks ?? 0}
+                </div>
+                <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '2px' }}>
+                  Direct review completions
+                </div>
+              </div>
+            </div>
+
+            {/* 4. THE CORE ASSET: Your Active QR Review Stand Card */}
+            {qrs[0] && (
               <div
                 style={{
-                  background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(245, 158, 11, 0.12) 100%)',
-                  border: '1.5px solid rgba(234, 88, 12, 0.28)',
-                  borderRadius: 'var(--radius-xl)',
-                  padding: '16px 22px',
-                  marginBottom: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '16px',
-                  flexWrap: 'wrap',
+                  background: 'var(--surface)',
+                  border: '1.5px solid var(--border)',
+                  borderRadius: '16px',
+                  padding: '18px',
+                  marginBottom: '18px',
                   boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#9a4018', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Active Counter Review Stand
+                    </div>
+                    <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '2px 0 0', color: '#0f172a' }}>
+                      {qrs[0].name || 'Main Billing Counter Stand'}
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '11.5px', background: 'var(--surface-container)', color: '#64748b', padding: '3px 10px', borderRadius: '20px', border: '1px solid var(--border)' }}>
+                    Code: <strong>{qrs[0].slug}</strong>
+                  </span>
+                </div>
+
+                {/* Stand Visual & Action Controls */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {/* Stand QR Image Display */}
                   <div
                     style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #b45309, #f59e0b)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#ffffff',
-                      boxShadow: '0 4px 12px rgba(217, 119, 6, 0.35)',
+                      padding: '12px',
+                      background: '#ffffff',
+                      border: `2px solid ${qrs[0].colorDark || '#9a4018'}`,
+                      borderRadius: '14px',
+                      textAlign: 'center',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
                       flexShrink: 0,
                     }}
                   >
-                    <Sparkles size={22} />
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', background: '#dc2626', color: '#ffffff', padding: '2px 8px', borderRadius: '4px' }}>
-                        Diwali Special
-                      </span>
-                      <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                        Closes in <strong>{offerTimeLeft.hours}h {offerTimeLeft.minutes}m {offerTimeLeft.seconds}s</strong>
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginTop: '3px' }}>
-                      Spin the Lucky Wheel to unlock 84% OFF (Instant 14-Day Growth Trial for ₹79)
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setShowSpinModal(true)}
-                    className="btn btn-primary"
-                    style={{
-                      background: 'linear-gradient(135deg, #b45309 0%, #ea580c 50%, #f59e0b 100%)',
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '10px 20px',
-                      borderRadius: 'var(--radius-lg)',
-                      fontSize: '13.5px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)',
-                    }}
-                  >
-                    <Sparkles size={16} />
-                    <span>Spin Lucky Wheel</span>
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Overview Top 4 KPIs & Mobile Quick Actions */}
-            <div>
-              {/* Top 4 KPI Metrics Row */}
-              <div
-                className="dashboard-kpi-grid"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-                  gap: '16px',
-                  marginBottom: '20px',
-                }}
-              >
-              <div
-                className="card dashboard-kpi-card"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '20px 22px',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                  Average Rating
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '6px' }}>
-                  <div className="kpi-value" style={{ fontSize: '32px', fontWeight: 700, color: 'var(--text)' }}>
-                    {analytics?.avgRating ? `${analytics.avgRating}` : '5.0'}
-                  </div>
-                  <div style={{ display: 'inline-flex', gap: '3px', alignItems: 'center' }}>
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} size={15} fill="#f59e0b" color="#f59e0b" />
-                    ))}
-                  </div>
-                </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--success)', marginTop: '6px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block' }} />
-                  <span>{reviews.length > 0 ? 'Active verified reviews' : 'Ready for initial reviews'}</span>
-                </div>
-              </div>
-
-              <div
-                className="card dashboard-kpi-card"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '20px 22px',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                  <GoogleLogo size={14} />
-                  <span>Google Maps Visits</span>
-                </div>
-                <div className="kpi-value" style={{ fontSize: '32px', fontWeight: 700, marginTop: '6px', color: 'var(--success)' }}>
-                  {analytics?.googleClicks ?? 0}
-                </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                  <strong style={{ color: 'var(--text)' }}>{analytics?.funnel?.copiedToGoogle ?? 0}%</strong> conversion from scans
-                </div>
-              </div>
-
-              <div
-                className="card dashboard-kpi-card"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '20px 22px',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                    Reviews Drafted
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('subscription')}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--primary)',
-                      fontSize: '11.5px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      padding: 0,
-                    }}
-                    title="View plans and upgrade monthly limit"
-                  >
-                    Manage Limit →
-                  </button>
-                </div>
-                <div className="kpi-value" style={{ fontSize: '32px', fontWeight: 700, marginTop: '6px', color: 'var(--primary)' }}>
-                  {analytics?.generated ?? 0}
-                </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                  From <strong style={{ color: 'var(--text)' }}>{analytics?.ratings ?? 0}</strong> customer scans
-                </div>
-              </div>
-
-              <div
-                className="card dashboard-kpi-card"
-                style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '20px 22px',
-                  boxShadow: 'var(--shadow-sm)',
-                }}
-              >
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                  Total QR Scans
-                </div>
-                <div className="kpi-value" style={{ fontSize: '32px', fontWeight: 700, marginTop: '6px', color: 'var(--text)' }}>
-                  {analytics?.scans ?? 0}
-                </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                  Across <strong style={{ color: 'var(--text)' }}>{qrs.length}</strong> counter stands
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Quick Action Hub (Visible on mobile screens) */}
-            <div className="show-mobile-only" style={{ marginBottom: '18px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                {qrs[0] && (
-                  <a
-                    href={`/r/${qrs[0].slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-primary"
-                    style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                  >
-                    <SparklesIcon size={14} color="#ffffff" />
-                    <span>Test Flow ↗</span>
-                  </a>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setOverviewSection('setup')}
-                  className="btn btn-secondary"
-                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: '1.5px solid #fed7aa', background: '#fffaf5' }}
-                >
-                  <Star size={14} color="#ea580c" />
-                  <span>Questions ({questions.length})</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('qrs')}
-                  className="btn btn-secondary"
-                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                >
-                  <QrCode size={14} />
-                  <span>Get Stand</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePayTrial}
-                  className="btn btn-secondary"
-                  style={{ padding: '10px 10px', fontSize: '12px', fontWeight: 700, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#ea580c', border: '1.5px solid #fdba74' }}
-                >
-                  <Flame size={14} color="#ea580c" />
-                  <span>Festive Offer ₹79</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Universal Overview Segmented Navigation (Desktop & Mobile) */}
-          <div className="overview-segment-tabs">
-            <button
-              type="button"
-              className={`overview-segment-tab ${overviewSection === 'activity' ? 'active' : ''}`}
-              onClick={() => setOverviewSection('activity')}
-            >
-              <BarChart3 size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
-              <span>Weekly Activity</span>
-            </button>
-            <button
-              type="button"
-              className={`overview-segment-tab ${overviewSection === 'setup' ? 'active' : ''}`}
-              onClick={() => setOverviewSection('setup')}
-            >
-              <Star size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
-              <span>Questions &amp; Keywords ({questions.length})</span>
-            </button>
-            <button
-              type="button"
-              className={`overview-segment-tab ${overviewSection === 'seo' ? 'active' : ''}`}
-              onClick={() => setOverviewSection('seo')}
-            >
-              <MapPin size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
-              <span>Google Maps Rankings</span>
-            </button>
-            <button
-              type="button"
-              className={`overview-segment-tab ${overviewSection === 'roi' ? 'active' : ''}`}
-              onClick={() => setOverviewSection('roi')}
-            >
-              <TrendingUp size={15} style={{ display: 'inline', marginRight: '6px', verticalAlign: '-2px' }} />
-              <span>Business Impact &amp; Competitors</span>
-            </button>
-          </div>
-
-          {/* ⭐ SECTION 2: CUSTOMER 5-STAR RATING CRITERIA & QUESTIONS */}
-          {overviewSection === 'setup' && (
-            <div>
-              {/* Feature Sub-Navigation */}
-              <div className="overview-sub-tabs">
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${setupSubtab === 'questions' ? 'active' : ''}`}
-                  onClick={() => setSetupSubtab('questions')}
-                >
-                  <Star size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Rating Questions ({questions.length})</span>
-                </button>
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${setupSubtab === 'keywords' ? 'active' : ''}`}
-                  onClick={() => setSetupSubtab('keywords')}
-                >
-                  <Target size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Target Keywords ({((settings?.targetKeywords || settings?.thingsToHighlight) || []).length})</span>
-                </button>
-              </div>
-
-              {setupSubtab === 'questions' && (
-                <div
-                  className="card dashboard-card-responsive"
-                  style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '16px',
-                    padding: '24px 26px',
-                    marginBottom: '24px',
-                    boxShadow: 'var(--shadow-sm)',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#fff7ed', border: '1px solid #fdba74', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Star size={16} color="#ea580c" />
-                        </div>
-                        <div>
-                          <h4 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: '#0f172a' }}>
-                            Customer Rating Questions
-                          </h4>
-                          <span className="badge badge-success" style={{ fontSize: '10.5px', marginTop: '2px' }}>
-                            ● {questions.length} Active Criteria
-                          </span>
-                        </div>
-                      </div>
-                      <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
-                        Criteria customers rate on your counter QR stands. Gemini generates reviews from these ratings.
-                      </p>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('ai_settings')}
-                        className="btn btn-secondary btn-sm"
-                        style={{ fontSize: '12px', padding: '6px 12px' }}
-                      >
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                          <SlidersHorizontal size={13} /> Review Settings →
-                        </span>
-                      </button>
+                    <img
+                      src={`/api/qrs/${qrs[0].slug}/image?format=svg&color=${encodeURIComponent(qrs[0].colorDark || '#9a4018')}`}
+                      alt="Counter QR Code"
+                      style={{ width: '140px', height: '140px', display: 'block', borderRadius: '6px' }}
+                    />
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: qrs[0].colorDark || '#9a4018', marginTop: '6px' }}>
+                      ★ SCAN TO REVIEW ★
                     </div>
                   </div>
 
-              {/* 1-Tap Category Presets (Food, Retail, Services, Health) */}
-              <div style={{ background: 'var(--surface-container)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border)', marginBottom: '16px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                    <Lightbulb size={13} color="#ea580c" /> Tap to add common rating criteria for your store:
-                  </span>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {[
-                    'Food Taste & Quality',
-                    'Speed of Service',
-                    'Staff Hospitality & Care',
-                    'Ambiance & Cleanliness',
-                    'Value for Money & Pricing',
-                    'Genuine Products & Authenticity',
-                    'Staff Technical Advice',
-                    'Diagnostic & Repair Speed',
-                  ].map((presetLabel) => {
-                    const isAlreadyAdded = questions.some((q) => (q.label || q.text || '').toLowerCase() === presetLabel.toLowerCase());
-                    return (
-                      <button
-                        key={presetLabel}
-                        type="button"
-                        onClick={() => !isAlreadyAdded && handleQuickAddQuestion(presetLabel)}
-                        disabled={isAlreadyAdded}
+                  {/* Stand Quick Buttons */}
+                  <div style={{ flex: 1, minWidth: '220px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.5 }}>
+                      Place this stand on your billing counter or dining table. Customers tap NFC or scan with any smartphone camera.
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px' }}>
+                      <a
+                        href={`/r/${qrs[0].slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn btn-primary"
                         style={{
-                          padding: '6px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          cursor: isAlreadyAdded ? 'default' : 'pointer',
-                          background: isAlreadyAdded ? '#e2e8f0' : '#ffffff',
-                          color: isAlreadyAdded ? '#64748b' : 'var(--primary)',
-                          border: isAlreadyAdded ? '1px solid #cbd5e1' : '1.5px solid var(--primary)',
-                          transition: 'all 0.15s ease',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <span>{isAlreadyAdded ? '✓ Added' : '+ Add'}</span>
-                        <span>{presetLabel}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Quick Inline Custom Question Input */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleQuickAddQuestion();
-                }}
-                style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}
-              >
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Type any custom question (e.g. Doctor Consultation, Delivery Speed, Room View)..."
-                  value={newOverviewQuestion}
-                  onChange={(e) => setNewOverviewQuestion(e.target.value)}
-                  style={{ flex: 1, minWidth: '220px', fontSize: '13.5px', background: 'var(--surface)', border: '1px solid var(--border)' }}
-                />
-                <button
-                  type="submit"
-                  disabled={!newOverviewQuestion.trim()}
-                  className="btn btn-primary"
-                  style={{ padding: '0 20px', height: '46px', whiteSpace: 'nowrap', fontWeight: 700 }}
-                >
-                  + Add Question
-                </button>
-              </form>
-
-              {/* Active Questions List */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {questions.map((q, idx) => (
-                  <div
-                    key={q.questionKey || idx}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '10px',
-                      padding: '10px 14px',
-                      gap: '10px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
-                      <span style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#fed7aa', color: '#9a3412', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800, flexShrink: 0 }}>
-                        {idx + 1}
-                      </span>
-                      <span style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {q.label || q.text || 'Rating Question'}
-                      </span>
-                      <span style={{ display: 'inline-flex', gap: '2px', alignItems: 'center' }} className="hide-mobile">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} size={11} fill="#f59e0b" color="#f59e0b" />
-                        ))}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                      <span className="badge badge-neutral" style={{ fontSize: '10.5px' }}>
-                        1–5 Stars
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickRemoveQuestion(idx)}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: '#ef4444',
-                          cursor: 'pointer',
-                          padding: '4px 6px',
+                          fontSize: '12.5px',
+                          fontWeight: 700,
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '9px 12px',
+                          borderRadius: '8px',
                         }}
-                        title="Delete question"
                       >
-                        <X size={14} />
+                        <Sparkles size={14} color="#ffffff" />
+                        <span>Test Stand ↗</span>
+                      </a>
+
+                      <a
+                        href={`/api/qrs/${qrs[0].slug}/image?format=png&color=${encodeURIComponent(qrs[0].colorDark || '#9a4018')}`}
+                        download={`kindlyrate-qr-${qrs[0].slug}.png`}
+                        className="btn btn-secondary"
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '9px 12px',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        <Download size={14} />
+                        <span>Download</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => handlePrintStand(qrs[0])}
+                        className="btn btn-secondary"
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '9px 12px',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        <Printer size={14} />
+                        <span>Print</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openQRDesignStudio(qrs[0])}
+                        className="btn btn-outline"
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '9px 12px',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        <Palette size={14} color="var(--primary)" />
+                        <span>Color/Style</span>
                       </button>
                     </div>
-                  </div>
-                ))}
 
-                {questions.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '20px', color: '#64748b', fontSize: '13px' }}>
-                    No rating criteria added yet. Add questions above or tap presets to customize what guests rate.
-                  </div>
-                )}
-              </div>
-            </div>
-            )}
-
-            {/* TARGET KEYWORDS & MENTION SUGGESTIONS ENGINE */}
-            {setupSubtab === 'keywords' && (
-            <div
-              className="card dashboard-card-responsive"
-              style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: '16px',
-                padding: '24px 28px',
-                marginBottom: '24px',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Target size={22} color="var(--primary)" />
-                  <div>
-                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                      Target Keywords &amp; Services to Mention in Reviews
-                    </h3>
-                    <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
-                      Specify custom keywords (e.g. <strong>"16GB RAM"</strong>, <strong>"SSD Upgrade"</strong>, <strong>"Painless Treatment"</strong>, <strong>"Fair Pricing"</strong>). Our AI will weave them naturally into customer reviews.
-                    </p>
-                  </div>
-                </div>
-
-                <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d' }}>
-                  ● Active Keyword Injection
-                </span>
-              </div>
-
-              {/* Active Target Keywords Chips */}
-              <div style={{ marginBottom: '14px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Active Target Keywords ({((settings?.targetKeywords || settings?.thingsToHighlight) || []).length}):
-                </div>
-                {((settings?.targetKeywords || settings?.thingsToHighlight) || []).length === 0 ? (
-                  <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic', marginBottom: '8px' }}>
-                    No target keywords added yet. Click suggestions below or type custom keywords.
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {((settings?.targetKeywords || settings?.thingsToHighlight) || []).map((kw: string, i: number) => (
-                      <span
-                        key={i}
+                    {/* Copy Direct Review Link */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                      <input
+                        type="text"
+                        readOnly
+                        value={`https://kindlyrate.com/r/${qrs[0].slug}`}
                         style={{
-                          background: '#f0fdf4',
-                          border: '1.5px solid #86efac',
-                          color: '#15803d',
-                          fontWeight: 600,
-                          fontSize: '13px',
-                          padding: '6px 14px',
-                          borderRadius: '20px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                        }}
-                      >
-                        <span>✓ {kw}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTargetKeyword(kw)}
-                          title="Remove keyword"
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#15803d',
-                            cursor: 'pointer',
-                            padding: '0 2px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <X size={12} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Smart Category Keyword Suggestions */}
-              {(() => {
-                const cat = (business?.mainCategory || '').toUpperCase();
-                const sub = (business?.subcategory || '').toLowerCase();
-                const bName = (business?.name || '').toLowerCase();
-
-                const isRetailOrTech =
-                  cat === 'RETAIL' ||
-                  /pc|computer|electronics|laptop|tech|mobile|gadget|hardware|store|shop/i.test(sub) ||
-                  /pc|computer|electronics|laptop|tech|mobile|gadget|hardware/i.test(bName);
-
-                const isServices =
-                  cat === 'SERVICES' ||
-                  /auto|car|repair|garage|mechanic|service|plumb|clean/i.test(sub);
-
-                const isHealth =
-                  cat === 'HEALTH & WELLNESS' ||
-                  /salon|spa|dental|clinic|hospital|beauty|hair|skin/i.test(sub);
-
-                const suggestions = isRetailOrTech
-                  ? [
-                    '16GB RAM',
-                    'SSD Upgrade',
-                    'Custom Gaming PC',
-                    'Genuine Warranty',
-                    'Quick Diagnostics',
-                    'Fair Pricing',
-                    'Clean Setup',
-                    'Helpful Staff',
-                    'Official Parts',
-                    'Fast Turnaround',
-                  ]
-                  : isServices
-                    ? [
-                      'Quick Diagnostics',
-                      'Honest Mechanic',
-                      'Original Spare Parts',
-                      'Transparent Billing',
-                      'Neat Workmanship',
-                      'Affordable Charges',
-                      'Punctual Service',
-                      'Reliable Quality',
-                    ]
-                    : isHealth
-                      ? [
-                        'Painless Treatment',
-                        'Friendly Doctor',
-                        'Clean Clinic',
-                        'Accurate Diagnostics',
-                        'Short Waiting Time',
-                        'Caring Staff',
-                        'Modern Equipment',
-                      ]
-                      : [
-                        'Quick Service',
-                        'Fresh Quality',
-                        'Honest Team',
-                        'Fair Price',
-                        'Clean Space',
-                        'Great Hospitality',
-                        'Highly Recommended',
-                      ];
-
-                return (
-                  <div style={{ marginBottom: '16px', background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Zap size={14} color="var(--primary)" />
-                      <span>Click to add suggested keywords for {business?.subcategory || business?.mainCategory || 'your business'}:</span>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      {suggestions.map((sug: string) => {
-                        const isAdded = ((settings?.targetKeywords || settings?.thingsToHighlight) || []).includes(sug);
-                        return (
-                          <button
-                            key={sug}
-                            type="button"
-                            onClick={() => {
-                              if (isAdded) {
-                                handleRemoveTargetKeyword(sug);
-                              } else {
-                                handleAddTargetKeyword(sug);
-                              }
-                            }}
-                            style={{
-                              background: isAdded ? '#dcfce7' : '#ffffff',
-                              border: isAdded ? '1.5px solid #22c55e' : '1px solid #cbd5e1',
-                              color: isAdded ? '#15803d' : '#334155',
-                              fontWeight: isAdded ? 700 : 500,
-                              fontSize: '12px',
-                              padding: '5px 12px',
-                              borderRadius: '16px',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s ease',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                            }}
-                          >
-                            <span>{isAdded ? '✓' : '+'}</span>
-                            <span>{sug}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Add Custom Keyword Input */}
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', maxWidth: '640px' }}>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Type custom keyword (e.g. 16GB RAM, SSD Upgrade, Doctor Care)..."
-                  value={newTargetKeyword}
-                  onChange={(e) => setNewTargetKeyword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTargetKeyword(newTargetKeyword);
-                    }
-                  }}
-                  style={{ flex: 1, padding: '10px 14px', fontSize: '13.5px' }}
-                />
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => handleAddTargetKeyword(newTargetKeyword)}
-                  disabled={!newTargetKeyword.trim()}
-                  style={{ whiteSpace: 'nowrap', padding: '10px 20px', fontSize: '13.5px', fontWeight: 600 }}
-                >
-                  + Add Keyword
-                </button>
-              </div>
-            </div>
-            )}
-          </div>
-          )}
-
-          {/* SECTION 1: WEEKLY REVIEW ACTIVITY & 3 GROWTH ACTIONS */}
-          {overviewSection === 'activity' && (
-            <div>
-              {/* Feature Sub-Navigation */}
-              <div className="overview-sub-tabs">
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${weeklyViewSubtab === 'chart' ? 'active' : ''}`}
-                  onClick={() => setWeeklyViewSubtab('chart')}
-                >
-                  <BarChart3 size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>7-Day Review Chart</span>
-                </button>
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${weeklyViewSubtab === 'tips' ? 'active' : ''}`}
-                  onClick={() => setWeeklyViewSubtab('tips')}
-                >
-                  <Lightbulb size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>3 Growth Tips</span>
-                </button>
-              </div>
-
-              {/* 1. WEEKLY REVIEW ACTIVITY (SIMPLIFIED & CLEAN) */}
-              {weeklyViewSubtab === 'chart' && (
-                <div className="card dashboard-card-responsive" style={{ padding: '24px 26px', marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                      Weekly Reviews (Last 7 Days)
-                    </h3>
-                    <span className="stat-pill stat-pill-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700 }}>
-                      <TrendingUpIcon size={13} color="#15803d" />
-                      {reviews.length > 0 ? `+${reviews.length} Reviews` : '0 Reviews'}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0' }}>
-                    Customer reviews collected vs posted to Google Maps.
-                  </p>
-                </div>
-
-                {/* Clean 2-Item Legend */}
-                <div style={{ display: 'flex', gap: '14px', alignItems: 'center', fontSize: '12px', color: '#64748b', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '3px', background: '#10b981' }} />
-                    <span style={{ fontWeight: 600 }}>Reviews Collected</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#2563eb' }} />
-                    <span style={{ fontWeight: 600 }}>Posted on Google</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Simplified Bar Chart */}
-              <div style={{ height: '190px', display: 'flex', alignItems: 'flex-end', gap: '12px', paddingBottom: '28px', position: 'relative', borderBottom: '1px solid #f1f5f9' }}>
-                {((dailyTrends && dailyTrends.length > 0)
-                  ? dailyTrends
-                  : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => ({
-                      day,
-                      date: 'Today',
-                      totalReviews: 0,
-                      googleClicks: 0,
-                      critical: 0,
-                    }))
-                ).map((d: any, idx: number) => {
-                  const hasReviews = (d.totalReviews || 0) > 0;
-                  const barHeightPct = hasReviews
-                    ? Math.max(16, Math.min(100, Math.round((d.totalReviews / maxDayReviews) * 100)))
-                    : 6;
-                  const isHovered = selectedDayIdx === idx;
-
-                  return (
-                    <div
-                      key={idx}
-                      style={{
-                        flex: 1,
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        position: 'relative',
-                        cursor: 'pointer',
-                      }}
-                      onMouseEnter={() => setSelectedDayIdx(idx)}
-                      onMouseLeave={() => setSelectedDayIdx(null)}
-                    >
-                      {/* Floating Tooltip */}
-                      {isHovered && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: `${Math.min(95, barHeightPct + 12)}%`,
-                            background: '#0f172a',
-                            color: '#ffffff',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            fontSize: '11.5px',
-                            whiteSpace: 'nowrap',
-                            zIndex: 20,
-                            boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
-                            pointerEvents: 'none',
-                            textAlign: 'center',
-                          }}
-                        >
-                          <div style={{ fontWeight: 700, marginBottom: '2px', color: '#f8fafc' }}>{d.day}, {d.date}</div>
-                          <div style={{ color: '#86efac' }}>{d.totalReviews} Total Reviews</div>
-                          <div style={{ color: '#93c5fd' }}>{d.googleClicks} Posted to Google</div>
-                          {d.critical > 0 && <div style={{ color: '#fca5a5' }}>{d.critical} Shielded Private</div>}
-                        </div>
-                      )}
-
-                      {/* Number count / Google dot above bar */}
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', marginBottom: '6px' }}>
-                        {d.googleClicks > 0 && (
-                          <div
-                            style={{
-                              width: '7px',
-                              height: '7px',
-                              borderRadius: '50%',
-                              background: '#2563eb',
-                              boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.2)',
-                            }}
-                            title={`${d.googleClicks} Google Reviews`}
-                          />
-                        )}
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: hasReviews ? '#0f172a' : '#94a3b8' }}>
-                          {hasReviews ? d.totalReviews : '0'}
-                        </span>
-                      </div>
-
-                      {/* Solid Clean Bar */}
-                      <div
-                        style={{
-                          width: '80%',
-                          maxWidth: '44px',
-                          height: `${barHeightPct}%`,
-                          borderRadius: '6px 6px 0 0',
-                          background: hasReviews
-                            ? (isHovered ? '#059669' : '#10b981')
-                            : '#f1f5f9',
-                          transition: 'all 0.2s ease',
-                          transform: isHovered ? 'scaleY(1.04)' : 'none',
+                          flex: 1,
+                          background: 'var(--surface-container)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '8px',
+                          padding: '7px 10px',
+                          fontSize: '12px',
+                          color: '#64748b',
                         }}
                       />
-
-                      {/* Day Label */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          bottom: '-22px',
-                          fontSize: '12px',
-                          fontWeight: isHovered ? 700 : 600,
-                          color: isHovered ? '#0f172a' : '#64748b',
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`https://kindlyrate.com/r/${qrs[0].slug}`);
+                          setCopiedSlug(qrs[0].slug);
+                          setTimeout(() => setCopiedSlug(null), 2000);
                         }}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '12px', whiteSpace: 'nowrap' }}
                       >
-                        {d.day}
-                      </div>
+                        {copiedSlug === qrs[0].slug ? 'Copied!' : 'Copy Link'}
+                      </button>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Bottom Simple Summary */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px', fontSize: '12.5px', color: '#64748b', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Lightbulb size={14} color="#ea580c" />
-                  <span><strong>Tip:</strong> Customer reviews peak during weekend lunch and evening checkout hours.</span>
-                </div>
-                <div style={{ fontSize: '11.5px', color: '#16a34a', fontWeight: 600 }}>
-                  ● Live Sync
+                  </div>
                 </div>
               </div>
-            </div>
             )}
 
-            {/* 2. 3 QUICK WAYS TO GET MORE REVIEWS (SIMPLIFIED & CLEAN LIGHT CARD) */}
-            {weeklyViewSubtab === 'tips' && (
+            {/* 5. Recent Customer Reviews */}
             <div
-              className="card dashboard-card-responsive"
               style={{
                 background: 'var(--surface)',
                 border: '1px solid var(--border)',
                 borderRadius: '16px',
-                padding: '24px 26px',
-                marginBottom: '24px',
+                padding: '18px',
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef3c7', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Lightbulb size={18} color="#ea580c" />
-                  </div>
-                  <div>
-                    <h3 className="serif" style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
-                      3 Ways to Grow Your Google Reviews
-                    </h3>
-                    <div style={{ fontSize: '12.5px', color: '#64748b', marginTop: '2px' }}>
-                      Recommended actions based on your store's live rating data.
-                    </div>
-                  </div>
-                </div>
-                <span className="badge badge-success" style={{ fontSize: '11px', fontWeight: 700 }}>
-                  ● Quick Setup
-                </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+                  Recent Customer Reviews
+                </h3>
+                {reviews.length > 0 && (
+                  <button
+                    onClick={() => setActiveTab('history')}
+                    style={{ background: 'none', border: 'none', color: '#9a4018', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+                  >
+                    View All ({reviews.length}) →
+                  </button>
+                )}
               </div>
 
-              {/* 3 Simple Action Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-                {/* Tip 1 */}
-                <div
-                  style={{
-                    background: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '12px',
-                    padding: '16px 18px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <Tag size={16} color="var(--primary)" />
-                      <strong style={{ fontSize: '14px', color: '#0f172a' }}>1. Target Keywords</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#64748b', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Add your top specialties so Gemini naturally mentions them in customer reviews to boost local Google ranking.
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    style={{ fontSize: '12px', fontWeight: 700, alignSelf: 'flex-start', border: '1.5px solid #cbd5e1' }}
-                    onClick={() => {
-                      setOverviewSection('setup');
-                      setSetupSubtab('keywords');
-                      showNotification('Switched to Target Keywords');
-                    }}
-                  >
-                    Add Keywords →
-                  </button>
-                </div>
-
-                {/* Tip 2 */}
-                <div
-                  style={{
-                    background: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '12px',
-                    padding: '16px 18px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <ShieldCheckIcon size={16} color="#16a34a" />
-                      <strong style={{ fontSize: '14px', color: '#0f172a' }}>2. Reputation Shield</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#64748b', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Keep low 1–3 star ratings private on your dashboard so only happy 5-star reviews reach Google Maps.
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      alignSelf: 'flex-start',
-                      border: shieldStrictness === 'strict' ? '1.5px solid #16a34a' : '1.5px solid #cbd5e1',
-                      color: shieldStrictness === 'strict' ? '#166534' : 'inherit',
-                      background: shieldStrictness === 'strict' ? '#dcfce7' : '#ffffff',
-                    }}
-                    onClick={() => {
-                      setShieldStrictness(shieldStrictness === 'strict' ? 'standard' : 'strict');
-                      showNotification(shieldStrictness === 'strict' ? 'Reputation Shield returned to Standard' : 'Reputation Shield set to Strict (100% negative feedback intercepted)');
-                    }}
-                  >
-                    {shieldStrictness === 'strict' ? '✓ Strict Active' : 'Enable Strict Shield'}
-                  </button>
-                </div>
-
-                {/* Tip 3 */}
-                <div
-                  style={{
-                    background: '#f8fafc',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '12px',
-                    padding: '16px 18px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <QrCode size={16} color="#2563eb" />
-                      <strong style={{ fontSize: '14px', color: '#0f172a' }}>3. Place QR at Checkout</strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: '#64748b', lineHeight: 1.5, margin: '0 0 14px' }}>
-                      Display your stand right on the billing desk so customers scan while paying with UPI or cash.
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    style={{ fontSize: '12px', fontWeight: 700, alignSelf: 'flex-start', border: '1.5px solid #cbd5e1' }}
-                    onClick={() => {
-                      setActiveTab('qrs');
-                      showNotification('Navigated to QR Stands Generator');
-                    }}
-                  >
-                    View QR Stands →
-                  </button>
-                </div>
-              </div>
-            </div>
-            )}
-          </div>
-          )}
-
-          {/* SECTION 4: ROI, COMPETITORS & PEAK ACTIVITY */}
-          {overviewSection === 'roi' && (
-            <div>
-              {/* Feature Sub-Navigation */}
-              <div className="overview-sub-tabs">
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${roiSubtab === 'financial' ? 'active' : ''}`}
-                  onClick={() => setRoiSubtab('financial')}
-                >
-                  <TrendingUp size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Revenue Impact &amp; Savings</span>
-                </button>
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${roiSubtab === 'competitors' ? 'active' : ''}`}
-                  onClick={() => setRoiSubtab('competitors')}
-                >
-                  <Target size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Nearby Competitors</span>
-                </button>
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${roiSubtab === 'peakhours' ? 'active' : ''}`}
-                  onClick={() => setRoiSubtab('peakhours')}
-                >
-                  <Clock size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Peak Hours &amp; Praise</span>
-                </button>
-              </div>
-
-              {/* Sub-Feature 1: Estimated Revenue & Savings */}
-              {roiSubtab === 'financial' && (
-              <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                    Estimated Revenue &amp; Cost Savings
+              {reviews.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '28px 16px', background: 'var(--surface-container)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                  <Star size={26} color="#cbd5e1" style={{ margin: '0 auto 8px' }} />
+                  <h4 style={{ fontSize: '14.5px', fontWeight: 700, color: '#0f172a', margin: '0 0 4px' }}>
+                    Ready for your first customer review
                   </h4>
-                  <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700 }}>
-                    Net: +₹{(financial?.totalMonthlyImpactInr ?? 0).toLocaleString()}/mo
-                  </span>
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px', marginTop: '2px' }}>
-                  Estimated business value delivered to your bottom line.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ padding: '14px 16px', background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Direct Walk-In Revenue</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Customers discovering you via top Google Maps ratings</div>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--success)' }}>
-                      +₹{(financial?.walkInRevenueInr ?? 0).toLocaleString()}
-                    </div>
-                  </div>
-
-                  <div style={{ padding: '14px 16px', background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Aggregator Commissions Saved</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Commissions saved when diners and shoppers visit directly</div>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--primary)' }}>
-                      +₹{(financial?.aggregatorCommissionsSavedInr ?? 0).toLocaleString()}
-                    </div>
-                  </div>
-
-                  <div style={{ padding: '14px 16px', background: 'var(--surface-container)', border: '1px solid var(--border)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Recovered Customer Value</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{roi.negativeReviewsShielded ?? 0} customer concerns resolved privately before reaching Google</div>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '16px', color: 'var(--success)' }}>
-                      +₹{(financial?.shieldRecoveredRevenueInr ?? 0).toLocaleString()}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 4px', fontSize: '13px', color: 'var(--text-muted)' }}>
-                    <span>Customer Acquisition Cost: <strong style={{ color: 'var(--success)' }}>₹0</strong> (vs ₹450 Google Ads CPC)</span>
-                    <span>LTV Multiplier: <strong style={{ color: 'var(--text)' }}>{financial.customerLifetimeValueMultiplier}</strong></span>
-                  </div>
-                </div>
-              </div>
-              )}
-
-              {/* Sub-Feature 2: Nearby Competitors */}
-              {roiSubtab === 'competitors' && (
-              <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                    Local Competitor Comparison
-                  </h4>
-                  <span className="stat-pill stat-pill-primary" style={{ fontSize: '11px', fontWeight: 600 }}>Active</span>
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', marginTop: '2px' }}>
-                  Your Google Maps local standing compared to nearby businesses.
-                </p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {competitors.length === 0 ? (
-                    <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--surface-container)', borderRadius: '10px', border: '1px solid var(--border)' }}>
-                      <div style={{ marginBottom: '6px' }}><Target size={20} color="var(--primary)" /></div>
-                      <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Competitor Tracking</div>
-                      <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Nearby competitor benchmarks will populate as reviews and Google Maps data are collected.</div>
-                    </div>
-                  ) : (
-                    competitors.map((comp: any, idx: number) => (
-                      <div
-                        key={idx}
-                        style={{
-                          padding: '12px 14px',
-                          background: comp.rank === 1 ? '#fef3ee' : '#f8fafc',
-                          border: comp.rank === 1 ? '1.5px solid #fed7aa' : '1px solid #e2e8f0',
-                          borderRadius: '10px',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <strong style={{ fontSize: '14px', width: '24px', color: comp.rank === 1 ? 'var(--primary)' : '#64748b' }}>
-                            #{comp.rank}
-                          </strong>
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: '14px', color: comp.rank === 1 ? 'var(--primary)' : '#0f172a' }}>
-                              {comp.name}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '1px' }}>
-                              {comp.reviewsCount} reviews · {comp.shareOfSearch} search share
-                            </div>
-                          </div>
-                        </div>
-
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontWeight: 800, fontSize: '14px', color: '#0f172a' }}>{comp.rating} ★</div>
-                          <span className={`stat-pill ${comp.rank === 1 ? 'stat-pill-success' : 'stat-pill-neutral'}`} style={{ fontSize: '10.5px', fontWeight: 600 }}>
-                            {comp.badge}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-              )}
-
-              {/* Sub-Feature 3: Hourly Peak Hours & Customer Praise Themes */}
-              {roiSubtab === 'peakhours' && (
-              <div
-                className="grid-mobile-single"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1.2fr 1fr',
-                  gap: '24px',
-                  marginBottom: '24px',
-                }}
-              >
-                {/* Hourly / Peak Shift Heatmap */}
-                <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                    <h4 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                      Customer Peak Hours &amp; Store Activity
-                    </h4>
-                    <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 700 }}>
-                      {reviews.length > 0 ? '● Active' : 'Awaiting Scans'}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px', marginTop: '2px' }}>
-                    Customer activity, review submission velocity, and visit patterns.
+                  <p style={{ fontSize: '12.5px', color: '#64748b', maxWidth: '380px', margin: '0 auto 12px' }}>
+                    Place your stand on the counter. When customers scan and leave reviews, they will appear here in real time.
                   </p>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {(!analytics?.hourlyDistribution || analytics.hourlyDistribution.length === 0) ? (
-                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--surface-container)', borderRadius: '10px', border: '1px solid var(--border)' }}>
-                        <Clock size={22} color="var(--text-muted)" style={{ margin: '0 auto 6px', display: 'block' }} />
-                        <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Activity Tracker Standby</div>
-                        <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Hourly distribution begins tracking with your first customer scan.</div>
-                      </div>
-                    ) : (
-                      analytics.hourlyDistribution.map((shift: any, idx: number) => (
-                        <div key={idx} style={{ padding: '12px 14px', background: shift.isPeak ? 'var(--primary-light)' : 'var(--surface-container)', borderRadius: '10px', border: shift.isPeak ? '1.5px solid var(--border)' : '1px solid var(--border)' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div style={{ fontWeight: 700, fontSize: '14px', color: shift.isPeak ? 'var(--primary)' : 'var(--text)' }}>
-                              {shift.shift} {shift.isPeak && <span className="badge badge-warning" style={{ fontSize: '10px', padding: '1px 6px', marginLeft: '6px' }}>Peak Shift</span>}
-                            </div>
-                            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-muted)' }}>
-                              {shift.reviews} reviews · {shift.avgRating} / 5 · <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>{shift.turnRate}</span>
-                            </div>
-                          </div>
-                          <div style={{ height: '7px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
-                            <div
-                              style={{
-                                height: '100%',
-                                width: `${shift.percentage}%`,
-                                background: shift.isPeak ? 'var(--primary)' : '#22c55e',
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* Topic & Offering Sentiment Intelligence */}
-                <div className="card" style={{ padding: '26px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                    <h4 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                      What Customers Praise Most
-                    </h4>
-                    <span className="stat-pill stat-pill-neutral" style={{ fontSize: '11px', fontWeight: 600 }}>Review Topics</span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', marginTop: '2px' }}>
-                    Common themes and compliments mentioned in customer reviews.
-                  </p>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {(!analytics?.sentimentTopics || analytics.sentimentTopics.length === 0) ? (
-                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'var(--surface-container)', borderRadius: '10px', border: '1px solid var(--border)' }}>
-                        <div style={{ marginBottom: '6px' }}><MessageSquare size={20} color="var(--primary)" /></div>
-                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>Topic Intelligence Initializing</div>
-                        <div style={{ fontSize: '12.5px', marginTop: '2px' }}>Customer praise themes and service mentions appear here once customers submit reviews.</div>
-                      </div>
-                    ) : (
-                      analytics.sentimentTopics.map((t: any, i: number) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                          <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.score >= 85 ? '#22c55e' : '#eab308', display: 'inline-block' }} />
-                            <span>{t.topic}</span>
-                          </div>
-                          <div style={{ display: 'center', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '12px', color: '#64748b' }}>{t.count} mentions</span>
-                            <span style={{ fontSize: '12.5px', fontWeight: 800, color: t.score >= 85 ? '#15803d' : '#d97706' }}>
-                              {t.score}%
-                            </span>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-              )}
-            </div>
-          )}
-
-          {/* SECTION 3: MAPS & RANKING TRACKER */}
-          {overviewSection === 'seo' && (
-            <div>
-              {/* Feature Sub-Navigation */}
-              <div className="overview-sub-tabs">
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${seoSubtab === 'grid' ? 'active' : ''}`}
-                  onClick={() => setSeoSubtab('grid')}
-                >
-                  <MapPin size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Local Maps Ranking Heatmap</span>
-                </button>
-                <button
-                  type="button"
-                  className={`overview-sub-tab ${seoSubtab === 'table' ? 'active' : ''}`}
-                  onClick={() => setSeoSubtab('table')}
-                >
-                  <BarChart3 size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
-                  <span>Keyword Search Rankings ({keywordRankings.length})</span>
-                </button>
-              </div>
-
-              {/* Sub-Feature 1: 3x3 GeoGrid Heatmap */}
-              {seoSubtab === 'grid' && (
-                <GeoGridHeatmap
-                  geoGrid={analytics?.geoGrid}
-                  businessName={business?.name || 'Your Business'}
-                  city={business?.city || 'Local Area'}
-                  onRefresh={handleRefreshMapsRankings}
-                  isRefreshing={isRefreshingMaps}
-                />
-              )}
-
-              {/* Sub-Feature 2: Google Maps Keyword Rankings Tracker */}
-              {seoSubtab === 'table' && (
-                <div
-                  className="card"
-                  style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '16px',
-                    padding: '28px',
-                    marginBottom: '24px',
-                    boxShadow: 'var(--shadow-sm)',
-                  }}
-                >
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(34, 197, 94, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(34, 197, 94, 0.25)' }}>
-                    <TrendingUpIcon size={22} color="var(--success)" />
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <h4 style={{ fontSize: '19px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                        Google Maps Keyword Rankings Tracker
-                      </h4>
-                      <span className="badge badge-success" style={{ fontSize: '11px', background: '#dcfce7', color: '#15803d' }}>
-                        ● Rankings Rising
-                      </span>
-                    </div>
-                    <p style={{ margin: '3px 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>
-                      Live Google Maps &amp; local 3-pack search ranking positions with monthly movement and impression lift.
-                    </p>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={handleRefreshMapsRankings}
-                    disabled={isRefreshingMaps}
-                    className="btn btn-primary btn-sm"
-                    style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                    title="Refresh Google Maps ranking analysis"
-                  >
-                    <RefreshIcon size={13} color="#ffffff" />
-                    <span>{isRefreshingMaps ? 'Checking Maps...' : 'Check Maps Rank'}</span>
-                  </button>
-                  <span className="stat-pill stat-pill-success" style={{ fontSize: '12px', fontWeight: 700, padding: '6px 12px' }}>
-                    {localSeo.averageRankLift || 'Baseline Setup'}
-                  </span>
-                  {business?.googleReviewUrl && (
+                  {qrs[0] && (
                     <a
-                      href={business.googleReviewUrl}
+                      href={`/r/${qrs[0].slug}`}
                       target="_blank"
-                      rel="noopener noreferrer"
+                      rel="noreferrer"
                       className="btn btn-secondary btn-sm"
-                      style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                      style={{ fontSize: '12px' }}
                     >
-                      <span>Google Maps Page ↗</span>
+                      Test Review Flow ↗
                     </a>
                   )}
                 </div>
-              </div>
-
-              {/* Success Callout Banner */}
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
-                  border: '1px solid #86efac',
-                  borderRadius: '12px',
-                  padding: '16px 20px',
-                  marginBottom: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                }}
-              >
-                <TrophyIcon size={24} color="#f59e0b" />
-                <div style={{ fontSize: '13.5px', color: '#166534', lineHeight: 1.5, fontWeight: 500 }}>
-                  <strong>Client Growth Milestone:</strong> {localSeo.rankingMessage}
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {reviews.slice(0, 5).map((rev: any, idx: number) => (
+                    <div
+                      key={rev.id || idx}
+                      style={{
+                        padding: '12px 14px',
+                        background: 'var(--surface-container)',
+                        borderRadius: '10px',
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: '12px',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: '180px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                          <div style={{ display: 'flex', gap: '2px' }}>
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star key={s} size={12} fill={s <= (rev.rating || 5) ? '#f59e0b' : 'none'} color="#f59e0b" />
+                            ))}
+                          </div>
+                          <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+                            {rev.customerName || 'Verified Customer'}
+                          </span>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#334155', lineHeight: 1.4 }}>
+                          {rev.comment || rev.generatedReview || 'Great experience and friendly service!'}
+                        </p>
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#64748b', whiteSpace: 'nowrap' }}>
+                        {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : 'Recently'}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-
-              {/* 4 SEO KPI Highlights */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '14px',
-                  marginBottom: '22px',
-                }}
-              >
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-                    Average Rank Movement
-                  </div>
-                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#16a34a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{localSeo.averageRankLift || 'Baseline'}</span>
-                  </div>
-                  <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
-                    Gained across all target keywords
-                  </div>
-                </div>
-
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-                    Search Impressions
-                  </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{(localSeo.totalSearchImpressions ?? 0).toLocaleString()}</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px' }}>
-                      {localSeo.impressionsGrowth || '0%'}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
-                    Monthly Google Maps discovery views
-                  </div>
-                </div>
-
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-                    Direction &amp; Route Requests
-                  </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#2563eb', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{(localSeo.mapsDirectionsClicks ?? 0).toLocaleString()}</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#1d4ed8', background: '#dbeafe', padding: '2px 8px', borderRadius: '12px' }}>
-                      {localSeo.directionsGrowth || '0%'}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
-                    Customers navigating directly to storefront
-                  </div>
-                </div>
-
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-                    Call &amp; Direct Clicks
-                  </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#9333ea', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{(localSeo.phoneCallClicks ?? 0).toLocaleString()}</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#7e22ce', background: '#f3e8ff', padding: '2px 8px', borderRadius: '12px' }}>
-                      {localSeo.phoneCallsGrowth || '0%'}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>
-                    Reservations &amp; inquiry calls driven
-                  </div>
-                </div>
-              </div>
-
-              {/* Keywords Ranking Table */}
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                  <thead>
-                    <tr style={{ background: 'var(--surface-container)', borderBottom: '1.5px solid var(--border-light)', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)' }}>Target Search Keyword</th>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)', textAlign: 'center' }}>Google Maps Rank</th>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)', textAlign: 'center' }}>Rank Lift</th>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)', textAlign: 'center' }}>Monthly Volume</th>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)', textAlign: 'center' }}>Views Growth</th>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)' }}>Local 3-Pack Status</th>
-                      <th style={{ padding: '12px 14px', fontWeight: 700, color: 'var(--text-muted)' }}>Competitor Stance</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {keywordRankings.length === 0 ? (
-                      <tr>
-                        <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                          <div style={{ marginBottom: '8px' }}><MapPin size={24} color="var(--primary)" /></div>
-                          <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)' }}>Awaiting Initial Google Maps Scans</div>
-                          <div style={{ fontSize: '12.5px', marginTop: '4px' }}>Click "Refresh Live Maps Rank" above or generate your first customer reviews to track real-time 3-pack positions.</div>
-                        </td>
-                      </tr>
-                    ) : (
-                      keywordRankings.map((kw: any, idx: number) => (
-                        <tr
-                          key={kw.id || idx}
-                          style={{
-                            borderBottom: '1px solid var(--border-light)',
-                            background: idx % 2 === 0 ? '#ffffff' : '#fcfbf9',
-                            transition: 'background 0.15s ease',
-                          }}
-                        >
-                          <td style={{ padding: '14px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>
-                                "{kw.keyword}"
-                              </strong>
-                              <span className="badge badge-neutral" style={{ fontSize: '10.5px' }}>
-                                {kw.tag}
-                              </span>
-                            </div>
-                          </td>
-
-                          <td style={{ padding: '14px', textAlign: 'center' }}>
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '38px',
-                                height: '38px',
-                                borderRadius: '10px',
-                                fontWeight: 800,
-                                fontSize: '15px',
-                                background: kw.rank === 1 ? '#fef3c7' : kw.rank === 2 ? '#e0f2fe' : '#f3e8ff',
-                                color: kw.rank === 1 ? '#92400e' : kw.rank === 2 ? '#0369a1' : '#6b21a8',
-                                border: `1.5px solid ${kw.rank === 1 ? '#f59e0b' : kw.rank === 2 ? '#38bdf8' : '#c084fc'}`,
-                              }}
-                            >
-                              #{kw.rank}
-                            </span>
-                          </td>
-
-                          <td style={{ padding: '14px', textAlign: 'center' }}>
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                color: kw.change > 0 ? '#15803d' : '#64748b',
-                                background: kw.change > 0 ? '#dcfce7' : '#f1f5f9',
-                                fontWeight: 700,
-                                fontSize: '12px',
-                                padding: '4px 10px',
-                                borderRadius: '20px',
-                              }}
-                            >
-                              {kw.change > 0 ? `▲ +${kw.change}` : kw.change < 0 ? `▼ ${kw.change}` : '● 0'} Positions
-                            </span>
-                          </td>
-
-                          <td style={{ padding: '14px', textAlign: 'center', fontWeight: 600, color: '#334155' }}>
-                            {(kw.monthlySearches ?? 0).toLocaleString()}/mo
-                          </td>
-
-                          <td style={{ padding: '14px', textAlign: 'center', fontWeight: 700, color: '#16a34a' }}>
-                            {kw.impressionsLift || '0%'}
-                          </td>
-
-                          <td style={{ padding: '14px' }}>
-                            <span className={`stat-pill ${kw.rank === 1 ? 'stat-pill-success' : 'stat-pill-primary'}`} style={{ fontSize: '11px', fontWeight: 600 }}>
-                              {kw.status}
-                            </span>
-                          </td>
-
-                          <td style={{ padding: '14px', color: 'var(--text-muted)', fontSize: '12px' }}>
-                            {kw.competitorRank !== '-' ? (
-                              <span>Ahead of {kw.competitorRank}</span>
-                            ) : (
-                              <span style={{ color: '#16a34a', fontWeight: 600 }}>✓ Verified Sole Owner</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              )}
             </div>
-            )}
-
-            </div>
-          )}
           </div>
         )}
 

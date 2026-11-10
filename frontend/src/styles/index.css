@@ -40,291 +40,6 @@
   --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
 }
 
-/* Dark Mode Theme Variables & Full Spectrum Adaptations */
-[data-theme="dark"] {
-  --primary: #f97316;
-  --primary-hover: #ea580c;
-  --primary-container: rgba(249, 115, 22, 0.15);
-  --primary-light: rgba(249, 115, 22, 0.08);
-  --on-primary: #ffffff;
-
-  --background: #09090b;
-  --surface: #121215;
-  --surface-container: #18181b;
-  --surface-container-high: #202024;
-  --surface-container-highest: #27272a;
-
-  --text: #f4f4f5;
-  --text-muted: #a1a1aa;
-  --text-subtle: #71717a;
-  --border: #27272a;
-  --border-light: #1f1f23;
-
-  --star-active: #fbbf24;
-  --star-empty: #3f3f46;
-  --success: #22c55e;
-  --success-bg: rgba(34, 197, 94, 0.12);
-  --error: #ef4444;
-  --error-bg: rgba(239, 68, 68, 0.12);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.12);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.55);
-}
-
-/* Comprehensive Dark Mode Cascading Overrides */
-[data-theme="dark"] body,
-[data-theme="dark"] .dashboard-layout,
-[data-theme="dark"] .dashboard-main,
-[data-theme="dark"] .dashboard-content-body {
-  background-color: var(--background) !important;
-  color: var(--text) !important;
-}
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .dashboard-kpi-card,
-[data-theme="dark"] .dashboard-card-responsive,
-[data-theme="dark"] .dashboard-topbar,
-[data-theme="dark"] .dashboard-sidebar,
-[data-theme="dark"] .modal-content,
-[data-theme="dark"] .mobile-bottom-nav,
-[data-theme="dark"] *[style*="background: #ffffff"],
-[data-theme="dark"] *[style*="background:#ffffff"],
-[data-theme="dark"] *[style*="background: rgb(255, 255, 255)"],
-[data-theme="dark"] *[style*="background: white"] {
-  background-color: var(--surface) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
-}
-
-/* Sub-containers & nested items in dark mode */
-[data-theme="dark"] *[style*="background: #f8fafc"],
-[data-theme="dark"] *[style*="background:#f8fafc"],
-[data-theme="dark"] *[style*="background: #f1f5f9"],
-[data-theme="dark"] *[style*="background:#f1f5f9"],
-[data-theme="dark"] *[style*="background: #fcfbf9"],
-[data-theme="dark"] *[style*="background:#fcfbf9"],
-[data-theme="dark"] *[style*="background: rgb(248, 250, 252)"],
-[data-theme="dark"] *[style*="background: rgb(241, 245, 249)"] {
-  background-color: var(--surface-container) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
-}
-
-/* Light warm / warning accent boxes in dark mode */
-[data-theme="dark"] *[style*="background: #fff7ed"],
-[data-theme="dark"] *[style*="background:#fff7ed"],
-[data-theme="dark"] *[style*="background: #fffaf5"],
-[data-theme="dark"] *[style*="background:#fffaf5"],
-[data-theme="dark"] *[style*="background: #fffbeb"],
-[data-theme="dark"] *[style*="background:#fffbeb"],
-[data-theme="dark"] *[style*="background: #fef3ee"],
-[data-theme="dark"] *[style*="background:#fef3ee"],
-[data-theme="dark"] *[style*="background: rgb(255, 247, 237)"],
-[data-theme="dark"] *[style*="background: rgb(255, 250, 245)"],
-[data-theme="dark"] *[style*="background: rgb(255, 251, 235)"],
-[data-theme="dark"] *[style*="background: rgb(254, 243, 238)"] {
-  background: rgba(249, 115, 22, 0.12) !important;
-  border-color: rgba(249, 115, 22, 0.3) !important;
-  color: #fed7aa !important;
-}
-
-/* Success / green pill boxes in dark mode */
-[data-theme="dark"] *[style*="background: #dcfce7"],
-[data-theme="dark"] *[style*="background:#dcfce7"],
-[data-theme="dark"] *[style*="background: #f0fdf4"],
-[data-theme="dark"] *[style*="background:#f0fdf4"],
-[data-theme="dark"] *[style*="background: rgb(220, 252, 231)"],
-[data-theme="dark"] *[style*="background: rgb(240, 253, 244)"] {
-  background: rgba(34, 197, 94, 0.15) !important;
-  border-color: rgba(34, 197, 94, 0.3) !important;
-  color: #4ade80 !important;
-}
-
-/* Error / danger pill boxes in dark mode */
-[data-theme="dark"] *[style*="background: #fee2e2"],
-[data-theme="dark"] *[style*="background:#fee2e2"],
-[data-theme="dark"] *[style*="background: #fef2f2"],
-[data-theme="dark"] *[style*="background:#fef2f2"],
-[data-theme="dark"] *[style*="background: rgb(254, 226, 226)"],
-[data-theme="dark"] *[style*="background: rgb(254, 242, 242)"] {
-  background: rgba(239, 68, 68, 0.15) !important;
-  border-color: rgba(239, 68, 68, 0.3) !important;
-  color: #f87171 !important;
-}
-
-/* Light borders in dark mode */
-[data-theme="dark"] *[style*="border: 1.5px solid #e2e8f0"],
-[data-theme="dark"] *[style*="border: 1px solid #e2e8f0"],
-[data-theme="dark"] *[style*="border:1.5px solid #e2e8f0"],
-[data-theme="dark"] *[style*="border:1px solid #e2e8f0"],
-[data-theme="dark"] *[style*="border: 1.5px solid #cbd5e1"],
-[data-theme="dark"] *[style*="border: 1px solid #cbd5e1"],
-[data-theme="dark"] *[style*="border: 1px solid rgb(226, 232, 240)"],
-[data-theme="dark"] *[style*="border: 1.5px solid rgb(226, 232, 240)"],
-[data-theme="dark"] *[style*="border: 1px solid rgb(203, 213, 225)"],
-[data-theme="dark"] *[style*="border: 1.5px solid rgb(203, 213, 225)"] {
-  border-color: var(--border) !important;
-}
-
-/* Headings and primary text in dark mode */
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] h5,
-[data-theme="dark"] .dashboard-page-title,
-[data-theme="dark"] .dashboard-brand-title,
-[data-theme="dark"] .dashboard-biz-name,
-[data-theme="dark"] .kpi-value,
-[data-theme="dark"] strong,
-[data-theme="dark"] *[style*="color: #0f172a"],
-[data-theme="dark"] *[style*="color:#0f172a"],
-[data-theme="dark"] *[style*="color: #1e293b"],
-[data-theme="dark"] *[style*="color:#1e293b"],
-[data-theme="dark"] *[style*="color: rgb(15, 23, 42)"],
-[data-theme="dark"] *[style*="color: rgb(30, 41, 59)"] {
-  color: #f8fafc !important;
-}
-
-/* Secondary & muted text in dark mode */
-[data-theme="dark"] p,
-[data-theme="dark"] *[style*="color: #64748b"],
-[data-theme="dark"] *[style*="color:#64748b"],
-[data-theme="dark"] *[style*="color: #475569"],
-[data-theme="dark"] *[style*="color:#475569"],
-[data-theme="dark"] *[style*="color: #334155"],
-[data-theme="dark"] *[style*="color:#334155"],
-[data-theme="dark"] *[style*="color: rgb(100, 116, 139)"],
-[data-theme="dark"] *[style*="color: rgb(71, 85, 105)"],
-[data-theme="dark"] *[style*="color: rgb(51, 65, 85)"] {
-  color: #94a3b8 !important;
-}
-
-/* Dark green & dark red text converted to luminous high-contrast shades */
-[data-theme="dark"] *[style*="color: #15803d"],
-[data-theme="dark"] *[style*="color:#15803d"],
-[data-theme="dark"] *[style*="color: #166534"],
-[data-theme="dark"] *[style*="color:#166534"],
-[data-theme="dark"] *[style*="color: rgb(21, 128, 61)"] {
-  color: #4ade80 !important;
-}
-
-[data-theme="dark"] *[style*="color: #9a3412"],
-[data-theme="dark"] *[style*="color:#9a3412"],
-[data-theme="dark"] *[style*="color: #c2410c"],
-[data-theme="dark"] *[style*="color:#c2410c"],
-[data-theme="dark"] *[style*="color: rgb(154, 52, 18)"] {
-  color: #fb923c !important;
-}
-
-/* Form controls in dark mode */
-[data-theme="dark"] .form-input,
-[data-theme="dark"] .form-select,
-[data-theme="dark"] input[type="text"],
-[data-theme="dark"] input[type="email"],
-[data-theme="dark"] input[type="password"],
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
-  background-color: var(--surface-container) !important;
-  border-color: var(--border) !important;
-  color: #f8fafc !important;
-}
-[data-theme="dark"] select option {
-  background-color: var(--surface) !important;
-  color: var(--text) !important;
-}
-[data-theme="dark"] .form-input::placeholder,
-[data-theme="dark"] input::placeholder {
-  color: #64748b !important;
-}
-
-/* Buttons in dark mode */
-[data-theme="dark"] .btn-secondary,
-[data-theme="dark"] .btn-outline {
-  background-color: var(--surface-container) !important;
-  border-color: var(--border) !important;
-  color: #f1f5f9 !important;
-}
-[data-theme="dark"] .btn-secondary:hover,
-[data-theme="dark"] .btn-outline:hover {
-  background-color: var(--surface-container-high) !important;
-  border-color: var(--primary) !important;
-}
-
-/* Segmented tabs in dark mode */
-[data-theme="dark"] .overview-segment-tabs,
-[data-theme="dark"] .overview-sub-tabs {
-  background-color: var(--surface-container) !important;
-  border-color: var(--border) !important;
-}
-[data-theme="dark"] .overview-segment-tab,
-[data-theme="dark"] .overview-sub-tab {
-  color: #94a3b8 !important;
-}
-[data-theme="dark"] .overview-segment-tab.active,
-[data-theme="dark"] .overview-sub-tab.active {
-  background-color: var(--surface) !important;
-  color: #f97316 !important;
-  border-color: var(--border) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Tables in dark mode */
-[data-theme="dark"] table {
-  color: #e2e8f0 !important;
-}
-[data-theme="dark"] table thead tr {
-  background-color: var(--surface-container) !important;
-  border-color: var(--border) !important;
-}
-[data-theme="dark"] table th {
-  color: #94a3b8 !important;
-  border-color: var(--border) !important;
-}
-[data-theme="dark"] table td {
-  border-color: var(--border) !important;
-  color: #e2e8f0 !important;
-}
-[data-theme="dark"] table tbody tr {
-  background-color: transparent !important;
-}
-[data-theme="dark"] table tbody tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.02) !important;
-}
-[data-theme="dark"] table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.04) !important;
-}
-
-/* Sidebar navigation in dark mode */
-[data-theme="dark"] .dashboard-sidebar-link {
-  color: #94a3b8 !important;
-}
-[data-theme="dark"] .dashboard-sidebar-link:hover {
-  background-color: var(--surface-container) !important;
-  color: #f8fafc !important;
-}
-[data-theme="dark"] .dashboard-sidebar-link.active {
-  background-color: rgba(249, 115, 22, 0.15) !important;
-  color: #f97316 !important;
-}
-
-/* Topbar & slim banner in dark mode */
-[data-theme="dark"] .dashboard-topbar {
-  background-color: var(--surface) !important;
-  border-color: var(--border) !important;
-}
-[data-theme="dark"] .mobile-slim-notice {
-  background-color: var(--surface-container) !important;
-  border-color: var(--border) !important;
-}
-[data-theme="dark"] .dashboard-paywall-banner {
-  background: var(--surface-container) !important;
-  border-color: var(--border) !important;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -1956,5 +1671,80 @@ a {
   }
   .pricing-grid .card {
     padding: 22px 16px !important;
+  }
+}
+
+
+/* ====================================================================
+   SENIOR MOBILE RESPONSIVENESS & TOUCH OPTIMIZATION (360px - 768px)
+   ==================================================================== */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  /* Prevent horizontal scroll entirely */
+  .dashboard-layout,
+  .dashboard-main,
+  .dashboard-content-body {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    padding: 12px 12px 84px !important;
+  }
+
+  /* Make cards comfortable on small screens */
+  .card,
+  .dashboard-kpi-card,
+  .dashboard-card-responsive {
+    padding: 16px 14px !important;
+    border-radius: 12px !important;
+    max-width: 100% !important;
+  }
+
+  /* Topbar mobile cleanup */
+  .dashboard-topbar {
+    padding: 10px 14px !important;
+    min-height: 54px !important;
+  }
+  .dashboard-page-title {
+    font-size: 17px !important;
+  }
+
+  /* Touch buttons minimum 44px height */
+  .btn,
+  button,
+  .btn-sm {
+    min-height: 42px;
+    touch-action: manipulation;
+  }
+
+  /* Mobile tables always scroll cleanly inside container */
+  .table-responsive,
+  table {
+    display: block;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modals must never overflow screen width */
+  .modal-overlay {
+    padding: 10px !important;
+  }
+  .modal-content {
+    width: 100% !important;
+    max-width: 96vw !important;
+    margin: 8px auto !important;
+    padding: 18px 14px !important;
+    max-height: 92vh !important;
+    border-radius: 14px !important;
+  }
+
+  /* Stand showcase and QR preview sizing */
+  .qr-preview-box {
+    width: 180px !important;
+    height: 180px !important;
   }
 }

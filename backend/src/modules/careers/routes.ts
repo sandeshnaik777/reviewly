@@ -64,16 +64,8 @@ careersRouter.post('/apply', async (req: Request, res: Response, next: NextFunct
       status: 'PENDING',
     });
 
-    // Notify Super Admin through System Notifications
-    try {
-      await db.createNotification({
-        title: `New Candidate: ${fullName.trim()} applied for ${jobTitle}`,
-        message: `${fullName.trim()} submitted an application for ${jobTitle} (${department || 'Team'}). Experience: ${experience || 'N/A'}. Phone: ${phone.trim()}. Email: ${email.trim()}`,
-        type: 'INFO',
-      });
-    } catch {
-      // Non-fatal notification failure
-    }
+    // Job applications are stored securely in database for Super Admin review
+    // They are private and NEVER broadcast as merchant notifications
 
     res.status(201).json({
       success: true,
