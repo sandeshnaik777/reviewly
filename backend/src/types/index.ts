@@ -123,6 +123,9 @@ export interface QRCodeItem {
   googleClicks?: number;
   avgRating?: number;
   lastScan?: string;
+  colorDark?: string;
+  colorLight?: string;
+  designStyle?: string;
   createdAt: string;
   updatedAt: string;
 }

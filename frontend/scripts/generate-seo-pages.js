@@ -15,6 +15,199 @@ const baseIndexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8')
 
 const pages = [
   {
+    path: '',
+    title: 'KindlyRate — #1 Smart Google Review Stands & AI Local SEO Platform | Trusted by 876+ Businesses',
+    description: 'Trusted by 876+ businesses with over 1.2M+ customer reviews collected. Turn happy walk-ins into verified 5-star Google Maps reviews automatically with KindlyRate smart QR & NFC counter stands, AI review drafting, and 100% negative feedback interception.',
+    heading: 'Smart Google Review Stands & AI Local SEO Platform',
+    subheading: 'Turn happy customers into verified 5-star Google Maps reviews in 5 seconds. Capture reviews at your physical billing counter with NFC and QR code stands.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' }
+    ],
+    schemaType: 'SoftwareApplication',
+    schemaExtra: {
+      name: 'KindlyRate Google Review Platform & Smart Stands',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'All',
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        reviewCount: '876',
+        bestRating: '5',
+        worstRating: '1'
+      },
+      offers: {
+        '@type': 'Offer',
+        price: '79',
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock'
+      }
+    },
+    contentHtml: `
+      <section style="max-width: 1200px; margin: 0 auto; padding: 48px 20px;">
+        <div style="text-align: center; max-width: 860px; margin: 0 auto 48px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; background: #fffaf8; border: 1.5px solid #fed7aa; padding: 6px 16px; border-radius: 9999px; font-size: 13px; font-weight: 700; color: #9a4018; margin-bottom: 20px;">
+            <span>★ 4.9 Rating</span> • <span>Trusted by 876+ Businesses</span> • <span>1,200,000+ Reviews Generated</span>
+          </div>
+          <h1 style="font-size: 42px; font-weight: 800; color: #0f172a; line-height: 1.2; margin-bottom: 20px;">
+            Smart Google Review Stands &amp; AI Local SEO Platform
+          </h1>
+          <p style="font-size: 19px; color: #475569; line-height: 1.6; margin-bottom: 32px;">
+            Turn walk-in customers into verified 5-star Google Maps reviews in 5 seconds. Physical NFC &amp; QR code counter stands for restaurants, clinics, salons, and retail shops across India.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+            <a href="/signup" style="background: #9a4018; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">Get Started for ₹79 →</a>
+            <a href="/pricing" style="background: #ffffff; color: #0f172a; border: 1.5px solid #cbd5e1; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; text-decoration: none;">View Subscription Packs</a>
+            <a href="/google-review-stand" style="background: #f8fafc; color: #334155; border: 1.5px solid #cbd5e1; padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; text-decoration: none;">Explore Smart Stands</a>
+          </div>
+        </div>
+
+        <!-- 4 Step Flow -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 64px;">
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 28px;">
+            <div style="font-size: 24px; font-weight: 800; color: #9a4018; margin-bottom: 8px;">01</div>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: #0f172a;">Instant NFC Tap or QR Scan</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">Customers tap their phone or scan the physical counter QR stand. No apps to install, opens instantly in Safari or Chrome.</p>
+          </div>
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 28px;">
+            <div style="font-size: 24px; font-weight: 800; color: #9a4018; margin-bottom: 8px;">02</div>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: #0f172a;">AI Natural Review Drafting</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">Our fine-tuned AI generates authentic, personalized review drafts in English, Hindi, and local languages incorporating your high-intent local SEO tags.</p>
+          </div>
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 28px;">
+            <div style="font-size: 24px; font-weight: 800; color: #9a4018; margin-bottom: 8px;">03</div>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: #0f172a;">Direct Google Maps Deep-Link</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">One click copies the drafted text and opens your verified Google Business Profile review dialog. Fast, frictionless 5-star publishing.</p>
+          </div>
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 28px;">
+            <div style="font-size: 24px; font-weight: 800; color: #9a4018; margin-bottom: 8px;">04</div>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0; color: #0f172a;">100% Reputation Shield</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">If a customer rates 1-3 stars, they are routed to a private resolution form directly to store managers. Never lose stars to temporary service hiccups.</p>
+          </div>
+        </div>
+
+        <!-- Hardware Showcase -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 40px; margin-bottom: 64px;">
+          <div style="text-align: center; max-width: 700px; margin: 0 auto 36px;">
+            <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Physical Counter Stand Styles &amp; Color Palettes</h2>
+            <p style="font-size: 16px; color: #64748b; margin: 0;">Choose from 5 premium physical templates and 8 customized color palettes (or custom hex) to match your brand aesthetics.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px;">
+              <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 6px 0; color: #0f172a;">Classic Counter Stand</h3>
+              <p style="font-size: 13px; color: #64748b; margin: 0;">5-Star gold header badge, matte finish, ideal for billing counters &amp; hotel receptions.</p>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px;">
+              <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 6px 0; color: #0f172a;">Modern Acrylic Plaque</h3>
+              <p style="font-size: 13px; color: #64748b; margin: 0;">Frosted acrylic glass with embedded NTAG213 NFC chip for instant smartphone tap.</p>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px;">
+              <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 6px 0; color: #0f172a;">Dining Table Tent</h3>
+              <p style="font-size: 13px; color: #64748b; margin: 0;">Double-sided foldable table tent engineered for cafes, bars, and fine dining tables.</p>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px;">
+              <h3 style="font-size: 16px; font-weight: 700; margin: 0 0 6px 0; color: #0f172a;">POS Register Sticker</h3>
+              <p style="font-size: 13px; color: #64748b; margin: 0;">Weatherproof vinyl badge for cash registers, drive-throughs, and showroom counters.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Industry Vertical Solutions -->
+        <div style="margin-bottom: 64px;">
+          <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 32px;">Engineered for High-Footfall Physical Businesses</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0;"><a href="/google-reviews-for-restaurants" style="color: #9a4018; text-decoration: none;">Restaurants &amp; Cafes →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin: 0;">Table tent stands capture food and ambiance reviews right after dining. Triple your monthly review count.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0;"><a href="/google-reviews-for-clinics" style="color: #9a4018; text-decoration: none;">Dental &amp; Health Clinics →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin: 0;">Reception stands capture patient trust and doctor attentiveness. Build unstoppable local clinic reputation.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0;"><a href="/google-reviews-for-salons" style="color: #9a4018; text-decoration: none;">Salons, Spas &amp; Beauty →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin: 0;">Capture reviews at the styling mirror or billing desk. Stylist-specific review routing and ranking boost.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 8px 0;"><a href="/google-reviews-for-retail" style="color: #9a4018; text-decoration: none;">Retail Stores &amp; Showrooms →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin: 0;">Billing counter stand captures happy customer checkout sentiment. Dominate local "stores near me" searches.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pillar SEO Blog Articles Grid -->
+        <div style="margin-bottom: 64px;">
+          <div style="text-align: center; max-width: 760px; margin: 0 auto 36px;">
+            <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Local SEO Playbooks &amp; Ranking Architecture</h2>
+            <p style="font-size: 16px; color: #64748b; margin: 0;">In-depth guides by the KindlyRate Research Lab on dominating Google Maps Local 3-Pack rankings.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <span style="font-size: 12px; font-weight: 700; color: #9a4018;">RANKING ALGORITHM</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin: 8px 0;"><a href="/blog/how-to-dominate-google-maps-local-3-pack-rankings-2026" style="color: #0f172a; text-decoration: none;">The Definitive 2026 Guide to Dominating Google Maps Local 3-Pack Rankings →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">15-point architectural breakdown of review velocity, keyword density, and proximity.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <span style="font-size: 12px; font-weight: 700; color: #9a4018;">HARDWARE CONVERSION</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin: 8px 0;"><a href="/blog/smart-nfc-qr-stands-vs-sms-whatsapp-review-requests" style="color: #0f172a; text-decoration: none;">Why Smart Counter QR &amp; NFC Stands Outperform SMS &amp; WhatsApp Review Links by 800% →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">Point-of-experience review capture analysis: why on-counter NFC stands convert over 34% of visitors.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <span style="font-size: 12px; font-weight: 700; color: #9a4018;">REPUTATION DEFENSE</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin: 8px 0;"><a href="/blog/shielding-business-from-unfair-1-star-fake-reviews-legally" style="color: #0f172a; text-decoration: none;">How to Shield Your Business from Unfair 1-Star &amp; Competitor Fake Reviews Legally →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">The playbook for legal reputation shielding: intercepting disgruntled customer feedback in real time.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <span style="font-size: 12px; font-weight: 700; color: #9a4018;">SEMANTIC SEARCH</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin: 8px 0;"><a href="/blog/keyword-injection-and-semantic-search-in-customer-reviews" style="color: #0f172a; text-decoration: none;">How Customer Review Keywords Power Google Maps Semantic Search Rankings →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">How specific purchase keywords in customer reviews trigger Google Local 3-Pack justifications.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <span style="font-size: 12px; font-weight: 700; color: #9a4018;">SOFTWARE COMPARISON</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin: 8px 0;"><a href="/blog/why-businesses-are-replacing-generic-aggregators-with-bespoke-software" style="color: #0f172a; text-decoration: none;">Why Modern Merchants Are Replacing Generic Review Aggregators with KindlyRate →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">Why brick-and-mortar stores are abandoning clunky legacy review software for lightweight smart QR platforms.</p>
+            </div>
+            <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+              <span style="font-size: 12px; font-weight: 700; color: #9a4018;">MULTI-LOCATION ENTERPRISE</span>
+              <h3 style="font-size: 18px; font-weight: 700; margin: 8px 0;"><a href="/blog/enterprise-multi-location-review-architecture" style="color: #0f172a; text-decoration: none;">Enterprise Architecture for Multi-Location Google Business Profile Management →</a></h3>
+              <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">How retail chains and restaurant franchises scale Google reviews across 50+ branches with unified telemetry.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hiring Banner -->
+        <div style="background: #0f172a; color: #ffffff; border-radius: 16px; padding: 40px; text-align: center; margin-bottom: 64px;">
+          <h2 style="font-size: 26px; font-weight: 800; margin: 0 0 12px 0;">We Are Hiring Across India: 100+ Open Positions</h2>
+          <p style="font-size: 16px; color: #94a3b8; max-width: 650px; margin: 0 auto 24px; line-height: 1.6;">
+            Join KindlyRate as we build the premier physical-to-digital review growth platform. Openings in Engineering, Sales, AI/ML, Operations, and Customer Success.
+          </p>
+          <a href="/careers" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 700; text-decoration: none;">Explore 100+ Job Openings →</a>
+        </div>
+
+        <!-- Top FAQ -->
+        <div style="max-width: 800px; margin: 0 auto;">
+          <h2 style="font-size: 28px; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 32px;">Frequently Asked Questions</h2>
+          <div style="border-bottom: 1px solid #e2e8f0; padding: 20px 0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">Does KindlyRate comply with Google's Review Policies?</h3>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0;">Yes, 100%. KindlyRate does not gate reviews, incentivize reviews with gifts or money, or post reviews on behalf of customers. Real customers post from their own authenticated mobile devices.</p>
+          </div>
+          <div style="border-bottom: 1px solid #e2e8f0; padding: 20px 0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">How does the physical NFC counter stand work?</h3>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0;">The stand contains an embedded high-speed NTAG213 NFC chip. When a customer holds their smartphone near the stand, an instant notification opens your review page. Customers without NFC simply scan the high-contrast QR code.</p>
+          </div>
+          <div style="border-bottom: 1px solid #e2e8f0; padding: 20px 0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">What happens when a customer has a negative experience?</h3>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0;">If a customer taps 1, 2, or 3 stars, our intelligent shield directs them to a private management feedback form. You receive immediate notification so you can resolve their grievance privately before it harms your Google Maps rating.</p>
+          </div>
+          <div style="padding: 20px 0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">Can I customize the stand colors and design?</h3>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0;">Yes! Our Merchant Dashboard features a Stand Design Studio with 5 physical templates (Classic Counter, Modern Acrylic, Table Tent, Register Sticker, Minimal QR) and 8 curated color palettes or any custom hex color.</p>
+          </div>
+        </div>
+      </section>
+    `
+  },
+
+  {
     path: 'pricing',
     title: 'Pricing & Transparent Subscription Plans — KindlyRate | Trusted by 876+ Businesses',
     description: 'Trusted by 876+ businesses with over 1.2M+ reviews collected. Explore affordable KindlyRate pricing: Starter Pack at ₹79, Growth Pack at ₹149/mo, and Scale Pro at ₹249/mo. Smart NFC QR counter stands, AI review assistant, and local SEO booster.',
@@ -325,6 +518,7 @@ const pages = [
   },
   {
     path: 'login',
+    noindex: true,
     title: 'Merchant Sign In — KindlyRate Business Portal',
     description: 'Log into your KindlyRate merchant portal to monitor real-time QR stand scans, customize AI prompt keywords, view analytics, and manage customer reviews.',
     heading: 'Sign In to Your Merchant Dashboard',
@@ -808,7 +1002,7 @@ const pages = [
         </nav>
         <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Careers at KindlyRate</h1>
         <p style="font-size: 18px; color: #475569; max-width: 800px; line-height: 1.6; margin-bottom: 32px;">
-          Join our mission to help brick-and-mortar stores thrive. Explore 12+ open positions across Sales, Engineering, Product Design, and Operations.
+          Join our mission to help brick-and-mortar stores thrive. Explore 100+ open positions across Sales, Engineering, AI/ML, Product, Design, Operations, and Marketing.
         </p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
@@ -830,7 +1024,7 @@ const pages = [
         </div>
 
         <div style="text-align: center;">
-          <a href="/careers" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">View All 12 Openings &amp; Apply →</a>
+          <a href="/careers" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">View All 100+ Openings &amp; Apply →</a>
         </div>
       </section>
     `
@@ -963,7 +1157,23 @@ for (const blog of blogArticles) {
         <div style="font-size: 16px; color: #334155; line-height: 1.8;">
           ${blog.content}
         </div>
-        <div style="margin-top: 48px; padding: 24px; background: #fffaf8; border: 2px solid #9a4018; border-radius: 12px; text-align: center;">
+        
+        <!-- Related Local SEO Guides (Dense Internal Link Mesh) -->
+        <div style="margin-top: 48px; padding: 28px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px;">
+          <h3 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">Related Local SEO &amp; Google Review Guides</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+            ${blogArticles.filter(b => b.slug !== blog.slug).map(b => `
+              <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px;">
+                <h4 style="font-size: 15px; font-weight: 700; margin: 0 0 6px 0;">
+                  <a href="/blog/${b.slug}" style="color: #9a4018; text-decoration: none;">${b.title}</a>
+                </h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.5;">${b.description.slice(0, 110)}...</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; padding: 24px; background: #fffaf8; border: 2px solid #9a4018; border-radius: 12px; text-align: center;">
           <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Ready to boost your Google Maps rankings?</h2>
           <p style="font-size: 15px; color: #475569; margin-bottom: 18px;">Deploy KindlyRate smart QR stands at your counter and collect 5-star customer reviews automatically.</p>
           <a href="/signup" style="display: inline-block; background: #9a4018; color: #ffffff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700;">Get Started for ₹79 →</a>
@@ -1057,6 +1267,9 @@ for (const p of pages) {
   );
 
   // Inject Page Specific Structured Data before </head>
+  if (p.noindex) {
+    html = html.replace('</head>', '  <meta name="robots" content="noindex, follow" />\n  </head>');
+  }
   html = html.replace('</head>', `${pageSchemaScript}\n  </head>`);
 
   // Inject Pre-rendered Crawlable Content inside <div id="root">
@@ -1064,41 +1277,68 @@ for (const p of pages) {
   const crawlableRoot = `
     <div id="root">
       <header style="background: #ffffff; border-bottom: 1.5px solid #e2e8f0; padding: 14px 20px;">
-        <nav aria-label="Main Navigation" style="max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-          <a href="/" style="font-size: 20px; font-weight: 800; color: #9a4018; text-decoration: none;">KindlyRate</a>
-          <div style="display: flex; gap: 16px; font-size: 14px; font-weight: 600;">
+        <nav aria-label="Main Navigation" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <a href="/" style="font-size: 22px; font-weight: 800; color: #9a4018; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+            KindlyRate
+          </a>
+          <div style="display: flex; gap: 16px; align-items: center; font-size: 14px; font-weight: 600; flex-wrap: wrap;">
+            <a href="/google-review-stand" style="color: #334155; text-decoration: none;">Review Stands</a>
             <a href="/features" style="color: #334155; text-decoration: none;">Features</a>
             <a href="/pricing" style="color: #334155; text-decoration: none;">Pricing</a>
-            <a href="/blog" style="color: #334155; text-decoration: none;">Blog</a>
+            <a href="/careers" style="color: #334155; text-decoration: none;">Careers <span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 12px; font-size: 11px; font-weight: 700;">100+ Jobs</span></a>
+            <a href="/blog" style="color: #334155; text-decoration: none;">Blog &amp; SEO Guides</a>
             <a href="/faq" style="color: #334155; text-decoration: none;">FAQ</a>
             <a href="/login" style="color: #334155; text-decoration: none;">Sign In</a>
-            <a href="/signup" style="color: #9a4018; text-decoration: none;">Get Started</a>
+            <a href="/signup" style="background: #9a4018; color: #ffffff; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 700;">Start For ₹79</a>
           </div>
         </nav>
       </header>
       <main role="main">
         ${p.contentHtml}
       </main>
-      <footer style="background: #0f172a; color: #94a3b8; padding: 40px 20px; margin-top: 60px;">
-        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; font-size: 14px;">
+      <footer style="background: #09090b; color: #94a3b8; padding: 56px 20px 32px; margin-top: 64px; border-top: 1px solid #27272a;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 40px; font-size: 14px;">
           <div>
-            <h3 style="color: #ffffff; font-size: 16px; font-weight: 700; margin-bottom: 12px;">KindlyRate</h3>
-            <p style="line-height: 1.6;">#1 AI Google Reviews &amp; Local SEO Platform for Every Business.</p>
+            <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 12px;">KindlyRate</div>
+            <p style="line-height: 1.6; color: #a1a1aa; margin-bottom: 16px;">
+              #1 Smart Google Review Stands &amp; AI Local SEO Platform. Turn walk-in customers into verified 5-star Google Maps reviews automatically.
+            </p>
+            <div style="font-size: 13px; color: #71717a; line-height: 1.8;">
+              ✓ Trusted by 876+ Businesses<br>
+              ✓ 1,200,000+ Reviews Generated<br>
+              ✓ 4.9 / 5 Verified Merchant Rating
+            </div>
           </div>
           <div>
-            <h4 style="color: #ffffff; font-size: 14px; font-weight: 700; margin-bottom: 12px;">Navigation</h4>
-            <p><a href="/" style="color: #94a3b8; text-decoration: none;">Home</a></p>
-            <p><a href="/features" style="color: #94a3b8; text-decoration: none;">Features</a></p>
-            <p><a href="/pricing" style="color: #94a3b8; text-decoration: none;">Pricing</a></p>
-            <p><a href="/blog" style="color: #94a3b8; text-decoration: none;">Blog &amp; SEO Guides</a></p>
+            <h4 style="color: #ffffff; font-size: 15px; font-weight: 700; margin-bottom: 14px;">Products &amp; Hardware</h4>
+            <p style="margin-bottom: 8px;"><a href="/google-review-stand" style="color: #a1a1aa; text-decoration: none;">Smart NFC QR Review Stands</a></p>
+            <p style="margin-bottom: 8px;"><a href="/google-maps-seo" style="color: #a1a1aa; text-decoration: none;">Google Maps Local 3-Pack SEO</a></p>
+            <p style="margin-bottom: 8px;"><a href="/negative-review-shield" style="color: #a1a1aa; text-decoration: none;">Negative Feedback Shield</a></p>
+            <p style="margin-bottom: 8px;"><a href="/features" style="color: #a1a1aa; text-decoration: none;">Platform Features &amp; Analytics</a></p>
+            <p style="margin-bottom: 8px;"><a href="/pricing" style="color: #a1a1aa; text-decoration: none;">Pricing &amp; Subscription Packs</a></p>
           </div>
           <div>
-            <h4 style="color: #ffffff; font-size: 14px; font-weight: 700; margin-bottom: 12px;">Legal &amp; Support</h4>
-            <p><a href="/help" style="color: #94a3b8; text-decoration: none;">Help Center</a></p>
-            <p><a href="/terms" style="color: #94a3b8; text-decoration: none;">Terms of Service</a></p>
-            <p><a href="/privacy" style="color: #94a3b8; text-decoration: none;">Privacy Policy</a></p>
-            <p><a href="/refund" style="color: #94a3b8; text-decoration: none;">Refund Policy</a></p>
+            <h4 style="color: #ffffff; font-size: 15px; font-weight: 700; margin-bottom: 14px;">Industry Solutions</h4>
+            <p style="margin-bottom: 8px;"><a href="/google-reviews-for-restaurants" style="color: #a1a1aa; text-decoration: none;">Restaurants &amp; Cafes</a></p>
+            <p style="margin-bottom: 8px;"><a href="/google-reviews-for-clinics" style="color: #a1a1aa; text-decoration: none;">Dental &amp; Health Clinics</a></p>
+            <p style="margin-bottom: 8px;"><a href="/google-reviews-for-salons" style="color: #a1a1aa; text-decoration: none;">Salons, Spas &amp; Beauty</a></p>
+            <p style="margin-bottom: 8px;"><a href="/google-reviews-for-retail" style="color: #a1a1aa; text-decoration: none;">Retail Stores &amp; Showrooms</a></p>
+            <p style="margin-bottom: 8px;"><a href="/blog" style="color: #a1a1aa; text-decoration: none;">All Local SEO Playbooks</a></p>
           </div>
+          <div>
+            <h4 style="color: #ffffff; font-size: 15px; font-weight: 700; margin-bottom: 14px;">Guides &amp; Company</h4>
+            <p style="margin-bottom: 8px;"><a href="/blog/how-to-dominate-google-maps-local-3-pack-rankings-2026" style="color: #a1a1aa; text-decoration: none;">Google Maps Ranking 2026 Guide</a></p>
+            <p style="margin-bottom: 8px;"><a href="/blog/smart-nfc-qr-stands-vs-sms-whatsapp-review-requests" style="color: #a1a1aa; text-decoration: none;">NFC Stands vs SMS Review Requests</a></p>
+            <p style="margin-bottom: 8px;"><a href="/blog/shielding-business-from-unfair-1-star-fake-reviews-legally" style="color: #a1a1aa; text-decoration: none;">Shield From 1-Star Fake Reviews</a></p>
+            <p style="margin-bottom: 8px;"><a href="/blog/keyword-injection-and-semantic-search-in-customer-reviews" style="color: #a1a1aa; text-decoration: none;">Review Keyword Injection Guide</a></p>
+            <p style="margin-bottom: 8px;"><a href="/careers" style="color: #38bdf8; text-decoration: none; font-weight: 600;">Careers (100+ Open Positions) →</a></p>
+            <p style="margin-bottom: 8px;"><a href="/faq" style="color: #a1a1aa; text-decoration: none;">Frequently Asked Questions</a></p>
+            <p style="margin-bottom: 8px;"><a href="/help" style="color: #a1a1aa; text-decoration: none;">Help &amp; Merchant Support</a></p>
+            <p style="margin-bottom: 8px;"><a href="/terms" style="color: #71717a; text-decoration: none;">Terms</a> • <a href="/privacy" style="color: #71717a; text-decoration: none;">Privacy</a> • <a href="/refund" style="color: #71717a; text-decoration: none;">Refunds</a></p>
+          </div>
+        </div>
+        <div style="max-width: 1200px; margin: 36px auto 0; padding-top: 24px; border-top: 1px solid #18181b; text-align: center; font-size: 13px; color: #71717a;">
+          © 2026 KindlyRate Technologies. All rights reserved. High-velocity Google Maps review growth engine for brick-and-mortar merchants.
         </div>
       </footer>
     </div>

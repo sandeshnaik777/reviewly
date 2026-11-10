@@ -63,26 +63,30 @@ export class QRService {
     return db.createQRCode(qr);
   }
 
-  async getQRImageSvg(slug: string): Promise<string> {
+  async getQRImageSvg(slug: string, options?: { colorDark?: string; colorLight?: string }): Promise<string> {
     const targetUrl = `${config.appUrl}/r/${slug}`;
+    const dark = options?.colorDark || '#9a4018';
+    const light = options?.colorLight || '#ffffff';
     return QRCode.toString(targetUrl, {
       type: 'svg',
       margin: 2,
       color: {
-        dark: '#9a4018', // Stitch terracotta primary brand color
-        light: '#ffffff',
+        dark,
+        light,
       },
     });
   }
 
-  async getQRImageDataUrl(slug: string): Promise<string> {
+  async getQRImageDataUrl(slug: string, options?: { colorDark?: string; colorLight?: string }): Promise<string> {
     const targetUrl = `${config.appUrl}/r/${slug}`;
+    const dark = options?.colorDark || '#9a4018';
+    const light = options?.colorLight || '#ffffff';
     return QRCode.toDataURL(targetUrl, {
       margin: 2,
       width: 400,
       color: {
-        dark: '#9a4018',
-        light: '#ffffff',
+        dark,
+        light,
       },
     });
   }

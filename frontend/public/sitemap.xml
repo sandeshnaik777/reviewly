@@ -79,11 +79,11 @@
     <priority>0.95</priority>
   </url>
 
-  <!-- Merchant Portal Login -->
+  <!-- Careers & Job Openings (100+ Active Roles) -->
   <url>
-    <loc>https://kindlyrate.com/login</loc>
+    <loc>https://kindlyrate.com/careers</loc>
     <lastmod>2026-11-10</lastmod>
-    <changefreq>monthly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>0.90</priority>
   </url>
 

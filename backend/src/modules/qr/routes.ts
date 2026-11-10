@@ -60,8 +60,11 @@ qrRouter.get('/:slug/image', async (req, res, next) => {
       throw new AppError('QR Code not found or inactive', 404, 'QR_NOT_FOUND');
     }
 
+    const colorDark = ((req.query.color || req.query.colorDark) as string) || qr.colorDark || '#9a4018';
+    const colorLight = ((req.query.bgColor || req.query.colorLight) as string) || qr.colorLight || '#ffffff';
+
     if (format === 'png') {
-      const dataUrl = await qrService.getQRImageDataUrl(slug);
+      const dataUrl = await qrService.getQRImageDataUrl(slug, { colorDark, colorLight });
       const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
       const imgBuffer = Buffer.from(base64Data, 'base64');
       res.setHeader('Content-Type', 'image/png');
@@ -69,7 +72,7 @@ qrRouter.get('/:slug/image', async (req, res, next) => {
       return res.send(imgBuffer);
     }
 
-    const svg = await qrService.getQRImageSvg(slug);
+    const svg = await qrService.getQRImageSvg(slug, { colorDark, colorLight });
     res.setHeader('Content-Type', 'image/svg+xml');
     res.send(svg);
   } catch (err) {
@@ -89,6 +92,9 @@ qrRouter.patch(
       googleReviewUrl: z.string().optional(),
       googleMapsShareUrl: z.string().optional(),
       isActive: z.boolean().optional(),
+      colorDark: z.string().optional(),
+      colorLight: z.string().optional(),
+      designStyle: z.string().optional(),
     })
   ),
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

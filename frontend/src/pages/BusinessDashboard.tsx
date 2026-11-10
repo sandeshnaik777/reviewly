@@ -62,6 +62,7 @@ import {
   Sparkles,
   Trash2,
   Edit2,
+  Palette,
   Sun,
   Moon,
   AlertTriangle,
@@ -191,6 +192,45 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
   const [newQRLocation, setNewQRLocation] = useState('Table 1');
   const [newQRGoogleReviewUrl, setNewQRGoogleReviewUrl] = useState('');
   const [editingQR, setEditingQR] = useState<any | null>(null);
+  // QR Stand Design & Color Studio State
+  const [selectedQRForDesign, setSelectedQRForDesign] = useState<any | null>(null);
+  const [designColor, setDesignColor] = useState<string>('#9a4018');
+  const [designBgColor, setDesignBgColor] = useState<string>('#ffffff');
+  const [designStyle, setDesignStyle] = useState<string>('classic');
+  const [savingDesign, setSavingDesign] = useState<boolean>(false);
+
+  const handleOpenQRDesignStudio = (qr: any) => {
+    setSelectedQRForDesign(qr);
+    setDesignColor(qr.colorDark || '#9a4018');
+    setDesignBgColor(qr.colorLight || '#ffffff');
+    setDesignStyle(qr.designStyle || 'classic');
+  };
+
+  const handleSaveQRDesign = async () => {
+    if (!selectedQRForDesign) return;
+    try {
+      setSavingDesign(true);
+      await api.updateQR(business.id, selectedQRForDesign.id, {
+        colorDark: designColor,
+        colorLight: designBgColor,
+        designStyle: designStyle,
+      });
+      setQrs((prev) =>
+        prev.map((q) =>
+          q.id === selectedQRForDesign.id
+            ? { ...q, colorDark: designColor, colorLight: designBgColor, designStyle }
+            : q
+        )
+      );
+      showNotification(`Saved custom design & color for "${selectedQRForDesign.name}"!`);
+      setSelectedQRForDesign(null);
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to save stand design');
+    } finally {
+      setSavingDesign(false);
+    }
+  };
+
 
   // Software Inquiry Callback Modal
   const [showInquiryModal, setShowInquiryModal] = useState(false);
@@ -3579,9 +3619,12 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                 {qrs.map((qr: any) => {
+                  const standColor = qr.colorDark || '#9a4018';
+                  const standBg = qr.colorLight || '#ffffff';
+                  const standDesign = qr.designStyle || 'classic';
                   const targetCustomerUrl = `${window.location.origin}/r/${qr.slug}`;
-                  const pngDownloadUrl = `/api/qrs/${qr.slug}/image?format=png`;
-                  const svgDownloadUrl = `/api/qrs/${qr.slug}/image?format=svg`;
+                  const pngDownloadUrl = `/api/qrs/${qr.slug}/image?format=png&color=${encodeURIComponent(standColor)}&bgColor=${encodeURIComponent(standBg)}`;
+                  const svgDownloadUrl = `/api/qrs/${qr.slug}/image?format=svg&color=${encodeURIComponent(standColor)}&bgColor=${encodeURIComponent(standBg)}`;
 
                   return (
                     <div
@@ -3632,10 +3675,40 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
                             alt={`QR for ${qr.name}`}
                             style={{ width: '160px', height: '160px', objectFit: 'contain' }}
                           />
-                          <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: 500 }}>
-                            Direct Scan URL: /r/{qr.slug}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
+                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: standColor, display: 'inline-block', border: '1px solid rgba(0,0,0,0.15)' }} />
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                              {qr.colorDark ? `Color: ${standColor}` : 'Brand Terracotta'} • {standDesign.replace('-', ' ').toUpperCase()}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 500 }}>
+                            Direct Scan: /r/{qr.slug}
                           </div>
                         </div>
+
+                        {/* Customize Design & Color Studio Button */}
+                        <button
+                          type="button"
+                          className="btn btn-outline"
+                          onClick={() => handleOpenQRDesignStudio(qr)}
+                          style={{
+                            width: '100%',
+                            marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '7px',
+                            fontWeight: 700,
+                            fontSize: '12.5px',
+                            padding: '8px 12px',
+                            borderColor: standColor,
+                            color: standColor,
+                            background: 'rgba(0,0,0,0.01)',
+                          }}
+                        >
+                          <Palette size={14} color={standColor} />
+                          <span>Customize Stand Design &amp; Color</span>
+                        </button>
 
                         {/* Customer Link Box */}
                         <div
@@ -6312,6 +6385,421 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
           </button>
         </nav>
       </div>
+
+        
+        {/* MODAL: QR Stand Design & Color Studio */}
+        {selectedQRForDesign && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.65)',
+              backdropFilter: 'blur(6px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1200,
+              padding: '16px',
+            }}
+            onClick={() => setSelectedQRForDesign(null)}
+          >
+            <div
+              style={{
+                background: 'var(--surface)',
+                borderRadius: '16px',
+                maxWidth: '920px',
+                width: '100%',
+                maxHeight: '92vh',
+                overflowY: 'auto',
+                padding: '32px',
+                boxShadow: 'var(--shadow-xl)',
+                position: 'relative',
+                border: '1px solid var(--border)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedQRForDesign(null)}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  background: 'var(--bg-canvas)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                <X size={16} />
+              </button>
+
+              {/* Modal Header */}
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(22, 163, 74, 0.08)', color: '#15803d', fontSize: '11.5px', fontWeight: 700, padding: '3px 9px', borderRadius: '6px', marginBottom: '8px' }}>
+                  <Palette size={13} />
+                  <span>Hardware Stand &amp; QR Color Studio</span>
+                </div>
+                <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 4px', color: 'var(--text)', letterSpacing: '-0.02em' }}>
+                  Customize QR Stand for "{selectedQRForDesign.name}"
+                </h3>
+                <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: 0 }}>
+                  Choose from 5 physical counter stand styles and curated brand color palettes, or pick your exact brand hex code.
+                </p>
+              </div>
+
+              {/* 2-Column Responsive Layout */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '28px', alignItems: 'start' }}>
+                {/* LEFT: Live Interactive Stand Artwork Preview */}
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                    Live Stand Preview
+                  </div>
+
+                  {/* Render based on designStyle */}
+                  <div
+                    style={{
+                      background: designBgColor === '#18181b' ? '#0f172a' : '#f8fafc',
+                      border: '2px solid var(--border)',
+                      borderRadius: '16px',
+                      padding: '24px 20px',
+                      textAlign: 'center',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {/* Stand Design 1: Classic Counter Stand */}
+                    {designStyle === 'classic' && (
+                      <div style={{ background: designBgColor, borderRadius: '14px', padding: '24px 18px', border: `3px solid ${designColor}`, color: designBgColor === '#18181b' ? '#ffffff' : '#09090b' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
+                          <GoogleLogo size={18} />
+                          <span style={{ fontSize: '14px', fontWeight: 800, letterSpacing: '-0.01em' }}>Google Reviews</span>
+                        </div>
+                        <div style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 4px', color: designColor }}>
+                          {business?.name || 'Your Business Name'}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '3px', margin: '6px 0 14px' }}>
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <StarIcon key={i} size={18} color="#f59e0b" filled={true} />
+                          ))}
+                        </div>
+                        <div style={{ background: '#ffffff', padding: '12px', borderRadius: '10px', display: 'inline-block', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                          <img
+                            src={`/api/qrs/${selectedQRForDesign.slug}/image?format=svg&color=${encodeURIComponent(designColor)}&bgColor=${encodeURIComponent(designBgColor === '#18181b' ? '#ffffff' : designBgColor)}`}
+                            alt="QR Preview"
+                            style={{ width: '160px', height: '160px', display: 'block' }}
+                          />
+                        </div>
+                        <div style={{ fontSize: '12px', fontWeight: 700, marginTop: '12px', color: designColor }}>
+                          Scan with your phone camera
+                        </div>
+                        <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          Takes under 15 seconds • Verified Direct Link
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stand Design 2: Modern Acrylic Plaque */}
+                    {designStyle === 'acrylic' && (
+                      <div
+                        style={{
+                          background: designBgColor === '#18181b' ? '#18181b' : 'rgba(255, 255, 255, 0.95)',
+                          backdropFilter: 'blur(10px)',
+                          borderRadius: '16px',
+                          padding: '28px 20px',
+                          border: '1.5px solid rgba(255, 255, 255, 0.4)',
+                          boxShadow: '0 12px 32px rgba(0,0,0,0.1)',
+                          color: designBgColor === '#18181b' ? '#ffffff' : '#09090b',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
+                          <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: '15px', fontWeight: 800, color: designColor }}>{business?.name || 'KindlyRate Verified'}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{selectedQRForDesign.locationTag || 'Front Desk'}</div>
+                          </div>
+                          <span style={{ fontSize: '10.5px', fontWeight: 800, background: 'rgba(22, 163, 74, 0.1)', color: '#15803d', padding: '3px 8px', borderRadius: '12px' }}>
+                            NFC + QR
+                          </span>
+                        </div>
+                        <div style={{ background: '#ffffff', padding: '14px', borderRadius: '12px', display: 'inline-block', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+                          <img
+                            src={`/api/qrs/${selectedQRForDesign.slug}/image?format=svg&color=${encodeURIComponent(designColor)}&bgColor=${encodeURIComponent(designBgColor === '#18181b' ? '#ffffff' : designBgColor)}`}
+                            alt="QR Preview"
+                            style={{ width: '160px', height: '160px', display: 'block' }}
+                          />
+                        </div>
+                        <div style={{ fontSize: '13px', fontWeight: 700, marginTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                          <GoogleLogo size={14} />
+                          <span>Tap Phone Here or Scan</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '3px' }}>
+                          Leave your genuine 5-star experience
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stand Design 3: Hospitality Table Tent */}
+                    {designStyle === 'table-tent' && (
+                      <div style={{ background: designBgColor, borderRadius: '12px', padding: '22px 18px', border: `2px dashed ${designColor}`, color: designBgColor === '#18181b' ? '#ffffff' : '#09090b' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: designColor, marginBottom: '4px' }}>
+                          Table Talker · Dining Edition
+                        </div>
+                        <h4 style={{ fontSize: '17px', fontWeight: 800, margin: '0 0 6px' }}>
+                          Loved Your Visit Today?
+                        </h4>
+                        <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 12px' }}>
+                          Share a quick review and help others discover {business?.name || 'our kitchen'}!
+                        </p>
+                        <div style={{ background: '#ffffff', padding: '10px', borderRadius: '10px', display: 'inline-block', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                          <img
+                            src={`/api/qrs/${selectedQRForDesign.slug}/image?format=svg&color=${encodeURIComponent(designColor)}&bgColor=${encodeURIComponent(designBgColor === '#18181b' ? '#ffffff' : designBgColor)}`}
+                            alt="QR Preview"
+                            style={{ width: '150px', height: '150px', display: 'block' }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '3px', marginTop: '10px' }}>
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <StarIcon key={i} size={16} color="#f59e0b" filled={true} />
+                          ))}
+                        </div>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '6px' }}>
+                          Scan to Rate Us on Google Maps
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stand Design 4: POS Register Sticker */}
+                    {designStyle === 'pos-sticker' && (
+                      <div style={{ background: designColor, borderRadius: '14px', padding: '16px', color: '#ffffff', maxWidth: '280px', margin: '0 auto', boxShadow: '0 4px 14px rgba(0,0,0,0.12)' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+                          ★ RATE US ON GOOGLE ★
+                        </div>
+                        <div style={{ background: '#ffffff', padding: '12px', borderRadius: '10px', display: 'inline-block' }}>
+                          <img
+                            src={`/api/qrs/${selectedQRForDesign.slug}/image?format=svg&color=${encodeURIComponent(designColor)}&bgColor=#ffffff`}
+                            alt="QR Preview"
+                            style={{ width: '150px', height: '150px', display: 'block' }}
+                          />
+                        </div>
+                        <div style={{ fontSize: '12px', fontWeight: 700, marginTop: '8px', color: '#ffffff' }}>
+                          SCAN WITH CAMERA
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stand Design 5: Minimal Pure QR */}
+                    {designStyle === 'minimal' && (
+                      <div style={{ background: designBgColor, borderRadius: '12px', padding: '24px', display: 'inline-block', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+                        <img
+                          src={`/api/qrs/${selectedQRForDesign.slug}/image?format=svg&color=${encodeURIComponent(designColor)}&bgColor=${encodeURIComponent(designBgColor)}`}
+                          alt="QR Preview"
+                          style={{ width: '190px', height: '190px', display: 'block' }}
+                        />
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px', fontWeight: 600 }}>
+                          Lossless Pure Vector QR
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* RIGHT: Color & Template Selection Controls */}
+                <div>
+                  {/* Color Palette Section */}
+                  <div style={{ marginBottom: '22px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '10px' }}>
+                      Choose Stand Color Palette
+                    </label>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '12px' }}>
+                      {[
+                        { name: 'Terracotta', hex: '#9a4018', bg: '#ffffff', label: 'Signature Warm' },
+                        { name: 'Obsidian', hex: '#09090b', bg: '#ffffff', label: 'Classic Minimal' },
+                        { name: 'Emerald', hex: '#059669', bg: '#ffffff', label: 'Trust & Growth' },
+                        { name: 'Royal Blue', hex: '#2563eb', bg: '#ffffff', label: 'Professional' },
+                        { name: 'Violet', hex: '#7c3aed', bg: '#ffffff', label: 'Modern Tech' },
+                        { name: 'Crimson', hex: '#e11d48', bg: '#ffffff', label: 'Hospitality' },
+                        { name: 'Luxury Gold', hex: '#b45309', bg: '#ffffff', label: 'Salons & Spas' },
+                        { name: 'Ocean Teal', hex: '#0d9488', bg: '#ffffff', label: 'Medical/Clinics' },
+                        { name: 'Night Mode', hex: '#ffffff', bg: '#18181b', label: 'Dark Plaque' },
+                      ].map((preset) => {
+                        const isSelected = designColor.toLowerCase() === preset.hex.toLowerCase() && designBgColor === preset.bg;
+                        return (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() => {
+                              setDesignColor(preset.hex);
+                              setDesignBgColor(preset.bg);
+                            }}
+                            style={{
+                              background: isSelected ? 'rgba(0,0,0,0.06)' : 'var(--bg-canvas)',
+                              border: isSelected ? `2px solid ${preset.hex}` : '1px solid var(--border)',
+                              borderRadius: '8px',
+                              padding: '8px 6px',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '4px',
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                background: preset.hex,
+                                border: '1.5px solid rgba(0,0,0,0.15)',
+                                display: 'inline-block',
+                              }}
+                            />
+                            <span style={{ fontSize: '11.5px', fontWeight: isSelected ? 800 : 600, color: 'var(--text)' }}>
+                              {preset.name}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Hex Color Input */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg-canvas)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                      <input
+                        type="color"
+                        value={designColor}
+                        onChange={(e) => setDesignColor(e.target.value)}
+                        style={{ width: '32px', height: '32px', border: 'none', borderRadius: '6px', cursor: 'pointer', padding: 0, background: 'none' }}
+                        title="Pick custom brand color"
+                      />
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block' }}>Custom Brand Hex</span>
+                        <input
+                          type="text"
+                          value={designColor}
+                          onChange={(e) => setDesignColor(e.target.value)}
+                          placeholder="#9a4018"
+                          style={{ border: 'none', background: 'none', fontSize: '13px', fontWeight: 700, color: 'var(--text)', outline: 'none', width: '100%' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Design Template Options */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text)', marginBottom: '10px' }}>
+                      Choose Physical Stand Template
+                    </label>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {[
+                        { id: 'classic', title: 'Classic Counter Stand', desc: 'Vertical acrylic stand with Google 5-star header & scan prompt.', badge: 'Most Popular' },
+                        { id: 'acrylic', title: 'Modern Acrylic Plaque', desc: 'Glassmorphic frosted border with NFC badge & verified seal.', badge: 'Premium Look' },
+                        { id: 'table-tent', title: 'Hospitality Table Tent', desc: 'Foldable dining table format: "Loved your food? Scan to review".', badge: 'Dining & Cafes' },
+                        { id: 'pos-sticker', title: 'Checkout Register Sticker', desc: 'Compact square badge formatted for monitor corners or drawers.', badge: 'Compact' },
+                        { id: 'minimal', title: 'Minimal Pure QR', desc: 'Lossless vector QR code without frame text for custom printing.', badge: 'Vector' },
+                      ].map((tpl) => {
+                        const isSelected = designStyle === tpl.id;
+                        return (
+                          <div
+                            key={tpl.id}
+                            onClick={() => setDesignStyle(tpl.id)}
+                            style={{
+                              border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
+                              background: isSelected ? 'rgba(154, 64, 24, 0.04)' : 'var(--bg-canvas)',
+                              borderRadius: '10px',
+                              padding: '10px 14px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '12px',
+                              transition: 'all 0.15s ease',
+                            }}
+                          >
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>{tpl.title}</span>
+                                <span style={{ fontSize: '10px', fontWeight: 700, background: 'rgba(0,0,0,0.06)', padding: '1px 6px', borderRadius: '4px', color: 'var(--text-muted)' }}>
+                                  {tpl.badge}
+                                </span>
+                              </div>
+                              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0', lineHeight: 1.4 }}>
+                                {tpl.desc}
+                              </p>
+                            </div>
+                            <div
+                              style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                border: isSelected ? '5px solid var(--primary)' : '2px solid var(--border)',
+                                background: '#ffffff',
+                                flexShrink: 0,
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Actions Row */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleSaveQRDesign}
+                      disabled={savingDesign}
+                      style={{ width: '100%', padding: '10px 16px', fontWeight: 700, fontSize: '13.5px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                    >
+                      <CheckCircle2 size={16} />
+                      <span>{savingDesign ? 'Saving Preferences...' : 'Save as Stand Default Style'}</span>
+                    </button>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <a
+                        href={`/api/qrs/${selectedQRForDesign.slug}/image?format=png&color=${encodeURIComponent(designColor)}&bgColor=${encodeURIComponent(designBgColor === '#18181b' ? '#ffffff' : designBgColor)}`}
+                        download={`${selectedQRForDesign.name.replace(/\s+/g, '_')}_${designColor.replace('#', '')}_QR.png`}
+                        className="btn btn-outline"
+                        style={{ fontSize: '12px', padding: '8px', textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                      >
+                        <Download size={13} />
+                        <span>Download PNG</span>
+                      </a>
+                      <a
+                        href={`/api/qrs/${selectedQRForDesign.slug}/image?format=svg&color=${encodeURIComponent(designColor)}&bgColor=${encodeURIComponent(designBgColor === '#18181b' ? '#ffffff' : designBgColor)}`}
+                        download={`${selectedQRForDesign.name.replace(/\s+/g, '_')}_${designColor.replace('#', '')}_QR.svg`}
+                        className="btn btn-outline"
+                        style={{ fontSize: '12px', padding: '8px', textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                      >
+                        <Download size={13} />
+                        <span>Download SVG</span>
+                      </a>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => window.print()}
+                      style={{ width: '100%', fontSize: '12px', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                    >
+                      <Printer size={13} />
+                      <span>Print Stand Sheet</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Create QR Modal */}
         {showQRModal && (
