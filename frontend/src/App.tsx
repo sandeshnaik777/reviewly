@@ -8,12 +8,13 @@ import { LoginPage } from './pages/LoginPage.js';
 import { LandingPage } from './pages/LandingPage.js';
 import { BlogPage } from './pages/BlogPage.js';
 import { ThankYouPage } from './pages/ThankYouPage.js';
+import { CareersPage } from './pages/CareersPage.js';
 import { updatePageSeo } from './utils/seo.js';
 
 export const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [currentBusiness, setCurrentBusiness] = useState<any>(null);
-  const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog' | 'thank-you'>('landing');
+  const [view, setView] = useState<'landing' | 'login' | 'onboarding' | 'dashboard' | 'admin' | 'customer' | 'blog' | 'thank-you' | 'careers'>('landing');
   const [customerSlug, setCustomerSlug] = useState<string>('');
   const [blogSlug, setBlogSlug] = useState<string>('');
   const [initialLandingSection, setInitialLandingSection] = useState<string>('');
@@ -110,6 +111,12 @@ export const App: React.FC = () => {
         description: 'Expert actionable playbooks on Google Maps Local 3-Pack optimization, smart QR counter stands, review velocity algorithms, and legal reputation management for brick-and-mortar merchants.',
         path: '/blog',
       });
+    } else if (view === 'careers') {
+      updatePageSeo({
+        title: 'Careers at KindlyRate — Join Our High-Growth Team',
+        description: 'Explore exciting career opportunities at KindlyRate. We are hiring across Sales & BD, Full-Stack Engineering, Product Design, Local SEO, and Cloud Operations in Bengaluru and across India.',
+        path: '/careers',
+      });
     }
   }, [view, initialLandingSection, blogSlug]);
 
@@ -120,6 +127,13 @@ export const App: React.FC = () => {
     // Check if customer is on post-payment Thank You page (Google Ads conversion target)
     if (normalizedPath === '/thank-you' || normalizedPath === '/success' || normalizedPath === '/order-confirmed') {
       setView('thank-you');
+      setLoading(false);
+      return;
+    }
+
+    // Check if visitor is navigating to /careers
+    if (normalizedPath === '/careers' || normalizedPath === '/jobs') {
+      setView('careers');
       setLoading(false);
       return;
     }
@@ -359,6 +373,20 @@ export const App: React.FC = () => {
     );
   }
 
+  // Careers & Job Openings View
+  if (view === 'careers') {
+    return (
+      <CareersPage
+        onNavigateHome={() => {
+          setView('landing');
+          window.history.pushState({}, '', '/');
+        }}
+        onStartOnboarding={() => setView('onboarding')}
+        onNavigateLogin={() => setView('login')}
+      />
+    );
+  }
+
   // Public Landing Page
   return (
     <LandingPage
@@ -374,6 +402,10 @@ export const App: React.FC = () => {
           setBlogSlug('');
         }
         setView('blog');
+      }}
+      onNavigateCareers={() => {
+        window.history.pushState({}, '', '/careers');
+        setView('careers');
       }}
     />
   );

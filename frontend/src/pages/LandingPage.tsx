@@ -46,10 +46,11 @@ interface Props {
   onStartOnboarding: () => void;
   onNavigateLogin: () => void;
   onNavigateBlog?: (slug?: string) => void;
+  onNavigateCareers?: () => void;
   initialSection?: string;
 }
 
-export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin, onNavigateBlog, initialSection }) => {
+export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogin, onNavigateBlog, onNavigateCareers, initialSection }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isFast, setIsFast] = useState(false);
   const [legalModal, setLegalModal] = useState<LegalModalType>(() => {
@@ -280,6 +281,42 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               }}
             >
               <BookOpen size={14} style={{ marginRight: '2px' }} /> Articles &amp; Blog
+            </a>
+            <a
+              href="/careers"
+              onClick={(e) => {
+                e.preventDefault();
+                if (onNavigateCareers) {
+                  onNavigateCareers();
+                } else {
+                  window.location.href = '/careers';
+                }
+              }}
+              style={{
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13.5px',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+              }}
+            >
+              Careers
+              <span
+                style={{
+                  fontSize: '9.5px',
+                  background: 'rgba(22, 163, 74, 0.1)',
+                  color: '#15803d',
+                  padding: '1px 5px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                }}
+              >
+                Hiring
+              </span>
             </a>
             <a
               href="/faq"
@@ -1626,6 +1663,25 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
               </li>
               <li>
                 <a
+                  href="/careers"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onNavigateCareers) {
+                      onNavigateCareers();
+                    } else {
+                      window.location.href = '/careers';
+                    }
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  Careers &amp; Open Roles
+                  <span style={{ fontSize: '10px', background: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', padding: '1px 6px', borderRadius: '8px', fontWeight: 700 }}>
+                    12 Openings
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
                   href="/features"
                   style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
@@ -1689,6 +1745,25 @@ export const LandingPage: React.FC<Props> = ({ onStartOnboarding, onNavigateLogi
                   style={{ color: '#94a3b8', textDecoration: 'none' }}
                 >
                   Articles &amp; Growth Blog
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/careers"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onNavigateCareers) {
+                      onNavigateCareers();
+                    } else {
+                      window.location.href = '/careers';
+                    }
+                  }}
+                  style={{ color: '#94a3b8', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  Careers &amp; Open Roles
+                  <span style={{ fontSize: '10px', background: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', padding: '1px 6px', borderRadius: '8px', fontWeight: 700 }}>
+                    12 Openings
+                  </span>
                 </a>
               </li>
               <li>

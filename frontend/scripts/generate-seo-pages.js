@@ -780,6 +780,60 @@ const pages = [
         </div>
       </section>
     `
+  },
+  {
+    path: 'careers',
+    title: 'Careers & Job Openings — Join KindlyRate | Bengaluru & Remote',
+    description: 'Explore career opportunities at KindlyRate. We are hiring across Sales & BD, Full-Stack Engineering, Product Design, Local SEO, and Cloud Operations in Bengaluru and across India. High autonomy, top compensation, and rapid growth.',
+    heading: 'Build the Future of Physical-to-Digital Local Commerce',
+    subheading: 'Join 12+ open roles at KindlyRate. Empower 876+ restaurants, clinics, salons, and retail shops to dominate local search with smart NFC QR hardware and AI.',
+    breadcrumbs: [
+      { name: 'Home', url: 'https://kindlyrate.com/' },
+      { name: 'Careers', url: 'https://kindlyrate.com/careers' }
+    ],
+    schemaType: 'Organization',
+    schemaExtra: {
+      name: 'KindlyRate',
+      url: 'https://kindlyrate.com',
+      logo: 'https://kindlyrate.com/assets/logo.svg',
+      sameAs: [
+        'https://www.linkedin.com/company/kindlyrate',
+        'https://twitter.com/kindlyrate'
+      ]
+    },
+    contentHtml: `
+      <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom: 24px; font-size: 14px; color: #64748b;">
+          <a href="/" style="color: #9a4018; text-decoration: none;">Home</a> &gt; <span>Careers</span>
+        </nav>
+        <h1 style="font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Careers at KindlyRate</h1>
+        <p style="font-size: 18px; color: #475569; max-width: 800px; line-height: 1.6; margin-bottom: 32px;">
+          Join our mission to help brick-and-mortar stores thrive. Explore 12+ open positions across Sales, Engineering, Product Design, and Operations.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <span style="font-size: 12px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 3px 8px; border-radius: 6px;">ENGINEERING</span>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 12px 0 6px;">Senior Software Engineer (Backend)</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.5;">Bengaluru / Remote • ₹18 LPA – ₹28 LPA + ESOPs</p>
+          </div>
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <span style="font-size: 12px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 3px 8px; border-radius: 6px;">ENGINEERING</span>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 12px 0 6px;">SDE Intern (Full-Stack)</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.5;">Bengaluru • ₹25,000 – ₹35,000 / month + PPO</p>
+          </div>
+          <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <span style="font-size: 12px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 3px 8px; border-radius: 6px;">SALES &amp; BD</span>
+            <h2 style="font-size: 18px; font-weight: 700; margin: 12px 0 6px;">Business Development Associate</h2>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.5;">Bengaluru • ₹4.5 LPA – ₹7.5 LPA + Incentives</p>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="/careers" style="display: inline-block; background: #0f172a; color: #ffffff; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 700; text-decoration: none;">View All 12 Openings &amp; Apply →</a>
+        </div>
+      </section>
+    `
   }
 ];
 

@@ -1,4 +1,4 @@
-import { Search, Bell, Building2, BookOpen, Key, Phone, Mail, MapPin, Trash2, Edit3, Plus, RefreshCw, ShieldCheck, Trophy, Sparkles } from 'lucide-react';
+import { Search, Bell, Building2, BookOpen, Key, Phone, Mail, MapPin, Trash2, Edit3, Plus, RefreshCw, ShieldCheck, Trophy, Sparkles, Briefcase, UserCheck, UserX, ExternalLink, MessageSquare, Check, X, FileText, ChevronDown, Filter } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api.js';
 import {
@@ -28,7 +28,17 @@ interface Props {
 }
 
 export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'businesses' | 'plans' | 'blogs' | 'notifications' | 'inquiries' | 'logs' | 'apikeys'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'businesses' | 'applications' | 'plans' | 'blogs' | 'notifications' | 'inquiries' | 'logs' | 'apikeys'>('overview');
+  // Careers & Job Applications State
+  const [applications, setApplications] = useState<any[]>([]);
+  const [appFilterStatus, setAppFilterStatus] = useState<string>('ALL');
+  const [appFilterDept, setAppFilterDept] = useState<string>('ALL');
+  const [appSearch, setAppSearch] = useState<string>('');
+  const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
+  const [selectedAppForNotes, setSelectedAppForNotes] = useState<any | null>(null);
+  const [appNotesText, setAppNotesText] = useState<string>('');
+  const [savingNotes, setSavingNotes] = useState<boolean>(false);
+
   const [stats, setStats] = useState<any>(null);
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
@@ -148,6 +158,48 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
       pass += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setNewBizForm((prev) => ({ ...prev, password: pass }));
+  };
+
+
+  const handleUpdateApplicationStatus = async (id: string, status: string) => {
+    try {
+      setUpdatingAppId(id);
+      await api.updateAdminJobApplication(id, { status });
+      setApplications((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+      showNotification(`Candidate status updated to ${status}`);
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to update status');
+    } finally {
+      setUpdatingAppId(null);
+    }
+  };
+
+  const handleSaveApplicationNotes = async () => {
+    if (!selectedAppForNotes) return;
+    try {
+      setSavingNotes(true);
+      await api.updateAdminJobApplication(selectedAppForNotes.id, { notes: appNotesText });
+      setApplications((prev) =>
+        prev.map((a) => (a.id === selectedAppForNotes.id ? { ...a, notes: appNotesText } : a))
+      );
+      showNotification('Internal evaluation notes saved');
+      setSelectedAppForNotes(null);
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to save notes');
+    } finally {
+      setSavingNotes(false);
+    }
+  };
+
+  const handleDeleteApplication = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete the job application from ${name}?`)) return;
+    try {
+      await api.deleteAdminJobApplication(id);
+      setApplications((prev) => prev.filter((a) => a.id !== id));
+      showNotification('Application deleted');
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to delete application');
+    }
   };
 
   const showNotification = (msg: string) => {
@@ -600,126 +652,202 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
         </div>
       )}
 
-      {/* Top Header */}
+      {/* Modern Executive Header */}
       <header
         style={{
           background: 'var(--surface)',
-          borderBottom: '1px solid var(--border-light)',
-          padding: '16px 28px',
+          borderBottom: '1px solid var(--border)',
+          padding: '14px 28px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          boxShadow: 'var(--shadow-sm)',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          backdropFilter: 'blur(8px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <KindlyRateLogo height={34} />
-          <span style={{ color: 'var(--border)', height: '22px', borderLeft: '1px solid var(--border)' }} />
-          <h2 className="serif" style={{ fontSize: '20px', margin: 0 }}>Super-Admin Portal</h2>
-          <span className="badge badge-primary">Operations & Finance</span>
+          <KindlyRateLogo height={32} />
+          <span style={{ color: 'var(--border)', height: '20px', borderLeft: '1px solid var(--border)' }} />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--text)', letterSpacing: '-0.02em' }}>
+                Super Admin Console
+              </h2>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  background: 'rgba(22, 163, 74, 0.08)',
+                  color: '#15803d',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '2px 8px',
+                  borderRadius: '100px',
+                  border: '1px solid rgba(22, 163, 74, 0.2)',
+                }}
+              >
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                Live • 99.99% Uptime
+              </span>
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+              Master Tenant Operations, Hiring Pipeline &amp; System Infrastructure
+            </div>
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             className="btn btn-primary"
             onClick={() => setShowAddBusinessModal(true)}
-            style={{ fontWeight: 600, fontSize: '13.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
+            style={{ fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px' }}
           >
-            <PlusIcon size={15} />
+            <PlusIcon size={14} />
             <span>Add Subscriber</span>
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-secondary"
             onClick={() => setShowBroadcastModal(true)}
-            style={{ background: '#7c3aed', borderColor: '#7c3aed', color: '#ffffff', fontWeight: 600, fontSize: '13.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
+            style={{ fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px' }}
           >
-            <BroadcastIcon size={15} />
-            <span>Broadcast Announcement</span>
+            <BroadcastIcon size={14} />
+            <span>Broadcast</span>
           </button>
-          <button className="btn btn-secondary" onClick={loadAdminData} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <RefreshIcon size={14} />
-            <span>Refresh Metrics</span>
+          <button
+            className="btn btn-outline"
+            onClick={loadAdminData}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 12px' }}
+            title="Refresh All Data"
+          >
+            <RefreshIcon size={13} />
+            <span>Refresh</span>
           </button>
-          <button className="btn btn-outline" onClick={onLogout}>
+          <button
+            className="btn btn-outline"
+            onClick={onLogout}
+            style={{ fontSize: '13px', padding: '8px 14px', color: 'var(--danger, #dc2626)', borderColor: 'var(--border)' }}
+          >
             Sign Out
           </button>
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <div className="desktop-container" style={{ padding: '24px 20px' }}>
-        <div className="segmented-nav">
+      {/* Modern Segmented Navigation Tabs */}
+      <div className="desktop-container" style={{ padding: '20px 20px 0' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            overflowX: 'auto',
+            paddingBottom: '8px',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
           <button
             className={`segmented-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <ChartBarIcon size={15} />
-            <span>Financial &amp; API Observability</span>
+            <ChartBarIcon size={14} />
+            <span>Overview &amp; Observability</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveTab('analytics')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <TrophyIcon size={15} />
-            <span>Platform Analytics &amp; Social Traffic</span>
+            <TrophyIcon size={14} />
+            <span>Analytics &amp; Traffic</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'businesses' ? 'active' : ''}`}
             onClick={() => setActiveTab('businesses')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <StorefrontIcon size={15} />
-            <span>Tenant Businesses ({businesses.length})</span>
+            <StorefrontIcon size={14} />
+            <span>Tenants ({businesses.length})</span>
+          </button>
+          <button
+            className={`segmented-nav-item ${activeTab === 'applications' ? 'active' : ''}`}
+            onClick={() => setActiveTab('applications')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              padding: '7px 12px',
+              whiteSpace: 'nowrap',
+              background: activeTab === 'applications' ? 'var(--primary)' : undefined,
+              color: activeTab === 'applications' ? '#ffffff' : undefined,
+            }}
+          >
+            <Briefcase size={14} color={activeTab === 'applications' ? '#ffffff' : '#15803d'} />
+            <span style={{ fontWeight: 700 }}>Job Candidates</span>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                padding: '1px 6px',
+                borderRadius: '10px',
+                background: activeTab === 'applications' ? 'rgba(255,255,255,0.25)' : 'rgba(22, 163, 74, 0.12)',
+                color: activeTab === 'applications' ? '#ffffff' : '#15803d',
+              }}
+            >
+              {applications.length}
+            </span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'plans' ? 'active' : ''}`}
             onClick={() => setActiveTab('plans')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <ShieldCheckIcon size={15} />
-            <span>Subscription Plans &amp; Pricing</span>
+            <ShieldCheckIcon size={14} />
+            <span>Plans &amp; Pricing</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
             onClick={() => setActiveTab('notifications')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <BroadcastIcon size={15} />
-            <span>Broadcast Notifications ({notifications.length})</span>
+            <BroadcastIcon size={14} />
+            <span>Broadcasts ({notifications.length})</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'inquiries' ? 'active' : ''}`}
             onClick={() => setActiveTab('inquiries')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <MobileIcon size={15} />
-            <span>Custom Software Leads ({inquiries.length})</span>
+            <MobileIcon size={14} />
+            <span>Leads ({inquiries.length})</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'blogs' ? 'active' : ''}`}
             onClick={() => setActiveTab('blogs')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <ClipboardCopyIcon size={15} />
-            <span>Articles &amp; Blogs ({blogs.length})</span>
-          </button>
-          <button
-            className={`segmented-nav-item ${activeTab === 'logs' ? 'active' : ''}`}
-            onClick={() => setActiveTab('logs')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <CheckCircleIcon size={15} />
-            <span>Audit &amp; Security Logs</span>
+            <ClipboardCopyIcon size={14} />
+            <span>Articles ({blogs.length})</span>
           </button>
           <button
             className={`segmented-nav-item ${activeTab === 'apikeys' ? 'active' : ''}`}
             onClick={() => setActiveTab('apikeys')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
           >
-            <SparklesIcon size={15} color={activeTab === 'apikeys' ? 'var(--primary)' : 'inherit'} />
-            <span>API Keys &amp; AI Engine ({apiKeys.length})</span>
+            <SparklesIcon size={14} color={activeTab === 'apikeys' ? 'var(--primary)' : 'inherit'} />
+            <span>AI Keys ({apiKeys.length})</span>
+          </button>
+          <button
+            className={`segmented-nav-item ${activeTab === 'logs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('logs')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 12px', whiteSpace: 'nowrap' }}
+          >
+            <CheckCircleIcon size={14} />
+            <span>Audit Logs</span>
           </button>
         </div>
 
@@ -728,7 +856,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             {/* Row 1: Revenue & Growth Cards */}
             <div style={{ marginBottom: '28px' }}>
-              <h3 className="serif" style={{ fontSize: '22px', marginBottom: '14px' }}>
+              <h3 className="admin-heading" style={{ fontSize: '22px', marginBottom: '14px' }}>
                 Revenue Growth & Subscription Health
               </h3>
               <div className="dashboard-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
@@ -776,7 +904,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
             {/* Row 2: API & System Observability (Rate limits, retries, latency) */}
             <div style={{ marginBottom: '28px' }}>
-              <h3 className="serif" style={{ fontSize: '22px', marginBottom: '14px' }}>
+              <h3 className="admin-heading" style={{ fontSize: '22px', marginBottom: '14px' }}>
                 API Traffic, Rate-Limits & AI Health
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
@@ -816,7 +944,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
 
             {/* Row 3: Revenue Distribution by Plan */}
             <div className="card" style={{ padding: '24px' }}>
-              <h3 className="serif" style={{ fontSize: '20px', marginBottom: '16px' }}>Revenue Distribution by Subscription Plan</h3>
+              <h3 className="admin-heading" style={{ fontSize: '20px', marginBottom: '16px' }}>Revenue Distribution by Subscription Plan</h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
                 {(stats?.revenueByPlan || []).map((p: any, idx: number) => (
                   <div key={idx} style={{ padding: '16px', background: 'var(--surface-container)', borderRadius: 'var(--radius-md)' }}>
@@ -843,7 +971,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '24px' }}>Platform Analytics &amp; Conversion Velocity</h3>
+                <h3 className="admin-heading" style={{ fontSize: '24px' }}>Platform Analytics &amp; Conversion Velocity</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '2px' }}>
                   End-to-end QR scan funnels, merchant social media engagement, category share &amp; reputation shield metrics.
                 </p>
@@ -1202,7 +1330,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '24px' }}>Tenant Businesses & Customer Directory</h3>
+                <h3 className="admin-heading" style={{ fontSize: '24px' }}>Tenant Businesses & Customer Directory</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '2px' }}>
                   Real-time customer search, quota management, account status, and merchant communication.
                 </p>
@@ -1392,7 +1520,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
               {filteredBusinesses.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)' }}>
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}><Search size={38} color='var(--text-muted)' /></div>
-                  <h4 className="serif" style={{ fontSize: '18px', color: 'var(--text)', marginBottom: '6px' }}>
+                  <h4 className="admin-heading" style={{ fontSize: '18px', color: 'var(--text)', marginBottom: '6px' }}>
                     No businesses matching your search
                   </h4>
                   <p style={{ fontSize: '13px', maxWidth: '420px', margin: '0 auto 16px' }}>
@@ -1585,7 +1713,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
               >
                 <div className="card" style={{ width: '100%', maxWidth: '520px', padding: '28px', maxHeight: '90vh', overflowY: 'auto' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h3 className="serif" style={{ fontSize: '22px' }}>
+                    <h3 className="admin-heading" style={{ fontSize: '22px' }}>
                       Contact: {selectedContactBusiness.name}
                     </h3>
                     <button
@@ -1701,7 +1829,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 }}
               >
                 <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '28px' }}>
-                  <h3 className="serif" style={{ fontSize: '20px', marginBottom: '8px' }}>
+                  <h3 className="admin-heading" style={{ fontSize: '20px', marginBottom: '8px' }}>
                     Adjust Quota Limit
                   </h3>
                   <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
@@ -1745,7 +1873,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '22px' }}>Subscription Packs, Pricing &amp; Review Quotas</h3>
+                <h3 className="admin-heading" style={{ fontSize: '22px' }}>Subscription Packs, Pricing &amp; Review Quotas</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                   Set monthly, quarterly, semi-annual, and 1-year pack prices. Configure review quotas and QR allowances.
                 </p>
@@ -1850,7 +1978,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 <div className="card" style={{ width: '100%', maxWidth: '580px', padding: '28px', maxHeight: '90vh', overflowY: 'auto' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <div>
-                      <h3 className="serif" style={{ fontSize: '22px' }}>Edit {editingPlan.name}</h3>
+                      <h3 className="admin-heading" style={{ fontSize: '22px' }}>Edit {editingPlan.name}</h3>
                       <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: 0 }}>
                         Configure subscriber pricing and review generation quotas for this pack.
                       </p>
@@ -2030,7 +2158,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '22px' }}>Security Audit & Rate Limit Log Feed</h3>
+                <h3 className="admin-heading" style={{ fontSize: '22px' }}>Security Audit & Rate Limit Log Feed</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                   Tracks rate-limit blocks (429s), admin overrides, and business modifications.
                 </p>
@@ -2078,7 +2206,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '22px' }}>Broadcast Announcements & System Alerts</h3>
+                <h3 className="admin-heading" style={{ fontSize: '22px' }}>Broadcast Announcements & System Alerts</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                   Send real-time alerts, maintenance notices, new feature launches, or promotions to all merchant dashboards.
                 </p>
@@ -2185,7 +2313,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '22px' }}>Custom Software Leads & Enterprise Inquiries</h3>
+                <h3 className="admin-heading" style={{ fontSize: '22px' }}>Custom Software Leads & Enterprise Inquiries</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                   Consultation requests from businesses wanting Delivery Fleet Dispatch, ERP, Omnichannel Billing, or Bespoke Apps.
                 </p>
@@ -2346,7 +2474,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <h3 className="serif" style={{ fontSize: '22px' }}>Editorial Knowledge Base &amp; Growth Articles</h3>
+                <h3 className="admin-heading" style={{ fontSize: '22px' }}>Editorial Knowledge Base &amp; Growth Articles</h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                   Manage and publish field playbooks, Google SEO strategies, and custom software guides accessible publicly and to merchants.
                 </p>
@@ -2440,7 +2568,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                         </span>
                       </div>
 
-                      <h4 className="serif" style={{ fontSize: '18px', fontWeight: 600, margin: '4px 0 6px', color: '#0f172a' }}>
+                      <h4 className="admin-heading" style={{ fontSize: '18px', fontWeight: 600, margin: '4px 0 6px', color: '#0f172a' }}>
                         {b.title}
                       </h4>
 
@@ -2496,7 +2624,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '16px' }}>
                 <div>
-                  <h3 className="serif" style={{ fontSize: '22px', fontWeight: 600, margin: '0 0 4px' }}>
+                  <h3 className="admin-heading" style={{ fontSize: '22px', fontWeight: 600, margin: '0 0 4px' }}>
                     API Keys &amp; Multi-Model AI Routing Pool
                   </h3>
                   <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: 0 }}>
@@ -2747,6 +2875,444 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           </div>
         )}
 
+        
+        {/* TAB: Careers & Job Applications Pipeline */}
+        {activeTab === 'applications' && (
+          <div style={{ marginTop: '24px' }}>
+            {/* Header & Quick Actions */}
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '16px',
+                marginBottom: '24px',
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 4px', color: 'var(--text)', letterSpacing: '-0.02em' }}>
+                  Careers &amp; Candidate Pipeline
+                </h3>
+                <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: 0 }}>
+                  Review and evaluate candidate applications submitted via kindlyrate.com/careers
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <a
+                  href="/careers"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 14px' }}
+                >
+                  <ExternalLink size={14} />
+                  <span>View Public Careers Page</span>
+                </a>
+                <button
+                  onClick={loadAdminData}
+                  className="btn btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 14px' }}
+                >
+                  <RefreshIcon size={13} />
+                  <span>Refresh</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Metric KPI Cards */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+                gap: '14px',
+                marginBottom: '24px',
+              }}
+            >
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
+                  Total Applications
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>
+                  {applications.length}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>All-time candidates</div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '12px', color: '#d97706', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+                  Pending Review
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#b45309', letterSpacing: '-0.02em' }}>
+                  {applications.filter((a) => !a.status || a.status === 'PENDING').length}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Awaiting initial review</div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '12px', color: '#2563eb', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }} />
+                  Shortlisted &amp; In Interview
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#1d4ed8', letterSpacing: '-0.02em' }}>
+                  {applications.filter((a) => ['SHORTLISTED', 'INTERVIEWING'].includes(a.status)).length}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Active interview stage</div>
+              </div>
+
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '18px 20px', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }} />
+                  Offers &amp; Hired
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#15803d', letterSpacing: '-0.02em' }}>
+                  {applications.filter((a) => a.status === 'HIRED').length}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Hired team members</div>
+              </div>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                marginBottom: '20px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '14px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ position: 'relative', flex: '1 1 280px' }}>
+                <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                <input
+                  type="text"
+                  placeholder="Search candidate name, email, phone, or position..."
+                  value={appSearch}
+                  onChange={(e) => setAppSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px 8px 36px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                    fontSize: '13px',
+                    outline: 'none',
+                    background: 'var(--bg-canvas, #fafafa)',
+                    color: 'var(--text)',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              {/* Status Filters */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {['ALL', 'PENDING', 'SHORTLISTED', 'INTERVIEWING', 'HIRED', 'REJECTED'].map((st) => {
+                  const isActive = appFilterStatus === st;
+                  return (
+                    <button
+                      key={st}
+                      onClick={() => setAppFilterStatus(st)}
+                      style={{
+                        background: isActive ? 'var(--text)' : 'var(--bg-canvas)',
+                        color: isActive ? 'var(--surface)' : 'var(--text-muted)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {st === 'ALL' ? 'All Status' : st}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Department Dropdown */}
+              <div>
+                <select
+                  value={appFilterDept}
+                  onChange={(e) => setAppFilterDept(e.target.value)}
+                  style={{
+                    padding: '7px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    background: 'var(--surface)',
+                    color: 'var(--text)',
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="ALL">All Departments</option>
+                  <option value="Sales">Sales &amp; BD</option>
+                  <option value="Engineering">Engineering</option>
+                  <option value="Design">Product &amp; Design</option>
+                  <option value="Marketing">Marketing &amp; Growth</option>
+                  <option value="Customer Success">Customer Success</option>
+                  <option value="Operations">Operations</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Applications List */}
+            {applications.length === 0 ? (
+              <div
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px dashed var(--border)',
+                  borderRadius: '12px',
+                  padding: '48px 24px',
+                  textAlign: 'center',
+                }}
+              >
+                <Briefcase size={36} color="var(--text-muted)" style={{ margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 6px', color: 'var(--text)' }}>
+                  No Candidate Applications Yet
+                </h4>
+                <p style={{ fontSize: '13.5px', color: 'var(--text-muted)', margin: '0 0 16px' }}>
+                  Job applications submitted on kindlyrate.com/careers will automatically appear here with full candidate contact details.
+                </p>
+                <a href="/careers" target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <ExternalLink size={14} />
+                  <span>Preview Careers Portal</span>
+                </a>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {applications
+                  .filter((app) => {
+                    if (appFilterStatus !== 'ALL') {
+                      if (appFilterStatus === 'PENDING' && app.status && app.status !== 'PENDING') return false;
+                      if (appFilterStatus !== 'PENDING' && app.status !== appFilterStatus) return false;
+                    }
+                    if (appFilterDept !== 'ALL') {
+                      if (!app.department || !app.department.toLowerCase().includes(appFilterDept.toLowerCase())) return false;
+                    }
+                    if (appSearch.trim()) {
+                      const q = appSearch.toLowerCase().trim();
+                      const matchName = (app.fullName || '').toLowerCase().includes(q);
+                      const matchEmail = (app.email || '').toLowerCase().includes(q);
+                      const matchPhone = (app.phone || '').toLowerCase().includes(q);
+                      const matchJob = (app.jobTitle || '').toLowerCase().includes(q);
+                      if (!matchName && !matchEmail && !matchPhone && !matchJob) return false;
+                    }
+                    return true;
+                  })
+                  .map((app) => {
+                    const statusColorMap: Record<string, { bg: string; text: string; dot: string }> = {
+                      PENDING: { bg: 'rgba(245, 158, 11, 0.1)', text: '#b45309', dot: '#f59e0b' },
+                      REVIEWED: { bg: 'rgba(100, 116, 139, 0.1)', text: '#475569', dot: '#64748b' },
+                      SHORTLISTED: { bg: 'rgba(59, 130, 246, 0.1)', text: '#1d4ed8', dot: '#3b82f6' },
+                      INTERVIEWING: { bg: 'rgba(147, 51, 234, 0.1)', text: '#7e22ce', dot: '#9333ea' },
+                      HIRED: { bg: 'rgba(22, 163, 74, 0.1)', text: '#15803d', dot: '#22c55e' },
+                      REJECTED: { bg: 'rgba(239, 68, 68, 0.1)', text: '#b91c1c', dot: '#ef4444' },
+                    };
+                    const statusStyle = statusColorMap[app.status || 'PENDING'] || statusColorMap.PENDING;
+
+                    return (
+                      <div
+                        key={app.id}
+                        style={{
+                          background: 'var(--surface)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '12px',
+                          padding: '20px 24px',
+                          boxShadow: 'var(--shadow-sm)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '14px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div
+                              style={{
+                                width: '42px',
+                                height: '42px',
+                                borderRadius: '50%',
+                                background: '#18181b',
+                                color: '#ffffff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 800,
+                                fontSize: '15px',
+                              }}
+                            >
+                              {(app.fullName || 'C').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <h4 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
+                                  {app.fullName}
+                                </h4>
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    padding: '2px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '11.5px',
+                                    fontWeight: 700,
+                                    background: statusStyle.bg,
+                                    color: statusStyle.text,
+                                  }}
+                                >
+                                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: statusStyle.dot }} />
+                                  {app.status || 'PENDING'}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                Applied for <strong style={{ color: 'var(--text)' }}>{app.jobTitle}</strong> • {app.department || 'General'} • {new Date(app.createdAt).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Quick Status Selector */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <select
+                              value={app.status || 'PENDING'}
+                              disabled={updatingAppId === app.id}
+                              onChange={(e) => handleUpdateApplicationStatus(app.id, e.target.value)}
+                              style={{
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border)',
+                                fontSize: '12.5px',
+                                fontWeight: 600,
+                                background: 'var(--surface)',
+                                color: 'var(--text)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <option value="PENDING">PENDING</option>
+                              <option value="REVIEWED">REVIEWED</option>
+                              <option value="SHORTLISTED">SHORTLISTED</option>
+                              <option value="INTERVIEWING">INTERVIEWING</option>
+                              <option value="HIRED">HIRED</option>
+                              <option value="REJECTED">REJECTED</option>
+                            </select>
+
+                            <button
+                              onClick={() => {
+                                setSelectedAppForNotes(app);
+                                setAppNotesText(app.notes || '');
+                              }}
+                              className="btn btn-outline"
+                              style={{ fontSize: '12px', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                              title="Add or Edit Internal Evaluation Notes"
+                            >
+                              <FileText size={13} />
+                              <span>{app.notes ? 'View Notes' : '+ Add Note'}</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteApplication(app.id, app.fullName)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--danger, #dc2626)',
+                                cursor: 'pointer',
+                                padding: '6px',
+                                borderRadius: '6px',
+                              }}
+                              title="Delete Application"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Contact Chips & Details */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', fontSize: '13px', padding: '10px 14px', background: 'var(--bg-canvas, #fafafa)', borderRadius: '8px' }}>
+                          <a
+                            href={`tel:${app.phone}`}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text)', textDecoration: 'none', fontWeight: 600 }}
+                          >
+                            <Phone size={13} color="var(--primary)" />
+                            {app.phone}
+                          </a>
+                          <span style={{ color: 'var(--border)' }}>•</span>
+                          <a
+                            href={`mailto:${app.email}`}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text)', textDecoration: 'none' }}
+                          >
+                            <Mail size={13} color="var(--primary)" />
+                            {app.email}
+                          </a>
+                          <span style={{ color: 'var(--border)' }}>•</span>
+                          <span style={{ color: 'var(--text-muted)' }}>
+                            Experience: <strong style={{ color: 'var(--text)' }}>{app.experience || 'N/A'}</strong>
+                          </span>
+                          {app.currentCompany && (
+                            <>
+                              <span style={{ color: 'var(--border)' }}>•</span>
+                              <span style={{ color: 'var(--text-muted)' }}>
+                                Current: <strong style={{ color: 'var(--text)' }}>{app.currentCompany}</strong>
+                              </span>
+                            </>
+                          )}
+                          {app.resumeUrl && (
+                            <>
+                              <span style={{ color: 'var(--border)' }}>•</span>
+                              <a
+                                href={app.resumeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+                              >
+                                <ExternalLink size={12} />
+                                View Resume / Portfolio
+                              </a>
+                            </>
+                          )}
+                          {app.linkedinUrl && (
+                            <>
+                              <span style={{ color: 'var(--border)' }}>•</span>
+                              <a
+                                href={app.linkedinUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#0077b5', fontWeight: 600, textDecoration: 'none' }}
+                              >
+                                <ExternalLink size={12} />
+                                LinkedIn Profile
+                              </a>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Cover Note & Internal Notes */}
+                        {app.coverNote && (
+                          <div style={{ fontSize: '13px', color: 'var(--text)', background: 'rgba(0,0,0,0.02)', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid var(--border)' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Candidate Pitch</div>
+                            <div style={{ fontStyle: 'italic', color: 'var(--text)' }}>"{app.coverNote}"</div>
+                          </div>
+                        )}
+
+                        {app.notes && (
+                          <div style={{ fontSize: '12.5px', color: '#15803d', background: 'rgba(22, 163, 74, 0.05)', padding: '8px 12px', borderRadius: '6px', border: '1px solid rgba(22, 163, 74, 0.2)' }}>
+                            <span style={{ fontWeight: 700 }}>Internal Recruiter Notes:</span> {app.notes}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* MODAL: Post Broadcast Announcement */}
         {showBroadcastModal && (
           <div
@@ -2766,7 +3332,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           >
             <div className="card" style={{ width: '100%', maxWidth: '500px', padding: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <h3 className="serif" style={{ fontSize: '20px', fontWeight: 600 }}>
+                <h3 className="admin-heading" style={{ fontSize: '20px', fontWeight: 600 }}>
                   Broadcast Announcement
                 </h3>
                 <button
@@ -2874,7 +3440,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           >
             <div className="card" style={{ width: '100%', maxWidth: '720px', maxHeight: '90vh', overflowY: 'auto', padding: '28px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 className="serif" style={{ fontSize: '20px', fontWeight: 600 }}>
+                <h3 className="admin-heading" style={{ fontSize: '20px', fontWeight: 600 }}>
                   {editingBlog ? 'Edit Growth Article' : 'Write New Growth Article & Playbook'}
                 </h3>
                 <button
@@ -3020,7 +3586,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
           >
             <div className="card" style={{ width: '100%', maxWidth: '600px', padding: '32px', maxHeight: '90vh', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 className="serif" style={{ fontSize: '24px' }}>Add Business & Owner Manually</h3>
+                <h3 className="admin-heading" style={{ fontSize: '24px' }}>Add Business & Owner Manually</h3>
                 <button className="btn btn-secondary" style={{ padding: '4px 8px' }} onClick={() => setShowAddBusinessModal(false)}>
                   ✕
                 </button>
@@ -3308,7 +3874,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                 >
                   ✓
                 </div>
-                <h3 className="serif" style={{ fontSize: '24px', marginBottom: '6px' }}>
+                <h3 className="admin-heading" style={{ fontSize: '24px', marginBottom: '6px' }}>
                   Subscriber Created Successfully!
                 </h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '13.5px' }}>
@@ -3398,7 +3964,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Key size={20} />
-                  <h3 className="serif" style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>
+                  <h3 className="admin-heading" style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>
                     Register System API Key
                   </h3>
                 </div>

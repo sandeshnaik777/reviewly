@@ -356,3 +356,25 @@ export interface SystemApiKey {
   updatedAt: string;
 }
 
+export type JobApplicationStatus = 'PENDING' | 'REVIEWED' | 'SHORTLISTED' | 'INTERVIEWING' | 'REJECTED' | 'HIRED';
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  department: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  experience: string;
+  currentCompany?: string;
+  portfolioUrl?: string;
+  linkedinUrl?: string;
+  resumeUrl?: string;
+  coverNote?: string;
+  status: JobApplicationStatus;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

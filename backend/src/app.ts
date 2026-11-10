@@ -16,6 +16,7 @@ import { qrRouter } from './modules/qr/routes.js';
 import { customerRouter } from './modules/customer/routes.js';
 import { paymentRouter } from './modules/payment/routes.js';
 import { adminRouter } from './modules/admin/routes.js';
+import { careersRouter } from './modules/careers/routes.js';
 import { db } from './db/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -153,6 +154,7 @@ export function createApp(): Express {
   app.use('/api/customer', customerRouter);
   app.use('/api/payment', paymentRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/careers', careersRouter);
 
   // Public Subscription Plans API
   app.get('/api/plans', async (_req, res, next) => {

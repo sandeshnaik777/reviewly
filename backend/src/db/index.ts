@@ -57,6 +57,7 @@ interface DatabaseSchema {
   customSoftwareInquiries: CustomSoftwareInquiry[];
   blogPosts: BlogPost[];
   apiKeys: SystemApiKey[];
+  jobApplications: JobApplication[];
 }
 
 const DEFAULT_PLANS: SubscriptionPlan[] = [
@@ -430,6 +431,7 @@ class DatabaseService {
         },
       ],
       customSoftwareInquiries: [],
+      jobApplications: [],
       blogPosts: DEFAULT_BLOGS,
       apiKeys: config.gemini.apiKey
         ? [
@@ -2316,6 +2318,77 @@ class DatabaseService {
       await this.persist();
     }
   }
+
+  // --- Job Applications Management ---
+  async listJobApplications(): Promise<JobApplication[]> {
+    if (!this.data.jobApplications) {
+      this.data.jobApplications = [];
+    }
+    return [...this.data.jobApplications].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async createJobApplication(
+    application: Omit<JobApplication, 'id' | 'createdAt' | 'updatedAt' | 'status'> & { status?: JobApplication['status'] }
+  ): Promise<JobApplication> {
+    if (!this.data.jobApplications) {
+      this.data.jobApplications = [];
+    }
+    const record: JobApplication = {
+      id: crypto.randomUUID(),
+      jobId: application.jobId,
+      jobTitle: application.jobTitle,
+      department: application.department,
+      fullName: application.fullName,
+      email: application.email,
+      phone: application.phone,
+      experience: application.experience,
+      currentCompany: application.currentCompany || '',
+      portfolioUrl: application.portfolioUrl || '',
+      linkedinUrl: application.linkedinUrl || '',
+      resumeUrl: application.resumeUrl || '',
+      coverNote: application.coverNote || '',
+      status: application.status || 'PENDING',
+      notes: application.notes || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.data.jobApplications.unshift(record);
+    await this.persist();
+    return record;
+  }
+
+  async updateJobApplication(
+    id: string,
+    updates: Partial<JobApplication>
+  ): Promise<JobApplication | null> {
+    if (!this.data.jobApplications) return null;
+    const index = this.data.jobApplications.findIndex((j) => j.id === id);
+    if (index === -1) return null;
+
+    this.data.jobApplications[index] = {
+      ...this.data.jobApplications[index],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await this.persist();
+    return this.data.jobApplications[index];
+  }
+
+  async deleteJobApplication(id: string): Promise<boolean> {
+    if (!this.data.jobApplications) return false;
+    const initialLen = this.data.jobApplications.length;
+    this.data.jobApplications = this.data.jobApplications.filter((j) => j.id !== id);
+    if (this.data.jobApplications.length !== initialLen) {
+      await this.persist();
+      return true;
+    }
+    return false;
+  }
+
 }
 
 export const db = new DatabaseService();

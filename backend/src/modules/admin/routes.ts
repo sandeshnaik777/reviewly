@@ -346,6 +346,48 @@ adminRouter.patch(
   }
 );
 
+
+// List all job applications
+adminRouter.get('/job-applications', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const list = await db.listJobApplications();
+    res.json({ success: true, data: list });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Update job application status & notes
+adminRouter.put(
+  '/job-applications/:id',
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id as string;
+      const updated = await db.updateJobApplication(id, req.body);
+      if (!updated) {
+        throw new AppError('Job application not found', 404, 'NOT_FOUND');
+      }
+      res.json({ success: true, data: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Delete job application
+adminRouter.delete('/job-applications/:id', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params.id as string;
+    const deleted = await db.deleteJobApplication(id);
+    if (!deleted) {
+      throw new AppError('Job application not found', 404, 'NOT_FOUND');
+    }
+    res.json({ success: true, message: 'Job application deleted successfully' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // List all blog posts
 adminRouter.get('/blogs', async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {

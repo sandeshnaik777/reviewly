@@ -238,5 +238,15 @@ export const api = {
     apiRequest(`/admin/api-keys/${id}/test`, { method: 'POST' }),
   testRawApiKey: (data: { service: string; keyValue: string; secondaryValue?: string }) =>
     apiRequest('/admin/api-keys/test-raw', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Careers & Job Applications
+  getOpenJobs: () => apiRequest('/careers/jobs'),
+  submitJobApplication: (data: any) =>
+    apiRequest('/careers/apply', { method: 'POST', body: JSON.stringify(data) }),
+  getAdminJobApplications: () => apiRequest('/admin/job-applications'),
+  updateAdminJobApplication: (id: string, data: any) =>
+    apiRequest(`/admin/job-applications/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteAdminJobApplication: (id: string) =>
+    apiRequest(`/admin/job-applications/${id}`, { method: 'DELETE' }),
 };
 
