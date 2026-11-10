@@ -30,6 +30,7 @@ import {
   BlogPost,
   SystemApiKey,
   ApiKeyServiceType,
+  JobApplication,
 } from '../types/index.js';
 import { getDefaultQuestionsForCategory } from '../modules/business/categories.js';
 import { DEFAULT_BLOGS } from './blogs.js';
@@ -626,13 +627,13 @@ class DatabaseService {
     }
 
     // Remove associated questions
-    if (this.data.questions) {
-      this.data.questions = this.data.questions.filter((q) => !ownedBusinessIds.has(q.businessId));
+    if (this.data.businessQuestions) {
+      this.data.businessQuestions = this.data.businessQuestions.filter((q) => !ownedBusinessIds.has(q.businessId));
     }
 
     // Remove associated settings
-    if (this.data.settings) {
-      this.data.settings = this.data.settings.filter((s) => !ownedBusinessIds.has(s.businessId));
+    if (this.data.businessSettings) {
+      this.data.businessSettings = this.data.businessSettings.filter((s) => !ownedBusinessIds.has(s.businessId));
     }
 
     this.rebuildIndexes();

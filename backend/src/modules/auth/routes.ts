@@ -965,8 +965,8 @@ authRouter.delete('/account', authenticate, async (req: AuthenticatedRequest, re
 
     res.clearCookie(config.jwt.cookieName, {
       httpOnly: true,
-      secure: config.env === 'production',
-      sameSite: config.env === 'production' ? 'none' : 'lax',
+      secure: config.isProduction,
+      sameSite: config.isProduction ? 'none' : 'lax',
       path: '/',
     });
 
