@@ -140,6 +140,8 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
   const [togglingAutoRenew, setTogglingAutoRenew] = useState(false);
   const [copiedTxnId, setCopiedTxnId] = useState<string | null>(null);
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const handlePrintStand = (_qr?: any) => window.print();
 
   // Reputation & Shield Controls
   const [shieldStrictness, setShieldStrictness] = useState<'standard' | 'strict'>('standard');
@@ -1925,7 +1927,7 @@ export const BusinessDashboard: React.FC<Props> = ({ businessId, initialBusiness
 
                       <button
                         type="button"
-                        onClick={() => openQRDesignStudio(qrs[0])}
+                        onClick={() => handleOpenQRDesignStudio(qrs[0])}
                         className="btn btn-outline"
                         style={{
                           fontSize: '12.5px',

@@ -287,12 +287,12 @@ export const SparklesIcon: React.FC<{ size?: number; color?: string }> = ({ size
 );
 
 // Clean Star Vector Icon
-export const StarIcon: React.FC<{ size?: number; filled?: boolean }> = ({ size = 18, filled = true }) => (
+export const StarIcon: React.FC<{ size?: number; filled?: boolean; color?: string }> = ({ size = 18, filled = true, color }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill={filled ? '#d97706' : '#d1c7c2'}
+    fill={filled ? (color || '#d97706') : '#d1c7c2'}
     xmlns="http://www.w3.org/2000/svg"
     style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
   >

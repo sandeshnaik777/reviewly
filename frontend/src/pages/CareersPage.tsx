@@ -9,7 +9,6 @@ import {
   X,
   ExternalLink,
   FileText,
-  Linkedin,
   Globe,
   Phone,
   Mail,
